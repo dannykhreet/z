@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<popup:SfPopup
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:popup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    x:Class="EZGO.Maui.Controls.Popup.SkipAllTasksPopup"
+    MinimumHeightRequest="300"
+    ShowFooter="True"
+    WidthRequest="500"
+    FooterHeight="80" 
+    HeaderHeight="45"
+    x:Name="skipAllTasksPopup">
+    <popup:SfPopup.HeaderTemplate>
+        <DataTemplate>
+            <StackLayout Padding="20,8,20,0">
+                <Label
+                   x:Name="HeaderLabel"
+                   Text="{classes:Translate BASE_TEXT_CONFIRMATION}" 
+                   FontSize="Medium"
+                   FontFamily="{StaticResource RobotoRegular}"
+                   HorizontalTextAlignment="Start"
+                   VerticalTextAlignment="Start"/>
+            </StackLayout>
+        </DataTemplate>
+    </popup:SfPopup.HeaderTemplate>
+
+    <!-- Content -->
+    <popup:SfPopup.ContentTemplate>
+        <DataTemplate>
+            <StackLayout Padding="20,0,20,0">
+                <Label Text="{classes:Translate CONFIRMATION_OF_SKIP_ALL_TASKS}"
+                       FontSize="Medium"
+                       FontFamily="{StaticResource RobotoRegular}"
+                       HorizontalTextAlignment="Start"
+                       VerticalTextAlignment="Start"/>
+                <StackLayout Padding="0,20,0,0">
+                    <Label
+                        Text="{classes:Translate REASON_TO_SKIP_ALL_TASKS}"/>
+                    <Editor
+                        x:Name="InputEntry"
+                        Text="{Binding InputText, Source={x:Reference skipAllTasksPopup}}"
+                        HeightRequest="100"
+                        AutoSize="TextChanges"
+                        BackgroundColor="{StaticResource LightGreyColor}"
+                        Placeholder="{classes:Translate PLACEHOLDER_FOR_SKIP_ALL_TASKS_REASON}"
+                        />
+                </StackLayout>
+            </StackLayout>
+        </DataTemplate>
+    </popup:SfPopup.ContentTemplate>
+
+
+    <!-- Footer -->
+    <popup:SfPopup.FooterTemplate>
+        <DataTemplate>
+            <Grid                
+                  Padding="20, 20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5*" />
+                    <ColumnDefinition Width="5*" />
+                    <ColumnDefinition Width="5*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Cancel button -->
+                <buttons:SfButton
+                    Grid.Column="0"
+                    CornerRadius="3"
+                    Background="{StaticResource DarkerGreyColor}"
+                    Text="{Binding CancelButtonText, Source={x:Reference skipAllTasksPopup}}"
+                    TextColor="Black"
+                    Command="{Binding CancelButtonCommand, Source={x:Reference skipAllTasksPopup}}" />
+
+                <!-- Keep button -->
+                <buttons:SfButton
+                    Grid.Column="2"
+                    CornerRadius="3"
+                    Text="{Binding SubmitButtonText, Source={x:Reference skipAllTasksPopup}}"
+                    Background="{StaticResource GreenColor}"
+                    Command="{Binding SubmitButtonCommand, Source={x:Reference skipAllTasksPopup}}"
+                    IsVisible="{Binding IsInputValid, Source={x:Reference skipAllTasksPopup}}"/>
+            </Grid>
+        </DataTemplate>
+    </popup:SfPopup.FooterTemplate>
+</popup:SfPopup>
+

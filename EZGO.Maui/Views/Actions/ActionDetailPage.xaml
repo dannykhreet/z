@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EZGO.Maui.Views.Actions.ActionDetailPage"
+             x:Name="Page"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             ios:Page.UseSafeArea="true"
+             xmlns:viewmodels="clr-namespace:EZGO.Maui.Core.ViewModels;assembly=EZGO.Maui.Core"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             xmlns:panCardView="clr-namespace:PanCardView;assembly=PanCardView"
+             x:DataType="viewmodels:ActionDetailViewModel"
+             xmlns:settings="clr-namespace:EZGO.Maui.Core.Classes;assembly=EZGO.Maui.Core"
+             xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+             xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+             xmlns:processors="clr-namespace:PanCardView.Processors;assembly=PanCardView"
+             xmlns:classes1="clr-namespace:EZGO.Maui.Core.Classes;assembly=EZGO.Maui.Core"
+             NavigationPage.HasNavigationBar="false"
+             NavigationPage.HasBackButton="True"
+             Title="ActionDetailPage">
+    <ContentPage.Content>
+
+        <Grid BackgroundColor="{StaticResource DarkGreyColor}">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Carousel -->
+            <StackLayout Grid.Row="0" Grid.RowSpan="2">
+
+                <panCardView:CoverFlowView
+                    Margin="0"
+                    IsRightToLeftFlowDirectionEnabled="{Binding Source={x:Static settings:Settings.IsRightToLeftLanguage}}"
+                    HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"
+                    ItemsSource="{Binding MediaItems}"
+                    PositionShiftValue="0" IsCyclical="False"
+                    SelectedItem="{Binding SelectedMediaItem}"
+                    SelectedIndex="{Binding CurrentIndex}"
+                    SwipeThresholdDistance="70"
+                    IsPanInteractionEnabled="{Binding IsZooming, Converter={StaticResource ReverseBooleanConverter}}">
+                    <x:Arguments>
+                        <processors:CoverFlowProcessor ScaleFactor="0.85" OpacityFactor="0" />
+                    </x:Arguments>
+                    <panCardView:CoverFlowView.ItemTemplate>
+                        <DataTemplate x:DataType="classes1:MediaItem">
+                            <Grid>
+                                <!-- Picture -->
+                                <controls:PinchToZoomContainer IsZooming="{Binding BindingContext.IsZooming, Source={x:Reference Page}}" IsVisible="{Binding IsVideo, Converter={StaticResource ReverseBooleanConverter}}">
+
+                                    <controls:PinchToZoomContainer.Content>
+                                        <controls:CustomImage
+                                            IsLocalFile="{Binding IsLocalFile}"
+                                            ImageUrl="{Binding PictureUrl}"
+                                            Aspect="AspectFit" DownsampleToViewSize="False" />
+                                    </controls:PinchToZoomContainer.Content>
+                                </controls:PinchToZoomContainer>
+
+                                <!-- Or a video -->
+                                <controls:CustomVideoView IsVisible="{Binding IsVideo}" />
+                            </Grid>
+                        </DataTemplate>
+                    </panCardView:CoverFlowView.ItemTemplate>
+                </panCardView:CoverFlowView>
+
+            </StackLayout>
+
+            <StackLayout Grid.Row="0">
+                <buttons:SfButton
+                    Margin="20,0,0,0"
+                    Background="{StaticResource GreyColor}"
+                    WidthRequest="40" HeightRequest="40" CornerRadius="10"
+                    Command="{Binding BindingContext.CancelCommand, Source={x:Reference Page}}"
+                    HorizontalOptions="Start" VerticalOptions="CenterAndExpand">
+                    <buttons:SfButton.Content>
+                        <DataTemplate>
+                        <Label
+                            x:Name="BackButton"
+                            Text="{x:Static classes:IconFont.ChevronLeft}"
+                            StyleClass="fontButton, fs-42, fc-darkgrey"
+                            FontFamily="{StaticResource MaterialFontFamily}"
+                            VerticalTextAlignment="Center" HorizontalTextAlignment="Center" />
+                        </DataTemplate>
+                    </buttons:SfButton.Content>
+                </buttons:SfButton>
+
+            </StackLayout>
+
+        </Grid>
+
+    </ContentPage.Content>
+</ContentPage>

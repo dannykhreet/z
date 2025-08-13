@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Areas.WorkAreaPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:appBars="clr-namespace:EZGO.Maui.Controls.AppBars"
+    xmlns:busyindicator="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes;assembly=EZGO.Maui"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:converter="clr-namespace:EZGO.Maui.Core.Converter;assembly=EZGO.Maui.Core"
+    xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons"
+    xmlns:viewModels="clr-namespace:EZGO.Maui.Core.ViewModels;assembly=EZGO.Maui.Core"
+    xmlns:workAreaCt="clr-namespace:EZGO.Maui.Controls.WorkAreas"
+    x:Name="Page"
+    Title="WorkAreaPage"
+    x:DataType="viewModels:WorkAreaViewModel"
+    NavigationPage.HasNavigationBar="False">
+    <ContentPage.Resources>
+        <Style Class="bg-dbc" TargetType="Grid">
+            <Setter Property="BackgroundColor" Value="{StaticResource DarkBlueColor}" />
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="HorizontalOptions" Value="CenterAndExpand" />
+            <Setter Property="VerticalOptions" Value="CenterAndExpand" />
+        </Style>
+        <converter:ReverseBooleanConverter x:Key="ReverseBooleanConverter" />
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+        <Grid
+            x:Name="WorkAreaContent"
+            BackgroundColor="White"
+            HorizontalOptions="FillAndExpand"
+            VerticalOptions="FillAndExpand">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="80" />
+            </Grid.RowDefinitions>
+            <!--  header  -->
+            <appBars:AppBarWithUser
+                x:Name="Header"
+                Title="{classes:Translate AREA_SELECTION_SCREEN_TITLE}"
+                Grid.Row="0"
+                PopupCommand="{Binding PopupCommand}"
+                QRButtonCommand="{Binding QRButtonCommand}" />
+
+            <!--  Work Areas Grids  -->
+            <workAreaCt:AreasGridControl
+                x:Name="AreaGrid"
+                Grid.Row="1"
+                IsRefreshing="{Binding IsRefreshing}"
+                IsVisible="{Binding HasItems}"
+                Items="{Binding WorkAreas}"
+                RefreshCommand="{Binding RefreshCommand}"
+                SelectWorkAreaCommand="{Binding SelectWorkAreaCommand}" />
+
+            <!--  switch and continue area  -->
+            <Grid
+                x:Name="Fotter"
+                Grid.Row="2"
+                BackgroundColor="{StaticResource WhiteColor}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="3*" />
+                </Grid.ColumnDefinitions>
+
+                <StackLayout
+                    Grid.Column="0"
+                    Padding="25,0"
+                    IsVisible="{Binding ChooseAreaOnly, Converter={StaticResource ReverseBooleanConverter}}"
+                    Orientation="Horizontal">
+
+                    <Label
+                        Padding="0,0,10,0"
+                        HorizontalOptions="Start"
+                        Text="{classes:Translate AREAS_PRELOAD_MEDIA_TITLE}"
+                        TextColor="{StaticResource DarkerGreyColor}"
+                        VerticalOptions="Center" />
+                    <buttons:SfSwitch
+                        HorizontalOptions="StartAndExpand"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource ReverseBooleanConverter}}"
+                        IsOn="{Binding DownloadMedia}">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="On">
+                                    <VisualState.Setters>
+                                        <Setter Property="SwitchSettings">
+                                            <Setter.Value>
+                                                <buttons:SwitchSettings
+                                                    ThumbBackground="{StaticResource WhiteColor}"
+                                                    ThumbStroke="{StaticResource WhiteColor}"
+                                                    TrackBackground="{StaticResource GreenColor}"
+                                                    TrackStroke="{StaticResource DarkerGreyColor}" />
+                                            </Setter.Value>
+                                        </Setter>
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Off">
+                                    <VisualState.Setters>
+                                        <Setter Property="SwitchSettings">
+                                            <Setter.Value>
+                                                <buttons:SwitchSettings
+                                                    ThumbBackground="{StaticResource WhiteColor}"
+                                                    ThumbStroke="{StaticResource WhiteColor}"
+                                                    TrackBackground="{StaticResource LightGreyColor}"
+                                                    TrackStroke="{StaticResource DarkerGreyColor}" />
+                                            </Setter.Value>
+                                        </Setter>
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </buttons:SfSwitch>
+
+                </StackLayout>
+
+                <StackLayout
+                    Grid.Column="1"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand">
+                    <customButtons:SubmitMauiButton
+                        Background="{StaticResource GreenColor}"
+                        ButtonText="{classes:Translate AREA_SELECTION_CONTINUE_BUTTON_TITLE}"
+                        Clicked="{Binding ContinueButtonCommand}"
+                        HeightRequest="40"
+                        HorizontalOptions="CenterAndExpand"
+                        IsLoading="{Binding IsBusy}"
+                        IsVisible="{Binding IsAreaSelected}"
+                        LoadingIndicatorSize="1"
+                        TextSize="Medium"
+                        VerticalOptions="CenterAndExpand"
+                        WidthRequest="150" />
+                </StackLayout>
+
+                <StackLayout
+                    Grid.Column="2"
+                    Padding="0,0,25,0"
+                    Spacing="0">
+                    <Label
+                        FontSize="10"
+                        HorizontalOptions="EndAndExpand"
+                        IsVisible="{Binding NetworkTimeIsVisible}"
+                        Text="{Binding NetworkTime}"
+                        TextColor="{StaticResource DarkerGreyColor}" />
+                </StackLayout>
+
+            </Grid>
+
+            <controls:MessageCenter Grid.Row="1" />
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

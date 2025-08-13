@@ -1,0 +1,599 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Checklists.IncompleteChecklistsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:images="clr-namespace:EZGO.Maui.Controls.Images"
+    xmlns:button="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:statusBar="clr-namespace:EZGO.Maui.Controls.ProgressBar"
+    xmlns:gauge="clr-namespace:Syncfusion.Maui.Gauges;assembly=Syncfusion.Maui.Gauges"
+    xmlns:popups="clr-namespace:EZGO.Maui.Controls.Popup"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons"
+    xmlns:partial="clr-namespace:EZGO.Maui.Views.Partial"
+    xmlns:pulltoRefresh="clr-namespace:Syncfusion.Maui.PullToRefresh;assembly=Syncfusion.Maui.PullToRefresh"
+    xmlns:listview="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    xmlns:models="clr-namespace:EZGO.Maui.Core.Models.Checklists;assembly=EZGO.Maui.Core"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime"
+    x:Name="Page"
+    Title="Checklists"
+    ios:Page.UseSafeArea="True"
+    IsEnabled="{Binding IsInitialized}"
+    NavigationPage.HasBackButton="True"
+    NavigationPage.HasNavigationBar="false">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <DataTemplate x:Key="GridTemplate" x:DataType="models:ChecklistModel">
+                <Grid BackgroundColor="{StaticResource DarkBlueColor}">
+                    <Grid CompressedLayout.IsHeadless="True">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="25*" />
+                            <RowDefinition Height="75*" />
+                        </Grid.RowDefinitions>
+                        <!--  Background Image  -->
+                        <controls:CustomImageOnline
+                            Grid.RowSpan="3"
+                            Aspect="Fill"
+                            ImageUrl="{Binding Picture}"
+                            Opacity="0.2" />
+                        <!--  Start new checklist  -->
+                        <Grid
+                            Grid.RowSpan="3"
+                            HorizontalOptions="Fill"
+                            IsVisible="False"
+                            VerticalOptions="Fill">
+                            <Grid.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding Id}"
+                                    TargetType="Grid"
+                                    Value="-1">
+                                    <Setter Property="IsVisible" Value="True" />
+                                </DataTrigger>
+                            </Grid.Triggers>
+                            <BoxView Opacity="0.75" Color="{StaticResource DarkBlueColor}" />
+                            <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="20"
+                                    HorizontalTextAlignment="Center"
+                                    Text="{classes:Translate CHECKLIST_START_NEW}"
+                                    TextColor="{StaticResource WhiteColor}"
+                                    VerticalTextAlignment="Center" />
+                                <Label
+                                    Margin="0,10,0,0"
+                                    FontAttributes="Bold"
+                                    FontFamily="FAR"
+                                    FontSize="30"
+                                    HorizontalTextAlignment="Center"
+                                    Text="circle-plus"
+                                    TextColor="{StaticResource GreenColor}"
+                                    VerticalTextAlignment="Center" />
+                            </StackLayout>
+                        </Grid>
+                        <!--  Users involved  -->
+                        <images:UserImageList
+                            Grid.Row="0"
+                            Margin="0,0,0,0"
+                            HorizontalOptions="End"
+                            ItemsSourceChangeCachingStrategy="ClearItems"
+                            UserIds="{Binding EditedByUsersId}"
+                            VerticalOptions="Fill" />
+                        <!--  Saved checklist details  -->
+                        <Grid
+                            Grid.Row="1"
+                            Grid.RowSpan="2"
+                            BackgroundColor="White"
+                            HorizontalOptions="Fill"
+                            IsVisible="True"
+                            VerticalOptions="Fill">
+                            <Grid.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding Id}"
+                                    TargetType="Grid"
+                                    Value="-1">
+                                    <Setter Property="IsVisible" Value="False" />
+                                </DataTrigger>
+                            </Grid.Triggers>
+                            <Grid Margin="20,0,20,10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="22*" />
+                                    <RowDefinition Height="61*" />
+                                    <RowDefinition Height="17*" />
+                                </Grid.RowDefinitions>
+                                <!--  Delete button  -->
+                                <button:SfButton
+                                    Grid.Row="0"
+                                    Margin="0,0,-20,0"
+                                    Background="Transparent"
+                                    HorizontalOptions="End"
+                                    WidthRequest="60"
+                                    VerticalOptions="Fill"
+                                    Command="{Binding BindingContext.OpenDeleteChecklsitPopupCommand, Source={x:Reference Page}}"
+                                    CommandParameter="{Binding .}"
+                                    Clicked="SfButton_Clicked"
+                                    IsVisible="{Binding BindingContext.CanDeleteChecklist, Source={x:Reference Page}}">
+                                    <button:SfButton.Content>
+                                        <DataTemplate>
+                                            <Label
+                                                Margin="0,0,20,0"
+                                                FontFamily="FAR"
+                                                FontSize="20"
+                                                HorizontalOptions="End"
+                                                Text="trash"
+                                                TextColor="Black"
+                                                VerticalOptions="Center" />
+                                        </DataTemplate>
+                                    </button:SfButton.Content>
+                                </button:SfButton>
+                                <Grid Grid.Row="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="0.5*" />
+                                        <RowDefinition Height="0.5*" />
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0" RowSpacing="20">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="30" />
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Label
+                                            Grid.Column="0"
+                                            FontFamily="FAR"
+                                            FontSize="27"
+                                            HorizontalTextAlignment="Start"
+                                            Text="square-list"
+                                            VerticalTextAlignment="Center" />
+                                        <!--  Participant picture  -->
+                                        <images:RoundUserImage
+                                            Grid.Column="1"
+                                            HorizontalOptions="Start"
+                                            UserId="{Binding CreatedById}" />
+                                        <!--  Started by info  -->
+                                        <Label
+                                            Grid.Column="2"
+                                            HorizontalTextAlignment="Start"
+                                            VerticalTextAlignment="Center">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span FontSize="14" Text="{Binding LocalCreatedAt, Converter={StaticResource DateTimeShortMonthToStringConverter}}" />
+                                                    <Span Text="{x:Static system:Environment.NewLine}" />
+                                                    <Span Text="{classes:Translate TASK_DETAIL_MARKED_BY}" />
+                                                    <Span Text=" " />
+                                                    <Span FontAttributes="Bold" Text="{Binding CreatedBy}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </Grid>
+                                    <Grid Grid.Row="1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="30" />
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Label
+                                            Grid.Column="0"
+                                            FontFamily="FAR"
+                                            FontSize="27"
+                                            HorizontalTextAlignment="Start"
+                                            Text="calendar-pen"
+                                            VerticalTextAlignment="Center" />
+                                        <!--  Participant picture  -->
+                                        <images:RoundUserImage Grid.Column="1" UserId="{Binding ModifiedById}" />
+                                        <!--  Last change info  -->
+                                        <Label
+                                            Grid.Column="2"
+                                            HorizontalTextAlignment="Start"
+                                            VerticalTextAlignment="Center">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span FontSize="14" Text="{Binding LastChange, Converter={StaticResource DateTimeShortMonthToStringConverter}}" />
+                                                    <Span Text="{x:Static system:Environment.NewLine}" />
+                                                    <Span Text="{classes:Translate TASK_DETAIL_MARKED_BY}" />
+                                                    <Span Text=" " />
+                                                    <Span FontAttributes="Bold" Text="{Binding ModifiedBy}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </Grid>
+                                    <Grid.Triggers>
+                                        <DataTrigger
+                                            Binding="{Binding BindingContext.CanDeleteChecklist, Source={x:Reference Page}}"
+                                            TargetType="Grid"
+                                            Value="False">
+                                            <Setter Property="Grid.RowSpan" Value="2" />
+                                            <Setter Property="Grid.Row" Value="0" />
+                                        </DataTrigger>
+                                    </Grid.Triggers>
+                                </Grid>
+                                <Grid Grid.Row="2">
+                                    <statusBar:CustomLinearProgressBar
+                                        Margin="-20,-20,-20,0"
+                                        BarColor="{StaticResource GreenColor}"
+                                        BarHeight="20"
+                                        IsLabelVisible="False"
+                                        Score="{Binding PercentageFinished}"
+                                        VerticalOptions="Center" />
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+        <ResourceDictionary>
+            <DataTemplate x:Key="LinearTemplate" x:DataType="models:ChecklistModel">
+                <Grid>
+                    <Grid BackgroundColor="{StaticResource WhiteColor}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.5*" />
+                            <RowDefinition Height="0.5*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.13*" />
+                            <ColumnDefinition Width="0.2*" />
+                            <ColumnDefinition Width="0.17*" />
+                            <ColumnDefinition Width="0.2*" />
+                            <ColumnDefinition Width="0.16*" />
+                            <ColumnDefinition Width="0.04*" />
+                        </Grid.ColumnDefinitions>
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="6"
+                            BackgroundColor="{StaticResource GreyColor}"
+                            FontSize="Medium"
+                            HorizontalOptions="Fill"
+                            HorizontalTextAlignment="Center"
+                            Text="Ongoing"
+                            VerticalOptions="Fill"
+                            VerticalTextAlignment="Center" />
+                        <StackLayout
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Spacing="5"
+                            HorizontalOptions="Center"
+                            Orientation="Horizontal"
+                            VerticalOptions="Center">
+                            <Label
+                                FontFamily="FAR"
+                                FontSize="Medium"
+                                Text="user-group" />
+                            <Label FontSize="Medium" Text="Users" />
+                        </StackLayout>
+                        <StackLayout
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Spacing="5"
+                            HorizontalOptions="Center"
+                            Orientation="Horizontal"
+                            VerticalOptions="Center">
+                            <Label
+                                FontFamily="FAR"
+                                FontSize="Medium"
+                                Text="square-list" />
+                            <Label FontSize="Medium" Text="Started" />
+                        </StackLayout>
+                        <StackLayout
+                            Grid.Row="1"
+                            Grid.Column="3"
+                            Spacing="5"
+                            HorizontalOptions="Center"
+                            Orientation="Horizontal"
+                            VerticalOptions="Center">
+                            <Label
+                                FontFamily="FAR"
+                                FontSize="Medium"
+                                Text="user-pen" />
+                            <Label FontSize="Medium" Text="Last update" />
+                        </StackLayout>
+                        <StackLayout
+                            Grid.Row="1"
+                            Grid.Column="4"
+                            Spacing="5"
+                            HorizontalOptions="Center"
+                            Orientation="Horizontal"
+                            VerticalOptions="Center">
+                            <Label
+                                FontFamily="FAR"
+                                FontSize="Medium"
+                                Text="percent" />
+                            <Label FontSize="Medium" Text="Progress" />
+                            <StackLayout.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding BindingContext.CanDeleteChecklist, Source={x:Reference Page}}"
+                                    TargetType="StackLayout"
+                                    Value="False">
+                                    <Setter Property="Grid.ColumnSpan" Value="2" />
+                                </DataTrigger>
+                            </StackLayout.Triggers>
+                        </StackLayout>
+                        <Grid.Triggers>
+                            <DataTrigger
+                                Binding="{Binding Id}"
+                                TargetType="Grid"
+                                Value="-1">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </Grid.Triggers>
+                    </Grid>
+                    <Grid BackgroundColor="{Binding ., Converter={StaticResource IncompletedChecklistLinearIndexToColorConverter}, ConverterParameter={x:Reference Name=linearList}}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.2*" />
+                                <ColumnDefinition Width="0.25*" />
+                                <ColumnDefinition Width="0.15*" />
+                                <ColumnDefinition Width="0.2*" />
+                                <ColumnDefinition Width="0.12*" />
+                                <ColumnDefinition Width="0.08*" />
+                            </Grid.ColumnDefinitions>
+                            <!--  Users involved  -->
+                            <images:UserImageList
+                                Grid.Column="0"
+                                Margin="10,0,0,0"
+                                HorizontalOptions="Start"
+                                ItemsSourceChangeCachingStrategy="ClearItems"
+                                UserIds="{Binding EditedByUsersId}"
+                                VerticalOptions="Fill" />
+                            <!--  CreatedBy column  -->
+                            <Grid Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.3*" />
+                                    <ColumnDefinition Width="0.7*" />
+                                </Grid.ColumnDefinitions>
+                                <images:RoundUserImage Grid.Column="0" UserId="{Binding CreatedById}" />
+                                <Label
+                                    Grid.Column="1"
+                                    FontAttributes="Bold"
+                                    Text="{Binding ModifiedBy}"
+                                    VerticalOptions="CenterAndExpand">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span FontSize="15" Text="{Binding LocalCreatedAt, Converter={StaticResource DateTimeShortMonthToStringConverter}}" />
+                                            <Span Text="{x:Static system:Environment.NewLine}" />
+                                            <Span Text="{classes:Translate TASK_DETAIL_MARKED_BY}" />
+                                            <Span Text=" " />
+                                            <Span FontFamily="{StaticResource RobotoBold}" Text="{Binding CreatedBy}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </Grid>
+                            <!--  CreatedBy column  -->
+                            <StackLayout
+                                Grid.Column="3"
+                                Orientation="Horizontal"
+                                Spacing="10">
+                                <images:RoundUserImage
+                                    HorizontalOptions="Start"
+                                    UserId="{Binding ModifiedById}"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontAttributes="Bold"
+                                    Text="{Binding ModifiedBy}"
+                                    VerticalOptions="Center">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span FontSize="15" Text="{Binding LastChange, Converter={StaticResource DateTimeShortMonthToStringConverter}}" />
+                                            <Span Text="{x:Static system:Environment.NewLine}" />
+                                            <Span Text="{classes:Translate TASK_DETAIL_MARKED_BY}" />
+                                            <Span Text=" " />
+                                            <Span FontFamily="{StaticResource RobotoBold}" Text="{Binding ModifiedBy}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </StackLayout>
+                            <gauge:SfRadialGauge Grid.Column="4" Background="Transparent">
+                                <gauge:SfRadialGauge.Axes>
+                                    <gauge:RadialAxis
+                                        Interval="10"
+                                        RadiusFactor="0.95"
+                                        ShowLabels="False"
+                                        ShowTicks="False"
+                                        StartAngle="270"
+                                        EndAngle="270">
+                                        <gauge:RadialAxis.Ranges>
+                                            <gauge:RadialRange
+                                                EndValue="{Binding PercentageFinished}"
+                                                StartValue="0"
+                                                RangeOffset="1"
+                                                Fill="{StaticResource GreenColor}" />
+                                        </gauge:RadialAxis.Ranges>
+                                        <gauge:RadialAxis.Annotations>
+                                            <gauge:GaugeAnnotation>
+                                                <gauge:GaugeAnnotation.Content>
+                                                    <Label
+                                                        FontFamily="{StaticResource RobotoRegular}"
+                                                        FontSize="Small"
+                                                        HorizontalOptions="Center"
+                                                        Text="{Binding PercentageFinished, StringFormat='{0}%'}"
+                                                        TextColor="{StaticResource DarkGreyColor}" />
+                                                </gauge:GaugeAnnotation.Content>
+                                            </gauge:GaugeAnnotation>
+                                        </gauge:RadialAxis.Annotations>
+                                    </gauge:RadialAxis>
+                                </gauge:SfRadialGauge.Axes>
+                                <gauge:SfRadialGauge.Triggers>
+                                    <DataTrigger
+                                        Binding="{Binding BindingContext.CanDeleteChecklist, Source={x:Reference Page}}"
+                                        TargetType="gauge:SfRadialGauge"
+                                        Value="False">
+                                        <Setter Property="Grid.ColumnSpan" Value="2" />
+                                    </DataTrigger>
+                                </gauge:SfRadialGauge.Triggers>
+                            </gauge:SfRadialGauge>
+                            <!--  Delete button  -->
+                            <button:SfButton
+                                Grid.Column="5"
+                                Background="Transparent"
+                                Command="{Binding BindingContext.OpenDeleteChecklsitPopupCommand, Source={x:Reference Page}}"
+                                CommandParameter="{Binding .}"
+                                Clicked="SfButton_Clicked"
+                                FontFamily="FAR"
+                                FontSize="20"
+                                IsVisible="{Binding BindingContext.CanDeleteChecklist, Source={x:Reference Page}}"
+                                Text="trash"
+                                TextColor="Black" />
+                        </Grid>
+                        <Grid.Triggers>
+                            <DataTrigger
+                                Binding="{Binding Id}"
+                                TargetType="Grid"
+                                Value="-1">
+                                <Setter Property="IsVisible" Value="False" />
+                            </DataTrigger>
+                        </Grid.Triggers>
+                    </Grid>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <Grid ColumnSpacing="0" RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.127*" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <popups:DeleteIncompleteChecklistPopupView
+                x:Name="DeletePopup"
+                DeleteButtonCommand="{Binding DeleteIncompletedChecklsitCommand}"
+                CancelButtonCommand="{Binding CloseDeleteChecklsitPopupCommand}" />
+            <!--  Toolbar Menu  -->
+            <Grid CompressedLayout.IsHeadless="True" Style="{StaticResource HeaderStyle}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.098*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="0.15*" />
+                </Grid.ColumnDefinitions>
+                <!--  Cancel Button  -->
+                <customButtons:BackButton Grid.Column="0" Command="{Binding CancelCommand}" />
+                <!--  Title Label  -->
+                <Label
+                    Grid.Column="1"
+                    Margin="20,0,0,0"
+                    FontFamily="{StaticResource RobotoLight}"
+                    FontSize="30"
+                    StyleClass="title, fs-large, fc-darkgrey"
+                    Text="{Binding Name}"
+                    VerticalTextAlignment="Center" />
+                <!--  Change List Style Buttons  -->
+                <controls:LayoutSwitcher
+                    Grid.Column="2"
+                    Margin="0,10,0,0"
+                    HorizontalOptions="CenterAndExpand"
+                    ListLayout="{Binding ListViewLayout}"
+                    TapCommand="{Binding ListViewLayoutCommand}"
+                    VerticalOptions="Center" />
+            </Grid>
+            <Grid
+                x:Name="BottomRowGrid"
+                Grid.Row="1"
+                ColumnSpacing="0"
+                CompressedLayout.IsHeadless="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Name="MenuColumn" Width="0.098*" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <!--  Side menu  -->
+                <partial:MenuNewControl
+                    Grid.Column="0"
+                    StyleClass="bg-darkblue, fc-white"
+                    IsVisible="{Binding BindingContext.IsMenuVisible, Mode=OneWay, Source={x:Reference Page}}" />
+                <pulltoRefresh:SfPullToRefresh
+                    x:Name="pullToRefresh"
+                    Grid.Column="1"
+                    ProgressColor="#0003E8"
+                    IsRefreshing="{Binding IsRefreshing}"
+                    RefreshCommand="{Binding RefreshCommand}">
+                    <pulltoRefresh:SfPullToRefresh.PullableContent>
+                        <Grid>
+                            <!--  Grid list  -->
+                            <listview:SfListView
+                                BackgroundColor="{StaticResource BackgroundColor}"
+                                IsVisible="{Binding IsListVisible, Converter={StaticResource ReverseBooleanConverter}, FallbackValue=False}"
+                                ItemSize="220"
+                                ItemSpacing="10"
+                                ItemTemplate="{StaticResource GridTemplate}"
+                                ItemsSource="{Binding Checklists}"
+                                CachingStrategy="RecycleTemplate"
+                                SelectionMode="None"
+                                TapCommand="{Binding NavigateToChecklistCommand}">
+                                <listview:SfListView.ItemsLayout>
+                                    <listview:GridLayout SpanCount="3" />
+                                </listview:SfListView.ItemsLayout>
+                            </listview:SfListView>
+                            <!--  Linear list  -->
+                            <Grid
+                                x:Name="ListGrid"
+                                BackgroundColor="{StaticResource BackgroundColor}"
+                                IsVisible="{Binding IsListVisible}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="0.15*" />
+                                    <RowDefinition Height="0.85*" />
+                                </Grid.RowDefinitions>
+                                <button:SfButton
+                                    Grid.Row="0"
+                                    Margin="15"
+                                    CornerRadius="0"
+                                    Command="{Binding NavigateToNewChecklistCommand}">
+                                    <button:SfButton.Content>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <!--  Background Image  -->
+                                                <controls:CustomImageOnline
+                                                    Grid.RowSpan="3"
+                                                    Aspect="AspectFill"
+                                                    ImageUrl="{Binding Picture}" />
+                                                <BoxView
+                                                    Grid.RowSpan="3"
+                                                    BackgroundColor="{StaticResource DarkBlueColor}"
+                                                    Opacity="0.8" />
+                                                <StackLayout
+                                                    Grid.RowSpan="3"
+                                                    HorizontalOptions="FillAndExpand"
+                                                    Orientation="Horizontal">
+                                                    <Label
+                                                        Margin="30,0,0,0"
+                                                        FontFamily="{StaticResource RobotoBold}"
+                                                        FontSize="Large"
+                                                        Text="Start new checklist"
+                                                        TextColor="{StaticResource WhiteColor}"
+                                                        VerticalOptions="Center" />
+                                                    <Label
+                                                        Margin="0,0,30,0"
+                                                        FontFamily="FAR"
+                                                        FontSize="40"
+                                                        HorizontalOptions="EndAndExpand"
+                                                        Text="circle-plus"
+                                                        TextColor="{StaticResource GreenColor}"
+                                                        VerticalOptions="Center" />
+                                                </StackLayout>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </button:SfButton.Content>
+                                </button:SfButton>
+                                <listview:SfListView
+                                    x:Name="linearList"
+                                    Grid.Row="1"
+                                    Margin="15,0"
+                                    IsStickyHeader="True"
+                                    ItemSize="70"
+                                    ItemTemplate="{StaticResource LinearTemplate}"
+                                    ItemsSource="{Binding Checklists}"
+                                    TapCommand="{Binding NavigateToChecklistCommand}" />
+                            </Grid>
+
+                            <!--  Circular Progress Indicator  -->
+                            <statusBar:CustomCircularIndicator IsBusy="{Binding IsInitialized, Converter={StaticResource ReverseBooleanConverter}}" IsVisible="{Binding IsInitialized, Converter={StaticResource ReverseBooleanConverter}}" />
+
+                            <!--  Empty view  -->
+                            <controls:EmptyView IsVisible="{Binding HasItems, Converter={StaticResource ReverseBooleanConverter}}" />
+                        </Grid>
+                    </pulltoRefresh:SfPullToRefresh.PullableContent>
+                </pulltoRefresh:SfPullToRefresh>
+                <!--  Message Center  -->
+                <controls:MessageCenter Grid.Column="1" />
+            </Grid>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

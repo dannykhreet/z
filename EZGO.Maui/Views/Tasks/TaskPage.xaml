@@ -1,0 +1,216 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Tasks.TaskPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:enums="clr-namespace:EZGO.Maui.Core.Enumerations;assembly=EZGO.Maui.Core"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:partial="clr-namespace:EZGO.Maui.Views.Partial"
+    xmlns:pulltorefresh="clr-namespace:Syncfusion.Maui.PullToRefresh;assembly=Syncfusion.Maui.PullToRefresh"
+    xmlns:sfList="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    xmlns:viewModels="clr-namespace:EZGO.Maui.Core.ViewModels;assembly=EZGO.Maui.Core"
+    Title="TaskPage"
+    ios:Page.UseSafeArea="true"
+    x:DataType="viewModels:TaskViewModel"
+    IsEnabled="{Binding IsInitialized}"
+    NavigationPage.HasBackButton="True"
+    NavigationPage.HasNavigationBar="false">
+    <Grid ColumnSpacing="0" RowSpacing="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.127*" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <!--  Header  -->
+        <Grid
+            x:Name="HeaderControl"
+            ColumnSpacing="0"
+            RowSpacing="0"
+            StyleClass="header, bg-white, m-0, pr-15">
+
+            <Grid.ColumnDefinitions>
+                <!--  above left menu width = 120 else 160  -->
+                <ColumnDefinition Width="120" />
+                <ColumnDefinition Width="*" />
+                <!--  width depending on number of children  -->
+                <ColumnDefinition Width="200" />
+            </Grid.ColumnDefinitions>
+
+            <!--  All Tasks && Title  -->
+            <StackLayout
+                Grid.Column="1"
+                CompressedLayout.IsHeadless="True"
+                Orientation="Horizontal">
+
+                <!--  All Tasks Button  -->
+                <buttons:SfButton
+                    Margin="0"
+                    Padding="0,0"
+                    Background="Transparent"
+                    Command="{Binding NavigateToAllTasksCommand}"
+                    CornerRadius="5"
+                    FontSize="Small"
+                    HeightRequest="50"
+                    HorizontalOptions="Start"
+                    Stroke="{StaticResource GreenColor}"
+                    StrokeThickness="1"
+                    Text="{classes:Translate ALL_TASKS_BUTTON_TITLE}"
+                    TextColor="{StaticResource GreenColor}">
+                    <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Disabled">
+                                <VisualState.Setters>
+                                    <Setter Property="Background" Value="Transparent" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateManager.VisualStateGroups>
+                </buttons:SfButton>
+
+                <!--  Choose Tasks Label  -->
+                <Label
+                    FontFamily="{DynamicResource RobotoLight}"
+                    FontSize="Large"
+                    HorizontalOptions="CenterAndExpand"
+                    Text="{Binding Title}"
+                    VerticalOptions="CenterAndExpand" />
+            </StackLayout>
+        </Grid>
+
+        <Grid
+            Grid.Row="1"
+            ColumnSpacing="0"
+            CompressedLayout.IsHeadless="True">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="NavigationControl" Width="0.098*" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <!--  Side menu  -->
+            <partial:MenuNewControl Grid.Column="0" StyleClass="bg-darkblue, fc-white" />
+
+            <!--  Detail Page  -->
+            <pulltorefresh:SfPullToRefresh
+                Grid.Column="1"
+                ProgressColor="#0003E8"
+                BackgroundColor="{StaticResource BackgroundColor}"
+                IsRefreshing="{Binding IsRefreshing}"
+                PullingThreshold="100"
+                RefreshCommand="{Binding RefreshCommand}"
+                RefreshViewHeight="30"
+                RefreshViewThreshold="30"
+                RefreshViewWidth="30">
+
+                <pulltorefresh:SfPullToRefresh.PullableContent>
+
+                    <Grid
+                        x:Name="PullableGrid"
+                        Padding="15"
+                        CompressedLayout.IsHeadless="True"
+                        RowSpacing="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="{Binding ShiftBarGridLength}" />
+                            <RowDefinition Height="{Binding TodayBarGridLength}" />
+                            <RowDefinition Height="{Binding WeekBarGridLength}" />
+                            <RowDefinition Height="{Binding OverdueBarGridLength}" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!--  Shift Bar  -->
+                        <controls:TaskBars
+                            x:Name="ShiftBars"
+                            Grid.Row="0"
+                            BarIsVisible="{Binding ShiftBarIsVisible}"
+                            ReportItems="{Binding ReportItemsShift}"
+                            IsLoading="{Binding IsInitialized}"
+                            TapCommand="{Binding NavigateToTaskBarCommand}"
+                            TapCommandParamater="Shift"
+                            Text="{classes:Translate TASKS_SCREEN_SHIFT_FILTER_TEXT}" />
+
+                        <!--  Today Bar  -->
+                        <controls:TaskBars
+                            x:Name="TodayBars"
+                            Grid.Row="1"
+                            BarIsVisible="{Binding TodayBarIsVisible}"
+                            IsLoading="{Binding IsInitialized}"
+                            ReportItems="{Binding ReportItemsToday}"
+                            TapCommand="{Binding NavigateToTaskBarCommand}"
+                            TapCommandParamater="Today"
+                            Text="{classes:Translate CHOOSE_TASKS_TITLE_DAY}" />
+
+                        <!--  Week Bar  -->
+                        <controls:TaskBars
+                            x:Name="WeekBars"
+                            Grid.Row="2"
+                            BarIsVisible="{Binding WeekBarIsVisible}"
+                            ReportItems="{Binding ReportItemsWeek}"
+                            IsLoading="{Binding IsInitialized}"
+                            TapCommand="{Binding NavigateToTaskBarCommand}"
+                            TapCommandParamater="Week"
+                            Text="{classes:Translate CHOOSE_TASKS_TITLE_WEEK}" />
+
+                        <!--  Overdue Bar  -->
+                        <controls:TaskBars
+                            x:Name="OverdueBars"
+                            Grid.Row="3"
+                            BarIsVisible="{Binding OverdueBarIsVisible}"
+                            IsLoading="{Binding IsInitialized}"
+                            EmptyColor="{Binding OverdueEmptyColor}"
+                            ReportItems="{Binding ReportItemsOverDue}"
+                            TapCommand="{Binding NavigateToTaskBarCommand}"
+                            TapCommandParamater="OverDue"
+                            Text="{classes:Translate TASKS_SCREEN_SHIFT_OVERDUE_TEXT}" />
+
+                        <!--  Circle Gauges  -->
+                        <Grid
+                            x:Name="CircleGauges"
+                            Grid.Row="4"
+                            BackgroundColor="White">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.3*" />
+                                <ColumnDefinition Width="0.3*" />
+                                <ColumnDefinition Width="0.3*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!--  Previous Shift Gauge  -->
+                            <controls:TaskGauges
+                                Grid.Column="0"
+                                ReportItems="{Binding ReportItemsPreviousShift}"
+                                TapCommand="{Binding NavigateToCompletedTaskCommand}"
+                                TapCommandParameter="{x:Static enums:AggregationTimeInterval.Shift}"
+                                Text="{classes:Translate RECURRENCE_PREVIOUS_SHIFT_TITLE}" />
+
+                            <!--  Yesterday Shift Gauge  -->
+                            <controls:TaskGauges
+                                Grid.Column="1"
+                                ReportItems="{Binding ReportItemsYesterday}"
+                                TapCommand="{Binding NavigateToCompletedTaskCommand}"
+                                TapCommandParameter="{x:Static enums:AggregationTimeInterval.Day}"
+                                Text="{classes:Translate RECURRENCE_PREVIOUS_DAY_TITLE}" />
+
+                            <!--  Previous Week Shift Gauge  -->
+                            <controls:TaskGauges
+                                Grid.Column="2"
+                                ReportItems="{Binding ReportItemsPreviousWeek}"
+                                TapCommand="{Binding NavigateToCompletedTaskCommand}"
+                                TapCommandParameter="{x:Static enums:AggregationTimeInterval.Week}"
+                                Text="{classes:Translate RECURRENCE_PREVIOUS_WEEK_TITLE}" />
+
+                        </Grid>
+
+                        <!--  Empty list for fixing bug with app crashing when trying to refresh after going second time to task page  -->
+                        <sfList:SfListView IsVisible="False" />
+                    </Grid>
+                </pulltorefresh:SfPullToRefresh.PullableContent>
+            </pulltorefresh:SfPullToRefresh>
+
+            <!--  Message Center  -->
+            <controls:MessageCenter Grid.Column="1" />
+        </Grid>
+
+
+    </Grid>
+</ContentPage>

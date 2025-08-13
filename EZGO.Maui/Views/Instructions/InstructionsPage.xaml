@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Instructions.InstructionsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:button="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:models="clr-namespace:EZGO.Maui.Core.Models.Instructions;assembly=EZGO.Maui.Core"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:labels="clr-namespace:EZGO.Maui.Controls.CustomLabels"
+    xmlns:partial="clr-namespace:EZGO.Maui.Views.Partial"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:list="clr-namespace:EZGO.Maui.Controls.Lists"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:filters="clr-namespace:EZGO.Maui.Controls.Filters"
+    x:Name="Page"
+    Title="InstructionsPage"
+    ios:Page.UseSafeArea="True"
+    NavigationPage.HasBackButton="False"
+    NavigationPage.HasNavigationBar="false"
+    HideSoftInputOnTapped="True">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <DataTemplate x:Key="InstructionsTemplate" x:DataType="models:InstructionsModel">
+                <Grid Margin="0,0,0,10" HorizontalOptions="Fill">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="200" />
+                    </Grid.RowDefinitions>
+
+                    <!--  Background Image  -->
+                    <controls:CustomImageOnline
+                        Grid.Row="0"
+                        Grid.RowSpan="2"
+                        ImageUrl="{Binding Picture}"
+                        Aspect="Fill" />
+
+                    <!--  Overlay  -->
+                    <BoxView
+                        Grid.Row="0"
+                        Grid.RowSpan="2"
+                        BackgroundColor="{StaticResource DarkBlueColor}"
+                        Opacity="0.8" />
+
+                    <!--  ChecklistTemplate Title  -->
+                    <Label
+                        Margin="20"
+                        VerticalOptions="End"
+                        HorizontalOptions="Start"
+                        Text="{Binding Name}"
+                        FontSize="Large"
+                        TextColor="White" />
+
+                    <!--  Change  -->
+                    <Label
+                        Margin="10"
+                        Padding="10,5,10,5"
+                        BackgroundColor="{x:StaticResource GreenColor}"
+                        FontSize="Medium"
+                        HorizontalOptions="End"
+                        IsVisible="{Binding HasUnreadChanges}"
+                        Text="{classes:Translate BASE_TEXT_CHANGES}"
+                        TextColor="White"
+                        VerticalOptions="Start" />
+
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding BindingContext.NavigateToInstructionTaskTemplates, Source={x:Reference Page}}" CommandParameter="{Binding}" />
+                    </Grid.GestureRecognizers>
+
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+        <AbsoluteLayout AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="WidthProportional,HeightProportional">
+            <Grid AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="WidthProportional,HeightProportional">
+                <Grid.RowDefinitions>
+                    <!--  AppBar Row  -->
+                    <RowDefinition Height="0.127*" />
+                    <!--  Content Row  -->
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <!--  App Bar  -->
+                <Grid Grid.Row="0" Style="{StaticResource HeaderStyle}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.25*" />
+                        <ColumnDefinition Width="0.8*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!--  Title Label  -->
+                    <labels:TitleLabel
+                        Grid.Column="1"
+                        HorizontalTextAlignment="Start"
+                        Text="{Binding Title}"
+                        IsVisible="{Binding IsSearchBarVisible, Source={x:Reference ActionSearch}, Mode=TwoWay, Converter={StaticResource ReverseBooleanConverter}}" />
+                </Grid>
+
+                <!--  Content  -->
+                <Grid
+                    Grid.Row="1"
+                    CompressedLayout.IsHeadless="True"
+                    ColumnSpacing="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition x:Name="MenuColumn" Width="0.098*" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!--  Side menu  -->
+                    <partial:MenuNewControl
+                        Grid.RowSpan="2"
+                        Grid.Column="0"
+                        StyleClass="bg-darkblue, fc-white" />
+
+                    <!--  Selected tags list  -->
+                    <filters:SelectedTagsList
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        DeleteTagCommand="{Binding DeleteTagCommand}"
+                        Filter="{Binding InstructionsFilter}" />
+
+                    <!--  Instructions List  -->
+                    <RefreshView
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        IsRefreshing="{Binding IsRefreshing}"
+                        Command="{Binding RefreshCommand}">
+                        <CollectionView
+                            Margin="10,0,10,0"
+                            ItemTemplate="{StaticResource InstructionsTemplate}"
+                            ItemsSource="{Binding InstructionsFilter.FilteredList}">
+                            <CollectionView.ItemsLayout>
+                                <GridItemsLayout
+                                    Orientation="Vertical"
+                                    Span="3"
+                                    HorizontalItemSpacing="10" />
+                            </CollectionView.ItemsLayout>
+                        </CollectionView>
+                    </RefreshView>
+                </Grid>
+
+            </Grid>
+            <!--  Search Bar  -->
+            <controls:ExtSearchBar
+                x:Name="ActionSearch"
+                Grid.Column="0"
+                Margin="40,15,0,0"
+                Filter="{Binding InstructionsFilter}"
+                HasFilterIcon="True"
+                IsSearchBarVisible="{Binding IsSearchBarVisible}"
+                Text="{Binding InstructionsFilter.SearchText}"
+                TextChangedCommand="{Binding SearchTextChangedCommand}"
+                TextChangedDelay="550" />
+        </AbsoluteLayout>
+    </ContentPage.Content>
+</ContentPage>

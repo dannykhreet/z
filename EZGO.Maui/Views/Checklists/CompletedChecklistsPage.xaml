@@ -1,0 +1,501 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Checklists.CompletedChecklistsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewModels="clr-namespace:EZGO.Maui.Core.ViewModels;assembly=EZGO.Maui.Core"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:checklistmodels="clr-namespace:EZGO.Maui.Core.Models.Checklists;assembly=EZGO.Maui.Core"
+    xmlns:labels="clr-namespace:EZGO.Maui.Controls.CustomLabels"
+    xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons"
+    xmlns:pulltoRefresh="clr-namespace:Syncfusion.Maui.PullToRefresh;assembly=Syncfusion.Maui.PullToRefresh"
+    xmlns:syncfusion="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    xmlns:taskmodels="clr-namespace:EZGO.Maui.Core.Models.Tasks;assembly=EZGO.Maui.Core"
+    xmlns:sfaccordian="clr-namespace:Syncfusion.Maui.Accordion;assembly=Syncfusion.Maui.Expander"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes;assembly=EZGO.Maui"
+    xmlns:viewCells="clr-namespace:EZGO.Maui.Controls.ViewCells"
+    xmlns:openFields="clr-namespace:EZGO.Maui.Controls.ChecklistsOpenFields"
+    xmlns:progressbar="clr-namespace:EZGO.Maui.Controls.ProgressBar"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:images="clr-namespace:EZGO.Maui.Controls.Images"
+    xmlns:stages="clr-namespace:EZGO.Maui.Core.Models.Stages;assembly=EZGO.Maui.Core"
+    x:Name="Page"
+    Title="Completed Checklists"
+    ios:Page.UseSafeArea="true"
+    x:DataType="viewModels:CompletedChecklistsViewModel"
+    NavigationPage.HasNavigationBar="False"
+    NavigationPage.HasBackButton="True">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <DataTemplate x:Key="Signature">
+                <!--  Signatures  -->
+                <controls:CompletedSignature
+                    BackgroundColor="White"
+                    IsSignatureVisible="{Binding BindingContext.SelectedChecklist.IsSignatureRequired, Source={x:Reference Page}}"
+                    SelectedSignatures="{Binding BindingContext.SelectedChecklistSignatures, Source={x:Reference Page}}" />
+            </DataTemplate>
+            <DataTemplate x:Key="CompletedChecklistTemplate" x:DataType="checklistmodels:ChecklistModel">
+                <viewCells:CompletedTemplateViewCell />
+            </DataTemplate>
+            <DataTemplate x:Key="TaskTemplate" x:DataType="taskmodels:TasksTaskModel">
+                <viewCells:CompletedItemTemplateViewCell ActionsCommand="{Binding BindingContext.NavigateToActionsCommand, Source={x:Reference Page}}" TapStatusCommand="{Binding BindingContext.NavigateToPictureProofDetailsCommand, Source={x:Reference Page}}" />
+            </DataTemplate>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <Grid BackgroundColor="{StaticResource BackgroundColor}" RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <!--  Header  -->
+            <Grid Style="{StaticResource HeaderStyle}">
+                <Grid.ColumnDefinitions>
+                    <!--  above left menu width = 120 else 160  -->
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="*" />
+                    <!--  width depending on number of children  -->
+                    <ColumnDefinition Width="120" />
+                </Grid.ColumnDefinitions>
+                <!--  Back Button  -->
+                <customButtons:BackButton Grid.Column="0" />
+                <!--  Title  -->
+                <labels:TitleLabel
+                    Grid.Column="1"
+                    FontSize="30"
+                    Text="{classes:Translate COMPLETED_CHECKLISTS_SCREEN_TITLE}" />
+            </Grid>
+            <!--  Body  -->
+            <Grid
+                Grid.Row="1"
+                Margin="15"
+                ColumnSpacing="15"
+                RowSpacing="15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="1.9*" />
+                </Grid.ColumnDefinitions>
+                <!--  CompletedChecklistsList  -->
+                <pulltoRefresh:SfPullToRefresh
+                    x:Name="pullToRefresh"
+                    ProgressColor="#0003E8"
+                    IsRefreshing="{Binding IsRefreshing}"
+                    PullingThreshold="100"
+                    RefreshCommand="{Binding RefreshCommand}"
+                    RefreshViewHeight="30"
+                    RefreshViewThreshold="30"
+                    RefreshViewWidth="30"
+                    StyleClass="bg-lightgrey"
+                    VerticalOptions="Fill">
+                    <pulltoRefresh:SfPullToRefresh.PullableContent>
+                        <!--  Pullable Content  -->
+                        <syncfusion:SfListView
+                            x:Name="listView"
+                            BackgroundColor="White"
+                            SelectionMode="Single"
+                            IsLazyLoading="{Binding LoadMoreIsBusy}"
+                            ItemSize="140"
+                            ItemTemplate="{StaticResource CompletedChecklistTemplate}"
+                            ItemsSource="{Binding CompletedChecklists}"
+                            LoadMoreCommand="{Binding LoadMoreCommand}"
+                            LoadMoreOption="{Binding CanLoadMore, Converter={StaticResource BoolToLoadMoreOptionConverter}, ConverterParameter={x:Static syncfusion:LoadMoreOption.AutoOnScroll}}"
+                            LoadMorePosition="End"
+                            SelectedItem="{Binding SelectedChecklist}"
+                            SelectionBackground="LightGray"
+                            ItemSpacing="0"
+                            TapCommand="{Binding ChecklistSelectedCommand}" />
+                    </pulltoRefresh:SfPullToRefresh.PullableContent>
+                </pulltoRefresh:SfPullToRefresh>
+                <!--  Selected Item Content  -->
+                <Grid
+                    x:Name="SelectedItemContent"
+                    Grid.Column="1"
+                    RowSpacing="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="55" />
+                    </Grid.RowDefinitions>
+                    <!--  Tag list  -->
+                    <ScrollView
+                        Grid.Row="0"
+                        BackgroundColor="White"
+                        HeightRequest="70"
+                        IsVisible="{Binding ContainsTags}"
+                        Orientation="Horizontal">
+                        <controls:TagList
+                            Margin="20,0,0,0"
+                            BindableLayout.ItemsSource="{Binding SelectedChecklist.Tags}"
+                            Wrap="NoWrap" />
+                    </ScrollView>
+                    <!--  Checklist Tasks  -->
+                    <syncfusion:SfListView
+                        x:Name="checklistDetailList"
+                        Grid.Row="1"
+                        Padding="15,0"
+                        BackgroundColor="White"
+                        FooterSize="140"
+                        FooterTemplate="{StaticResource Signature}"
+                        HeaderSize="{Binding SelectedOpenFields.PropertyListHeight, Converter={StaticResource CompletedOpenFieldsConverter}, ConverterParameter=true}"
+                        HorizontalOptions="Fill"
+                        IsStickyFooter="True"
+                        IsVisible="{Binding Stages.HasStages, Converter={StaticResource ReverseBooleanConverter}}"
+                        ItemTemplate="{StaticResource TaskTemplate}"
+                        ItemsSource="{Binding SelectedChecklistTasks}"
+                        QueryItemSize="checklistDetailList_QueryItemSize"
+                        SelectionBackground="White"
+                        TapCommand="{Binding NavigateToDetailsCommand}">
+                        <syncfusion:SfListView.ItemsLayout>
+                            <syncfusion:GridLayout SpanCount="1" />
+                        </syncfusion:SfListView.ItemsLayout>
+                        <!--  Open Fields  -->
+                        <syncfusion:SfListView.HeaderTemplate>
+                            <DataTemplate>
+                                <openFields:OpenChecklistFields
+                                    Grid.Row="1"
+                                    IsCompleted="True"
+                                    ItemHeight="{Binding BindingContext.SelectedOpenFields.FieldHeight, Source={x:Reference Page}}"
+                                    PropertyList="{Binding BindingContext.SelectedOpenFields.PropertyList, Source={x:Reference Page}}"
+                                    SpanCount="1" />
+                            </DataTemplate>
+                        </syncfusion:SfListView.HeaderTemplate>
+                    </syncfusion:SfListView>
+                    <!--  Checklist Stage Tasks  -->
+                    <syncfusion:SfListView
+                        x:Name="checklistDetaiStagelList"
+                        Grid.Row="1"
+                        Padding="15,10"
+                        Background="White"
+                        FooterSize="140"
+                        FooterTemplate="{StaticResource Signature}"
+                        HeaderSize="{Binding SelectedOpenFields.PropertyListHeight, Converter={StaticResource CompletedOpenFieldsConverter}, ConverterParameter=true}"
+                        HorizontalOptions="Fill"
+                        IsStickyFooter="True"
+                        IsVisible="{Binding Stages.HasStages}"
+                        ItemSpacing="10"
+                        ItemsSource="{Binding Stages.Stages}"
+                        CachingStrategy="CreateNewTemplate"
+                        QueryItemSize="checklistDetaiStagelList_QueryItemSize"
+                        SelectionBackground="White">
+                        <!--  Open Fields  -->
+                        <syncfusion:SfListView.HeaderTemplate>
+                            <DataTemplate>
+                                <openFields:OpenChecklistFields
+                                    IsCompleted="True"
+                                    ItemHeight="{Binding BindingContext.SelectedOpenFields.FieldHeight, Source={x:Reference Page}}"
+                                    PropertyList="{Binding BindingContext.SelectedOpenFields.PropertyList, Source={x:Reference Page}}"
+                                    SpanCount="1" />
+                            </DataTemplate>
+                        </syncfusion:SfListView.HeaderTemplate>
+                        <syncfusion:SfListView.ItemTemplate>
+                            <DataTemplate x:DataType="stages:StageModel">
+                                <syncfusion:SfListView
+                                    AutoFitMode="DynamicHeight"
+                                    Background="{StaticResource LightGreenColor}"
+                                    IsScrollingEnabled="False"
+                                    ItemSpacing="3"
+                                    ItemTemplate="{StaticResource TaskTemplate}"
+                                    ItemsSource="{Binding Tasks}"
+                                    QueryItemSize="checklistDetailList_QueryItemSize"
+                                    SelectionMode="None"
+                                    TapCommand="{Binding BindingContext.NavigateToDetailsCommand, Source={x:Reference Page}}">
+                                    <syncfusion:SfListView.HeaderTemplate>
+                                        <DataTemplate>
+                                            <!--  Stage header  -->
+                                            <controls:StageHeader
+                                                VerticalOptions="Start"
+                                                IsVisible="{Binding IsHeaderVisible}"
+                                                IsLocked="False"
+                                                IsSigned="True"
+                                                StageName="{Binding Name}"
+                                                Tags="{Binding Tags}" />
+                                        </DataTemplate>
+                                    </syncfusion:SfListView.HeaderTemplate>
+                                    <syncfusion:SfListView.FooterTemplate>
+                                        <DataTemplate>
+                                            <StackLayout>
+                                                <sfaccordian:SfAccordion
+                                                    x:Name="FooterAccordion"
+                                                    x:DataType="stages:StageModel"
+                                                    AnimationEasing="None"
+                                                    ExpandMode="SingleOrNone"
+                                                    HeightRequest="110"
+                                                    IsVisible="{Binding HasNotesOrSignature}">
+                                                    <sfaccordian:AccordionItem
+                                                        HeaderBackground="{StaticResource WhiteColor}"
+                                                        HeaderIconColor="{StaticResource BlackColor}"
+                                                        IsExpanded="{Binding IsAccordionExpanded}"
+                                                        PropertyChanged="AccordionItem_PropertyChanged">
+                                                        <sfaccordian:AccordionItem.Header>
+                                                            <Grid
+                                                                ColumnSpacing="0"
+                                                                HeightRequest="110"
+                                                                HorizontalOptions="Fill"
+                                                                VerticalOptions="Fill">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="110" />
+                                                                    <ColumnDefinition Width="*" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <controls:CustomImage
+                                                                    Grid.Column="0"
+                                                                    Aspect="AspectFill"
+                                                                    IsLocalFile="True"
+                                                                    ImageUrl="sign.jpeg"
+                                                                    IsOpaque="True" />
+                                                                <BoxView
+                                                                    Grid.Column="0"
+                                                                    BackgroundColor="{StaticResource DarkBlueColor}"
+                                                                    Opacity="0.5" />
+                                                                <Label
+                                                                    x:Name="CheckIcon"
+                                                                    Grid.Column="0"
+                                                                    FontFamily="FAR"
+                                                                    FontSize="55"
+                                                                    HorizontalOptions="Center"
+                                                                    Text="check"
+                                                                    TextColor="{StaticResource GreenColor}"
+                                                                    VerticalOptions="Center" />
+                                                                <Grid
+                                                                    Grid.Column="1"
+                                                                    BackgroundColor="{StaticResource WhiteColor}"
+                                                                    HorizontalOptions="Fill">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="0.15*" />
+                                                                        <ColumnDefinition Width="*" />
+                                                                        <ColumnDefinition Width="Auto" />
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <images:UserImageList
+                                                                        Grid.Column="0"
+                                                                        HorizontalOptions="Center"
+                                                                        UserIds="{Binding SignedByUserIds}"
+                                                                        VerticalOptions="Fill" />
+                                                                    <Grid Grid.Column="1" ColumnSpacing="3">
+                                                                        <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="Auto" />
+                                                                            <ColumnDefinition Width="Auto" />
+                                                                            <ColumnDefinition Width="Auto" />
+                                                                            <ColumnDefinition Width="*" />
+                                                                        </Grid.ColumnDefinitions>
+
+                                                                        <Label
+                                                                            Grid.Column="0"
+                                                                            FontSize="15"
+                                                                            Text="{Binding LocalFirstSignedAt, Converter={StaticResource DateTimeToStringConverter}}"
+                                                                            VerticalOptions="Center" />
+                                                                        <Label
+                                                                            Grid.Column="1"
+                                                                            FontFamily="{StaticResource RobotoBold}"
+                                                                            Text="{Binding FirstSignature.SignedBy}"
+                                                                            VerticalOptions="Center" />
+                                                                        <Label
+                                                                            Grid.Column="2"
+                                                                            IsVisible="{Binding SecondSignature, Converter={StaticResource IsNullConverter}, ConverterParameter=False}"
+                                                                            LineBreakMode="NoWrap"
+                                                                            MaxLines="1"
+                                                                            Text="{classes:Translate BASE_TEXT_AND}"
+                                                                            VerticalOptions="Center" />
+                                                                        <Label
+                                                                            Grid.Column="3"
+                                                                            FontFamily="{StaticResource RobotoBold}"
+                                                                            IsVisible="{Binding SecondSignature, Converter={StaticResource IsNullConverter}, ConverterParameter=False}"
+                                                                            Text="{Binding SecondSignature.SignedBy}"
+                                                                            VerticalOptions="Center"
+                                                                            LineBreakMode="WordWrap"
+                                                                            Margin="5,0,0,0"
+                                                                            HorizontalOptions="FillAndExpand"
+                                                                            MaxLines="2" />
+                                                                    </Grid>
+
+                                                                    <Label
+                                                                        Grid.Column="2"
+                                                                        Margin="20,0,0,0"
+                                                                        FontFamily="FAS"
+                                                                        FontSize="20"
+                                                                        HorizontalOptions="End"
+                                                                        IsVisible="{Binding HasNotes}"
+                                                                        MinimumWidthRequest="30"
+                                                                        Text="calendar-lines-pen"
+                                                                        TextColor="{StaticResource GreenColor}"
+                                                                        VerticalOptions="Center" />
+                                                                </Grid>
+                                                            </Grid>
+                                                        </sfaccordian:AccordionItem.Header>
+                                                        <sfaccordian:AccordionItem.Content>
+                                                            <Grid
+                                                                x:Name="NotesAndSignatureGrid"
+                                                                BackgroundColor="White"
+                                                                IsVisible="{Binding HasNotesOrSignature}"
+                                                                RowSpacing="0">
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition Height="{Binding ShiftNotes, Converter={StaticResource StageNoteStringToHeightConverter}, ConverterParameter={x:Reference checklistDetaiStagelList}}" />
+                                                                    <RowDefinition Height="160" />
+                                                                </Grid.RowDefinitions>
+                                                                <Label
+                                                                    Grid.Row="0"
+                                                                    Padding="10,10,10,10"
+                                                                    FontSize="14"
+                                                                    VerticalOptions="Start"
+                                                                    FontFamily="{StaticResource RobotoRegular}"
+                                                                    Text="{Binding ShiftNotes}" />
+                                                                <controls:CompletedSignature
+                                                                    Grid.Row="1"
+                                                                    HeightRequest="160"
+                                                                    IsSignatureVisible="{Binding FirstSignature.SignatureImage, Converter={StaticResource IsNullConverter}, ConverterParameter=False}"
+                                                                    SelectedSignatures="{Binding SignaturesList}" />
+                                                            </Grid>
+                                                        </sfaccordian:AccordionItem.Content>
+                                                        <sfaccordian:AccordionItem.Triggers>
+                                                            <DataTrigger
+                                                                Binding="{Binding HasNotesOrSignature}"
+                                                                TargetType="sfaccordian:AccordionItem"
+                                                                Value="False">
+                                                                <Setter Property="HeaderIconColor" Value="Transparent" />
+                                                            </DataTrigger>
+                                                        </sfaccordian:AccordionItem.Triggers>
+                                                        <VisualStateManager.VisualStateGroups>
+                                                            <VisualStateGroupList>
+                                                                <VisualStateGroup>
+                                                                    <VisualState Name="Expanded">
+                                                                        <VisualState.Setters>
+                                                                            <Setter Property="HeaderBackground" Value="{StaticResource WhiteColor}" />
+                                                                            <Setter Property="HeaderIconColor" Value="Black" />
+                                                                        </VisualState.Setters>
+                                                                    </VisualState>
+                                                                    <VisualState Name="Collapsed">
+                                                                        <VisualState.Setters>
+                                                                            <Setter Property="HeaderBackground" Value="{StaticResource WhiteColor}" />
+                                                                            <Setter Property="HeaderIconColor" Value="Black" />
+                                                                        </VisualState.Setters>
+                                                                    </VisualState>
+                                                                    <VisualState Name="Focused">
+                                                                        <VisualState.Setters>
+                                                                            <Setter Property="HeaderBackground" Value="{StaticResource WhiteColor}" />
+                                                                            <Setter Property="HeaderIconColor" Value="Black" />
+                                                                        </VisualState.Setters>
+                                                                    </VisualState>
+                                                                    <VisualState Name="Normal">
+                                                                        <VisualState.Setters>
+                                                                            <Setter Property="HeaderBackground" Value="{StaticResource WhiteColor}" />
+                                                                            <Setter Property="HeaderIconColor" Value="Black" />
+                                                                        </VisualState.Setters>
+                                                                    </VisualState>
+                                                                </VisualStateGroup>
+                                                            </VisualStateGroupList>
+                                                        </VisualStateManager.VisualStateGroups>
+                                                    </sfaccordian:AccordionItem>
+                                                </sfaccordian:SfAccordion>
+                                                <Grid
+                                                    ColumnSpacing="0"
+                                                    HeightRequest="110"
+                                                    HorizontalOptions="Fill"
+                                                    VerticalOptions="Fill"
+                                                    IsVisible="{Binding HasNotesOrSignature, Converter={StaticResource ReverseBooleanConverter}}">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="110" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <controls:CustomImage
+                                                        Grid.Column="0"
+                                                        Aspect="AspectFill"
+                                                        IsLocalFile="True"
+                                                        ImageUrl="sign.jpeg"
+                                                        IsOpaque="True" />
+                                                    <BoxView
+                                                        Grid.Column="0"
+                                                        BackgroundColor="{StaticResource DarkBlueColor}"
+                                                        Opacity="0.5" />
+                                                    <Label
+                                                        x:Name="CheckIcon2"
+                                                        Grid.Column="0"
+                                                        FontFamily="FAR"
+                                                        FontSize="55"
+                                                        HorizontalOptions="Center"
+                                                        Text="check"
+                                                        TextColor="{StaticResource GreenColor}"
+                                                        VerticalOptions="Center" />
+                                                    <Grid
+                                                        Grid.Column="1"
+                                                        BackgroundColor="{StaticResource WhiteColor}"
+                                                        HorizontalOptions="Fill">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="0.15*" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="60" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <images:UserImageList
+                                                            Grid.Column="0"
+                                                            HorizontalOptions="Center"
+                                                            UserIds="{Binding SignedByUserIds}"
+                                                            VerticalOptions="Fill" />
+                                                        <StackLayout
+                                                            Grid.Column="1"
+                                                            Orientation="Horizontal"
+                                                            Spacing="3">
+                                                            <Label
+                                                                FontSize="15"
+                                                                Text="{Binding LocalFirstSignedAt, Converter={StaticResource DateTimeToStringConverter}}"
+                                                                VerticalOptions="Center" />
+                                                            <Label
+                                                                FontFamily="{StaticResource RobotoBold}"
+                                                                Text="{Binding FirstSignature.SignedBy}"
+                                                                VerticalOptions="Center" />
+                                                            <Label
+                                                                IsVisible="{Binding SecondSignature, Converter={StaticResource IsNullConverter}, ConverterParameter=False}"
+                                                                LineBreakMode="NoWrap"
+                                                                MaxLines="1"
+                                                                Text="{classes:Translate BASE_TEXT_AND}"
+                                                                VerticalOptions="Center" />
+                                                            <Label
+                                                                FontFamily="{StaticResource RobotoBold}"
+                                                                IsVisible="{Binding SecondSignature, Converter={StaticResource IsNullConverter}, ConverterParameter=False}"
+                                                                Text="{Binding SecondSignature.SignedBy}"
+                                                                VerticalOptions="Center" />
+                                                        </StackLayout>
+                                                        <Label
+                                                            Grid.Column="2"
+                                                            Margin="20,0,0,0"
+                                                            FontFamily="FAS"
+                                                            FontSize="20"
+                                                            HorizontalOptions="End"
+                                                            IsVisible="{Binding HasNotes}"
+                                                            MinimumWidthRequest="30"
+                                                            Text="calendar-lines-pen"
+                                                            TextColor="{StaticResource GreenColor}"
+                                                            VerticalOptions="Center" />
+                                                    </Grid>
+                                                </Grid>
+                                            </StackLayout>
+                                        </DataTemplate>
+                                    </syncfusion:SfListView.FooterTemplate>
+                                </syncfusion:SfListView>
+                            </DataTemplate>
+                        </syncfusion:SfListView.ItemTemplate>
+                    </syncfusion:SfListView>
+                    <!--  Generate PDF Button  -->
+                    <customButtons:SubmitMauiButton
+                        x:Name="PdfBtn"
+                        Grid.Row="2"
+                        Margin="0,15,0,0"
+                        ButtonText="{classes:Translate GENERAL_GENERATE_PDF_BUTTON_TITLE}"
+                        Clicked="{Binding GeneratePdfCommand}"
+                        HorizontalOptions="End"
+                        IsLoading="{Binding IsLoadingPdf}"
+                        IsVisible="{Binding HasItem}"
+                        WidthRequest="150" />
+                </Grid>
+                <!--  Empty Unselected Screen  -->
+                <Grid
+                    Grid.Column="1"
+                    BackgroundColor="White"
+                    IsVisible="{Binding SelectedChecklist, Converter={StaticResource IsNullConverter}}" />
+            </Grid>
+            <!--  Circular Progress Indicator  -->
+            <progressbar:CustomCircularIndicator
+                Grid.Row="1"
+                IsBusy="{Binding IsInitialized, Converter={StaticResource ReverseBooleanConverter}}"
+                IsVisible="{Binding IsInitialized, Converter={StaticResource ReverseBooleanConverter}}" />
+            <!--  Message Center  -->
+            <controls:MessageCenter Grid.Row="1" />
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,360 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Actions.ActionReportActionsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:busyindicator="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+    xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:enumerations="clr-namespace:EZGO.Maui.Core.Enumerations;assembly=EZGO.Maui.Core"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:viewmodels="clr-namespace:EZGO.Maui.Core.ViewModels;assembly=EZGO.Maui.Core"
+    xmlns:syncfusion="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:pulltoRefresh="clr-namespace:Syncfusion.Maui.PullToRefresh;assembly=Syncfusion.Maui.PullToRefresh"
+    xmlns:actions="clr-namespace:EZGO.Maui.Core.Models.Actions;assembly=EZGO.Maui.Core"
+    x:Name="Page"
+    Title="ActionReportActionsPage"
+    ios:Page.UseSafeArea="true"
+    NavigationPage.HasBackButton="True"
+    NavigationPage.HasNavigationBar="false">
+    <ContentPage.Content>
+
+        <Grid StyleClass="bg-lightgrey" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.127*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" StyleClass="header, bg-white, m-0, pr-15" RowSpacing="0" ColumnSpacing="0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="120"/>
+                </Grid.ColumnDefinitions>
+
+                <!--Back button -->
+                <StackLayout Grid.Column="0" StyleClass="column0" VerticalOptions="CenterAndExpand">
+                    <customButtons:BackButton Command="{Binding BindingContext.CancelCommand, Source={x:Reference Page}}" VerticalOptions="CenterAndExpand"/>
+                </StackLayout>
+
+                <!-- Title -->
+                <Label Grid.Column="1" Text="{Binding ReportActionTitle}" VerticalOptions="Center" FontFamily="{StaticResource RobotoLight}" FontSize="21"/>
+
+                <StackLayout StyleClass="column2, custom" Grid.Column="2" VerticalOptions="CenterAndExpand" HorizontalOptions="EndAndExpand" Orientation="Horizontal">
+
+                </StackLayout>
+
+            </Grid>
+
+            <Grid Grid.Row="1">
+
+                <Grid IsVisible="{Binding HasItems, Converter= {StaticResource ReverseBooleanConverter}}">
+                    <StackLayout HorizontalOptions="Center"  VerticalOptions="Center">
+                        <Image Source="nolcn.png" IsOpaque="True"/>
+                        <Label Text="{classes:Translate EMPTY_SCREEN_TEXT}" FontFamily="{StaticResource RobotoLight}" StyleClass="fs-22" />
+                    </StackLayout>
+                </Grid>
+
+                <pulltoRefresh:SfPullToRefresh
+                              x:Name="pullToRefresh"
+                              IsRefreshing="{Binding IsRefreshing}" 
+                              PullingThreshold="100"
+                              VerticalOptions="FillAndExpand"
+                              RefreshViewHeight="30"
+                              RefreshViewThreshold="30"
+                              RefreshViewWidth="30"
+                              RefreshCommand="{Binding RefreshCommand}">
+
+                    <pulltoRefresh:SfPullToRefresh.PullableContent>
+
+                        <syncfusion:SfListView
+                        ItemSize="110" ItemSpacing="10" Padding="10"
+                          CachingStrategy="CreateNewTemplate"
+                        ItemsSource="{Binding Actions}" IsVisible="{Binding HasItems}"
+                        TapCommand="{Binding NavigateToConversationCommand}">
+
+                            <syncfusion:SfListView.ItemTemplate>
+                                <DataTemplate x:DataType="actions:BasicActionsModel">
+
+                                    <Grid StyleClass="bg-white">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="120" />
+                                            <ColumnDefinition Width="8*" />
+                                            <ColumnDefinition Width="2*" />
+                                            <ColumnDefinition Width="5" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Grid IsVisible="{Binding HasImages}" Grid.Column="0">
+
+                                            <Grid IsVisible="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=1}">
+                                                <controls:CustomImage ImageUrl="{Binding Image1}"
+                                                                      Aspect="AspectFill"
+                                                                      DownsampleToViewSize="False"
+                                                                      DownsampleHeight="600"
+                                                                      DownsampleWidth="600" />
+                                            </Grid>
+
+                                            <Grid IsVisible="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=2}" RowSpacing="1" ColumnSpacing="1">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="50*"/>
+                                                    <ColumnDefinition Width="50*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <controls:CustomImage ImageUrl="{Binding Image1}"
+                                                                      Aspect="AspectFill"
+                                                                      DownsampleToViewSize="False"
+                                                                      DownsampleHeight="600"
+                                                                      DownsampleWidth="600" />
+                                                <controls:CustomImage ImageUrl="{Binding Image2}"
+                                                                      Aspect="AspectFill"
+                                                                      Grid.Column="1"
+                                                                      DownsampleToViewSize="False"
+                                                                      DownsampleHeight="600"
+                                                                      DownsampleWidth="600" />
+                                            </Grid>
+
+                                            <Grid IsVisible="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=3}" RowSpacing="1" ColumnSpacing="1">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="50*"/>
+                                                    <RowDefinition Height="50*"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="50*"/>
+                                                    <ColumnDefinition Width="50*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <controls:CustomImage ImageUrl="{Binding Image1}"
+                                                                      Aspect="AspectFill"
+                                                                      Grid.RowSpan="2"
+                                                                      DownsampleToViewSize="False"
+                                                                      DownsampleHeight="600"
+                                                                      DownsampleWidth="600" />
+                                                <controls:CustomImage ImageUrl="{Binding Image2}"
+                                                                      Aspect="AspectFill"
+                                                                      Grid.Row="0"
+                                                                      Grid.Column="1"
+                                                                      DownsampleToViewSize="False"
+                                                                      DownsampleHeight="600"
+                                                                      DownsampleWidth="600" />
+                                                <controls:CustomImage ImageUrl="{Binding Image3}"
+                                                                      Aspect="AspectFill"
+                                                                      Grid.Row="1"
+                                                                      Grid.Column="1"
+                                                                      DownsampleToViewSize="False"
+                                                                      DownsampleHeight="600"
+                                                                      DownsampleWidth="600" />
+                                            </Grid>
+
+                                            <Grid IsVisible="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=4}" RowSpacing="1" ColumnSpacing="1">
+                                                <Grid.Triggers>
+                                                    <DataTrigger TargetType="Grid" Binding="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=5}" Value="True">
+                                                        <Setter Property="IsVisible" Value="True"></Setter>
+                                                    </DataTrigger>
+                                                    <DataTrigger TargetType="Grid" Binding="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=6}" Value="True">
+                                                        <Setter Property="IsVisible" Value="True"></Setter>
+                                                    </DataTrigger>
+                                                </Grid.Triggers>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="50*"/>
+                                                    <RowDefinition Height="50*"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="50*"/>
+                                                    <ColumnDefinition Width="50*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <controls:CustomImage ImageUrl="{Binding Image1}"
+                                                                      Aspect="AspectFill"
+                                                                      Grid.Row="0"
+                                                                      Grid.Column="0"
+                                                                      DownsampleToViewSize="False"
+                                                                      DownsampleHeight="600"
+                                                                      DownsampleWidth="600" />
+                                                <controls:CustomImage ImageUrl="{Binding Image2}"
+                                                                      Aspect="AspectFill"
+                                                                      Grid.Row="0"
+                                                                      Grid.Column="1"
+                                                                      DownsampleToViewSize="False"
+                                                                      DownsampleHeight="600"
+                                                                      DownsampleWidth="600" />
+                                                <controls:CustomImage ImageUrl="{Binding Image3}"
+                                                                      Aspect="AspectFill"
+                                                                      Grid.Row="1"
+                                                                      Grid.Column="0"
+                                                                      DownsampleToViewSize="False"
+                                                                      DownsampleHeight="600"
+                                                                      DownsampleWidth="600" />
+                                                <Grid Grid.Row="1" Grid.Column="1">
+                                                    <controls:CustomImage ImageUrl="{Binding Image4}" Aspect="AspectFill" />
+                                                    <Label Text="+1" IsVisible="False" HorizontalOptions="Center" VerticalOptions="Center" TextColor="White" FontFamily="{StaticResource RobotoBold}" FontSize="Medium">
+                                                        <Label.Triggers>
+                                                            <DataTrigger TargetType="Label" Binding="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=5}" Value="True">
+                                                                <Setter Property="IsVisible" Value="True"></Setter>
+                                                            </DataTrigger>
+                                                        </Label.Triggers>
+                                                    </Label>
+                                                    <Label Text="+2" IsVisible="False" HorizontalOptions="Center" VerticalOptions="Center" TextColor="White" FontFamily="{StaticResource RobotoBold}" FontSize="Medium">
+                                                        <Label.Triggers>
+                                                            <DataTrigger TargetType="Label" Binding="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=6}" Value="True">
+                                                                <Setter Property="IsVisible" Value="True"></Setter>
+                                                            </DataTrigger>
+                                                        </Label.Triggers>
+                                                    </Label>
+                                                </Grid>
+                                            </Grid>
+                                            <Grid></Grid>
+                                        </Grid>
+
+                                        <StackLayout Grid.Column="1" VerticalOptions="CenterAndExpand" Padding="10,0,0,0">
+                                            <StackLayout.Triggers>
+                                                <DataTrigger TargetType="StackLayout" Binding="{Binding HasImages}" Value="False">
+                                                    <Setter Property="Grid.Column" Value="0"></Setter>
+                                                    <Setter Property="Grid.ColumnSpan" Value="2"></Setter>
+                                                    <Setter Property="Padding" Value="15,0,0,0"></Setter>
+                                                </DataTrigger>
+                                            </StackLayout.Triggers>
+
+                                            <Label FontSize="Medium" Text="{Binding Description}" MaxLines="2"/>
+
+                                            <StackLayout Orientation="Horizontal">
+                                                <Label Text="{classes:Translate ACTION_DETAIL_SCREEN_AUTHOR_SECTION_TITLE}" FontFamily="{StaticResource RobotoLight}"></Label>
+                                                <Label Text="{Binding CreatedBy}" FontFamily="{StaticResource RobotoLight}"/>
+                                            </StackLayout>
+
+                                            <StackLayout Orientation="Horizontal">
+                                                <Label Text="{classes:Translate ACTION_DATE_EDITED}" FontFamily="{StaticResource RobotoLight}"/>
+                                                <Label Text="{Binding DueDate, Converter={StaticResource DateToStringConverter}}" FontFamily="{StaticResource RobotoLight}"/>
+                                            </StackLayout>
+
+                                        </StackLayout>
+
+                                        <StackLayout Orientation="Horizontal"
+                                             Grid.Column="2"
+                                             HorizontalOptions="End"
+                                             VerticalOptions="Center"
+                                             Margin="0, 0, 15, 0"
+                                             Spacing="5" StyleClass="z-1000">
+
+                                            <AbsoluteLayout>
+                                                <buttons:SfButton Style="{StaticResource GreyBorderButton}">
+                                                    <buttons:SfButton.Triggers>
+                                                        <DataTrigger TargetType="buttons:SfButton" Binding="{Binding HasComments}" Value="True">
+                                                            <Setter Property="Background" Value="{StaticResource GreenColor}" />
+                                                            <Setter Property="Stroke" Value="{StaticResource GreenColor}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="buttons:SfButton" Binding="{Binding HasComments}" Value="False">
+                                                            <Setter Property="Background" Value="Transparent" />
+                                                            <Setter Property="Stroke" Value="{StaticResource GreyColor}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="buttons:SfButton" Binding="{Binding HasUnseenComments}" Value="True">
+                                                            <Setter Property="Background" Value="{StaticResource RedColor}" />
+                                                            <Setter Property="Stroke" Value="{StaticResource RedColor}" />
+                                                        </DataTrigger>
+                                                    </buttons:SfButton.Triggers>
+                                                    <buttons:SfButton.Content>
+                                                        <DataTemplate>
+                                                        <Image HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" IsOpaque="True">
+                                                            <Image.Source>
+                                                                <FontImageSource
+                                                                        FontFamily="{StaticResource MaterialFontFamily}"
+                                                                        Glyph="{x:Static classes:IconFont.Textsms}"
+                                                                        Size="25"
+                                                                        Color="{StaticResource GreyColor}"/>
+                                                            </Image.Source>
+                                                            <Image.Triggers>
+                                                                <DataTrigger TargetType="Image" Binding="{Binding HasComments}" Value="True">
+                                                                    <Setter Property="Source">
+                                                                        <FontImageSource
+                                                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                                                            Glyph="{x:Static classes:IconFont.Textsms}"
+                                                                            Size="25"
+                                                                            Color="White">
+                                                                        </FontImageSource>
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                                <DataTrigger TargetType="Image" Binding="{Binding HasComments}" Value="False">
+                                                                    <Setter Property="Source">
+                                                                        <FontImageSource
+                                                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                                                            Glyph="{x:Static classes:IconFont.Textsms}"
+                                                                            Size="25"
+                                                                            Color="{StaticResource GreyColor}">
+                                                                        </FontImageSource>
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                            </Image.Triggers>
+                                                        </Image>
+                                                        </DataTemplate>
+                                                    </buttons:SfButton.Content>
+                                                </buttons:SfButton>
+
+                                                <buttons:SfButton IsVisible="{Binding HasUnseenComments}" StyleClass="action, count, ml-30, mtn-10" CornerRadius="12" Stroke="White" StrokeThickness="1" Background="{StaticResource RedColor}">
+                                                    <buttons:SfButton.Content>
+                                                        <DataTemplate>
+                                                        <Label Text="{Binding UnviewedCommentNr}" StyleClass="fc-white, fs-10, counter" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"></Label>
+                                                        </DataTemplate>
+                                                    </buttons:SfButton.Content>
+                                                </buttons:SfButton>
+
+                                            </AbsoluteLayout>
+
+                                            <buttons:SfButton Style="{StaticResource GreyBorderButton}" Background="Transparent" IsVisible="{Binding IsMine}" Command="{Binding BindingContext.ActionSolvedCommand, Source={x:Reference Page}}" CommandParameter="{Binding}">
+                                                <buttons:SfButton.Triggers>
+                                                    <DataTrigger TargetType="buttons:SfButton" Binding="{Binding FilterStatus}" Value="{x:Static enumerations:ActionStatusEnum.Solved}">
+                                                        <Setter Property="Background" Value="{StaticResource GreenColor}" />
+                                                        <Setter Property="Stroke" Value="{StaticResource GreenColor}" />
+                                                    </DataTrigger>
+                                                </buttons:SfButton.Triggers>
+                                                <buttons:SfButton.Content>
+                                                    <DataTemplate>
+                                                    <Image HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" IsOpaque="True">
+                                                        <Image.Source>
+                                                            <FontImageSource
+                                                                    FontFamily="{StaticResource MaterialFontFamily}"
+                                                                    Glyph="{x:Static classes:IconFont.ThumbUp}"
+                                                                    Size="25"
+                                                                    Color="{StaticResource GreyColor}"/>
+                                                        </Image.Source>
+                                                        <Image.Triggers>
+                                                            <DataTrigger TargetType="Image" Binding="{Binding FilterStatus}" Value="{x:Static enumerations:ActionStatusEnum.Solved}">
+                                                                <Setter Property="Source">
+                                                                    <FontImageSource FontFamily="{StaticResource MaterialFontFamily}" Glyph="{x:Static classes:IconFont.ThumbUp}" Color="White" Size="25"/>
+                                                                </Setter>
+                                                            </DataTrigger>
+                                                        </Image.Triggers>
+                                                    </Image>
+                                                    </DataTemplate>
+                                                </buttons:SfButton.Content>
+                                            </buttons:SfButton>
+
+                                        </StackLayout>
+
+                                        <StackLayout Grid.Column="3"
+                                                 BackgroundColor="{Binding FilterStatus, Converter={StaticResource StatusToColorConverter}}"
+                                                 VerticalOptions="FillAndExpand"
+                                                 HorizontalOptions="FillAndExpand">
+                                        </StackLayout>
+
+                                    </Grid>
+
+
+                                </DataTemplate>
+                            </syncfusion:SfListView.ItemTemplate>
+                        </syncfusion:SfListView>
+
+                    </pulltoRefresh:SfPullToRefresh.PullableContent>
+                </pulltoRefresh:SfPullToRefresh>
+
+                <Grid Grid.Row="0" IsVisible="{Binding IsBusy}">
+
+                    <Grid BackgroundColor="{StaticResource DarkGreyColor}" Opacity="0.2"></Grid>
+                    <busyindicator:SfBusyIndicator x:Name="busyindicator"
+                                       AnimationType="Cupertino" 
+                                       TextColor="{StaticResource DarkGreyColor}" 
+                                       IsRunning="{Binding IsBusy}"/>
+                </Grid>
+
+            </Grid>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,766 @@
+﻿/* font colors */
+.fc-green {
+    color: #1ed760;
+}
+
+.fc-red {
+    color: red;
+}
+
+.fc-orange {
+    color: orange;
+}
+
+.fc-white {
+    color: white;
+}
+
+.fc-grey {
+    color: lightgray;
+}
+
+.fc-silver {
+    color: silver;
+}
+
+.fc-midgrey {
+    color: #808080;
+}
+
+.fc-darkgrey {
+    color: #212121;
+}
+
+.fc-darkblue {
+    color: #364c59;
+}
+
+.fc-dimgray {
+    color: #393F45;
+}
+
+.fc-black {
+    color: black;
+}
+
+/* font weight fw-* */
+.fw-bold {
+    font-weight: bold;
+}
+
+/* font sizes fs-* */
+.fs-small {
+    font-size: small;
+}
+
+.fs-medium {
+    font-size: medium;
+}
+
+.fs-large {
+    font-size: large;
+}
+
+.fs-8 {
+    font-size: 8;
+}
+
+.fs-9 {
+    font-size: 9;
+}
+
+.fs-10 {
+    font-size: 10;
+}
+
+.fs-11 {
+    font-size: 11;
+}
+
+.fs-12 {
+    font-size: 12;
+}
+
+.fs-14 {
+    font-size: 14;
+}
+
+.fs-16 {
+    font-size: 16;
+}
+
+.fs-20 {
+    font-size: 20;
+}
+
+.fs-22 {
+    font-size: 22;
+}
+
+.fs-26 {
+    font-size: 26;
+}
+
+.fs-24 {
+    font-size: 24;
+}
+
+.fs-32 {
+    font-size: 32;
+}
+
+.fs-42 {
+    font-size: 42;
+}
+
+
+/* end font sizes */
+
+/* backgroud color bg-* */
+.bg-white {
+    background-color: white;
+}
+
+.bg-black {
+    background-color: #000000;
+}
+
+.bg-green {
+    background-color: #1ed760;
+}
+
+.bg-red {
+    background-color: red;
+}
+
+.bg-orange {
+    background-color: #EB7D16;
+}
+
+.bg-skipped {
+    background-color: orange;
+}
+
+.bg-grey {
+    background-color: lightgray;
+    /*background-color: #f4f5f6;*/
+}
+
+.bg-lightgrey {
+    background-color: #f4f5f6;
+}
+
+.bg-darkgrey {
+    background-color: #4b4b4b;
+}
+
+.bg-darkblue {
+    background-color: #364c59;
+}
+
+.bg-transparent {
+    background-color: transparent;
+}
+/* end backgroud color bg-* */
+
+/* border and colors */
+.bc-red {
+    border-color: red;
+}
+
+.bc-orange {
+    border-color: orange;
+}
+
+.bc-green {
+    border-color: #1ed760;
+}
+
+.bc-silver {
+    border-color: silver;
+}
+
+.bc-lightgray {
+    border-color: lightgray;
+}
+
+.bw-1 {
+    border-width: 1;
+}
+
+.bw-2 {
+    border-width: 2;
+}
+/* end borders and colors */
+
+/* Margin and padding */
+
+.m-0 {
+    margin: 0;
+}
+
+.m-5 {
+    margin: 5;
+}
+
+.m-10 {
+    margin: 10;
+}
+
+.m-15 {
+    margin: 15;
+}
+
+.m-20 {
+    margin: 20;
+}
+
+.m-25 {
+    margin: 25;
+}
+
+.m-30 {
+    margin: 30;
+}
+
+.mx-10 {
+    margin-left: 10;
+    margin-right: 10;
+}
+
+.mx-15 {
+    margin-left: 15;
+    margin-right: 15;
+}
+
+.mx-20 {
+    margin-left: 20;
+    margin-right: 20;
+}
+
+.mx-30 {
+    margin-left: 30;
+    margin-right: 30;
+}
+
+.mtn-10 {
+    margin-top: -10;
+}
+
+.mtn-15 {
+    margin-top: -15;
+}
+
+
+.mtn-5 {
+    margin-top: -5;
+}
+
+.mt-0 {
+    margin-top: 0;
+}
+
+.mt-5 {
+    margin-top: 5;
+}
+
+.mt-10 {
+    margin-top: 10;
+}
+
+.mt-15 {
+    margin-top: 15;
+}
+
+.mt-20 {
+    margin-top: 20;
+}
+
+.mt-25 {
+    margin-top: 25;
+}
+
+.mt-30 {
+    margin-top: 30;
+}
+
+.mrn-5 {
+    margin-right: -5;
+}
+.mrn-10 {
+    margin-right: -10;
+}
+.mrn-15 {
+    margin-right: -15;
+}
+.mrn-20 {
+    margin-right: -20;
+}
+.mr-0 {
+    margin-right: 0;
+}
+
+.mr-5 {
+    margin-right: 5;
+}
+
+.mr-10 {
+    margin-right: 10;
+}
+
+.mr-15 {
+    margin-right: 15;
+}
+
+.mr-20 {
+    margin-right: 20;
+}
+
+.mr-25 {
+    margin-right: 25;
+}
+
+.mr-30 {
+    margin-right: 30;
+}
+
+.mb-0 {
+    margin-bottom: 0;
+}
+
+.mb-5 {
+    margin-bottom: 5;
+}
+
+.mb-10 {
+    margin-bottom: 10;
+}
+
+.mb-15 {
+    margin-bottom: 15;
+}
+
+.mb-20 {
+    margin-bottom: 20;
+}
+
+.mb-25 {
+    margin-bottom: 25;
+}
+
+.mb-30 {
+    margin-bottom: 30;
+}
+
+.ml-0 {
+    margin-left: 0;
+}
+
+.mln-5 {
+    margin-left: -5;
+}
+
+.ml-5 {
+    margin-left: 5;
+}
+
+.ml-10 {
+    margin-left: 10;
+}
+
+.ml-15 {
+    margin-left: 15;
+}
+
+.ml-20 {
+    margin-left: 20;
+}
+
+.ml-25 {
+    margin-left: 25;
+}
+
+.ml-30 {
+    margin-left: 30;
+}
+
+.ml-40 {
+    margin-left: 40;
+}
+
+.p-0 {
+    padding: 0;
+}
+
+.p-5 {
+    padding: 5;
+}
+
+p-10 {
+    padding: 10;
+}
+
+.p-15 {
+    padding: 15;
+}
+
+.p-20 {
+    padding: 20;
+}
+
+.p-25 {
+    padding: 25;
+}
+
+.p-30 {
+    padding: 30;
+}
+
+.px-10 {
+    padding-left: 10;
+    padding-right: 10;
+}
+
+.px-20 {
+    padding-left: 20;
+    padding-right: 20;
+}
+
+.py-10 {
+    padding-top: 10;
+    padding-bottom: 10;
+}
+
+.py-20 {
+    padding-top: 20;
+    padding-bottom: 20;
+}
+
+.pt-0 {
+    padding-top: 0;
+}
+
+.pt-5 {
+    padding-top: 5;
+}
+
+pt-10 {
+    padding-top: 10;
+}
+
+.pt-15 {
+    padding-top: 15;
+}
+
+.pt-20 {
+    padding-top: 20;
+}
+
+.pt-25 {
+    padding-top: 25;
+}
+
+.pt-30 {
+    padding-top: 30;
+}
+
+.pr-0 {
+    padding-right: 0;
+}
+
+.pr-5 {
+    padding-right: 5;
+}
+
+pr-10 {
+    padding-right: 10;
+}
+
+.pr-15 {
+    padding-right: 15;
+}
+
+.pr-20 {
+    padding-right: 20;
+}
+
+.pr-25 {
+    padding-right: 25;
+}
+
+.pr-30 {
+    padding-right: 30;
+}
+
+.pb-0 {
+    padding-bottom: 0;
+}
+
+.pb-5 {
+    padding-bottom: 5;
+}
+
+pb-10 {
+    padding-bottom: 10;
+}
+
+.pb-15 {
+    padding-bottom: 15;
+}
+
+.pb-20 {
+    padding-bottom: 20;
+}
+
+.pb-25 {
+    padding-bottom: 25;
+}
+
+.pb-30 {
+    padding-bottom: 30;
+}
+
+.pl-0 {
+    padding-left: 0;
+}
+
+.pl-5 {
+    padding-left: 5;
+}
+
+pl-10 {
+    padding-left: 10;
+}
+
+.pl-15 {
+    padding-left: 15;
+}
+
+.pl-20 {
+    padding-left: 20;
+}
+
+.pl-25 {
+    padding-left: 25;
+}
+
+.pl-30 {
+    padding-left: 30;
+}
+
+/* end margin and padding */
+
+.z-0 {
+    z-index: 0;
+}
+
+.z-1000 {
+    z-index: 1000;
+}
+/* buttons */
+.btn {
+    padding-bottom: 1;
+    margin: 0;
+    height: 40;
+    width: 120;
+    border: none;
+    border-radius: 5;
+}
+
+    .btn.btn-border {
+        border-width: 2;
+        border-style: solid;
+    }
+/* end buttons */
+
+/* text alignment */
+.text-left {
+    text-align: left;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+/* end text alignment */
+
+/* statusses */
+
+.statusses .grid {
+    height: 30;
+}
+
+    .statusses .grid .status {
+        padding: 0;
+        margin: 0;
+        border: none;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+/* end statusses */
+
+/* header */
+.header .column0 {
+    width: 160;
+    height: 80;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.header .column1 .title {
+    font-size: 26;
+}
+
+.header .statusses,
+.header .score,
+.header .actions,
+.header .steps .grid,
+.header .steps .line {
+    width: 280;
+}
+
+    .header .steps .title,
+    .header .score .title,
+    .header .actions .title,
+    .header .statusses .title,
+    .header .profile .name {
+        text-align: center;
+    }
+
+    .header .statusses .grid {
+        height: 20;
+    }
+
+    .header .statusses .bg-skipped,
+    .header .statusses .bg-green,
+    .header .statusses .bg-red,
+    .header .statusses .bg-orange,
+    .header .statusses .bg-grey,
+    .header .score .bg-green,
+    .header .actions .bg-green,
+    .header .actions .bg-skipped,
+    .header .actions .bg-red,
+    .header .actions .bg-grey,
+    .header .steps .bg-green {
+        border: none;
+        text-align: center;
+        vertical-align: middle;
+        padding: 0;
+    }
+
+.header .steps .line {
+    height: 1;
+    margin-top: 11;
+}
+
+.header .steps .step {
+    text-align: center;
+    vertical-align: middle;
+    height: 22;
+    border-radius: 50;
+    width: 22;
+    border-width: 1;
+}
+
+.header .buttons {
+    padding: 0 0 0 20;
+    width: 80;
+}
+
+.header .fontButton {
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    border: none;
+}
+
+.header .fontButton {
+    height: 50;
+    /*width: 40;*/
+}
+
+/* end header */
+
+
+/* score */
+
+.scoregrid {
+    height: 20;
+}
+
+    .scoregrid .bar {
+        border: none;
+        text-align: center;
+        vertical-align: middle;
+        padding: 0;
+    }
+
+/* end score */
+
+/* side menu */
+
+.menu {
+}
+
+    .menu .item {
+        padding: 0;
+        margin-bottom: 3;
+        /*background-color:aqua;*/
+    }
+
+    .menu.count {
+        padding: 0;
+        margin: 0;
+        text-align: center;
+        vertical-align: middle;
+        border-color: #364c59;
+        height: 18;
+        border-radius: 50;
+        width: 18;
+    }
+
+        .menu.count .counter {
+        }
+
+/* end side menu */
+
+.action {
+}
+
+    .action .item {
+        padding: 0;
+        margin-bottom: 3;
+        /*background-color:aqua;*/
+    }
+
+    .action.count {
+        padding: 0;
+        margin: 0;
+        text-align: center;
+        vertical-align: middle;
+        border-color: white;
+        height: 25;
+        border-radius: 50;
+        width: 25;
+    }
+
+/* workareas */
+.workarea {
+    overflow: visible;
+}
+
+.text-wrap {
+    word-wrap: break-word;
+}
+
+.workarea button {
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    color: white;
+}
+/* end workareas */

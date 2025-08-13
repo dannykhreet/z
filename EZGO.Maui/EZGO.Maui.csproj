@@ -1,0 +1,254 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>net8.0-ios;net8.0-android</TargetFrameworks>
+		<!--<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>-->
+		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
+		<!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
+		<!-- Note for MacCatalyst:
+		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
+		When specifying both architectures, use the plural <RuntimeIdentifiers> instead of the singular <RuntimeIdentifier>.
+		The Mac App Store will NOT accept apps with ONLY maccatalyst-arm64 indicated;
+		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
+		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
+		<OutputType>Exe</OutputType>
+		<RootNamespace>EZGO.Maui</RootNamespace>
+		<UseMaui>true</UseMaui>
+		<SingleProject>true</SingleProject>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<!-- Display name -->
+		<ApplicationTitle>EZGO.Maui</ApplicationTitle>
+		<!-- App Identifier -->
+		<ApplicationId>nl.ezfactory.ezgoxam</ApplicationId>
+		<!-- Versions -->
+		<ApplicationDisplayVersion>4.0.0</ApplicationDisplayVersion>
+		<ApplicationVersion>1</ApplicationVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
+		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+		<Configurations>Debug;ReleaseTest;ReleaseAcceptance;ReleaseProduction</Configurations>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
+		<CreatePackage>false</CreatePackage>
+		<_MauiForceXamlCForDebug>true</_MauiForceXamlCForDebug>
+		<CodesignProvision>Automatic</CodesignProvision>
+		<CodesignKey>iPhone Developer</CodesignKey>
+		<MtouchDebug>true</MtouchDebug>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<_MauiForceXamlCForDebug>true</_MauiForceXamlCForDebug>
+		<WarningLevel>4</WarningLevel>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>latestmajor</LangVersion>
+		<CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseTest|AnyCPU' ">
+		<_MauiForceXamlCForDebug>true</_MauiForceXamlCForDebug>
+		<WarningLevel>4</WarningLevel>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>latestmajor</LangVersion>
+		<DebugSymbols>false</DebugSymbols>
+		<Optimize>true</Optimize>
+		<CreatePackage>false</CreatePackage>
+		<DefineConstants>RELEASE;USE_TEST;RELEASETEST;NET;NET8_0;NETCOREAPP</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='ReleaseTest|net8.0-ios|AnyCPU'">
+		<IntermediateOutputPath>obj\ReleaseTest\net8.0-ios</IntermediateOutputPath>
+		<DefineConstants>__IOS__;__MOBILE__;__UNIFIED__;RELEASE;USE_TEST;RELEASETEST;NET;NET8_0;NETCOREAPP</DefineConstants>
+		<WarningLevel>4</WarningLevel>
+		<CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseAcceptance|AnyCPU' ">
+		<_MauiForceXamlCForDebug>true</_MauiForceXamlCForDebug>
+		<WarningLevel>4</WarningLevel>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>latestmajor</LangVersion>
+		<DebugSymbols>false</DebugSymbols>
+		<Optimize>true</Optimize>
+		<CreatePackage>false</CreatePackage>
+		<DefineConstants>RELEASE;USE_ACCEPTANCE;RELEASETEST;NET;NET8_0;NETCOREAPP</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='ReleaseAcceptance|net8.0-ios|AnyCPU'">
+		<IntermediateOutputPath>obj\ReleaseAcceptance\net8.0-ios</IntermediateOutputPath>
+		<DefineConstants>__IOS__;__MOBILE__;__UNIFIED__;RELEASE;USE_ACCEPTANCE;RELEASETEST;NET;NET8_0;NETCOREAPP</DefineConstants>
+		<WarningLevel>4</WarningLevel>
+		<CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseProduction|AnyCPU' ">
+		<_MauiForceXamlCForDebug>true</_MauiForceXamlCForDebug>
+		<WarningLevel>4</WarningLevel>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>latestmajor</LangVersion>
+		<DebugSymbols>false</DebugSymbols>
+		<Optimize>true</Optimize>
+		<CreatePackage>false</CreatePackage>
+		<DefineConstants>RELEASE;USE_PRODUCTION;NET;NET8_0;NETCOREAPP</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='ReleaseProduction|net8.0-ios|AnyCPU'">
+		<IntermediateOutputPath>obj\ReleaseProduction\net8.0-ios</IntermediateOutputPath>
+		<DefineConstants>__IOS__;__MOBILE__;__UNIFIED__;RELEASE;USE_PRODUCTION;NET;NET8_0;NETCOREAPP</DefineConstants>
+		<WarningLevel>4</WarningLevel>
+		<CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
+	</PropertyGroup>
+	<PropertyGroup>
+		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<!-- App Icon -->
+		<MauiIcon Include="Resources\AppIcon\app_logo_ezf.png" />
+		<!-- Splash Screen -->
+		<MauiSplashScreen Include="Resources\Splash\ez_go_ipad.png" Color="White" Resize="false" />
+		<!-- Images -->
+		<MauiImage Include="Resources\Images\*" />
+		<MauiFont Include="Resources\Fonts\*" />
+		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
+		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.100" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.60" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+		<PackageReference Include="Sentry.Maui" Version="5.12.0" />
+		<!-- <PackageReference Include="Sentry.Maui" Version="5.7.0" /> -->
+		<PackageReference Include="Syncfusion.Maui.Buttons" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Core" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.ListView" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Inputs" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.TabView" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.ProgressBar" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Charts" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Popup" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.PdfViewer" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Gauges" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.SignaturePad" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Expander" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Calendar" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Picker" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.ImageEditor" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Barcode" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.TreeView" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.PullToRefresh" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Carousel" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Cards" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.NavigationDrawer" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.TreeMap" Version="27.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Chat" Version="27.2.4" />
+		<PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" Version="4.61.3" />
+		<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="9.0.0" />
+		<PackageReference Include="FFImageLoading.Maui" Version="1.2.7" />
+		<PackageReference Include="BarcodeScanning.Native.Maui" Version="1.5.6" />
+		<PackageReference Include="CardsView.Maui" Version="0.0.9" />
+		<PackageReference Include="CommunityToolkit.Maui.MediaElement" Version="4.1.2" />
+		<PackageReference Include="Microsoft.Maui.Graphics" Version="8.0.100" />
+		<PackageReference Include="DotNetMeteor.HotReload.Plugin" Version="3.*" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Remove="Views\" />
+		<None Remove="Views\Login\" />
+		<None Remove="Classes\" />
+		<None Remove="Classes\Timers\" />
+		<None Remove="Platforms\Android\Services\" />
+		<None Remove="Platforms\iOS\Services\" />
+		<None Remove="Views\Areas\" />
+		<None Remove="Controls\AppBars\" />
+		<None Remove="Controls\CustomLabels\" />
+		<None Remove="Controls\WorkAreas\" />
+		<None Remove="Converters\" />
+		<None Remove="Resources\Converters\" />
+		<None Remove="Views\Home\" />
+		<None Remove="Views\Bookmarks\" />
+		<None Remove="Views\User\" />
+		<None Remove="Controls\EntryFields\" />
+		<None Remove="Views\Checklists\" />
+		<None Remove="Controls\Lists\" />
+		<None Remove="Behaviors\" />
+		<None Remove="Views\Partial\" />
+		<None Remove="Controls\ViewCells\" />
+		<None Remove="Controls\DataTemplates\" />
+		<None Remove="Controls\ProgressBar\" />
+		<None Remove="Controls\ChecklistsOpenFields\" />
+		<None Remove="Controls\ViewCells\Templates\" />
+		<None Remove="Controls\Popup\" />
+		<None Remove="Controls\Signatures\" />
+		<None Remove="Controls\TaskProperties\" />
+		<None Remove="Views\Tasks\" />
+		<None Remove="Controls\DateTimePicker\" />
+		<None Remove="Controls\TimePickers\" />
+		<None Remove="Views\Shared\" />
+		<None Remove="Platforms\Android\Resources\xml\" />
+		<None Remove="Views\Audits\" />
+		<None Remove="Views\Actions\" />
+		<None Remove="Views\Step\" />
+		<None Remove="Views\Tasks\Comments\" />
+		<None Remove="Controls\Images\" />
+		<None Remove="Views\Assessments\" />
+		<None Remove="Views\Instructions\" />
+		<None Remove="Views\Feed\" />
+		<None Remove="Controls\ViewCells\Feed\" />
+	</ItemGroup>
+	<ItemGroup>
+		<Folder Include="Views\" />
+		<Folder Include="Views\Login\" />
+		<Folder Include="Classes\" />
+		<Folder Include="Classes\Timers\" />
+		<Folder Include="Platforms\Android\Services\" />
+		<Folder Include="Platforms\iOS\Services\" />
+		<Folder Include="Views\Areas\" />
+		<Folder Include="Controls\AppBars\" />
+		<Folder Include="Controls\CustomLabels\" />
+		<Folder Include="Controls\WorkAreas\" />
+		<Folder Include="Resources\Converters\" />
+		<Folder Include="Views\Home\" />
+		<Folder Include="Views\Bookmarks\" />
+		<Folder Include="Views\User\" />
+		<Folder Include="Controls\EntryFields\" />
+		<Folder Include="Views\Checklists\" />
+		<Folder Include="Controls\Lists\" />
+		<Folder Include="Behaviors\" />
+		<Folder Include="Views\Partial\" />
+		<Folder Include="Controls\ViewCells\" />
+		<Folder Include="Controls\DataTemplates\" />
+		<Folder Include="Controls\ProgressBar\" />
+		<Folder Include="Controls\ChecklistsOpenFields\" />
+		<Folder Include="Controls\ViewCells\Templates\" />
+		<Folder Include="Controls\Popup\" />
+		<Folder Include="Controls\Signatures\" />
+		<Folder Include="Controls\TaskProperties\" />
+		<Folder Include="Views\Tasks\" />
+		<Folder Include="Controls\DateTimePicker\" />
+		<Folder Include="Controls\TimePickers\" />
+		<Folder Include="Views\Shared\" />
+		<Folder Include="Platforms\Android\Resources\xml\" />
+		<Folder Include="Views\Audits\" />
+		<Folder Include="Views\Actions\" />
+		<Folder Include="Views\Step\" />
+		<Folder Include="Views\Tasks\Comments\" />
+		<Folder Include="Controls\Images\" />
+		<Folder Include="Views\Assessments\" />
+		<Folder Include="Views\Instructions\" />
+		<Folder Include="Views\Feed\" />
+		<Folder Include="Controls\ViewCells\Feed\" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\EZGO.Maui.Core\EZGO.Maui.Core.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Reference Include="EZGO.Api.Models">
+			<HintPath>..\Ref\EZGO.Api.Models.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+	<ItemGroup>
+		<MauiXaml Update="Resources\Styles\ResourceIcons.xaml">
+			<SubType>
+			</SubType>
+		</MauiXaml>
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
+		<PackageReference Include="Xamarin.AndroidX.Collection" Version="1.4.0.5" />
+		<PackageReference Include="Xamarin.AndroidX.Collection.Ktx" Version="1.4.0.4" />
+	</ItemGroup>
+</Project>

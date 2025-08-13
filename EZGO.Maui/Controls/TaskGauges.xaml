@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="EZGO.Maui.Controls.TaskGauges"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:gauge="clr-namespace:Syncfusion.Maui.Gauges;assembly=Syncfusion.Maui.Gauges"
+    x:Name="Page">
+
+    <StackLayout
+        Padding="0"
+        HorizontalOptions="FillAndExpand"
+        VerticalOptions="CenterAndExpand">
+
+        <!--  Gesture Recognizer Overlay Using Grid  -->
+        <Grid
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            HeightRequest="150"
+            WidthRequest="150">
+
+            <!--  Gauge  -->
+            <gauge:SfRadialGauge BackgroundColor="{StaticResource WhiteColor}">
+                <gauge:SfRadialGauge.Axes>
+                    <gauge:RadialAxis
+                        ShowLabels="False"
+                        ShowTicks="False"
+                        RadiusFactor="1"
+                        StartAngle="270"
+                        EndAngle="270"
+                        Minimum="0"
+                        Maximum="{Binding TotalTaskAmount, Source={x:Reference Page}}"
+                        Interval="10">
+                        <gauge:RadialAxis.Ranges>
+                            <gauge:RadialRange
+                                StartWidth="35"
+                                EndWidth="35"
+                                StartValue="0"
+                                EndValue="{Binding NotOkRangeStart, Source={x:Reference Page}}"
+                                Fill="{StaticResource GreenColor}"
+                                RangeOffset="1" />
+                            <gauge:RadialRange
+                                StartWidth="35"
+                                EndWidth="35"
+                                StartValue="{Binding NotOkRangeStart, Source={x:Reference Page}}"
+                                EndValue="{Binding SkippedRangeStart, Source={x:Reference Page}}"
+                                Fill="{StaticResource RedColor}"
+                                RangeOffset="1" />
+                            <gauge:RadialRange
+                                StartWidth="35"
+                                EndWidth="35"
+                                StartValue="{Binding SkippedRangeStart, Source={x:Reference Page}}"
+                                EndValue="{Binding TodoRangeStart, Source={x:Reference Page}}"
+                                Fill="{StaticResource SkippedColor}"
+                                RangeOffset="1" />
+                            <gauge:RadialRange
+                                StartWidth="35"
+                                EndWidth="35"
+                                StartValue="{Binding TodoRangeStart, Source={x:Reference Page}}"
+                                EndValue="{Binding TotalTaskAmount, Source={x:Reference Page}}"
+                                Fill="{StaticResource GreyColor}"
+                                RangeOffset="1" />
+                        </gauge:RadialAxis.Ranges>
+                        <gauge:RadialAxis.Annotations>
+                            <gauge:GaugeAnnotation>
+                                <gauge:GaugeAnnotation.Content>
+                                    <StackLayout
+                                        Orientation="Horizontal"
+                                        Spacing="0"
+                                        HorizontalOptions="CenterAndExpand"
+                                        WidthRequest="75">
+                                        <Label
+                                            HorizontalOptions="CenterAndExpand"
+                                            Text="{Binding CompletedTaskPercentage, StringFormat='{0}%', Source={x:Reference Page}}"
+                                            FontSize="Large"
+                                            TextColor="{StaticResource DarkGreyColor}"
+                                            FontFamily="{StaticResource RobotoRegular}" />
+                                    </StackLayout>
+                                </gauge:GaugeAnnotation.Content>
+                            </gauge:GaugeAnnotation>
+                        </gauge:RadialAxis.Annotations>
+                        <gauge:RadialAxis.AxisLineStyle>
+                            <gauge:RadialLineStyle Thickness="35" Fill="{StaticResource GreyColor}" />
+                        </gauge:RadialAxis.AxisLineStyle>
+                    </gauge:RadialAxis>
+                </gauge:SfRadialGauge.Axes>
+            </gauge:SfRadialGauge>
+
+            <!--  Transparent BoxView overlay to capture taps  -->
+            <BoxView BackgroundColor="Transparent">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding TapCommand, Source={x:Reference Page}}" CommandParameter="{Binding TapCommandParameter, Source={x:Reference Page}}" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+        </Grid>
+
+        <!--  Text Label  -->
+        <Label
+            Margin="0,0,0,0"
+            Text="{Binding Text, Source={x:Reference Page}}"
+            FontSize="Large"
+            FontFamily="{StaticResource RobotoRegular}"
+            TextColor="{StaticResource DarkGreyColor}"
+            HorizontalOptions="Center" />
+    </StackLayout>
+</ContentView>

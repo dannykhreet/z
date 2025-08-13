@@ -1,0 +1,290 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="EZGO.Maui.Controls.WorkAreas.AreasGridControl"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes;assembly=EZGO.Maui"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:pulltoRefresh="clr-namespace:Syncfusion.Maui.PullToRefresh;assembly=Syncfusion.Maui.PullToRefresh"
+    xmlns:treeview="clr-namespace:Syncfusion.Maui.TreeView;assembly=Syncfusion.Maui.TreeView"
+    x:Name="Page">
+    <ContentView.Resources>
+        <DataTemplate x:Key="gridItem">
+            <!--#region Grid Item Template-->
+            <Grid>
+                <!--  Grid Selected Gesture  -->
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer
+                        x:Name="BorderGesture"
+                        Command="{Binding BindingContext.SelectWorkAreaCommand, Source={x:Reference Page}}"
+                        CommandParameter="{Binding}" />
+                </Grid.GestureRecognizers>
+
+                <!--  Background Image  -->
+                <controls:CustomImageOnline
+                    Aspect="AspectFill"
+                    IsOpaque="True"
+                    Source="{Binding Picture}" />
+
+                <!--  Area Overlay  -->
+                <Border
+                    BackgroundColor="{StaticResource DarkBlueColor}"
+                    Opacity="0.8"
+                    Stroke="Transparent"
+                    StrokeThickness="7">
+                    <!--  Border Triggers  -->
+                    <Border.Triggers>
+                        <!--  Selected Trigger  -->
+                        <DataTrigger
+                            Binding="{Binding IsSelected}"
+                            TargetType="Border"
+                            Value="True">
+                            <Setter Property="Stroke" Value="{StaticResource GreenColor}" />
+                        </DataTrigger>
+                        <!--  Unselected Trigger  -->
+                        <DataTrigger
+                            Binding="{Binding IsSelected}"
+                            TargetType="Border"
+                            Value="False">
+                            <Setter Property="Stroke" Value="{StaticResource DarkBlueColor}" />
+                        </DataTrigger>
+                    </Border.Triggers>
+
+                    <Grid>
+
+                        <StackLayout VerticalOptions="StartAndExpand">
+
+                            <Grid RowSpacing="0" VerticalOptions="StartAndExpand">
+
+                                <!--#region Base Area Template Content-->
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <!--  Visible Content  -->
+                                <StackLayout Grid.Row="0" Margin="20">
+                                    <Grid>
+
+                                        <Grid.ColumnDefinitions>
+                                            <!--  Work Area Name Column  -->
+                                            <ColumnDefinition Width="*" />
+                                            <!--  Expand Button Column  -->
+                                            <ColumnDefinition Width="40" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!--  Work Area Name  -->
+                                        <Label
+                                            x:Name="AreaTitle"
+                                            Grid.Column="0"
+                                            FontSize="26"
+                                            HorizontalOptions="StartAndExpand"
+                                            HorizontalTextAlignment="Start"
+                                            LineBreakMode="WordWrap"
+                                            Text="{Binding Name}"
+                                            TextColor="White"
+                                            VerticalOptions="StartAndExpand" />
+
+                                        <!--  Expand Button  -->
+                                        <StackLayout Grid.Column="1" Padding="0">
+                                            <buttons:SfButton
+                                                x:Name="ExpandButton"
+                                                Margin="0,0,0,0"
+                                                Background="Transparent"
+                                                Clicked="ExpandArea_OnClicked"
+                                                CornerRadius="20"
+                                                HeightRequest="40"
+                                                IsVisible="{Binding HasChildren}"
+                                                Stroke="White"
+                                                StrokeThickness="1"
+                                                WidthRequest="40">
+                                                <buttons:SfButton.Content>
+                                                    <DataTemplate>
+                                                        <!--  Expand Button Content  -->
+                                                        <Image Margin="5,0,6,0" IsOpaque="True">
+                                                            <Image.Source>
+                                                                <FontImageSource
+                                                                    FontFamily="{StaticResource MaterialFontFamily}"
+                                                                    Glyph="{x:Static classes:IconFont.MoreHoriz}"
+                                                                    Color="White" />
+                                                            </Image.Source>
+                                                            <!--  Image Triggers  -->
+                                                            <Image.Triggers>
+                                                                <DataTrigger
+                                                                    Binding="{Binding IsRootExpanded}"
+                                                                    TargetType="Image"
+                                                                    Value="True">
+                                                                    <Setter Property="Source">
+                                                                        <FontImageSource
+                                                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                                                            Glyph="{x:Static classes:IconFont.Close}"
+                                                                            Color="White" />
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                            </Image.Triggers>
+                                                        </Image>
+                                                    </DataTemplate>
+                                                </buttons:SfButton.Content>
+                                            </buttons:SfButton>
+                                        </StackLayout>
+                                    </Grid>
+                                </StackLayout>
+
+                                <!--#endregion-->
+
+                                <!--#region Expanded Area Treeview-->
+
+                                <treeview:SfTreeView
+                                    x:Name="WorkAreaTree"
+                                    Grid.Row="0"
+                                    Margin="0,95,0,0"
+                                    AutoExpandMode="None"
+                                    BackgroundColor="Transparent"
+                                    ChildPropertyName="Children"
+                                    ExpanderWidth="0"
+                                    Indentation="0"
+                                    IsAnimationEnabled="True"
+                                    IsVisible="{Binding IsRootExpanded}"
+                                    ItemHeight="65"
+                                    ItemTemplateContextType="Node"
+                                    ItemsSource="{Binding Children}"
+                                    SelectionMode="None">
+                                    <treeview:SfTreeView.ItemTemplate>
+                                        <!--  TreeView Template  -->
+                                        <DataTemplate>
+                                            <ViewCell>
+                                                <ViewCell.View>
+                                                    <Grid Margin="0,0,0,10">
+                                                        <!--  Grid Triggers  -->
+                                                        <Grid.Triggers>
+                                                            <!--  IsSelected Trigger True  -->
+                                                            <DataTrigger
+                                                                Binding="{Binding IsSelected}"
+                                                                TargetType="Grid"
+                                                                Value="True">
+                                                                <Setter Property="BackgroundColor" Value="{StaticResource GreenColor}" />
+                                                            </DataTrigger>
+                                                            <!--  IsSelected Trigger False  -->
+                                                            <DataTrigger
+                                                                Binding="{Binding IsSelected}"
+                                                                TargetType="Grid"
+                                                                Value="False">
+                                                                <Setter Property="BackgroundColor" Value="Transparent" />
+                                                            </DataTrigger>
+                                                        </Grid.Triggers>
+
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="{Binding Level, Converter={StaticResource IndentationConverter}}" />
+                                                            <ColumnDefinition Width="35" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="35" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <!--  Expand Icon Image  -->
+                                                        <Image
+                                                            Grid.Column="1"
+                                                            IsOpaque="True"
+                                                            IsVisible="{Binding HasChildNodes, Converter={StaticResource ExpanderIconVisibilityConverter}}"
+                                                            Source="{Binding IsExpanded, Converter={StaticResource ExpanderIconConverter}}">
+                                                            <Image.GestureRecognizers>
+                                                                <TapGestureRecognizer Tapped="TapGestureRecognizer_OnTapped" />
+                                                            </Image.GestureRecognizers>
+                                                        </Image>
+
+                                                        <!--  Expanded Item Name  -->
+                                                        <Grid
+                                                            Grid.Column="2"
+                                                            BackgroundColor="Transparent"
+                                                            RowSpacing="0">
+                                                            <Label
+                                                                Padding="0,4"
+                                                                FontSize="Large"
+                                                                HorizontalOptions="Fill"
+                                                                HorizontalTextAlignment="Start"
+                                                                LineBreakMode="WordWrap"
+                                                                Text="{Binding Content.Name}"
+                                                                TextColor="White"
+                                                                VerticalTextAlignment="Center" />
+                                                            <Grid.GestureRecognizers>
+                                                                <TapGestureRecognizer Command="{Binding BindingContext.SelectWorkAreaCommand, Source={x:Reference Page}}" CommandParameter="{Binding Content}" />
+                                                            </Grid.GestureRecognizers>
+                                                        </Grid>
+
+                                                        <!--  Is Selected Image  -->
+                                                        <Image Grid.Column="3" IsOpaque="True">
+                                                            <Image.Triggers>
+                                                                <DataTrigger
+                                                                    Binding="{Binding Content.IsSelected}"
+                                                                    TargetType="Image"
+                                                                    Value="True">
+                                                                    <Setter Property="Image.Source">
+                                                                        <FontImageSource
+                                                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                                                            Glyph="{x:Static classes:IconFont.Check}"
+                                                                            Color="White" />
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                            </Image.Triggers>
+                                                        </Image>
+
+                                                    </Grid>
+                                                </ViewCell.View>
+                                            </ViewCell>
+                                        </DataTemplate>
+                                    </treeview:SfTreeView.ItemTemplate>
+                                </treeview:SfTreeView>
+
+                                <!--#endregion-->
+                            </Grid>
+
+                        </StackLayout>
+                    </Grid>
+                </Border>
+            </Grid>
+            <!--#endregion-->
+        </DataTemplate>
+    </ContentView.Resources>
+    <ContentView.Content>
+
+        <!--  PullToRefresh Grid  -->
+        <pulltoRefresh:SfPullToRefresh
+            x:Name="pullToRefresh"
+            Grid.Row="1"
+            ProgressColor="{StaticResource GreenColor}"
+            PullingThreshold="100"
+            RefreshViewHeight="30"
+            RefreshViewThreshold="30"
+            RefreshViewWidth="30"
+            TransitionMode="SlideOnTop">
+            <pulltoRefresh:SfPullToRefresh.PullableContent>
+                <!--#region Grid Content-->
+                <Grid x:Name="GridContent">
+
+                    <!--Grid Placeholder
+                    <Grid
+                        x:Name="Placeholder" ColumnSpacing="20" RowSpacing="10" Opacity="0.4" />-->
+
+                    <!--#region Grid Scroll View-->
+                    <ScrollView x:Name="AreaScrollView">
+
+                        <!--  Grid Bindable Layout  -->
+                        <Grid
+                            x:Name="AreaGrid"
+                            BindableLayout.ItemTemplate="{StaticResource gridItem}"
+                            ColumnSpacing="20"
+                            IsVisible="False"
+                            RowSpacing="10"
+                            StyleClass="workarea" />
+
+                    </ScrollView>
+                    <!--#endregion-->
+
+                    <!--  Empty Screen  -->
+                    <!--<controls:EmptyView x:Name="EmptyGrid" IsVisible="{Binding HasItems, Converter={StaticResource ReverseBooleanConverter}, Source={x:Reference Page}}" />-->
+                </Grid>
+                <!--#endregion-->
+            </pulltoRefresh:SfPullToRefresh.PullableContent>
+        </pulltoRefresh:SfPullToRefresh>
+    </ContentView.Content>
+</ContentView>
+

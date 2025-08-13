@@ -1,0 +1,567 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Home.HomePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes;assembly=EZGO.Maui"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:settings="clr-namespace:EZGO.Maui.Core.Classes;assembly=EZGO.Maui.Core"
+    xmlns:viewModels="clr-namespace:EZGO.Maui.Core.ViewModels;assembly=EZGO.Maui.Core"
+    Title="HomePage"
+    NavigationPage.HasNavigationBar="False">
+    <ContentPage.Resources>
+        <Style Class="Task_Label" TargetType="Label">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="VerticalOptions" Value="Center" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+            <Setter Property="TextColor" Value="White" />
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="HorizontalOptions" Value="StartAndExpand" />
+            <Setter Property="VerticalOptions" Value="StartAndExpand" />
+            <Setter Property="FontFamily" Value="{StaticResource RobotoRegular}" />
+        </Style>
+        <Style TargetType="buttons:SfButton">
+            <Setter Property="BackgroundColor" Value="Transparent" />
+        </Style>
+        <Style Class="Image" TargetType="Image">
+            <Setter Property="HeightRequest" Value="60" />
+            <Setter Property="WidthRequest" Value="60" />
+            <Setter Property="Aspect" Value="AspectFill" />
+            <Setter Property="HorizontalOptions" Value="EndAndExpand" />
+            <Setter Property="VerticalOptions" Value="StartAndExpand" />
+            <Setter Property="Opacity" Value="0.4" />
+        </Style>
+        <Style Class="Areas_Layout" TargetType="StackLayout">
+            <Setter Property="Orientation" Value="Horizontal" />
+            <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+            <Setter Property="VerticalOptions" Value="FillAndExpand" />
+        </Style>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <Grid
+            BackgroundColor="White"
+            HorizontalOptions="FillAndExpand"
+            VerticalOptions="FillAndExpand">
+            <Grid.RowDefinitions>
+                <!--  Header Row  -->
+                <RowDefinition Height="80" />
+                <!--  Main Content Row  -->
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!--  Header  -->
+            <Grid
+                x:Name="header"
+                Grid.Row="0"
+                StyleClass="header, bg-white, m-0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.2*" />
+                    <ColumnDefinition Width="0.6*" />
+                    <ColumnDefinition Width="0.2*" />
+                </Grid.ColumnDefinitions>
+
+                <!--  Logo  -->
+                <controls:CustomImage
+                    Grid.Column="0"
+                    Margin="21,0,0,0"
+                    Aspect="AspectFit"
+                    HeightRequest="100"
+                    HorizontalOptions="Start"
+                    ImageUrl="{Binding Logo}"
+                    VerticalOptions="CenterAndExpand" />
+
+                <!--  Title  -->
+                <Label
+                    Grid.Column="1"
+                    FontFamily="{StaticResource RobotoLight}"
+                    FontSize="30"
+                    HorizontalOptions="CenterAndExpand"
+                    StyleClass="title, fs-large, fc-darkgrey"
+                    Text="{Binding Title}"
+                    VerticalOptions="CenterAndExpand" />
+
+
+                <!--  User Info  -->
+                <Grid
+                    x:Name="User"
+                    Grid.Column="2"
+                    Margin="0,0,24,0"
+                    ColumnSpacing="25"
+                    HorizontalOptions="EndAndExpand"
+                    VerticalOptions="CenterAndExpand">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="20" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="30" />
+                    </Grid.ColumnDefinitions>
+
+                    <!--  Qr code scanner button  -->
+                    <buttons:SfButton
+                        Grid.Column="0"
+                        Background="Transparent"
+                        Command="{Binding MenuViewModel.NavigateToQRScannerCommand}"
+                        WidthRequest="45"
+                        BackgroundImageSource="qrcode.png"
+                        HeightRequest="45"
+                        HorizontalOptions="StartAndExpand"
+                        IsVisible="{x:Static settings:CompanyFeatures.QRCode}"
+                        TextColor="Black"
+                        VerticalOptions="CenterAndExpand"/>
+
+                    <!--  User Fullname  -->
+                    <Label
+                        Grid.Column="1"
+                        Margin="5,0,0,0"
+                        CharacterSpacing="0"
+                        FontFamily="{StaticResource RobotoRegular}"
+                        StyleClass="name, fs-small, fc-midgrey"
+                        Text="{Binding Fullname}"
+                        VerticalOptions="CenterAndExpand" />
+
+                    <!--  User Profile Picture  -->
+                    <buttons:SfButton
+                        Grid.Column="2"
+                        Background="Transparent"
+                        Command="{Binding MenuViewModel.PopupCommand}"
+                        HorizontalOptions="Center"
+                        Style="{StaticResource ProfileImageBorder}"
+                        TextColor="White"
+                        VerticalOptions="CenterAndExpand">
+                        <buttons:SfButton.Content>
+                            <DataTemplate>
+                                <controls:CustomImage
+                                    Margin="0"
+                                    Aspect="AspectFill"
+                                    HorizontalOptions="FillAndExpand"
+                                    ImageUrl="{Binding Picture}"
+                                    Placeholder="profile.png"
+                                    VerticalOptions="FillAndExpand" />
+
+                            </DataTemplate>
+                        </buttons:SfButton.Content>
+                        <!--  Picture  -->
+                    </buttons:SfButton>
+                </Grid>
+            </Grid>
+
+            <!--  Main Content  -->
+            <ScrollView
+                x:Name="ScrollViewContent"
+                Grid.Row="1"
+                HorizontalOptions="FillAndExpand"
+                Orientation="Vertical"
+                VerticalOptions="FillAndExpand"
+                VerticalScrollBarVisibility="Always">
+
+                <Grid
+                    x:Name="pageContent"
+                    Padding="30,0"
+                    ColumnSpacing="15"
+                    HorizontalOptions="FillAndExpand"
+                    RowSpacing="20"
+                    VerticalOptions="FillAndExpand">
+
+                    <!--  Checklist Button  -->
+                    <buttons:SfButton
+                        x:Name="checklistButton"
+                        BackgroundImageSource="checklist_cell_image.png"
+                        Command="{Binding MenuViewModel.NavigateToChecklistTemplatesCommand}"
+                        CommandParameter="1"
+                        CornerRadius="0"
+                        IsVisible="False">
+                        <buttons:SfButton.Content>
+                            <DataTemplate>
+                                <StackLayout Orientation="Horizontal">
+                                    <Label
+                                        Margin="20"
+                                        LineBreakMode="TailTruncation"
+                                        Style="{StaticResource HomeButtonLabel}"
+                                        Text="{classes:Translate SIDEBAR_TITLE_CHECKLIST}"
+                                        WidthRequest="210" />
+                                    <Image
+                                        Margin="20"
+                                        Aspect="AspectFit"
+                                        HeightRequest="70"
+                                        IsOpaque="True"
+                                        StyleClass="Image"
+                                        WidthRequest="80">
+                                        <Image.Source>
+                                            <FontImageSource
+                                                FontFamily="MyAlias"
+                                                Glyph="{StaticResource ChecklistIcon}"
+                                                Size="80"
+                                                Color="#cdcdcd" />
+                                        </Image.Source>
+                                    </Image>
+                                </StackLayout>
+                            </DataTemplate>
+                        </buttons:SfButton.Content>
+                    </buttons:SfButton>
+
+                    <!--  Tasks Button  -->
+                    <buttons:SfButton
+                        x:Name="tasksButton"
+                        BackgroundImageSource="tasks_cell_image.png"
+                        Command="{Binding MenuViewModel.NavigateToTasksCommand}"
+                        CommandParameter="2"
+                        CornerRadius="0"
+                        IsVisible="False">
+                        <buttons:SfButton.Content>
+                            <DataTemplate>
+                                <Grid>
+                                    <StackLayout Orientation="Horizontal">
+                                        <Label
+                                            Margin="20"
+                                            LineBreakMode="TailTruncation"
+                                            Style="{StaticResource HomeButtonLabel}"
+                                            Text="{classes:Translate SIDEBAR_TITLE_TASKS}"
+                                            WidthRequest="210" />
+                                        <Image
+                                            Margin="20"
+                                            Aspect="AspectFit"
+                                            HeightRequest="70"
+                                            IsOpaque="True"
+                                            StyleClass="Image"
+                                            VerticalOptions="StartAndExpand"
+                                            WidthRequest="80">
+                                            <Image.Source>
+                                                <FontImageSource
+                                                    FontFamily="MyAlias"
+                                                    Glyph="{StaticResource TaskIcon}"
+                                                    Size="80"
+                                                    Color="#cdcdcd" />
+                                            </Image.Source>
+                                        </Image>
+                                    </StackLayout>
+
+                                    <StackLayout
+                                        Padding="20"
+                                        HorizontalOptions="FillAndExpand"
+                                        StyleClass="statusses"
+                                        VerticalOptions="EndAndExpand">
+
+                                        <Label
+                                            FontSize="16"
+                                            HorizontalOptions="FillAndExpand"
+                                            Text="{classes:Translate TASKS_SCREEN_TODAY_FILTER_TEXT}"
+                                            TextColor="{StaticResource WhiteColor}" />
+
+                                        <Grid
+                                            ColumnSpacing="0"
+                                            HeightRequest="25"
+                                            HorizontalOptions="FillAndExpand"
+                                            RowSpacing="0">
+
+                                            <Border
+                                                Margin="0"
+                                                Padding="0"
+                                                BackgroundColor="{StaticResource GreyColor}"
+                                                StrokeThickness="0">
+                                                <Grid ColumnSpacing="0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border
+                                                        Grid.Column="0"
+                                                        BackgroundColor="{StaticResource GreenColor}"
+                                                        StrokeThickness="0">
+                                                        <Label StyleClass="Task_Label" Text="{Binding OkCount}" />
+                                                    </Border>
+                                                    <Border
+                                                        Grid.Column="1"
+                                                        BackgroundColor="{StaticResource RedColor}"
+                                                        StrokeThickness="0">
+                                                        <Label StyleClass="Task_Label" Text="{Binding NotOkCount}" />
+                                                    </Border>
+                                                    <Border
+                                                        Grid.Column="2"
+                                                        BackgroundColor="{StaticResource SkippedColor}"
+                                                        StrokeThickness="0">
+                                                        <Label StyleClass="Task_Label" Text="{Binding SkippedCount}" />
+                                                    </Border>
+                                                    <Label
+                                                        Grid.Column="3"
+                                                        StyleClass="Task_Label"
+                                                        Text="{Binding TodoCount}" />
+                                                </Grid>
+                                            </Border>
+                                        </Grid>
+                                    </StackLayout>
+                                </Grid>
+                            </DataTemplate>
+                        </buttons:SfButton.Content>
+                    </buttons:SfButton>
+
+                    <!--  Audits Button  -->
+                    <buttons:SfButton
+                        x:Name="auditsButton"
+                        BackgroundImageSource="audit_cell_image.png"
+                        Command="{Binding MenuViewModel.NavigateToAuditsCommand}"
+                        CommandParameter="3"
+                        CornerRadius="0"
+                        IsVisible="False">
+                        <buttons:SfButton.Content>
+                            <DataTemplate>
+                                <StackLayout Orientation="Horizontal">
+                                    <Label
+                                        Margin="20"
+                                        LineBreakMode="TailTruncation"
+                                        Style="{StaticResource HomeButtonLabel}"
+                                        Text="{classes:Translate SIDEBAR_TITLE_AUDIT}"
+                                        WidthRequest="210" />
+                                    <Image
+                                        Margin="20"
+                                        Aspect="AspectFit"
+                                        HeightRequest="70"
+                                        IsOpaque="True"
+                                        StyleClass="Image"
+                                        WidthRequest="80">
+                                        <Image.Source>
+                                            <FontImageSource
+                                                FontFamily="MyAlias"
+                                                Glyph="{StaticResource AuditIcon}"
+                                                Size="80"
+                                                Color="#cdcdcd" />
+                                        </Image.Source>
+                                    </Image>
+                                </StackLayout>
+                            </DataTemplate>
+                        </buttons:SfButton.Content>
+                    </buttons:SfButton>
+
+                    <!--  Reports Button  -->
+                    <buttons:SfButton
+                        x:Name="reportsButton"
+                        BackgroundImageSource="report_cell_image.png"
+                        Command="{Binding MenuViewModel.NavigateToReportCommand}"
+                        CommandParameter="5"
+                        CornerRadius="0"
+                        IsVisible="False">
+                        <buttons:SfButton.Content>
+                            <DataTemplate>
+                                <StackLayout Orientation="Horizontal">
+                                    <Label
+                                        Margin="20"
+                                        LineBreakMode="TailTruncation"
+                                        Style="{StaticResource HomeButtonLabel}"
+                                        Text="{classes:Translate SIDEBAR_TITLE_REPORT}"
+                                        WidthRequest="210" />
+                                    <Image
+                                        Margin="20"
+                                        Aspect="AspectFit"
+                                        HeightRequest="70"
+                                        IsOpaque="True"
+                                        StyleClass="Image"
+                                        WidthRequest="80">
+                                        <Image.Source>
+                                            <FontImageSource
+                                                FontFamily="MyAlias"
+                                                Glyph="{StaticResource ReportIcon}"
+                                                Size="80"
+                                                Color="#cdcdcd" />
+                                        </Image.Source>
+                                    </Image>
+                                </StackLayout>
+                            </DataTemplate>
+                        </buttons:SfButton.Content>
+                    </buttons:SfButton>
+
+                    <!--  Actions Button  -->
+                    <Grid x:Name="actionsButton" IsVisible="False">
+
+                        <buttons:SfButton
+                            x:Name="actionsButtonButton"
+                            BackgroundImageSource="action_tile_image.png"
+                            Command="{Binding MenuViewModel.NavigateToActionsCommand}"
+                            CommandParameter="4"
+                            CornerRadius="0">
+                            <buttons:SfButton.Content>
+                                <DataTemplate>
+                                    <StackLayout Grid.Row="0" Orientation="Horizontal">
+                                        <Label
+                                            Grid.Column="0"
+                                            Margin="20"
+                                            LineBreakMode="TailTruncation"
+                                            Style="{StaticResource HomeButtonLabel}"
+                                            Text="{classes:Translate SIDEBAR_TITLE_ACTIONS}"
+                                            WidthRequest="210" />
+                                        <Image
+                                            Margin="20"
+                                            Aspect="AspectFit"
+                                            HeightRequest="70"
+                                            IsOpaque="True"
+                                            StyleClass="Image"
+                                            WidthRequest="80">
+                                            <Image.Source>
+                                                <FontImageSource
+                                                    FontFamily="MyAlias"
+                                                    Glyph="{StaticResource ActionIcon}"
+                                                    Size="80"
+                                                    Color="#cdcdcd" />
+                                            </Image.Source>
+                                        </Image>
+                                    </StackLayout>
+                                </DataTemplate>
+                            </buttons:SfButton.Content>
+                        </buttons:SfButton>
+
+                        <!--  Add Action Button  -->
+                        <Button
+                            Margin="0,2"
+                            BackgroundColor="Transparent"
+                            Command="{Binding NavigateToNewActionCommand}"
+                            FontSize="18"
+                            HorizontalOptions="EndAndExpand"
+                            IsVisible="{Binding ActionOnTheSpotEnabled}"
+                            Text="{classes:Translate ADD_NEW_ACTION}"
+                            TextColor="White"
+                            VerticalOptions="EndAndExpand" />
+                    </Grid>
+
+                    <!--  Instructions Button  -->
+                    <buttons:SfButton
+                        x:Name="instructionsButton"
+                        BackgroundImageSource="instruction_cell_image.png"
+                        Command="{Binding MenuViewModel.NavigateToInstructionsCommand}"
+                        CommandParameter="3"
+                        CornerRadius="0"
+                        IsVisible="False">
+                        <buttons:SfButton.Content>
+                            <DataTemplate>
+                                <StackLayout Orientation="Horizontal">
+                                    <Label
+                                        Margin="20"
+                                        LineBreakMode="TailTruncation"
+                                        Style="{StaticResource HomeButtonLabel}"
+                                        Text="{classes:Translate SIDEBAR_TITLE_INSTRUCTIONS}"
+                                        WidthRequest="210" />
+                                    <Image
+                                        Margin="20"
+                                        Aspect="AspectFit"
+                                        HeightRequest="70"
+                                        IsOpaque="True"
+                                        StyleClass="Image"
+                                        WidthRequest="80">
+                                        <Image.Source>
+                                            <FontImageSource
+                                                FontFamily="MyAlias"
+                                                Glyph="{StaticResource WorkInstructionIcon}"
+                                                Size="80"
+                                                Color="#cdcdcd" />
+                                        </Image.Source>
+                                    </Image>
+                                </StackLayout>
+                            </DataTemplate>
+                        </buttons:SfButton.Content>
+                    </buttons:SfButton>
+
+                    <!--  Assessments Button  -->
+                    <buttons:SfButton
+                        x:Name="assessmentsButton"
+                        BackgroundImageSource="assessments_cell_image.png"
+                        Command="{Binding MenuViewModel.NavigateToAssessmentsCommand}"
+                        CommandParameter="6"
+                        CornerRadius="0"
+                        IsVisible="False">
+                        <buttons:SfButton.Content>
+                            <DataTemplate>
+                                <StackLayout StyleClass="Areas_Layout">
+                                    <Label
+                                        Margin="20"
+                                        HorizontalTextAlignment="Start"
+                                        LineBreakMode="TailTruncation"
+                                        Style="{StaticResource HomeButtonLabel}"
+                                        Text="{classes:Translate SIDEBAR_TITLE_ASSESSMENTS}"
+                                        WidthRequest="210" />
+                                    <Image
+                                        Margin="20"
+                                        Aspect="AspectFit"
+                                        HeightRequest="70"
+                                        IsOpaque="True"
+                                        StyleClass="Image"
+                                        WidthRequest="80">
+                                        <Image.Source>
+                                            <FontImageSource
+                                                FontFamily="MyAlias"
+                                                Glyph="{StaticResource AssessmentsIcon}"
+                                                Size="80"
+                                                Color="#cdcdcd" />
+                                        </Image.Source>
+                                    </Image>
+                                </StackLayout>
+                            </DataTemplate>
+                        </buttons:SfButton.Content>
+                    </buttons:SfButton>
+
+                    <!--  Feed Button  -->
+                    <buttons:SfButton
+                        x:Name="feedButton"
+                        BackgroundImageSource="feed_cell_image.png"
+                        Command="{Binding MenuViewModel.NavigateToFeedCommand}"
+                        CommandParameter="7"
+                        CornerRadius="0"
+                        IsVisible="False">
+                        <buttons:SfButton.Content>
+                            <DataTemplate>
+                                <StackLayout Orientation="Horizontal">
+                                    <Label
+                                        Margin="20"
+                                        LineBreakMode="TailTruncation"
+                                        Style="{StaticResource HomeButtonLabel}"
+                                        Text="{classes:Translate SIDEBAR_TITLE_FEED}"
+                                        WidthRequest="210" />
+                                    <Image
+                                        Margin="20"
+                                        Aspect="AspectFit"
+                                        HeightRequest="70"
+                                        IsOpaque="True"
+                                        StyleClass="Image"
+                                        WidthRequest="80">
+                                        <Image.Source>
+                                            <FontImageSource
+                                                FontFamily="MyAlias"
+                                                Glyph="{StaticResource FeedIcon}"
+                                                Size="80"
+                                                Color="#cdcdcd" />
+                                        </Image.Source>
+                                    </Image>
+                                </StackLayout>
+                            </DataTemplate>
+                        </buttons:SfButton.Content>
+                    </buttons:SfButton>
+                </Grid>
+            </ScrollView>
+
+            <!--  Show more button  -->
+            <Image
+                x:Name="ShowMoreImage"
+                Grid.Row="1"
+                Margin="10,0,0,30"
+                HeightRequest="40"
+                HorizontalOptions="Center"
+                IsOpaque="True"
+                VerticalOptions="End"
+                WidthRequest="40">
+                <!--  Image Source  -->
+                <Image.Source>
+                    <FontImageSource
+                        x:Name="ArrowImage"
+                        FontFamily="FAR"
+                        Glyph="{x:Static classes:IconFont.ArrowAltCircleDown}"
+                        Color="White" />
+                </Image.Source>
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+                </Image.GestureRecognizers>
+            </Image>
+
+            <!--  MessageCenter Info  -->
+            <controls:MessageCenter Grid.Row="1" />
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

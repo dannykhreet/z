@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ViewCell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EZGO.Maui.Controls.ViewCells.CompletedTaskViewCell"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+             xmlns:enumerations="clr-namespace:EZGO.Api.Models.Enumerations;assembly=EZGO.Api.Models"
+             x:Name="CompletedTaskViewCellPage"
+             xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+             xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons">
+    <ViewCell.View>
+        <Grid BackgroundColor="White">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="160" />
+                <ColumnDefinition Width="5" />
+            </Grid.ColumnDefinitions>
+            
+            <!-- Image -->
+            <controls:CustomImageOnline
+                Grid.Column="0"
+                ImageUrl="{Binding DisplayPicture}"
+                Aspect="AspectFit" />
+
+            <!-- Name, due date, marked by and property values -->
+            <StackLayout Grid.Column="1" Padding="5" Spacing="1">
+
+                <!-- Name -->
+                <Label Style="{StaticResource CompletedTasksTitleText}" Text="{Binding Name}" MaxLines="1" LineBreakMode="TailTruncation">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding HasProperties}" Value="False">
+                            <Setter Property="Margin" Value="0,0,0,6" x:Name="NameLabel"></Setter>
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+
+                <!--Task Detail String-->
+                <Label x:Name="TaskDetailsLabel"
+                       Style="{StaticResource CompletedTasksSmallText}"
+                       Text="{Binding TaskDetailsString}"
+                       LineBreakMode="TailTruncation"
+                       MaxLines="4"/>
+            </StackLayout>
+
+            <!-- Status -->
+            <StackLayout 
+                Orientation="Horizontal"
+                Grid.Column="2"
+                HorizontalOptions="End"
+                VerticalOptions="Center"
+                Margin="0, 0, 20, 0"
+                Spacing="10">
+
+                <!-- Action -->
+                <customButtons:ActionButton
+                    IsVisible="{Binding Action}"
+                    ActionBubbleCount="{Binding ActionBubbleCount}"
+                    Command="{Binding ActionsCommand, Source={x:Reference CompletedTaskViewCellPage}}"
+                    CommandParameter="{Binding}"
+                    Style="{StaticResource ActionBorderButton}"/>
+
+
+
+
+                <!-- Taks Status Buttons -->
+                <AbsoluteLayout
+                    VerticalOptions="Center"
+                    IsVisible="{Binding IsScoreButtonVisible, Converter={StaticResource ReverseBooleanConverter}}">
+
+                    <buttons:SfButton
+                    Style="{StaticResource WhiteBorderButton}"
+                    Margin="0,0,1,0"
+                    Command="{Binding TapStatusCommand, Source={x:Reference CompletedTaskViewCellPage }}"
+                    CommandParameter="{Binding}"
+                    IsVisible="{Binding IsStatusButtonVisible}"
+                    Background="{Binding TaskStatus, Converter={StaticResource StatusToColorConverter}}">
+
+                        <buttons:SfButton.Content>
+                            <DataTemplate>
+
+
+                            <Image
+                                IsOpaque="True"
+                            HorizontalOptions="CenterAndExpand"
+                            VerticalOptions="CenterAndExpand">
+                                <Image.Source>
+                                    <FontImageSource
+                                    FontFamily="{StaticResource MaterialFontFamily}"
+                                    Glyph="{x:Static classes:IconFont.ThumbDown}"
+                                    Size="25"
+                                    Color="White" />
+                                </Image.Source>
+                                <Image.Triggers>
+                                    <DataTrigger
+                                    TargetType="Image"
+                                    Binding="{Binding TaskStatus}"
+                                    Value="{x:Static enumerations:TaskStatusEnum.Ok}">
+                                        <Setter Property="Source">
+                                            <FontImageSource
+                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                            Glyph="{x:Static classes:IconFont.ThumbUp}"
+                                            Color="White"
+                                            Size="25" />
+                                        </Setter>
+                                    </DataTrigger>
+                                    <DataTrigger
+                                    TargetType="Image"
+                                    Binding="{Binding TaskStatus}"
+                                    Value="{x:Static enumerations:TaskStatusEnum.Skipped}">
+                                        <Setter Property="Source">
+                                            <FontImageSource
+                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                            Glyph="{x:Static classes:IconFont.FastForward}"
+                                            Color="White"
+                                            Size="30" />
+                                        </Setter>
+                                    </DataTrigger>
+                                    <DataTrigger
+                                    TargetType="Image"
+                                    Binding="{Binding TaskStatus}"
+                                    Value="{x:Static enumerations:TaskStatusEnum.NotOk}">
+                                        <Setter Property="Source">
+                                            <FontImageSource
+                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                            Glyph="{x:Static classes:IconFont.ThumbDown}"
+                                            Color="White"
+                                            Size="25" />
+                                        </Setter>
+                                    </DataTrigger>
+                                </Image.Triggers>
+                            </Image>
+                            </DataTemplate>
+
+                        </buttons:SfButton.Content>
+                    </buttons:SfButton>
+
+                    <!-- badge -->
+                    <buttons:SfButton
+                        Background="{Binding TaskStatus, Converter={StaticResource StatusToColorConverter}}"
+                        Stroke="White"
+                        StrokeThickness="1"
+                        WidthRequest="20"
+                        HeightRequest="20"
+                        CornerRadius="12"
+                        Margin="30,-10,0,0"
+                        IsVisible="{Binding HasPictureProof}">
+                        <buttons:SfButton.Content>
+                            <DataTemplate>
+
+
+                            <Label
+                                    HorizontalTextAlignment="Center"
+                                    TextColor="White" 
+                                    Text="{x:Static classes:IconFont.CameraAlt}"
+                                    FontFamily="{StaticResource MaterialFontFamily}" 
+                                    HorizontalOptions="CenterAndExpand"
+                                    VerticalOptions="CenterAndExpand"
+                                    FontSize="Small" />
+                            </DataTemplate>
+
+                        </buttons:SfButton.Content>
+                    </buttons:SfButton>
+                </AbsoluteLayout>
+            </StackLayout>
+
+            <!-- Color indicator -->
+            <BoxView Grid.Column="3" BackgroundColor="{Binding TaskStatus, Converter={StaticResource StatusToColorConverter}}"></BoxView>
+
+        </Grid>
+
+    </ViewCell.View>
+</ViewCell>
+

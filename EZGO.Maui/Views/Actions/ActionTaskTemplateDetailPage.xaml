@@ -1,0 +1,177 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EZGO.Maui.Views.Actions.ActionTaskTemplateDetailPage"
+             NavigationPage.HasNavigationBar="false"
+             NavigationPage.HasBackButton="True"
+             xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons"
+             xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+             xmlns:viewModels="clr-namespace:EZGO.Maui.Core.ViewModels;assembly=EZGO.Maui.Core"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             ios:Page.UseSafeArea="True"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             x:DataType="viewModels:ActionTaskTemplateDetailViewModel"
+             xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+             x:Name="Page"
+             Title="ActionTaskTemplateDetailPage">
+    <ContentPage.Content>
+
+        <Grid StyleClass="bg-lightgrey" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" RowSpacing="0">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="120" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" StyleClass="header, bg-white, m-0, pr-15" RowSpacing="0" ColumnSpacing="0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="0"/>
+                </Grid.ColumnDefinitions>
+
+                <StackLayout Grid.Column="0" StyleClass="column0" VerticalOptions="CenterAndExpand">
+                    <customButtons:BackButton Command="{Binding BindingContext.CancelCommand, Source={x:Reference Page}}" VerticalOptions="CenterAndExpand"/>
+                </StackLayout>
+
+                <StackLayout Grid.Column="1" StyleClass="column1">
+                    <Label Text="{Binding Title}" StyleClass="title, fs-large, fc-darkgrey" HorizontalOptions="StartAndExpand" VerticalOptions="CenterAndExpand" FontFamily="{StaticResource RobotoLight}" x:Name="SlideTitle"/>
+                </StackLayout>
+
+                <StackLayout StyleClass="column2" Grid.Column="2" VerticalOptions="CenterAndExpand" HorizontalOptions="EndAndExpand" Orientation="Horizontal">
+
+
+                </StackLayout>
+                <!--#endregion-->
+
+            </Grid>
+
+            <!-- Detail Page -->
+            <StackLayout Grid.Row="1" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+
+                <Grid HorizontalOptions="CenterAndExpand"
+                      VerticalOptions="CenterAndExpand"
+                      WidthRequest="700"
+                      HeightRequest="500" RowSpacing="0">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="74.5*"/>
+                        <RowDefinition Height="25.5*"/>
+                    </Grid.RowDefinitions>
+
+                    <controls:CustomImage
+                        ImageUrl="{Binding SelectedTaskTemplate.DisplayPicture}"
+                        Aspect="AspectFit"
+                        Grid.RowSpan="2"
+                        DownsampleToViewSize="False">
+                        <controls:CustomImage.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding DetailCommand}" CommandParameter="{Binding}"/>
+                        </controls:CustomImage.GestureRecognizers>
+                    </controls:CustomImage>
+
+                    <!-- Play button -->
+                    <Button
+                        Text="{x:Static classes:IconFont.PlayCircleOutline}"
+                        Grid.Row="0" Grid.RowSpan="2"
+                        TextColor="White" 
+                        FontSize="64" 
+                        BackgroundColor="Transparent"
+                        FontFamily="{StaticResource MaterialFontFamily}" 
+                        HorizontalOptions="Center" 
+                        VerticalOptions="Center" 
+                        IsVisible="{Binding SelectedTaskTemplate.HasVideo}"
+                        InputTransparent="True"/>
+
+                    <Grid Grid.Row="1">
+
+                        <StackLayout VerticalOptions="EndAndExpand" BackgroundColor="{StaticResource TransparentBlackColor}" Padding="20,15">
+
+                            <ScrollView>
+
+                                <StackLayout>
+
+                                    <Label FontFamily="{StaticResource RobotoBold}" Text="{Binding SelectedTaskTemplate.Name}" StyleClass="fc-white, fs-large"/>
+
+                                    <Label FontFamily="{StaticResource RobotoLight}" Text="{Binding SelectedTaskTemplate.Description}" StyleClass="fc-white, fs-small"/>
+
+                                </StackLayout>
+
+                            </ScrollView>
+
+                        </StackLayout>
+                    </Grid>
+
+                </Grid>
+
+            </StackLayout>
+
+            <controls:MessageCenter Grid.Row="1"/>
+
+            <!-- Buttons -->
+            <StackLayout
+                    Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalOptions="Center"
+                    VerticalOptions="CenterAndExpand"
+                    Spacing="10"
+                    WidthRequest="580" 
+                    Margin="25,25,0,25"
+                    IsVisible="True">
+
+                <!-- Skip button -->
+                <customButtons:SkipButton
+                        ButtonColor="{StaticResource GreyColor}"
+                        IsSkippedTextVisible="True"
+                        FilterStatus="{Binding SelectedTaskTemplate.FilterStatus}" />
+
+                <!-- Thumbs Down button -->
+                <customButtons:ThumbDownButton
+                        Status="{Binding SelectedTaskTemplate.FilterStatus}"
+                        IsVisible="{Binding ScoreType, Converter={StaticResource ThumbsTypeVisibilityConverter}}"
+                        ButtonColor="{StaticResource RedColor}"
+                        Style="{StaticResource GreyBorderButtonLarge}"/>
+
+                <!-- Score Button -->
+                <customButtons:ScoreButton
+                        x:Name="ScoreButton"
+                        IsVisible="{Binding SelectedTaskTemplate.Score, Converter={StaticResource IsNullConverter}, ConverterParameter=False}"
+                        Score="{Binding SelectedTaskTemplate.Score}"
+                        Style="{StaticResource DarkerGreyBorderButtonLarge}"
+                        ColorCalculator="{Binding ScoreColorCalculator}"/>
+
+                <!-- Thumbs Up button -->
+                <customButtons:ThumbUpButton
+                        Status="{Binding SelectedTaskTemplate.FilterStatus}"
+                        IsVisible="{Binding ScoreType, Converter={StaticResource ThumbsTypeVisibilityConverter}}"
+                        Stroke="{StaticResource GreenColor}"
+                        ButtonColor="{StaticResource GreenColor}"
+                        Style="{StaticResource GreyBorderButtonLarge}"/>
+
+                <!-- Extra Info Button -->
+                <StackLayout Orientation="Horizontal" Spacing="10" VerticalOptions="Center" IsVisible="{Binding SelectedTaskTemplate.HasExtraInformation}" >
+                    <buttons:SfButton Background="Transparent" Style="{StaticResource DarkerGreyBorderButton}" Command="{Binding BindingContext.StepsCommand, Source={x:Reference Page}}" CommandParameter="{Binding SelectedTaskTemplate}">
+                        <buttons:SfButton.Content>
+                             <DataTemplate>
+                                <Label Text="?" TextColor="{StaticResource DarkerGreyColor}" FontSize="26" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontFamily="{StaticResource RobotoBold}"></Label>
+                            </DataTemplate>
+                        </buttons:SfButton.Content>
+                    </buttons:SfButton>
+
+                    <Label
+                        Text="{classes:Translate TASK_DETAILS_SCREEN_INFO_BUTTON_TITLE}"
+                        VerticalTextAlignment="Center"
+                        TextColor="{StaticResource DarkerGreyColor}"
+                        IsVisible="{Binding SelectedTaskTemplate.HasStepsOrWorkInstructions}">
+                       
+                    </Label>
+
+                </StackLayout>
+
+            </StackLayout>
+
+        </Grid>
+
+    </ContentPage.Content>
+</ContentPage>

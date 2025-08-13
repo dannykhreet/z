@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Grid
+    x:Class="EZGO.Maui.Controls.TagsControl"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:tags="clr-namespace:EZGO.Maui.Core.Models.Tags;assembly=EZGO.Maui.Core"
+    xmlns:xforms="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    x:Name="Tags">
+    <Grid.Resources>
+        <sys:Boolean x:Key="True">True</sys:Boolean>
+        <sys:Boolean x:Key="False">False</sys:Boolean>
+
+        <!--  Expanded tag item template  -->
+        <DataTemplate x:Key="ExpandedTagItemTemplate" x:DataType="tags:TagModel">
+            <StackLayout>
+                <StackLayout.BackgroundColor>
+                    <MultiBinding Converter="{StaticResource TagTableBackgroundColorConverter}">
+                        <Binding Source="{x:Reference ExpandedTagList}" />
+                        <Binding />
+                        <Binding Path="IsExpanded" Source="{x:Reference Tags}" />
+                        <Binding Source="{StaticResource True}" />
+                    </MultiBinding>
+                </StackLayout.BackgroundColor>
+                <StackLayout HorizontalOptions="Fill" VerticalOptions="Fill">
+                    <StackLayout.BackgroundColor>
+                        <MultiBinding Converter="{StaticResource TagTableBackgroundColorConverter}">
+                            <Binding Source="{x:Reference ExpandedTagList}" />
+                            <Binding />
+                            <Binding Path="IsExpanded" Source="{x:Reference Tags}" />
+                            <Binding Source="{StaticResource False}" />
+                        </MultiBinding>
+                    </StackLayout.BackgroundColor>
+
+                    <controls:TagButton
+                        Margin="10"
+                        IsActive="{Binding IsActive}"
+                        IsExpanded="{Binding IsExpanded, Source={x:Reference Tags}}"
+                        TagIconName="{Binding IconName}"
+                        TagIconStyle="{Binding IconStyle}"
+                        TagText="{Binding Name}" />
+                </StackLayout>
+
+                <xforms:SfListView
+                    Margin="0,5,0,0"
+                    CachingStrategy="CreateNewTemplate"
+                    ItemSize="55"
+                    ItemSpacing="0,0,0,0"
+                    ItemsSource="{Binding SubTags}"
+                    ScrollBarVisibility="Never"
+                    SelectionMode="None"
+                    VerticalOptions="FillAndExpand">
+                    <xforms:SfListView.ItemTemplate>
+                        <DataTemplate>
+                            <controls:TagButton
+                                Margin="10"
+                                IsActive="{Binding IsActive}"
+                                IsExpanded="True"
+                                TagIconName="{Binding IconName}"
+                                TagIconStyle="{Binding IconStyle}"
+                                TagText="{Binding Name}" />
+                        </DataTemplate>
+                    </xforms:SfListView.ItemTemplate>
+                </xforms:SfListView>
+            </StackLayout>
+        </DataTemplate>
+    </Grid.Resources>
+    <StackLayout>
+        <!--  Tag group list  -->
+        <!--  Choose tag label  -->
+        <Label FontFamily="{StaticResource RobotoBold}" Text="{classes:Translate TAGS_CHOOSE_TAG}" />
+        <StackLayout Orientation="Horizontal">
+            <xforms:SfListView
+                x:Name="ExpandedTagList"
+                CachingStrategy="CreateNewTemplate"
+                HeightRequest="55"
+                HorizontalOptions="FillAndExpand"
+                ItemSize="166"
+                ItemTemplate="{StaticResource ExpandedTagItemTemplate}"
+                ItemsSource="{Binding TagList, Source={x:Reference Tags}}"
+                Orientation="Horizontal"
+                ScrollBarVisibility="Never"
+                SelectionMode="None"
+                VerticalOptions="StartAndExpand" />
+
+            <!--  Expand button  -->
+            <buttons:SfButton
+                Margin="20,5,20,0"
+                Background="{StaticResource GreenColor}"
+                Command="{Binding ExpandCommand, Source={x:Reference Tags}}"
+                HeightRequest="40"
+                HorizontalOptions="Start"
+                VerticalOptions="Start"
+                WidthRequest="40"
+                CornerRadius="0">
+                <buttons:SfButton.Content>
+                    <DataTemplate>
+                        <Label
+                            FontFamily="FAS"
+                            FontSize="15"
+                            HorizontalOptions="CenterAndExpand"
+                            StyleClass="fontButton, fs-32, fc-darkgrey"
+                            Text="{StaticResource ChevronsDown}"
+                            TextColor="White"
+                            VerticalTextAlignment="Center" />
+                    </DataTemplate>
+                </buttons:SfButton.Content>
+            </buttons:SfButton>
+        </StackLayout>
+    </StackLayout>
+</Grid>

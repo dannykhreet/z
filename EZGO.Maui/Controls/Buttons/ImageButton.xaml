@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<buttons:SfButton
+    x:Class="EZGO.Maui.Controls.Buttons.ImageButton"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    TextColor="White"
+    EnableRippleEffect="False"
+    Style="{StaticResource ProfileImageBorder}"
+    x:Name="ImageButtons">
+    <buttons:SfButton.Content>
+        <DataTemplate>
+            <controls:CustomImageOnline
+                IsOpaque="True"
+                Margin="0"
+                Aspect="AspectFill"
+                HorizontalOptions="FillAndExpand"
+                ImageUrl="{Binding ImageUrl, Source={x:Reference ImageButtons}}"
+                VerticalOptions="FillAndExpand" />
+        </DataTemplate>
+    </buttons:SfButton.Content>
+</buttons:SfButton>

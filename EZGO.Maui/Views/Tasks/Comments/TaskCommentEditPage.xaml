@@ -1,0 +1,306 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Tasks.Comments.TaskCommentEditPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:busyindicator="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons"
+    xmlns:inputLayout="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:xforms="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    x:Name="Page"
+    Title="TaskCommentEditPage"
+    ios:Page.PreferredStatusBarUpdateAnimation="Fade"
+    ios:Page.PrefersStatusBarHidden="True"
+    ios:Page.UseSafeArea="true"
+    NavigationPage.HasBackButton="True"
+    NavigationPage.HasNavigationBar="false">
+    <ContentPage.Content>
+
+        <!--  Main wrapper  -->
+        <Grid BackgroundColor="{StaticResource BackgroundColor}" RowSpacing="0">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!--  Top menu  -->
+            <Grid
+                Grid.Row="0"
+                ColumnSpacing="0"
+                RowSpacing="0"
+                StyleClass="header, bg-white, m-0, pr-15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="120" />
+                </Grid.ColumnDefinitions>
+
+                <!--  Back button  -->
+                <customButtons:BackButton
+                    Grid.Column="0"
+                    Command="{Binding CancelCommand}"
+                    VerticalOptions="CenterAndExpand" />
+
+                <!--  Page title  -->
+                <StackLayout Grid.Column="1" Spacing="-5">
+                    <Label
+                        FontFamily="{StaticResource RobotoLight}"
+                        HorizontalOptions="CenterAndExpand"
+                        StyleClass="title, fs-large, fc-darkgrey"
+                        Text="{classes:Translate CREATE_COMMENT_SCREEN_TITLE}"
+                        VerticalOptions="CenterAndExpand" />
+
+                    <Label
+                        HorizontalOptions="Center"
+                        LineBreakMode="TailTruncation"
+                        MaxLines="2"
+                        Text="{Binding Title}" />
+                </StackLayout>
+
+                <!--  Edit button  -->
+                <buttons:SfButton
+                    Grid.Column="2"
+                    Background="{StaticResource GreenColor}"
+                    Command="{Binding EditCommand}"
+                    CornerRadius="5"
+                    HeightRequest="35"
+                    IsVisible="{Binding ChangeButtonVisible}"
+                    VerticalOptions="CenterAndExpand">
+
+                    <buttons:SfButton.Content>
+                        <DataTemplate>
+                            <Label
+                                HorizontalTextAlignment="Center"
+                                Text="{classes:Translate ACTION_DETAIL_CHANGE_BUTTON_TITLE}"
+                                TextColor="White"
+                                TextTransform="Uppercase"
+                                VerticalTextAlignment="Center" />
+                        </DataTemplate>
+                    </buttons:SfButton.Content>
+                </buttons:SfButton>
+            </Grid>
+
+            <!--  Main content  -->
+            <ScrollView Grid.Row="1">
+                <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                    <Grid
+                        Padding="50,20,20,0"
+                        ColumnSpacing="40"
+                        HorizontalOptions="Fill"
+                        RowSpacing="0"
+                        VerticalOptions="Fill">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="25" />
+                            <RowDefinition x:Name="commentRow" Height="500" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="290" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--  Your comment label  -->
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            FontFamily="{StaticResource RobotoBold}"
+                            IsVisible="{Binding IsNew}"
+                            Text="{classes:Translate CREATE_COMMENT_SCREEN_COMMENTS_LABEL}" />
+
+                        <!--  Date and author  -->
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            FontFamily="{StaticResource RobotoBold}"
+                            IsVisible="{Binding IsNew, Converter={StaticResource ReverseBooleanConverter}}">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="{Binding Comment.LocalCommentDate, Converter={StaticResource DateToStringConverter}}" />
+                                    <Span Text=" " />
+                                    <Span Text="{Binding Comment.CreatedBy}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+
+                        <!--  Comment text container  -->
+                        <Grid
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            BackgroundColor="White"
+                            Margin="0,0,0,10">
+
+                            <!--  Editing mode with custom placeholder  -->
+                            <Frame
+                                x:Name="sfTextInput"
+                                IsVisible="{Binding EditingEnabled}"
+                                Padding="10"
+                                BorderColor="Gray"
+                                CornerRadius="4"
+                                HasShadow="False"
+                                BackgroundColor="White"
+                                HeightRequest="{Binding Source={x:Reference commentRow}, Path=Height}">
+
+                                <Grid>
+                                    <!-- Custom placeholder -->
+                                    <Label
+                                        x:Name="PlaceholderLabel"
+                                        Text="{classes:Translate CREATE_COMMENT_SCREEN_COMMENTS_PLACEHOLDER}"
+                                        TextColor="Gray"
+                                        Padding="15,13,0,0"
+                                        FontSize="18"
+                                        InputTransparent="True"
+                                        VerticalOptions="Start"
+                                        HorizontalOptions="Start" />
+
+                                    <!-- Editor -->
+                                    <Editor
+                                        x:Name="entry"
+                                        Text="{Binding CommentText, Mode=TwoWay}"
+                                        FontSize="18"
+                                        BackgroundColor="Transparent"
+                                        TextColor="Black"
+                                        Margin="10,10,10,10"
+                                        AutoSize="TextChanges"
+                                        VerticalOptions="FillAndExpand"
+                                        HorizontalOptions="FillAndExpand"
+                                        TextChanged="Editor_TextChanged"
+                                        Focused="Editor_Focused"
+                                        Unfocused="Editor_Unfocused" />
+                                </Grid>
+                            </Frame>
+
+                            <!--  View mode (read-only)  -->
+                            <ScrollView
+                                IsVisible="{Binding EditingEnabled, Converter={StaticResource ReverseBooleanConverter}}"
+                                BackgroundColor="White"
+                                HeightRequest="{Binding Source={x:Reference commentRow}, Path=Height}">
+
+                                <Label
+                                    Margin="15,15,15,15"
+                                    FontSize="18"
+                                    Text="{Binding CommentText}" />
+                            </ScrollView>
+
+                        </Grid>
+
+                        <!--  Images  -->
+                        <xforms:SfListView
+                            x:Name="ImagesList"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            HeightRequest="{Binding Source={x:Reference commentRow}, Path=Height}"
+                            ItemSize="120"
+                            ItemSpacing="0, 0, 20, 20"
+                            ItemsSource="{Binding MediaElements}">
+
+                            <xforms:SfListView.ItemsLayout>
+                                <xforms:GridLayout SpanCount="2" />
+                            </xforms:SfListView.ItemsLayout>
+
+                            <xforms:SfListView.ItemTemplate>
+                                <DataTemplate>
+                                    <controls:ImageInput
+                                        Command="{Binding BindingContext.ChangeMediaItemCommand, Source={x:Reference Page}}"
+                                        CurrentMediaItem="{Binding}"
+                                        ShowMediaOverlay="{Binding BindingContext.EditingEnabled, Source={x:Reference Page}}" />
+                                </DataTemplate>
+                            </xforms:SfListView.ItemTemplate>
+                        </xforms:SfListView>
+
+                        <!--  Tags section  -->
+                        <StackLayout
+                            x:Name="Tags"
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            Margin="0,20,0,0"
+                            IsVisible="False">
+                            
+                            <StackLayout IsVisible="{Binding EditingEnabled, Converter={StaticResource ReverseBooleanConverter}}">
+                                <Label FontFamily="{StaticResource RobotoBold}" Text="{classes:Translate BASE_TEXT_TAGS}" />
+                                <controls:TagList BindableLayout.ItemsSource="{Binding Comment.Tags}" />
+                            </StackLayout>
+
+                            <controls:TagsControl
+                                IsVisible="{Binding EditingEnabled}"
+                                TagList="{Binding AllTags}"
+                                VerticalOptions="Start" />
+                        </StackLayout>
+
+                    </Grid>
+
+                    <!--  Buttons  -->
+                    <Grid
+                        Margin="0,0,0,20"
+                        ColumnSpacing="30"
+                        IsVisible="{Binding EditingEnabled}"
+                        VerticalOptions="FillAndExpand">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50*" />
+                            <ColumnDefinition Width="50*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--  Cancel button  -->
+                        <Button
+                            Grid.Column="0"
+                            Background="Transparent"
+                            BorderColor="{StaticResource RedColor}"
+                            BorderWidth="3"
+                            HeightRequest="48"
+                            Command="{Binding CancelCommand}"
+                            CornerRadius="5"
+                            HorizontalOptions="End"
+                            Text="{classes:Translate BASE_TEXT_CANCEL}"
+                            TextColor="{StaticResource RedColor}"
+                            VerticalOptions="End"
+                            WidthRequest="150" />
+
+                        <!--  Save button  -->
+                        <buttons:SfButton
+                            Grid.Column="1"
+                            Background="{StaticResource GreenColor}"
+                            Command="{Binding SubmitCommand}"
+                            CornerRadius="5"
+                            HeightRequest="48"
+                            HorizontalOptions="Start"
+                            Stroke="{StaticResource GreenColor}"
+                            StrokeThickness="3"
+                            VerticalOptions="End"
+                            WidthRequest="150">
+                            <buttons:SfButton.Content>
+                                <DataTemplate>
+                                    <Grid>
+                                        <busyindicator:SfBusyIndicator
+                                            AnimationType="Cupertino"
+                                            HorizontalOptions="Center"
+                                            IsRunning="{Binding IsBusySaving}"
+                                            Opacity="0.8"
+                                            TextColor="White"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            HorizontalOptions="Center"
+                                            IsVisible="{Binding IsBusySaving, Converter={StaticResource ReverseBooleanConverter}}"
+                                            Text="{classes:Translate EDIT_SCREEN_SAVE_BUTTON_TITLE}"
+                                            TextColor="White"
+                                            TextTransform="Uppercase"
+                                            VerticalOptions="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </buttons:SfButton.Content>
+                        </buttons:SfButton>
+                    </Grid>
+                </StackLayout>
+            </ScrollView>
+
+        </Grid>
+
+    </ContentPage.Content>
+</ContentPage>

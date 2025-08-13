@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Grid
+    x:Class="EZGO.Maui.Controls.ViewCells.SignListItemTemplateViewCell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes;assembly=EZGO.Maui"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:images="clr-namespace:EZGO.Maui.Controls.Images"
+    x:Name="SignItemTemplate">
+    <Grid.GestureRecognizers>
+        <TapGestureRecognizer
+            Tapped="SignItemTemplate_Clicked"
+            Command="{Binding SaveStageCommand, Source={x:Reference SignItemTemplate}}"
+            CommandParameter="{Binding .}" />
+    </Grid.GestureRecognizers>
+    <Grid x:Name="NotYetSigned">
+        <controls:CustomImage
+            Aspect="AspectFill"
+            IsLocalFile="True"
+            ImageUrl="sign.jpeg"
+            IsOpaque="True" />
+        <BoxView
+            x:Name="BackgroundBox"
+            BackgroundColor="{StaticResource GreenColor}"
+            Opacity="0.5">
+            <BoxView.Triggers>
+                <DataTrigger
+                    TargetType="BoxView"
+                    Binding="{Binding IsSyncing, Source={x:Reference SignItemTemplate}}"
+                    Value="True">
+                    <Setter Property="BackgroundColor" Value="{StaticResource LightGreyColor}" />
+                </DataTrigger>
+            </BoxView.Triggers>
+        </BoxView>
+        <Label
+            x:Name="SignStageLabel"
+            FontAttributes="Bold"
+            FontFamily="RobotoBold"
+            FontSize="30"
+            HorizontalTextAlignment="Center"
+            Text="{classes:Translate SIGN_STAGE}"
+            TextColor="White"
+            VerticalOptions="Center">
+            <Label.Triggers>
+                <DataTrigger
+                    TargetType="Label"
+                    Binding="{Binding IsSyncing, Source={x:Reference SignItemTemplate}}"
+                    Value="True">
+                    <Setter Property="Text" Value="{classes:Translate SYNC_STATES_VIEW_SYNSING_MESSAGE}" />
+                    <Setter Property="TextColor" Value="{StaticResource StageGreyColor}" />
+                </DataTrigger>
+            </Label.Triggers>
+        </Label>
+    </Grid>
+    <Grid x:Name="Signed" ColumnSpacing="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="160" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <controls:CustomImage
+            Grid.Column="0"
+            IsLocalFile="True"
+            Aspect="AspectFill"
+            ImageUrl="sign.jpeg"
+            IsOpaque="True" />
+        <BoxView
+            Grid.Column="0"
+            BackgroundColor="{StaticResource DarkBlueColor}"
+            Opacity="0.5" />
+        <Label
+            x:Name="CheckIcon"
+            Grid.Column="0"
+            VerticalOptions="Center"
+            HorizontalOptions="Center"
+            FontSize="55"
+            FontFamily="FAR"
+            Text="check"
+            TextColor="{StaticResource GreenColor}" />
+        <Grid
+            Grid.Column="1"
+            HorizontalOptions="FillAndExpand"
+            BackgroundColor="{StaticResource WhiteColor}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.1*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="45" />
+            </Grid.ColumnDefinitions>
+            <!--  Participant picture  -->
+            <StackLayout
+                Grid.Column="0"
+                VerticalOptions="CenterAndExpand"
+                Orientation="Vertical"
+                Spacing="0">
+                <images:RoundUserImage x:Name="UserImage" />
+                <images:RoundUserImage
+                    x:Name="UserImage2"
+                    Margin="0,-15,0,0"
+                    IsVisible="False" />
+            </StackLayout>
+            <StackLayout Grid.Column="1" VerticalOptions="CenterAndExpand">
+                <Label
+                    x:Name="StageLabel"
+                    FontFamily="{StaticResource RobotoBold}"
+                    TextColor="{StaticResource GreenColor}" />
+                <StackLayout Orientation="Horizontal">
+                    <Label x:Name="DateLabel" />
+                    <Label x:Name="SignedByLabel" FontFamily="{StaticResource RobotoBold}" />
+                </StackLayout>
+            </StackLayout>
+            <Image
+                x:Name="NotesIcon"
+                Grid.Column="2"
+                Margin="0,0,20,0"
+                IsVisible="False"
+                HeightRequest="30"
+                HorizontalOptions="Center"
+                VerticalOptions="Center">
+                <Image.Source>
+                    <FontImageSource
+                        FontFamily="FAS"
+                        Glyph="calendar-lines-pen"
+                        Color="{StaticResource GreenColor}" />
+                </Image.Source>
+            </Image>
+        </Grid>
+    </Grid>
+</Grid>

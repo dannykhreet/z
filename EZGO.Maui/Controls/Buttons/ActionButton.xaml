@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<buttons:SfButton
+    x:Class="EZGO.Maui.Controls.Buttons.ActionButton"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    x:Name="actionButton"
+    Background="Transparent">
+    <buttons:SfButton.Triggers>
+        <DataTrigger
+            Binding="{Binding ActionBubbleCount, Source={x:Reference actionButton}, Converter={StaticResource ZeroToBoolConverter}, ConverterParameter=False}"
+            TargetType="buttons:SfButton"
+            Value="True">
+            <Setter Property="Background" Value="{StaticResource OrangeColor}" />
+        </DataTrigger>
+    </buttons:SfButton.Triggers>
+    <buttons:SfButton.Content>
+        <DataTemplate>
+            <Image
+                HorizontalOptions="CenterAndExpand"
+                IsOpaque="True"
+                VerticalOptions="CenterAndExpand">
+                <Image.Source>
+                    <FontImageSource
+                        FontFamily="{StaticResource MaterialFontFamily}"
+                        Glyph="{x:Static classes:IconFont.FlashOn}"
+                        Size="{Binding IconSize, Source={x:Reference actionButton}}"
+                        Color="{StaticResource OrangeColor}" />
+                </Image.Source>
+                <Image.Triggers>
+                    <DataTrigger
+                        Binding="{Binding ActionBubbleCount, Source={x:Reference actionButton}, Converter={StaticResource ZeroToBoolConverter}, ConverterParameter=False}"
+                        TargetType="Image"
+                        Value="True">
+                        <Setter Property="Source">
+                            <FontImageSource
+                                FontFamily="{StaticResource MaterialFontFamily}"
+                                Glyph="{x:Static classes:IconFont.FlashOn}"
+                                Size="{Binding IconSize, Source={x:Reference actionButton}}"
+                                Color="White" />
+                        </Setter>
+                    </DataTrigger>
+                </Image.Triggers>
+            </Image>
+        </DataTemplate>
+    </buttons:SfButton.Content>
+    <VisualStateManager.VisualStateGroups>
+        <VisualStateGroup x:Name="CommonStates">
+            <VisualState x:Name="Disabled">
+                <VisualState.Setters>
+                </VisualState.Setters>
+            </VisualState>
+        </VisualStateGroup>
+    </VisualStateManager.VisualStateGroups>
+</buttons:SfButton>
+

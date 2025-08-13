@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<StackLayout
+    x:Class="EZGO.Maui.Controls.ExtSearchBar"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:buttons="clr-namespace:EZGO.Maui.Controls.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes;assembly=EZGO.Maui"
+    xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons"
+    xmlns:filters="clr-namespace:EZGO.Maui.Controls.Filters"
+    xmlns:inputLayout="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+    x:Name="Root"
+    AbsoluteLayout.LayoutBounds="{Binding Source={x:Reference Root}, Path=TagsRect, Mode=TwoWay}"
+    AbsoluteLayout.LayoutFlags="WidthProportional,HeightProportional,YProportional"
+    HorizontalOptions="StartAndExpand"
+    StyleClass="column0">
+    <StackLayout.Triggers>
+        <DataTrigger
+            Binding="{Binding Source={x:Reference Root}, Path=IsSearchBarVisible}"
+            TargetType="StackLayout"
+            Value="True">
+            <Setter Property="Grid.ColumnSpan" Value="3" />
+        </DataTrigger>
+    </StackLayout.Triggers>
+
+    <Grid IsVisible="{Binding IsCancelButtonVisible, Source={x:Reference Root}, Converter={StaticResource ReverseBooleanConverter}}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid
+            Grid.Row="0"
+            Margin="0,-28,0,0"
+            RowSpacing="0">
+            <inputLayout:SfTextInputLayout
+                x:Name="searchBar"
+                BackgroundColor="White"
+                ContainerBackground="#E6EEF9"
+                ContainerType="None"
+                FocusedStrokeThickness="1"
+                InputViewPadding="60,0,50,10"
+                IsVisible="{Binding Source={x:Reference Root}, Path=IsSearchBarVisible}">
+                <!--  sam Entry  -->
+                <Entry
+                    x:Name="searchText"
+                    FontSize="20"
+                    HorizontalTextAlignment="Start"
+                    Text="{Binding Source={x:Reference Root}, Path=Text}"
+                    TextChanged="SearchBar_TextChanged" />
+            </inputLayout:SfTextInputLayout>
+
+            <Button
+                Margin="0,0,0,-10"
+                BackgroundColor="Transparent"
+                Clicked="TapGestureRecognizer_Tapped"
+                HeightRequest="55"
+                HorizontalOptions="Start"
+                IsVisible="{Binding Source={x:Reference Root}, Path=IsSearchBarVisible}"
+                VerticalOptions="Start"
+                WidthRequest="55">
+
+                <Button.ImageSource>
+                    <FontImageSource
+                        FontFamily="{StaticResource MaterialFontFamily}"
+                        Glyph="{x:Static classes:IconFont.Close}"
+                        Size="40"
+                        Color="Black" />
+                </Button.ImageSource>
+            </Button>
+
+            <!--  filter button  -->
+            <buttons:CustomFilterButton
+                x:Name="FilterButton"
+                HorizontalOptions="End"
+                TextColor="{StaticResource DarkGreyColor1}"
+                VerticalOptions="Start"
+                WidthRequest="60"
+                ZIndex="1" />
+        </Grid>
+
+        <Image
+            x:Name="iconFilter"
+            Grid.Row="0"
+            Aspect="AspectFit"
+            HorizontalOptions="Start"
+            IsEnabled="{Binding Source={x:Reference Root}, Path=HasFilterIcon}"
+            IsOpaque="True"
+            IsVisible="{Binding Source={x:Reference Root}, Path=HasFilterIcon}"
+            VerticalOptions="Fill"
+            WidthRequest="40">
+            <Image.GestureRecognizers>
+                <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="IconFilter_Tapped" />
+            </Image.GestureRecognizers>
+            <Image.Source>
+                <FontImageSource
+                    FontFamily="{StaticResource MaterialFontFamily}"
+                    Glyph="{x:Static classes:IconFont.Search}"
+                    Size="40"
+                    Color="{StaticResource DarkGreyColor}" />
+            </Image.Source>
+        </Image>
+
+        <filters:TagsFilterSection
+            x:Name="TagsFilter"
+            Grid.Row="1"
+            IsEnabled="{Binding Source={x:Reference Root}, Path=IsButtonClicked}"
+            IsVisible="{Binding Source={x:Reference Root}, Path=IsButtonClicked}" />
+    </Grid>
+
+    <Image
+        Margin="0,0,0,0"
+        Aspect="AspectFit"
+        HorizontalOptions="Start"
+        IsOpaque="True"
+        IsVisible="{Binding IsCancelButtonVisible, Source={x:Reference Root}}"
+        VerticalOptions="CenterAndExpand"
+        WidthRequest="40">
+        <Image.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding CancelCommand}" />
+        </Image.GestureRecognizers>
+        <Image.Source>
+            <FontImageSource
+                FontFamily="{StaticResource MaterialFontFamily}"
+                Glyph="{x:Static classes:IconFont.Close}"
+                Size="40"
+                Color="{StaticResource DarkGreyColor}" />
+        </Image.Source>
+    </Image>
+</StackLayout>

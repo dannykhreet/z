@@ -1,0 +1,812 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Assessments.AssessmentsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:actionsModels="clr-namespace:EZGO.Maui.Core.Models.Actions;assembly=EZGO.Maui.Core"
+    xmlns:behaviors="clr-namespace:EZGO.Maui.Behaviors"
+    xmlns:button="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:buttons="http://schemas.syncfusion.com/maui"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons"
+    xmlns:data="clr-namespace:Syncfusion.Maui.DataSource;assembly=Syncfusion.Maui.DataSource"
+    xmlns:inputLayout="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+    xmlns:inputs="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:list="clr-namespace:EZGO.Maui.Controls.Lists"
+    xmlns:listview="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    xmlns:models="clr-namespace:EZGO.Maui.Core.Models.Assessments;assembly=EZGO.Maui.Core"
+    xmlns:partial="clr-namespace:EZGO.Maui.Views.Partial"
+    xmlns:popup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
+    xmlns:pulltorefresh="clr-namespace:Syncfusion.Maui.PullToRefresh;assembly=Syncfusion.Maui.PullToRefresh"
+    xmlns:sf="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    xmlns:utils="clr-namespace:EZGO.Maui.Core.Utils;assembly=EZGO.Maui.Core"
+    xmlns:viewCells="clr-namespace:EZGO.Maui.Controls.ViewCells.Templates"
+    xmlns:viewModels="clr-namespace:EZGO.Maui.Core.ViewModels.Assessments;assembly=EZGO.Maui.Core"
+		xmlns:images="clr-namespace:EZGO.Maui.Controls.Images"
+	x:Name="Page"
+    ios:Page.UseSafeArea="true"
+    x:DataType="viewModels:AssessmentsViewModel"
+    NavigationPage.HasBackButton="False"
+    NavigationPage.HasNavigationBar="False">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <DataTemplate x:Key="HeaderItemTemplate" x:DataType="models:AssessmentSkillInstructionModel">
+                <Grid BackgroundColor="White" ColumnSpacing="12" Padding="0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="260"/>
+                        <ColumnDefinition Width="70"/>
+                        <ColumnDefinition Width="320"/>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="150"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0"/>
+                    <Label Grid.Column="1" Text="Title" FontFamily="RobotoMedium"/>
+                    <Label Grid.Column="2" FontFamily="FAR" FontSize="Medium" HorizontalOptions="End" Text="user-group"/>
+                    <Label Grid.Column="3" Text="Assessors"/>
+                    <Label Grid.Column="4" Text="Started"/>
+                    <Label Grid.Column="5" Text="Ended"/>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Key="LinearItemTemplate" x:DataType="models:AssessmentSkillInstructionModel">
+                <Grid ColumnSpacing="12"
+                        BackgroundColor="{Binding ., Converter={StaticResource PullToRefreshListLinearIndextToColorConverter}, ConverterParameter={x:Reference Name=LinearAssesmentList}}">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding BindingContext.NavigateToInstructionItems, Source={x:Reference Page}}" CommandParameter="{Binding}" />
+                    </Grid.GestureRecognizers>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="260"/>
+                        <ColumnDefinition Width="70"/>
+                        <ColumnDefinition Width="320"/>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="150"/>
+                    </Grid.ColumnDefinitions>
+                    <!-- image -->
+                    <controls:CustomImage Grid.Column="0" Aspect="Fill" ImageUrl="{Binding Picture}" Opacity="0.6" VerticalOptions="Fill">
+                        <controls:CustomImage.Clip>
+                            <RoundRectangleGeometry Rect="0,0,100,100" CornerRadius="0,15,0,15"/>
+                        </controls:CustomImage.Clip>
+                    </controls:CustomImage>
+                    <!-- check -->
+                    <Label Grid.Column="0" FontFamily="{StaticResource MaterialFontFamily}" FontSize="60"
+               HorizontalOptions="Center" VerticalOptions="Center"
+               IsVisible="{Binding IsCompleted}"
+               Text="{x:Static classes:IconFont.Check}" TextColor="{StaticResource GreenColor}" />
+                    <!-- title -->
+                    <Label Grid.Column="1" VerticalOptions="Center" FontFamily="RobotoBold" FontSize="Medium"
+               Text="{Binding Name}" TextColor="Black" LineBreakMode="TailTruncation" MaxLines="2"/>
+                    <!-- avatars -->
+                    <images:UserImageList Grid.Column="2"
+                      ItemsSourceChangeCachingStrategy="ClearItems"
+                              UserIds="{Binding EditedByUsersId}"
+                              HorizontalOptions="End"
+                              IsVisible="{Binding EditedByUsersId, Converter={StaticResource ListCountToBooleanConverter}}"/>
+                    <!-- names OR CTA -->
+                    <Label Grid.Column="3"
+                           FontFamily="{StaticResource RobotoMedium}"
+                           FontSize="12"
+                           TextColor="Black"
+                           VerticalOptions="Center"
+                           LineBreakMode="TailTruncation"
+                           Text="{Binding ReturnListOfUsers}"
+                           IsVisible="{Binding ReturnListOfUsers, Converter={StaticResource StringIsNullOrEmptyConverter}, ConverterParameter=False}"/>
+                    <Label Grid.Column="3" WidthRequest="300" FontFamily="RobotoBold" FontSize="Medium"
+                           Text="Start assessment of this instruction" TextColor="{StaticResource GreenColor}"
+                           VerticalOptions="Center"
+                           IsVisible="{Binding IsStartedOrCompleted, Converter={StaticResource ReverseBooleanConverter}}"/>
+                    <!-- started -->
+                    <Label Grid.Column="4" FontFamily="{StaticResource RobotoMedium}" FontSize="Small"
+               VerticalOptions="Center" HorizontalOptions="Start"
+               IsVisible="{Binding IsStartedOrCompleted}"
+               Text="{Binding LocalStartedAt, Converter={StaticResource DateTimeShortMonthToStringConverter}}"/>
+                    <!-- ended / ongoing -->
+                    <Label Grid.Column="5" FontFamily="RobotoMedium" FontSize="Small"
+               VerticalOptions="Center" HorizontalOptions="Start"
+               IsVisible="{Binding IsCompleted}"
+               Text="{Binding LocalCompletedAt, Converter={StaticResource DateTimeShortMonthToStringConverter}}"/>
+                    <Label Grid.Column="5" FontFamily="RobotoMedium" FontSize="Medium" Text="Ongoing"
+               TextColor="{StaticResource GreenColor}" IsVisible="{Binding IsStarted}"
+               VerticalOptions="Center"/>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate
+                x:Key="GridItemTemplate"
+                x:Name="Assessments"
+                x:DataType="models:AssessmentSkillInstructionModel">
+                <button:SfButton
+                    Background="{StaticResource DarkBlueColor}"
+                    Command="{Binding BindingContext.NavigateToInstructionItems, Source={x:Reference Page}}"
+                    CommandParameter="{Binding}"
+                    CornerRadius="0">
+                    <button:SfButton.Content>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.RowDefinitions />
+                                <!--  Background Image  -->
+                                <controls:CustomImage
+                                        Aspect="Fill"
+                                        ImageUrl="{Binding Picture}"
+                                        Opacity="0.2"/>
+                                <!--  Overlay  -->
+                                <controls:CustomImage
+                                        Aspect="Fill"
+                                        BackgroundColor="LightGray"
+                                        Opacity="0.8"
+                                        VerticalOptions="End"
+                                        HeightRequest="140" />
+                                <!--  Title & description  -->
+                                <images:UserImageList
+                                        Margin="140,0,0,140"
+                                        ItemsSourceChangeCachingStrategy="ClearItems"
+                                        UserIds="{Binding EditedByUsersId}"/>
+                                <ScrollView>
+                                    <StackLayout>
+                                        <Grid
+                                            Padding="10, 65, 0, 0"
+                                            RowSpacing="10" >
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="2*" />
+                                                <RowDefinition Height="2*" />
+                                                <RowDefinition Height="2*" />
+                                                <RowDefinition Height="2*" />
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="0.1*" />
+                                                <ColumnDefinition Width="0.1*" />
+                                            </Grid.ColumnDefinitions>
+                                            <HorizontalStackLayout Grid.Row="0" Spacing="10">
+                                                <Label
+                                                Grid.Column="0"
+                                                VerticalOptions="Center"
+                                                FontFamily="FAR"
+                                                FontSize="Small"
+                                                Text="input-text"/>
+                                                <Label
+                                                Grid.Column="1"
+                                                FontFamily="{StaticResource RobotoBold}"
+                                                FontSize="Small"
+                                                Text="{Binding Name}"
+                                                LineBreakMode="WordWrap"
+                                                MaximumWidthRequest="210"
+                                                TextColor="Black"/>
+                                            </HorizontalStackLayout>
+                                            <HorizontalStackLayout Grid.Row ="1" Spacing="10" IsVisible="{Binding IsStartedOrCompleted}">
+                                                <Label
+                                                Grid.Column="0"
+                                                VerticalOptions="Center"
+                                                FontFamily="FAR"
+                                                FontSize="Micro"
+                                                Text="user-group"/>
+                                                <Label 
+                                                Grid.Column="1"
+                                                FontFamily="{StaticResource RobotoMedium}"
+                                                FontSize="Micro"
+                                                TextColor="Black"
+                                                WidthRequest="180"
+                                                LineBreakMode="TailTruncation"
+                                                Text="{Binding ReturnListOfUsers}" />
+                                            </HorizontalStackLayout>
+                                            <HorizontalStackLayout Grid.Row ="2" Spacing="10" IsVisible="{Binding IsStartedOrCompleted}">
+                                                <Label
+                                                Grid.Column="0"
+                                                VerticalOptions="Center"
+                                                FontFamily="FAR"
+                                                FontSize="Micro"
+                                                Text="calendar"/>
+                                                <Label
+                                                Grid.Column="1"
+                                                FontFamily="{StaticResource RobotoMedium}"
+                                                FontSize="Micro"
+                                                IsVisible="{Binding IsStartedOrCompleted}"
+                                                Text ="{Binding LocalStartedAt, Converter={StaticResource  DateTimeShortMonthToStringConverter}}"/>
+                                            </HorizontalStackLayout>
+                                            <HorizontalStackLayout Grid.Row ="3" Spacing="10">
+                                                <Label
+                                                Grid.Column="1"
+                                                WidthRequest="300" 
+                                                Padding="20, 50, 0, 0"
+                                                FontFamily="RobotoBold"
+                                                FontSize="Micro"
+                                                Text="Start assessment of this instruction"
+                                                TextColor="{StaticResource GreenColor}"
+                                                IsVisible="{Binding IsStartedOrCompleted,Converter={StaticResource ReverseBooleanConverter}}"/>
+                                                <Label
+                                                Grid.Column="0"
+                                                VerticalOptions="Center"
+                                                FontFamily="FAR"
+                                                FontSize="Micro"
+                                                Text="calendar-check"
+                                                IsVisible="{Binding IsCompleted}"/>
+                                                <Label
+                                                Grid.Column="1"
+                                                FontFamily="RobotoMedium"
+                                                FontSize="Micro"
+                                                IsVisible="{Binding IsCompleted}">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span Text ="{Binding LocalCompletedAt, Converter={StaticResource DateTimeShortMonthToStringConverter}}"/>
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+                                                <Label
+                                                Grid.Column="1"
+                                                Padding="20, 0, 0, 0"
+                                                FontFamily="RobotoMedium"
+                                                FontSize="Micro"
+                                                Text="Ongoing"
+                                                TextColor="{StaticResource GreenColor}"
+                                                IsVisible="{Binding IsStarted}"/>
+                                            </HorizontalStackLayout>
+                                        </Grid>
+                                    </StackLayout>
+                                </ScrollView>
+                                <Label
+                                    Margin="10"
+                                    FontFamily="{StaticResource MaterialFontFamily}"
+                                    FontSize="60"
+                                    HorizontalOptions="Start"
+                                    IsVisible="{Binding IsCompleted}"
+                                    Text="{x:Static classes:IconFont.Check}"
+                                    TextColor="{StaticResource GreenColor}"
+                                    HeightRequest="200" />
+                            </Grid>
+                        </DataTemplate>
+                    </button:SfButton.Content>
+                </button:SfButton>
+            </DataTemplate>
+            <DataTemplate x:Key="ParticipantAssessmentsTemplate" x:DataType="models:BasicAssessmentModel">
+                <StackLayout
+                    Padding="0,5,0,5"
+                    BackgroundColor="White"
+                    Orientation="Horizontal">
+                    <!--  Participant name  -->
+                    <Label
+                        Grid.Column="0"
+                        Margin="15,0,0,0"
+                        FontSize="Medium"
+                        HorizontalOptions="StartAndExpand"
+                        Text="{Binding CompletedFor}"
+                        TextColor="Black"
+                        VerticalOptions="CenterAndExpand" />
+                    <!--  Participant picture  -->
+                    <button:SfButton
+                        Grid.Column="1"
+                        Margin="0,0,10,0"
+                        Style="{StaticResource ProfileImageBorder}">
+                        <button:SfButton.Content>
+                            <DataTemplate>
+                                <controls:CustomImage
+                                    Aspect="AspectFill"
+                                    HorizontalOptions="EndAndExpand"
+                                    ImageUrl="{Binding CompletedForPicture}"
+                                    Placeholder="profile.png" />
+                            </DataTemplate>
+                        </button:SfButton.Content>
+                    </button:SfButton>
+                </StackLayout>
+            </DataTemplate>
+            <DataTemplate x:Key="SelectedParticipantAssessmentsTemplate" x:DataType="models:BasicAssessmentModel">
+                <StackLayout
+                    Padding="0,5,0,5"
+                    BackgroundColor="{x:StaticResource GreenColor}"
+                    Orientation="Horizontal">
+                    <!--  Participant name  -->
+                    <Label
+                        Grid.Column="0"
+                        Margin="15,0,0,0"
+                        FontSize="Medium"
+                        HorizontalOptions="StartAndExpand"
+                        Text="{Binding CompletedFor}"
+                        TextColor="Black"
+                        VerticalOptions="CenterAndExpand" />
+                    <!--  Participant picture  -->
+                    <button:SfButton
+                        Grid.Column="1"
+                        Margin="0,0,10,0"
+                        Style="{StaticResource ProfileImageBorder}">
+                        <button:SfButton.Content>
+                            <DataTemplate>
+                                <controls:CustomImage
+                                    Aspect="AspectFill"
+                                    HorizontalOptions="EndAndExpand"
+                                    ImageUrl="{Binding CompletedForPicture}"
+                                    Placeholder="profile.png" />
+                            </DataTemplate>
+                        </button:SfButton.Content>
+                    </button:SfButton>
+                </StackLayout>
+            </DataTemplate>
+            <DataTemplate x:Key="ParticipantsHeaderTemplate">
+                <StackLayout
+                    Grid.Column="0"
+                    BackgroundColor="White"
+                    Orientation="Horizontal">
+                    <Label
+                        Margin="0,0,5,0"
+                        Padding="15,10,0,10"
+                        BackgroundColor="White"
+                        FontSize="Large"
+                        HorizontalOptions="Start"
+                        Text="{classes:Translate APP_ASSESSMENTS_PARTICIPANTS}"
+                        TextColor="Black"
+                        VerticalOptions="EndAndExpand" />
+                    <button:SfButton
+                        Margin="0,0,20,0"
+                        Background="Transparent"
+                        Command="{Binding BindingContext.OpenUserPopupCommand, Source={x:Reference Page}}"
+                        HorizontalOptions="End"
+                        IsEnabled="True"
+                        Stroke="Transparent"
+                        VerticalOptions="Center"
+                        WidthRequest="20">
+                        <buttons:SfButton.Content>
+                            <DataTemplate>
+                                <Label
+                                    FontFamily="{StaticResource MaterialFontFamily}"
+                                    FontSize="20"
+                                    HorizontalOptions="CenterAndExpand"
+                                    HorizontalTextAlignment="Center"
+                                    Text="{x:Static classes:IconFont.Add}"
+                                    TextColor="{x:StaticResource GreenColor}"
+                                    VerticalOptions="CenterAndExpand"
+                                    VerticalTextAlignment="Center" />
+                            </DataTemplate>
+                        </buttons:SfButton.Content>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Disabled">
+                                    <VisualState.Setters />
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </button:SfButton>
+                </StackLayout>
+            </DataTemplate>
+            <DataTemplate x:Key="AssessmentsFooterTemplate" x:DataType="viewModels:AssessmentsViewModel">
+                <viewCells:SignButtonTemplate
+                    CompleteText="{classes:Translate COMPLETE_ASSESSMENT_BUTTON_TEXT}"
+                    IsSignatureRequired="{Binding BindingContext.SelectedUserAssessment.SignatureRequired, Source={x:Reference Page}}"
+                    SignCommand="{Binding BindingContext.SignCommand, Source={x:Reference Page}}"
+                    SignText="{classes:Translate ASSESSMENT_TASKS_SIGN_TEXT}"
+                    TasksDone="{Binding BindingContext.SelectedUserAssessment.IsSignButtonEnabled, Source={x:Reference Page}}"
+                    TextHorizontalOption="EndAndExpand" />
+            </DataTemplate>
+            <DataTemplate x:Key="RightSwipeTemplate" x:DataType="viewModels:AssessmentsViewModel">
+                <Grid BackgroundColor="{StaticResource RedColor}">
+                    <Label
+                        FontFamily="{StaticResource MaterialFontFamily}"
+                        FontSize="Large"
+                        HorizontalOptions="CenterAndExpand"
+                        Text="{x:Static classes:IconFont.Delete}"
+                        TextColor="White"
+                        VerticalOptions="CenterAndExpand" />
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Key="AutocompleteTemplate" x:Name="AutocompleteTemplate">
+                <StackLayout
+                    Padding="20,20,20,0"
+                    HorizontalOptions="Fill"
+                    VerticalOptions="Start">
+                    <!--  Participant Input  -->
+                    <inputLayout:SfTextInputLayout
+                        ContainerType="Outlined"
+                        Hint="{classes:Translate Text={x:Static utils:LanguageConstants.participantName}}"
+                        OutlineCornerRadius="5"
+                        Stroke="{StaticResource GreenColor}">
+                        <inputs:SfAutocomplete
+                            DisplayMemberPath="Text"
+                            DropDownPlacement="Bottom"
+                            HeightRequest="55"
+                            IsClearButtonVisible="False"
+                            MaxDropDownHeight="150"
+                            ItemsSource="{Binding Resources}"
+                            Text="{Binding AutoCompleteText, Mode=TwoWay}"
+                            TextSearchMode="Contains">
+                            <inputs:SfAutocomplete.HeightRequest>
+                                <OnPlatform x:TypeArguments="x:Double">
+                                    <On Platform="iOS">20</On>
+                                    <On Platform="Android,Windows">45</On>
+                                </OnPlatform>
+                            </inputs:SfAutocomplete.HeightRequest>
+                            <inputs:SfAutocomplete.Behaviors>
+                                <behaviors:EventToCommandBehavior Command="{Binding AutoCompleteSelectedCommand}" EventName="SelectionChanged" />
+                            </inputs:SfAutocomplete.Behaviors>
+                        </inputs:SfAutocomplete>
+                    </inputLayout:SfTextInputLayout>
+                    <ScrollView HeightRequest="200">
+                        <StackLayout BindableLayout.ItemsSource="{Binding PopupResources}" VerticalOptions="StartAndExpand">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="actionsModels:ResourceModel">
+                                    <StackLayout Orientation="Horizontal">
+                                        <Label HorizontalOptions="StartAndExpand" Text="{Binding Text}" />
+                                        <Label
+                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                            FontSize="Large"
+                                            HorizontalOptions="End"
+                                            Text="{x:Static classes:IconFont.Delete}">
+                                            <Label.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding BindingContext.RemoveResourceCommand, Source={x:Reference Page}}" CommandParameter="{Binding}" />
+                                            </Label.GestureRecognizers>
+                                        </Label>
+                                    </StackLayout>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </StackLayout>
+                    </ScrollView>
+                </StackLayout>
+            </DataTemplate>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <AbsoluteLayout AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="WidthProportional,HeightProportional">
+            <popup:SfPopup
+                FooterHeight="80"
+                HeaderHeight="45"
+                HeaderTitle=""
+                IsOpen="{Binding IsDeleteParticipantPopupOpen}"
+                MinimumHeightRequest="400"
+                ShowFooter="True"
+                WidthRequest="500">
+                <popup:SfPopup.Behaviors>
+                    <behaviors:EventToCommandBehavior Command="{Binding CloseDeleteParticipantPopupCommand}" EventName="Closed" />
+                </popup:SfPopup.Behaviors>
+                <popup:SfPopup.ContentTemplate>
+                    <DataTemplate>
+                        <Label
+                            Padding="20"
+                            FontSize="Large"
+                            Text="{classes:Translate Text={x:Static utils:LanguageConstants.deleteParticipantMessage}}" />
+                    </DataTemplate>
+                </popup:SfPopup.ContentTemplate>
+                <popup:SfPopup.FooterTemplate>
+                    <DataTemplate>
+                        <Grid
+                            Padding="20"
+                            ColumnSpacing="30"
+                            CompressedLayout.IsHeadless="True"
+                            HeightRequest="80"
+                            HorizontalOptions="Fill"
+                            VerticalOptions="End">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.5*" />
+                                <ColumnDefinition Width="0.5*" />
+                            </Grid.ColumnDefinitions>
+                            <!--  Cancel Button  -->
+                            <button:SfButton
+                                Grid.Column="0"
+                                Background="Transparent"
+                                Command="{Binding CloseDeleteParticipantPopupCommand}"
+                                CornerRadius="5"
+                                HorizontalOptions="FillAndExpand"
+                                IsEnabled="True"
+                                Stroke="{StaticResource RedColor}"
+                                StrokeThickness="3"
+                                Text="{classes:Translate BASE_TEXT_CANCEL}"
+                                TextColor="{StaticResource RedColor}" />
+                            <!--  Add Button  -->
+                            <customButtons:SubmitButton
+                                Grid.Column="1"
+                                ButtonText="{classes:Translate BASE_TEXT_OK}"
+                                Command="{Binding SubmitDeleteParticipantPopupCommand}"
+                                HorizontalOptions="FillAndExpand"
+                                IsLoading="{Binding IsBusy}" />
+                        </Grid>
+                    </DataTemplate>
+                </popup:SfPopup.FooterTemplate>
+            </popup:SfPopup>
+            <popup:SfPopup
+                x:Name="PopupLayout"
+                x:DataType="viewModels:AssessmentsViewModel"
+                ContentTemplate="{StaticResource AutocompleteTemplate}"
+                ShowCloseButton="True"
+                FooterHeight="80"
+                HeaderHeight="45"
+                IsOpen="{Binding IsUserPopupOpen}"
+                MinimumHeightRequest="400"
+                Opened="PopupLayout_Opened"
+                ShowFooter="True"
+                StaysOpen="True"
+                WidthRequest="500">
+                <popup:SfPopup.Behaviors>
+                    <behaviors:EventToCommandBehavior Command="{Binding CloseUserPopupCommand}" EventName="Closed" />
+                </popup:SfPopup.Behaviors>
+                <!--  Add Participant Header  -->
+                <popup:SfPopup.HeaderTemplate>
+                    <DataTemplate>
+                        <StackLayout Padding="20,20,20,0">
+                            <Label
+                                FontFamily="{StaticResource RobotoRegular}"
+                                FontSize="Medium"
+                                HorizontalTextAlignment="Start"
+                                Text="{classes:Translate Text={x:Static utils:LanguageConstants.addParticipant}}"
+                                VerticalTextAlignment="Start" />
+                        </StackLayout>
+                    </DataTemplate>
+                </popup:SfPopup.HeaderTemplate>
+                <popup:SfPopup.FooterTemplate>
+                    <DataTemplate>
+                        <Grid
+                            Padding="20"
+                            ColumnSpacing="30"
+                            HeightRequest="80"
+                            HorizontalOptions="FillAndExpand"
+                            VerticalOptions="EndAndExpand">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.5*" />
+                                <ColumnDefinition Width="0.5*" />
+                            </Grid.ColumnDefinitions>
+                            <!--  Cancel Button  -->
+                            <button:SfButton
+                                Grid.Column="0"
+                                Background="Transparent"
+                                Command="{Binding CloseUserPopupCommand}"
+                                CornerRadius="0"
+                                HorizontalOptions="FillAndExpand"
+                                Stroke="{StaticResource RedColor}"
+                                StrokeThickness="3"
+                                Text="{classes:Translate BASE_TEXT_CANCEL}"
+                                TextColor="{StaticResource RedColor}" />
+                            <!--  Add Button  -->
+                            <customButtons:SubmitMauiButton
+                                Grid.Column="1"
+                                HeightRequest="40"
+                                ButtonText="{classes:Translate BASE_TEXT_ADD}"
+                                Clicked="{Binding SubmitUserPopupCommand}"
+                                HorizontalOptions="FillAndExpand"
+                                IsLoading="{Binding IsBusy}" />
+                        </Grid>
+                    </DataTemplate>
+                </popup:SfPopup.FooterTemplate>
+            </popup:SfPopup>
+            <Grid
+                AbsoluteLayout.LayoutBounds="0,0,1,1"
+                AbsoluteLayout.LayoutFlags="WidthProportional,HeightProportional"
+                ColumnSpacing="0"
+                CompressedLayout.IsHeadless="True"
+                RowSpacing="0">
+                <Grid.RowDefinitions>
+                    <!--  AppBar Row  -->
+                    <RowDefinition Height="0.127*" />
+                    <!--  Content Row  -->
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <!--  App Bar  -->
+                <Grid Grid.Row="0" Style="{StaticResource HeaderStyle}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="0.7*" />
+                        <ColumnDefinition Width="0.35*" />
+                    </Grid.ColumnDefinitions>
+                    <!--  Title Label  -->
+                    <Label
+                        Grid.Column="1"
+                        FontFamily="{StaticResource RobotoLight}"
+                        HorizontalOptions="Start"
+                        StyleClass="title, fs-large, fc-darkgrey"
+                        Text="{Binding AssessmentsTemplateFilter.SelectedFilter.Name}"
+                        VerticalOptions="CenterAndExpand" />
+                    <!--  Statuses && List Switcher Controls  -->
+                    <StackLayout Grid.Column="2" Orientation="Horizontal">
+                        <!--  Info Label  -->
+                        <StackLayout
+                            Grid.Column="0"
+                            Margin="10"
+                            HorizontalOptions="End"
+                            VerticalOptions="Center"
+                            WidthRequest="200">
+                            <Label
+                                Margin="10,0,0,0"
+                                FontSize="12"
+                                HorizontalOptions="EndAndExpand"
+                                Text="{Binding CompletedInstructionsText}" />
+                            <Label
+                                Margin="10,0,0,0"
+                                FontSize="12"
+                                HorizontalOptions="EndAndExpand"
+                                Text="{Binding AllInstructionsText}" />
+                        </StackLayout>
+                        <StackLayout
+                            Grid.Column="1"
+                            Padding="0,0,15,0"
+                            HorizontalOptions="EndAndExpand"
+                            StyleClass="column2"
+                            VerticalOptions="Center">
+                            <!--  Layout Switch Buttons  -->
+                            <controls:LayoutSwitcher
+                                HorizontalOptions="EndAndExpand"
+                                ListLayout="{Binding ListViewLayout}"
+                                TapCommand="{Binding ListViewLayoutCommand}"
+                                VerticalOptions="End" />
+                        </StackLayout>
+                    </StackLayout>
+                </Grid>
+                <!--  Content  -->
+                <Grid
+                    Grid.Row="1"
+                    x:DataType="viewModels:AssessmentsViewModel"
+                    BackgroundColor="{x:StaticResource BackgroundColor}"
+                    ColumnSpacing="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition x:Name="MenuColumn" Width="0.098*" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <!--  Side menu  -->
+                    <partial:MenuNewControl
+                        Grid.Row="0"
+                        Grid.RowSpan="2"
+                        Grid.Column="0"
+                        StyleClass="bg-darkblue, fc-white" />
+                    <!--  Tags and description container  -->
+                    <Grid Grid.Row="0" Grid.Column="1" BackgroundColor="White" ColumnSpacing="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="420" />
+                        </Grid.ColumnDefinitions>
+                        <!-- DESCRIPTION -->
+                        <StackLayout Grid.Column="0" Padding="20,0,0,10" Spacing="6"
+                                      IsVisible="{Binding SelectedAssessmentTemplate.Description, Converter={StaticResource StringIsNullOrEmptyConverter}, ConverterParameter=False}">
+                            <Label Text="DESCRIPTION" FontFamily="{StaticResource RobotoBold}" FontSize="12" TextColor="#8A8A8A" />
+                            <ScrollView HeightRequest="70">
+                                <Label Margin="0,0,0,10" FontFamily="{StaticResource RobotoLight}" Text="{Binding SelectedAssessmentTemplate.Description}" />
+                            </ScrollView>
+                            <ScrollView HeightRequest="100" IsVisible="{Binding ContainsTags}" Orientation="Horizontal">
+                                <controls:TagList Margin="0" BindableLayout.ItemsSource="{Binding SelectedAssessmentTemplate.Tags}" Wrap="NoWrap" />
+                            </ScrollView>
+                        </StackLayout>
+                        <!-- Assessors/Started panel (replace your snippet) -->
+                        <StackLayout Grid.Column="1"
+                                     Padding="0,0,20,10"
+                                     Spacing="6"
+                                     IsVisible="{Binding SelectedUserAssessment.HasAssessors}">
+                                                <Label Text="ASSESSORS" FontFamily="{StaticResource RobotoBold}" FontSize="12" TextColor="#8A8A8A"/>
+                                                <images:UserImageList Margin="0,0,0,4"
+                                                        ItemsSourceChangeCachingStrategy="ClearItems"
+                                                        UserIds="{Binding SelectedUserAssessment.EditedByUsersId}"/>
+                                                <Label FontFamily="{StaticResource RobotoMedium}"
+                                                         FontSize="12"
+                                                         LineBreakMode="TailTruncation"
+                                                         Text="{Binding SelectedUserAssessment.ReturnListOfUsers}"/>
+                                                <Label Margin="0,8,0,0"
+                                                         Text="STARTED"
+                                                         FontFamily="{StaticResource RobotoBold}"
+                                                         FontSize="12"
+                                                         TextColor="#8A8A8A"
+                                                         IsVisible="{Binding SelectedUserAssessment.StartDate, Converter={StaticResource IsNullConverter}}"/>
+                                                <Label FontFamily="{StaticResource RobotoMedium}"
+                                                         FontSize="12"
+                                                         Text="{Binding SelectedUserAssessment.StartDate, Converter={StaticResource DateTimeShortMonthToStringConverter}}"
+                                                         IsVisible="{Binding SelectedUserAssessment.StartDate, Converter={StaticResource IsNullConverter}}"/>
+                        </StackLayout>
+                    </Grid>
+                    <Grid
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Margin="20,20,10,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition x:Name="UsersColumn" Width="0.35*" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <!--  Participants column  -->
+                        <pulltorefresh:SfPullToRefresh
+                            Grid.Column="0"
+                            BackgroundColor="{StaticResource BackgroundColor}"
+                            IsRefreshing="{Binding IsRefreshing}"
+                            ProgressColor="#0003E8"
+                            PullingThreshold="100"
+                            RefreshCommand="{Binding RefreshCommand}"
+                            RefreshViewHeight="30"
+                            RefreshViewThreshold="30"
+                            RefreshViewWidth="30">
+                            <pulltorefresh:SfPullToRefresh.PullableContent>
+                                <sf:SfListView
+                                    x:Name="ParticipantsListView"
+                                    Grid.Column="0"
+                                    AllowSwiping="True"
+                                    AutoFitMode="DynamicHeight"
+                                    CachingStrategy="CreateNewTemplate"
+                                    EndSwipeTemplate="{StaticResource RightSwipeTemplate}"
+                                    HeaderSize="60"
+                                    HeaderTemplate="{StaticResource ParticipantsHeaderTemplate}"
+                                    ItemSpacing="1"
+                                    ItemTemplate="{StaticResource ParticipantAssessmentsTemplate}"
+                                    ItemsSource="{Binding Assessments}"
+                                    SelectedItem="{Binding SelectedUserAssessment, Mode=TwoWay}"
+                                    SelectedItemTemplate="{StaticResource SelectedParticipantAssessmentsTemplate}"
+                                    SelectionMode="Single"
+                                    SwipeOffset="100"
+                                    SwipeThreshold="60"
+                                    TapCommand="{Binding ShowUserAssessment}">
+                                    <sf:SfListView.DataSource>
+                                        <data:DataSource>
+                                            <data:DataSource.SortDescriptors>
+                                                <data:SortDescriptor Direction="Descending" PropertyName="Id" />
+                                            </data:DataSource.SortDescriptors>
+                                        </data:DataSource>
+                                    </sf:SfListView.DataSource>
+                                    <sf:SfListView.Behaviors>
+                                        <behaviors:EventToCommandBehavior Command="{Binding OpenDeleteParticipantPopupCommand}" EventName="Swiping" />
+                                    </sf:SfListView.Behaviors>
+                                </sf:SfListView>
+                            </pulltorefresh:SfPullToRefresh.PullableContent>
+                        </pulltorefresh:SfPullToRefresh>
+                        <!--  User assessments column  -->
+                        <Grid Grid.Column="1">
+                            <!--  Detail Page  -->
+                            <list:PullToRefreshList
+                                x:Name="LinearAssesmentList"
+                                x:TypeArguments="viewModels:AssessmentsViewModel"
+                                FooterSize="100"
+                                HeaderSize="50"
+                                FooterTemplate="{StaticResource AssessmentsFooterTemplate}"
+                                GridItemTemplate="{StaticResource GridItemTemplate}"
+                                HeaderItemTemplate="{StaticResource HeaderItemTemplate}"
+                                HasItems="{Binding UserSkillInstructionsFilter.HasItems}"
+                                IsRefreshing="{Binding IsRefreshing}"
+                                LinearItemTemplate="{StaticResource LinearItemTemplate}"
+                                ListDataSource="{Binding UserSkillInstructionsFilter.ListSource}"
+                                ListItemSize="{Binding LayoutManager.CurrentLayout.ItemSize}"
+                                ListItemSpacing="{Binding LayoutManager.CurrentLayout.ItemSpacing}"
+                                ListItemSizeForList="100"
+                                ListItemSpacingForList="1"
+                                ListItemsSource="{Binding UserSkillInstructionsFilter.FilteredList}"
+                                ListViewLayout="{Binding LayoutManager.ListLayout}"
+                                RefreshCommand="{Binding RefreshCommand}"
+                                SpanCount="{Binding LayoutManager.CurrentLayout.SpanCount}" />
+                        </Grid>
+                        <!--  Detail page  -->
+                        <pulltorefresh:SfPullToRefresh
+                            Grid.Column="1"
+                            IsRefreshing="{Binding IsRefreshing}"
+                            ProgressColor="#0003E8"
+                            PullingThreshold="100"
+                            RefreshCommand="{Binding RefreshCommand}"
+                            RefreshViewHeight="30"
+                            RefreshViewThreshold="30"
+                            RefreshViewWidth="30">
+                            <pulltorefresh:SfPullToRefresh.PullableContent>
+                                <Grid>
+                                    <listview:SfListView
+                                        x:Name="gridListView"
+                                        Background="White"
+                                        FooterSize="100"
+                                        FooterTemplate="{StaticResource AssessmentsFooterTemplate}"
+                                        IsVisible="{Binding IsListVisible, Converter={StaticResource ReverseBooleanConverter}}"
+                                        ItemSize="200"
+                                        ItemSpacing="5"
+                                        ItemTemplate="{StaticResource GridItemTemplate}"
+                                        ItemsSource="{Binding UserSkillInstructionsFilter.FilteredList}"
+                                        SelectionMode="Single">
+                                        <listview:SfListView.ItemsLayout>
+                                            <listview:GridLayout SpanCount="3" />
+                                        </listview:SfListView.ItemsLayout>
+                                    </listview:SfListView>
+                                    <listview:SfListView
+                                        x:Name="linearListView"
+                                        Background="White"
+                                        FooterSize="100"
+                                        FooterTemplate="{StaticResource AssessmentsFooterTemplate}"
+                                        IsVisible="{Binding IsListVisible}"
+                                        ItemSize="110"
+                                        ItemSpacing="7"
+                                        ItemTemplate="{StaticResource LinearItemTemplate}"
+                                        ItemsSource="{Binding UserSkillInstructionsFilter.FilteredList}"
+                                        SelectionMode="Single" />
+                                    <controls:EmptyView IsVisible="{Binding UserSkillInstructionsFilter.HasItems, Converter={StaticResource ReverseBooleanConverter}}" />
+                                </Grid>
+                            </pulltorefresh:SfPullToRefresh.PullableContent>
+                        </pulltorefresh:SfPullToRefresh>
+                    </Grid>
+                    <!--  Message Center  -->
+                    <controls:MessageCenter Grid.Column="1" />
+                </Grid>
+            </Grid>
+        </AbsoluteLayout>
+    </ContentPage.Content>
+</ContentPage>

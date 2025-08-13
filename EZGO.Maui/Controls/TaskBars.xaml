@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="EZGO.Maui.Controls.TaskBars"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:shimmer="clr-namespace:Syncfusion.Maui.Shimmer;assembly=Syncfusion.Maui.Core"
+    xmlns:converter="clr-namespace:EZGO.Maui.Core.Converter;assembly=EZGO.Maui.Core"
+    x:Name="BarPage">
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <converter:IntToGridProportionConverter x:Key="IntToGridProportionConverter" />
+        </ResourceDictionary>
+    </ContentView.Resources>
+
+    <Grid
+        Margin="{Binding GaugeMargin, Source={x:Reference BarPage}}"
+        Padding="20,0,30,0"
+        BackgroundColor="White"
+        IsVisible="{Binding BarIsVisible, Source={x:Reference BarPage}}">
+
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding TapCommand, Source={x:Reference BarPage}}" CommandParameter="{Binding TapCommandParamater, Source={x:Reference BarPage}}" />
+        </Grid.GestureRecognizers>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="140" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="60" />
+        </Grid.ColumnDefinitions>
+
+        <Label
+            Grid.Column="0"
+            Text="{Binding Text, Source={x:Reference BarPage}}"
+            FontFamily="{StaticResource RobotoRegular}"
+            FontSize="Large"
+            TextColor="{StaticResource DarkGreyColor}"
+            VerticalOptions="Center"
+            LineBreakMode="WordWrap" />
+
+        <shimmer:SfShimmer
+            Grid.Column="1"
+            Margin="20"
+            Fill="{StaticResource GreyColor}"
+            VerticalOptions="FillAndExpand"
+            HorizontalOptions="FillAndExpand"
+            IsVisible="{Binding IsLoading, Source={x:Reference BarPage} ,Converter={StaticResource ReverseBooleanConverter}}}">
+            <shimmer:SfShimmer.CustomView>
+                <shimmer:ShimmerView HorizontalOptions="FillAndExpand" />
+            </shimmer:SfShimmer.CustomView>
+        </shimmer:SfShimmer>
+
+        <Border
+            Grid.Column="1"
+            Margin="20"
+            IsVisible="{Binding IsLoading, Source={x:Reference BarPage}}}"
+            BackgroundColor="{StaticResource GreyColor}"
+            StrokeThickness="0">
+
+            <Grid ColumnSpacing="0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{Binding OkReport.NrOfItems, Source={x:Reference BarPage}, Converter={StaticResource IntToGridProportionConverter}}" />
+                    <ColumnDefinition Width="{Binding NotOkReport.NrOfItems, Source={x:Reference BarPage}, Converter={StaticResource IntToGridProportionConverter}}" />
+                    <ColumnDefinition Width="{Binding SkippedReport.NrOfItems, Source={x:Reference BarPage}, Converter={StaticResource IntToGridProportionConverter}}" />
+                    <ColumnDefinition Width="{Binding TodoReport.NrOfItems, Source={x:Reference BarPage}, Converter={StaticResource IntToGridProportionConverter}}" />
+                </Grid.ColumnDefinitions>
+
+                <Label
+                    Grid.Column="0"
+                    Text="{Binding OkReport.NrOfItems, Source={x:Reference BarPage}}"
+                    BackgroundColor="{StaticResource GreenColor}"
+                    HorizontalTextAlignment="Center"
+                    VerticalTextAlignment="Center"
+                    FontSize="Large"
+                    FontFamily="{StaticResource RobotoRegular}"
+                    TextColor="White" />
+                <Label
+                    Grid.Column="1"
+                    Text="{Binding NotOkReport.NrOfItems, Source={x:Reference BarPage}}"
+                    BackgroundColor="{StaticResource RedColor}"
+                    HorizontalTextAlignment="Center"
+                    VerticalTextAlignment="Center"
+                    FontSize="Large"
+                    FontFamily="{StaticResource RobotoRegular}"
+                    TextColor="White" />
+
+                <Label
+                    Grid.Column="2"
+                    Text="{Binding SkippedReport.NrOfItems, Source={x:Reference BarPage}}"
+                    BackgroundColor="{StaticResource SkippedColor}"
+                    HorizontalTextAlignment="Center"
+                    VerticalTextAlignment="Center"
+                    FontSize="Large"
+                    FontFamily="{StaticResource RobotoRegular}"
+                    TextColor="White" />
+
+                <Label
+                    Grid.Column="3"
+                    Text="{Binding TodoReport.NrOfItems, Source={x:Reference BarPage}}"
+                    BackgroundColor="{StaticResource GreyColor}"
+                    HorizontalTextAlignment="Center"
+                    VerticalTextAlignment="Center"
+                    FontSize="Large"
+                    FontFamily="{StaticResource RobotoRegular}"
+                    TextColor="White" />
+
+            </Grid>
+        </Border>
+
+        <Label
+            Grid.Column="2"
+            Text="{Binding TotalTaskAmount, Source={x:Reference BarPage}}"
+            FontSize="Large"
+            TextColor="{StaticResource DarkGreyColor}"
+            FontFamily="{StaticResource RobotoRegular}"
+            VerticalOptions="Center"
+            HorizontalOptions="Center"
+            VerticalTextAlignment="Center" />
+
+    </Grid>
+</ContentView>

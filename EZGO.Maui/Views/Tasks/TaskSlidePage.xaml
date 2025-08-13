@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Tasks.TaskSlidePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:appbar="clr-namespace:EZGO.Maui.Controls.AppBars"
+    xmlns:behaviors="clr-namespace:EZGO.Maui.Behaviors"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons"
+    xmlns:datatemplates="clr-namespace:EZGO.Maui.Controls.DataTemplates"
+    xmlns:enumerations="clr-namespace:EZGO.Api.Models.Enumerations;assembly=EZGO.Api.Models"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:labels="clr-namespace:EZGO.Maui.Controls.CustomLabels"
+    xmlns:panCardView="clr-namespace:PanCardView;assembly=PanCardView"
+    xmlns:popup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
+    xmlns:popups="clr-namespace:EZGO.Maui.Controls.Popup"
+    xmlns:processors="clr-namespace:PanCardView.Processors;assembly=PanCardView"
+    xmlns:settings="clr-namespace:EZGO.Maui.Core.Classes;assembly=EZGO.Maui.Core"
+    xmlns:sfList="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    xmlns:tasks="clr-namespace:EZGO.Maui.Core.Models.Tasks;assembly=EZGO.Maui.Core"
+    xmlns:viewCells="clr-namespace:EZGO.Maui.Controls.ViewCells"
+    x:Name="Page"
+    Title="TaskSlidePage"
+    ios:Page.UseSafeArea="True"
+    NavigationPage.HasBackButton="False"
+    NavigationPage.HasNavigationBar="False">
+    <Grid>
+        <!--  Action/Comment popup  -->
+        <popups:TaskCommentActionPopup
+            AbsoluteLayout.LayoutBounds="0,0,1,1"
+            AbsoluteLayout.LayoutFlags="WidthProportional,HeightProportional"
+            AbsoluteX="-165"
+            AbsoluteY="-5"
+            HeightRequest="85"
+            IsOpen="{Binding BindingContext.IsActionPopupOpen, Source={x:Reference Page}}"
+            NewActionCommand="{Binding BindingContext.NavigateToNewActionCommand, Source={x:Reference Page}}"
+            NewCommentCommand="{Binding BindingContext.NavigateToNewCommentCommand, Source={x:Reference Page}}"
+            RelativePosition="AlignTop"
+            RelativeView="{Binding Source={x:Reference Buttons}, Path=GetActionButton}"
+            ShowFooter="False"
+            ShowHeader="False"
+            WidthRequest="400" />
+        <!--  Task property popup  -->
+        <popups:TaskPropertyPopupView ContentBindingContext="{Binding PropertyEditViewModel}" IsOpen="{Binding IsPopupOpen}" />
+        <!--  Change photo proof status status popup  -->
+        <popups:PictureProofChangeStatusPopup
+            CancelButtonCommand="{Binding BindingContext.CloseChangeStatusPopupCommand, Source={x:Reference Page}}"
+            FooterHeight="80"
+            HeaderHeight="45"
+            IsOpen="{Binding IsChangeStatusPopupOpen}"
+            KeepButtonCommand="{Binding BindingContext.KeepButtonChangeStatusPopupCommand, Source={x:Reference Page}}"
+            MinimumHeightRequest="200"
+            RemoveButtonCommand="{Binding BindingContext.RemoveButtonChangeStatusPopupCommand, Source={x:Reference Page}}"
+            WidthRequest="500" />
+        <!--  Skip task popup  -->
+        <popups:SkipTaskPopup
+            CancelButtonCommand="{Binding BindingContext.CloseSkipTaskPopupCommand, Source={x:Reference Page}}"
+            FooterHeight="80"
+            HeaderHeight="45"
+            IsOpen="{Binding IsSkipTaskPopupOpen}"
+            MinimumHeightRequest="200"
+            ShowFooter="True"
+            SubmitButtonCommand="{Binding BindingContext.SubmitSkipTaskPopupCommand, Source={x:Reference Page}}"
+            WidthRequest="500" />
+        <Grid
+            x:Name="MainGrid"
+            BackgroundColor="{StaticResource BackgroundColor}"
+            HorizontalOptions="Fill"
+            VerticalOptions="Fill">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <!--  App Bar  -->
+            <Grid
+                Grid.Row="0"
+                ColumnSpacing="0"
+                RowSpacing="0"
+                StyleClass="header, bg-white, m-0, pr-15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="550" />
+                </Grid.ColumnDefinitions>
+                <!--  Back Button  -->
+                <customButtons:BackButton Grid.Column="0" Command="{Binding CancelCommand}" />
+                <!--  Title  -->
+                <labels:TitleLabel
+                    x:Name="SlideTitle"
+                    Grid.Column="1"
+                    HorizontalTextAlignment="Start"
+                    MaxLines="2"
+                    Text="{Binding SelectedTask.AreaPath}" />
+                <!--  Pager  -->
+                <StackLayout
+                    Grid.Column="2"
+                    HorizontalOptions="EndAndExpand"
+                    VerticalOptions="Center">
+                    <!--  Pager  -->
+                    <Label
+                        HorizontalTextAlignment="Center"
+                        Text="{Binding Pager}"
+                        TextColor="{StaticResource DarkerGreyColor}" />
+                    <!--  Filter Bar  -->
+                    <appbar:FilterBarControl
+                        x:TypeArguments="enumerations:TaskStatusEnum"
+                        FilterCommand="{Binding FilterCommand}"
+                        ItemWidth="100"
+                        Opacity="1"
+                        Statuses="{Binding TaskFilterControl.TaskStatusList}"
+                        WidthRequest="400" />
+                </StackLayout>
+            </Grid>
+            <!--  Detail Page  -->
+            <Grid
+                Grid.Row="1"
+                RowSpacing="0"
+                HorizontalOptions="Fill"
+                VerticalOptions="Fill">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="0.70*" />
+                    <RowDefinition Height="0.13*" />
+                    <RowDefinition Height="0.17*" />
+                </Grid.RowDefinitions>
+
+                <!--  Carousel View  -->
+                <panCardView:CoverFlowView
+                    x:Name="CoverFlow"
+                    Grid.Row="0"
+                    Margin="0,0,0,0"
+                    IsCyclical="False"
+                    IsRightToLeftFlowDirectionEnabled="{Binding Source={x:Static settings:Settings.IsRightToLeftLanguage}}"
+                    ItemSwipedCommand="{Binding SelectionChangedCommand}"
+                    ItemsSource="{Binding TaskFilterControl.FilteredList}"
+                    SelectedIndex="{Binding CurrentIndex}"
+                    SelectedItem="{Binding SelectedTask}">
+                    <x:Arguments>
+                        <processors:CoverFlowProcessor OpacityFactor="0.25" ScaleFactor="0.50" />
+                    </x:Arguments>
+                    <!--  Behaviours  -->
+                    <panCardView:CoverFlowView.Behaviors>
+                        <behaviors:CornerFlowViewShiftAsMarginBehavior x:Name="CarouselViewBehaviour" Margin="50" />
+                    </panCardView:CoverFlowView.Behaviors>
+                    <!--  Item Template  -->
+                    <panCardView:CoverFlowView.ItemTemplate>
+                        <DataTemplate x:DataType="tasks:BasicTaskModel">
+                            <viewCells:TaskCarouselViewCell
+                                CardPropertyWidth="{Binding BindingContext.DeviceFormat.PropertyWidth, Source={x:Reference Page}}"
+                                CardWidth="{Binding BindingContext.DeviceFormat.ItemWidth, Source={x:Reference Page}}"
+                                DetailCommand="{Binding BindingContext.SlideDetailCommand, Source={x:Reference Page}}"
+                                FullCardWidth="{Binding BindingContext.DeviceFormat.FullWidth, Source={x:Reference Page}}"
+                                PropertyCommand="{Binding BindingContext.OpenPopupCommand, Source={x:Reference Page}}" />
+                        </DataTemplate>
+                    </panCardView:CoverFlowView.ItemTemplate>
+                </panCardView:CoverFlowView>
+                <!--  Tags  -->
+                <sfList:SfListView
+                    Grid.Row="1"
+                    Margin="40,0,40,0"
+                    HeightRequest="55"
+                    HorizontalOptions="FillAndExpand"
+                    ItemSize="166"
+                    ItemsSource="{Binding SelectedTask.Tags}"
+                    Orientation="Horizontal"
+                    ScrollBarVisibility="Never"
+                    SelectionMode="None"
+                    VerticalOptions="Start">
+                    <sfList:SfListView.ItemTemplate>
+                        <datatemplates:TagDataTemplate />
+                    </sfList:SfListView.ItemTemplate>
+                </sfList:SfListView>
+
+                <!--  Buttons  -->
+                <controls:TaskSlideButtonsStackLayout
+                    x:Name="Buttons"
+                    Grid.Row="2"
+                    Margin="0,10,0,0"
+                    ActionBubbleCount="{Binding SelectedTask.ActionBubbleCount}"
+                    ActionButtonCommand="{Binding ActionCommand}"
+                    CompletedDeeplinkId="{Binding SelectedTask.CompletedDeeplinkId}"
+                    DeepLinkCommand="{Binding DeepLinkCommand}"
+                    DeepLinkCompletionIsRequired="{Binding SelectedTask.DeepLinkCompletionIsRequired}"
+                    DeeplinkButtonVisible="{Binding DeeplinkButtonVisible}"
+                    HasExtraInformation="{Binding SelectedTask.HasExtraInformation}"
+                    HasPictureProof="{Binding SelectedTask.HasPictureProof}"
+                    HasStepsOrWorkInstructions="{Binding SelectedTask.HasStepsOrWorkInstructions}"
+                    HorizontalOptions="Center"
+                    IsDeepLinkValid="{Binding SelectedTask.IsDeepLinkValid}"
+                    IsThumbsDownBadgeVisible="{Binding SelectedTask.IsThumbsDownBadgeVisible}"
+                    IsThumbsUpBadgeVisible="{Binding SelectedTask.IsThumbsUpBadgeVisible}"
+                    IsVisible="True"
+                    ScoreType="Thumbs"
+                    SkipButtonCommand="{Binding TaskSkippedCommand}"
+                    StepsCommand="{Binding ExtraInformationCommand}"
+                    TaskStatus="{Binding SelectedTask.FilterStatus}"
+                    ThumbsDownButtonCommand="{Binding TaskNotOkCommand}"
+                    ThumbsUpButtonCommand="{Binding TaskOkCommand}"
+                    VerticalOptions="StartAndExpand" />
+
+
+            </Grid>
+
+            <!--  Message Center  -->
+            <controls:MessageCenter Grid.Row="1" />
+
+
+            <!--  Empty View  -->
+            <controls:EmptyView
+                Grid.Row="1"
+                Grid.RowSpan="2"
+                IsVisible="{Binding TaskFilterControl.HasItems, Converter={StaticResource ReverseBooleanConverter}}" />
+        </Grid>
+    </Grid>
+</ContentPage>

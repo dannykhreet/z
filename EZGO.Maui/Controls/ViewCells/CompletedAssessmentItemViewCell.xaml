@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ViewCell
+    x:Class="EZGO.Maui.Controls.ViewCells.CompletedAssessmentItemViewCell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:dateFormats="clr-namespace:EZGO.Maui.Core.Classes.DateFormats;assembly=EZGO.Maui.Core"
+    xmlns:system="clr-namespace:System;assembly=netstandard"
+    x:Name="CompletedAssessmentsItemView">
+    <ViewCell.View>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!--  Assessments Title & SignedAt Date  -->
+            <StackLayout
+                Grid.Column="0"
+                Padding="10,5,10,15"
+                VerticalOptions="CenterAndExpand">
+
+                <!--  Assessment Name  -->
+                <Label
+                    FontSize="Medium"
+                    LineBreakMode="TailTruncation"
+                    Text="{Binding Name}"
+                    VerticalTextAlignment="Start" />
+
+                <!--  Completed By  -->
+                <Label>
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="{classes:Translate ASSESSEE}" />
+                            <Span Text=": " />
+                            <Span Text="{Binding CompletedFor}" />
+                            <Span Text="{x:Static system:Environment.NewLine}" />
+                            <Span Text="{classes:Translate ASSESSOR}" />
+                            <Span Text=": " />
+                            <Span Text="{Binding Assessor}" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+
+                <!--  Completed At  -->
+                <Label Text="{Binding LocalCompletedAt, Converter={StaticResource DateToStringConverter}, ConverterParameter={x:Static dateFormats:BaseDateFormats.DayFirstShortMonthDateTimeFormat}}" />
+            </StackLayout>
+        </Grid>
+    </ViewCell.View>
+</ViewCell>
+

@@ -1,0 +1,199 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             NavigationPage.HasNavigationBar="False"
+             HideSoftInputOnTapped="True"
+             xmlns:buttons="clr-namespace:EZGO.Maui.Controls.Buttons"
+             xmlns:classes="clr-namespace:EZGO.Maui.Classes;assembly=EZGO.Maui"
+             xmlns:labels="clr-namespace:EZGO.Maui.Controls.CustomLabels"
+             xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+             xmlns:button="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             xmlns:entryFields="clr-namespace:EZGO.Maui.Controls.EntryFields"
+             x:Class="EZGO.Maui.Views.User.ProfilePage">
+    <ContentPage.Content>
+
+        <Grid
+            x:Name="MainGrid"
+            BackgroundColor="{StaticResource BackgroundColor}"
+            RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid
+                Grid.Row="0"
+                Style="{StaticResource HeaderStyle}">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="60"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="200"/>
+                </Grid.ColumnDefinitions>
+
+                <!--Navigation Back-->
+                <buttons:BackButton Grid.Column="0"/>
+
+                <!--Title-->
+                <labels:TitleLabel Grid.Column="2"
+                                   Text="{Binding Title}"/>
+
+                <!--Change Password-->
+                <buttons:NavigationBarButton Text="{classes:Translate EDIT_PROFILE_CHANGE_PASSWORD_TITLE}"
+                                             Grid.Column="3"
+                                             Command="{Binding PasswordCommand}"/>
+            </Grid>
+
+            <Grid
+                Grid.Row="1"
+                x:Name="ContentGrid"
+                Padding="0,20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="150"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="80"/>
+                </Grid.RowDefinitions>
+
+                <!--Profile Picture-->
+                <Grid
+                    x:Name="ProfilePicture"
+                    Grid.Row="0"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    WidthRequest="350">
+                    <StackLayout>
+                        <Border
+                            StrokeThickness="0"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            WidthRequest="150"
+                            StrokeShape="RoundRectangle 75"
+                            HeightRequest="150">
+                            <controls:CustomImage
+                                IsLocalFile="{Binding ProfilePicture.IsLocalFile}" 
+                                ImageUrl="{Binding ProfilePicture.PictureUrl}" 
+                                Aspect="AspectFill"
+                                Placeholder="profile.png" />
+                        </Border>
+                    </StackLayout>
+                    <button:SfButton
+                        HorizontalOptions="Center"
+                        VerticalOptions="End"
+                        Background="{StaticResource RedColor}"
+                        WidthRequest="50"
+                        HeightRequest="50"
+                        CornerRadius="30"
+                        Padding="0"
+                        Margin="100, 0, 0, 0"
+                        Command="{Binding ChangePictureCommand}">
+                        <button:SfButton.Content>
+                            <DataTemplate>
+                                <Image Margin="10" IsOpaque="True">
+                                    <Image.Source>
+                                        <FontImageSource
+                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                            Glyph="{x:Static classes:IconFont.Edit}"
+                                            Size="30"
+                                            Color="White"/>
+                                    </Image.Source>
+                                </Image>
+                            </DataTemplate>
+                        </button:SfButton.Content>
+                    </button:SfButton>
+                </Grid>
+
+                <!--Form-->
+                <Grid
+                    x:Name="Form"
+                    Grid.Row="1"
+                    WidthRequest="350"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Fill"
+                    Padding="0,20,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!--Firstname field-->
+                    <entryFields:ValidatableEntry
+                        InputText="{Binding FirstName.Value}"
+                        Grid.Row="0"
+                        Validate="{Binding FirstName.ValidateDel}"
+                        Errors="{Binding FirstName.Errors}"
+                        IsValid="{Binding FirstName.IsValid}"
+                        Title="{classes:Translate EDIT_PROFILE_NAME_TITLE}"
+                        IsLiveValidationOn="True"/>
+
+                    <!--Lastname field-->
+                    <entryFields:ValidatableEntry
+                        InputText="{Binding LastName.Value}"
+                        Grid.Row="1"
+                        Validate="{Binding LastName.ValidateDel}"
+                        Errors="{Binding LastName.Errors}"
+                        IsValid="{Binding LastName.IsValid}"
+                        Title="{classes:Translate EDIT_PROFILE_SURNAME_TITLE}"
+                        IsLiveValidationOn="True"/>
+
+                    <!--Email field-->
+                    <entryFields:ValidatableEntry
+                        InputText="{Binding Email.Value}"
+                        Grid.Row="2"
+                        Errors="{Binding Email.Errors}"
+                        Validate="{Binding Email.ValidateDel}"
+                        IsValid="{Binding Email.IsValid}"
+                        Title="{classes:Translate EDIT_PROFILE_EMAIL_TITLE}"
+                        IsLiveValidationOn="True"/>
+
+                    <!--Language change-->
+                    <!--<StackLayout Grid.Row="3">
+                        <Label Text="{classes:Translate EDIT_PROFILE_LANGUAGE}" />
+                        <pickers:TranslatedPicker                        
+                            ItemsSource="{Binding AvailableLanguages}"
+                            SelectedItem="{Binding PreferredLanguage}"                            
+                        />
+                    </StackLayout>-->
+
+                </Grid>
+
+                <!--Buttons-->
+                <Grid
+                    x:Name="FunctionalButtons"
+                    Padding="0,20,0,0"
+                    WidthRequest="350"
+                    HorizontalOptions="Center"
+                    Grid.Row="2"
+                    ColumnSpacing="30">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!--Cancel Button-->
+                    <buttons:CancelButton
+                            Grid.Column="0"
+                            Text="{classes:Translate EDIT_PROFILE_CANCEL_BUTTON_TITLE}"
+                            Command="{Binding CancelCommand}"/>
+
+                    <!--Submit Button-->
+                    <buttons:SubmitButton
+                            Grid.Column="1"
+                            ButtonText="{classes:Translate EDIT_PROFILE_SAVE_BUTTON_TITLE}"
+                            IsLoading="{Binding IsLoading}"
+                            Command="{Binding UpdateCommand}"/>
+
+                </Grid>
+            </Grid>
+
+            <controls:MessageCenter Grid.Row="1"/>
+
+        </Grid>
+
+    </ContentPage.Content>
+</ContentPage>

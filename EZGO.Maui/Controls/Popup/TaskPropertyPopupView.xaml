@@ -1,0 +1,315 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<popup:SfPopup
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:popup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:taskProperties="clr-namespace:EZGO.Maui.Core.Converter.TaskProperties;assembly=EZGO.Maui.Core"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:textInputLayout="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+    xmlns:enums="clr-namespace:EZGO.Api.Models.Enumerations;assembly=EZGO.Api.Models"
+    xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+    xmlns:datetimepicker="clr-namespace:EZGO.Maui.Controls.DateTimePicker"
+    xmlns:timepickers="clr-namespace:EZGO.Maui.Controls.TimePickers"
+    x:Class="EZGO.Maui.Controls.Popup.TaskPropertyPopupView"
+    MinimumHeightRequest="300" 
+    WidthRequest="400"
+    FooterHeight="80" 
+    HeaderHeight="50"
+    ShowFooter="True"
+    x:Name="popup">
+    <popup:SfPopup.Resources>
+        <ResourceDictionary>
+            <taskProperties:NumericPropertyValueTypeToDecimalPlacesConveter x:Key="NumericPropertyValueTypeToDecimalPlacesConveter"/>
+
+            <!-- Measure time template -->
+            <DataTemplate x:Key="measureTimeInput">
+                <StackLayout
+                    HorizontalOptions="FillAndExpand" 
+                    VerticalOptions="StartAndExpand"
+                    Padding="20,0"
+                    BindingContext="{Binding ContentBindingContext, Source={x:Reference popup}}">
+                    <textInputLayout:SfTextInputLayout
+                        Hint="{Binding Property.DisplayTitleString}" 
+                        ContainerType="Outlined" 
+                        OutlineCornerRadius="5"
+                        ContainerBackground="White"
+                        HasError="{Binding HasError}"
+                        ErrorText="{Binding ErrorMessage}">
+                        <editors:SfNumericEntry
+                            Value="{Binding PopupTimeTaken}" 
+                            ValueChangeMode="OnKeyFocus"
+                            ValueChanged="SfNumericTextBox_ValueChanged"
+                            Maximum="2147483647"
+                            Minimum="-2147483648"/>
+                    </textInputLayout:SfTextInputLayout>
+                    <StackLayout Orientation="Horizontal">
+
+                        <Border
+                            StrokeThickness="1">
+                            <Label 
+                                Text="{Binding TimerLabelText}" 
+                                FontSize="22" 
+                                VerticalOptions="CenterAndExpand" 
+                                Padding="5" 
+                                FontFamily="{StaticResource RobotoRegular}" 
+                                TextColor="{StaticResource DarkGreyColor}"
+                                MaxLines="1"
+                                LineBreakMode="TailTruncation"/>
+                        </Border>
+
+                        <buttons:SfButton Style="{StaticResource TimerButton}"
+                                          Command="{Binding StartTimerCommand}" 
+                                          Text="{classes:Translate TASK_REALIZED_TIME_WATCH}" 
+                                          IsVisible="{Binding TimerStarted, Converter={StaticResource ReverseBooleanConverter}}" 
+                                          FontFamily="{StaticResource RobotoRegular}" 
+                                          TextColor="{StaticResource DarkGreyColor}" />
+
+                        <buttons:SfButton Style="{StaticResource TimerButton}" 
+                                          Command="{Binding StopTimerCommand}" 
+                                          Text="{classes:Translate TASK_REALIZED_TIME_STOP}" 
+                                          IsVisible="{Binding TimerStarted}" 
+                                          FontFamily="{StaticResource RobotoRegular}" 
+                                          TextColor="{StaticResource DarkGreyColor}"/>
+
+                        <buttons:SfButton Style="{StaticResource TimerButton}" 
+                                          Command="{Binding PauseTimerCommand}" 
+                                          Text="{classes:Translate TASK_REALIZED_TIME_PAUSE}"
+                                          IsVisible="{Binding TimerStarted}" 
+                                          FontFamily="{StaticResource RobotoRegular}" 
+                                          TextColor="{StaticResource DarkGreyColor}">
+                            <buttons:SfButton.Triggers>
+                                <DataTrigger TargetType="buttons:SfButton" 
+                                             Binding="{Binding TimerPaused}"
+                                             Value="True">
+                                    <Setter Property="Text" 
+                                            Value="{classes:Translate TASK_REALIZED_TIME_RESUME}"/>
+                                </DataTrigger>
+                            </buttons:SfButton.Triggers>
+                        </buttons:SfButton>
+                    </StackLayout>
+                </StackLayout>
+            </DataTemplate>
+
+            <!-- Single entry template -->
+            <DataTemplate x:Key="singleEntryTemplate">
+                <StackLayout HorizontalOptions="FillAndExpand" 
+                             VerticalOptions="StartAndExpand"
+                             Padding="20,0"
+                             BindingContext="{Binding ContentBindingContext, Source={x:Reference popup}}">
+
+                    <!-- Resources -->
+                    <StackLayout.Resources>
+                        <ResourceDictionary>
+                            <!-- Numeric text box -->
+                            <editors:SfNumericEntry
+                                x:Key="numericTextBox"
+                                Value="{Binding Entry}"
+                                ShowClearButton="False"
+                                CustomFormat="0.00"
+                                Maximum="2147483647"
+                                Minimum="-2147483648"
+                                ValueChanged="SfNumericTextBox_ValueChanged"
+                                ValueChangeMode="OnKeyFocus"/>
+
+                            <!-- String text box -->
+                            <Entry
+                                x:Key="stringEntry"
+                                Text="{Binding Entry}"
+                                Keyboard="Plain"
+                                ClearButtonVisibility="Never"
+                                Focused="EntryOnFocused"/>
+
+                            <!-- Date picker -->
+                            <datetimepicker:TranslatedDatePicker
+                                x:Key="datePicker"
+                                Date="{Binding Entry}"
+                                Focused="EntryOnFocused"/>
+
+                            <!-- Time picker -->
+                            <timepickers:TranslatedTimePicker
+                                x:Key="timePicker"
+                                Time="{Binding TimeEntry}"
+                                Format="HH:mm"/>
+
+                            <!-- Datetime picker -->
+                            <StackLayout x:Key="dateTimePicker"
+                                         Orientation="Horizontal">
+                                <!--Date picker-->
+                                <datetimepicker:TranslatedDatePicker
+                                    Date="{Binding Entry}"
+                                    x:Name="datePicker"
+                                    Unfocused="datePicker_Unfocused"/>
+
+                                <!--Time picker-->
+                                <timepickers:TranslatedTimePicker
+                                    Time="{Binding TimeEntry}"
+                                    x:Name="timePicker"
+                                    Format="HH:mm"/>
+                            </StackLayout>
+                        </ResourceDictionary>
+                    </StackLayout.Resources>
+
+                    <!-- Value input -->
+                    <textInputLayout:SfTextInputLayout
+                        Hint="{Binding Property.DisplayTitleString}"
+                        ContainerType="Outlined"
+                        OutlineCornerRadius="5"
+                        Stroke="Black"
+                        FocusedStrokeThickness="1"
+                        UnfocusedStrokeThickness="1"
+                        ContainerBackground="White"
+                        HasError="{Binding HasError}"
+                        ErrorText="{Binding ErrorMessage}">
+                        <textInputLayout:SfTextInputLayout.TrailingView>
+                            <StackLayout WidthRequest="120" Padding="0,0,10,0">
+                                <Label HorizontalOptions="EndAndExpand" Text="{Binding Property.Value.Name}"
+                                       MaxLines="2" LineBreakMode="TailTruncation"/>
+                            </StackLayout>
+                        </textInputLayout:SfTextInputLayout.TrailingView>
+
+                        <!-- Triggers -->
+                        <textInputLayout:SfTextInputLayout.Triggers>
+                            <!-- When integer input -->
+                            <DataTrigger TargetType="textInputLayout:SfTextInputLayout" Binding="{Binding Property.ValueType}" Value="{x:Static enums:PropertyValueTypeEnum.Integer}">
+                                <Setter Property="Content" Value="{StaticResource numericTextBox}"/>
+                            </DataTrigger>
+                            <!-- When decimal input -->
+                            <DataTrigger TargetType="textInputLayout:SfTextInputLayout" Binding="{Binding Property.ValueType}" Value="{x:Static enums:PropertyValueTypeEnum.Decimal}">
+                                <Setter Property="Content" Value="{StaticResource numericTextBox}"/>
+                            </DataTrigger>
+                            <!-- When string input -->
+                            <DataTrigger TargetType="textInputLayout:SfTextInputLayout" Binding="{Binding Property.ValueType}" Value="{x:Static enums:PropertyValueTypeEnum.String}">
+                                <Setter Property="Content" Value="{StaticResource stringEntry}"/>
+                            </DataTrigger>
+                            <!-- When date input -->
+                            <DataTrigger TargetType="textInputLayout:SfTextInputLayout" Binding="{Binding Property.ValueType}" Value="{x:Static enums:PropertyValueTypeEnum.Date}">
+                                <Setter Property="Content" Value="{StaticResource datePicker}"/>
+                            </DataTrigger>
+                            <!-- When date time input -->
+                            <DataTrigger TargetType="textInputLayout:SfTextInputLayout" Binding="{Binding Property.ValueType}" Value="{x:Static enums:PropertyValueTypeEnum.DateTime}">
+                                <Setter Property="Content" Value="{StaticResource dateTimePicker}"/>
+                            </DataTrigger>
+                            <!-- When time input -->
+                            <DataTrigger TargetType="textInputLayout:SfTextInputLayout" Binding="{Binding Property.ValueType}" Value="{x:Static enums:PropertyValueTypeEnum.Time}">
+                                <Setter Property="Content" Value="{StaticResource timePicker}"/>
+                            </DataTrigger>
+                        </textInputLayout:SfTextInputLayout.Triggers>
+                        <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroupList>
+                            <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="Stroke" Value="Black"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState Name="Focused">
+                                        <VisualState.Setters>
+                                            <Setter Property="Stroke" Value="Black"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState Name="Error">
+                                        <VisualState.Setters>
+                                            <Setter Property="Stroke" Value="Red"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateGroupList>
+    </VisualStateManager.VisualStateGroups>
+                    </textInputLayout:SfTextInputLayout>
+
+                    <!-- Footer -->
+                    <Label Text="{Binding Property.PropertyValueDisplay}"
+                           IsVisible="{Binding Property.PropertyValueDisplay, Converter={StaticResource StringIsNullOrEmptyConverter}, ConverterParameter=False}"
+                           MaxLines="1"
+                           LineBreakMode="TailTruncation"/>
+
+                    <!-- Min value -->
+                    <Label IsVisible="{Binding IsMinVisible}"
+                           MaxLines="1" LineBreakMode="TailTruncation">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="{Binding MinTextLabel}"/>
+                                <Span Text="{Binding MinValue}"/>
+                                <Span Text=" "/>
+                                <Span Text="{Binding Property.DisplayFooterString}"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+
+                    <!-- Max value -->
+                    <Label IsVisible="{Binding IsMaxVisible}"
+                           MaxLines="1" LineBreakMode="TailTruncation">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="{Binding MaxTextLabel}"/>
+                                <Span Text="{Binding MaxValue}"/>
+                                <Span Text=" "/>
+                                <Span Text="{Binding Property.DisplayFooterString}"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+
+                </StackLayout>
+
+            </DataTemplate>
+            <!-- Popup template selector -->
+            <classes:InputTemplateSelector
+                x:Key="InputTemplateSelector"
+                SingleEntryTemplate="{StaticResource singleEntryTemplate}"
+                MeasureTimeInput="{StaticResource measureTimeInput}"/>
+        </ResourceDictionary>
+    </popup:SfPopup.Resources>
+
+    <popup:SfPopup.PopupStyle>
+        <popup:PopupStyle PopupBackground="White"/>
+    </popup:SfPopup.PopupStyle>
+
+    <popup:SfPopup.HeaderTemplate>
+        <DataTemplate>
+            <StackLayout Padding="20,8,20,0">
+                <Label Text="{classes:Translate TASK_PROPERTY_POPUP_TITLE}" 
+                       FontSize="Medium"
+                       FontFamily="{StaticResource RobotoRegular}"
+                       HorizontalTextAlignment="Start"
+                       VerticalTextAlignment="Start"
+                       MaxLines="1"
+                       LineBreakMode="TailTruncation"/>
+            </StackLayout>
+        </DataTemplate>
+    </popup:SfPopup.HeaderTemplate>
+
+    <popup:SfPopup.FooterTemplate>
+        <DataTemplate>
+            <StackLayout Orientation="Horizontal" 
+                         HorizontalOptions="FillAndExpand" 
+                         VerticalOptions="EndAndExpand" 
+                         Padding="20" 
+                         HeightRequest="80" 
+                         Spacing="30">
+
+                <Button BackgroundColor="Transparent"
+                        x:Name="closeButton"
+                        BorderColor="{StaticResource RedColor}"
+                        TextColor="{StaticResource RedColor}"
+                        FontFamily="{StaticResource RobotoRegular}"
+                        Command="{Binding ClosePopupCommand}"
+                        Text="{classes:Translate BASE_TEXT_CANCEL}"
+                        BorderWidth="3"
+                        CornerRadius="5"
+                        HorizontalOptions="FillAndExpand"/>
+
+                <Button BackgroundColor="{StaticResource GreenColor}"
+                        BorderColor="{StaticResource GreenColor}"
+                        Command="{Binding SubmitPopupCommand}"
+                        TextColor="White"
+                        FontFamily="{StaticResource RobotoRegular}"
+                        CornerRadius="5"
+                        Text="{classes:Translate EDIT_SCREEN_SAVE_BUTTON_TITLE}"
+                        HorizontalOptions="FillAndExpand"/>
+
+            </StackLayout>
+        </DataTemplate>
+    </popup:SfPopup.FooterTemplate>
+</popup:SfPopup>
+

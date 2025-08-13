@@ -1,0 +1,3642 @@
+{
+  "Language": "en (US)",
+  "LanguageCulture": "en-US",
+  "LanguageIso": "eng",
+  "ResourceItems": [
+    {
+      "Description": "",
+      "Guid": "5935806952e1a1ed7f8b4569",
+      "ResourceKey": "SIDEBAR_TITLE_TASKS",
+      "ResourceValue": "Tasks"
+    },
+    {
+      "Description": "",
+      "Guid": "5935808452e1a172018b4567",
+      "ResourceKey": "SIDEBAR_TITLE_AUDIT",
+      "ResourceValue": "Audit"
+    },
+    {
+      "Description": "",
+      "Guid": "5943d3b7a39ff3f7178b4569",
+      "ResourceKey": "MAIN_SCREEN_LOGOUT_MESSAGE_TEXT",
+      "ResourceValue": "Logout"
+    },
+    {
+      "Description": "",
+      "Guid": "5943d498a39ff33c188b4567",
+      "ResourceKey": "BASE_TEXT_CANCEL",
+      "ResourceValue": "Cancel"
+    },
+    {
+      "Description": "",
+      "Guid": "594a2d90820ee990448b4569",
+      "ResourceKey": "TASK_DETAILS_SCREEN_SKIP_BUTTON_TITLE",
+      "ResourceValue": "Skip point"
+    },
+    {
+      "Description": "",
+      "Guid": "594a4d92820ee98a4c8b4568",
+      "ResourceKey": "TASK_STEPS_PAGE_NUMBER_TEXT",
+      "ResourceValue": "Page %@ of %@"
+    },
+    {
+      "Description": "",
+      "Guid": "594b93af820ee975318b4568",
+      "ResourceKey": "EDIT_SCREEN_TITLE",
+      "ResourceValue": "Edit task"
+    },
+    {
+      "Description": "",
+      "Guid": "594b93c6820ee936318b4567",
+      "ResourceKey": "EDIT_SCREEN_SAVE_BUTTON_TITLE",
+      "ResourceValue": "Save"
+    },
+    {
+      "Description": "",
+      "Guid": "59526967820ee9bc688b46b8",
+      "ResourceKey": "CHOOSE_TASKS_TITLE_DAY",
+      "ResourceValue": "Today"
+    },
+    {
+      "Description": "",
+      "Guid": "59526985820ee9bd688b461b",
+      "ResourceKey": "CHOOSE_TASKS_TITLE_MONTH",
+      "ResourceValue": "Month"
+    },
+    {
+      "Description": "",
+      "Guid": "5954bc54c430fed7508b4567",
+      "ResourceKey": "TASKS_SCREEN_WEEK_FILTER_TEXT",
+      "ResourceValue": "Week\u0027s tasks"
+    },
+    {
+      "Description": "",
+      "Guid": "5954bc9ac430fe2a518b4568",
+      "ResourceKey": "TASKS_SCREEN_NO_FILTER_TEXT",
+      "ResourceValue": "All tasks"
+    },
+    {
+      "Description": "",
+      "Guid": "5959edd1a39ff34c588b4567",
+      "ResourceKey": "CHECKLIST_SIGN_SCREEN_TITLE",
+      "ResourceValue": "Digital signature"
+    },
+    {
+      "Description": "",
+      "Guid": "5959edd1a39ff34c588b4567",
+      "ResourceKey": "SIGNATURE",
+      "ResourceValue": "Signatures"
+    },
+    {
+      "Description": "",
+      "Guid": "595b3c15820ee9aa3f8b456c",
+      "ResourceKey": "PICK_PHOTO_TAKE_FROM_CAMERA",
+      "ResourceValue": "Upload from camera"
+    },
+    {
+      "Description": "",
+      "Guid": "595b3c74820ee9923f8b4569",
+      "ResourceKey": "CHAT_SCREEN_INPUT_INPUT_TITLE",
+      "ResourceValue": "Type a message here"
+    },
+    {
+      "Description": "",
+      "Guid": "595cff9e820ee98d228b4567",
+      "ResourceKey": "SIDEBAR_TITLE_ACTIONS",
+      "ResourceValue": "Actions"
+    },
+    {
+      "Description": "",
+      "Guid": "595cffb7820ee989228b4567",
+      "ResourceKey": "CHAT_SCREEN_CELL_SHOW_PICTURES",
+      "ResourceValue": "Show pictures"
+    },
+    {
+      "Description": "",
+      "Guid": "595cffca820ee98c228b4567",
+      "ResourceKey": "ALERT_YES_BUTTON_TITLE",
+      "ResourceValue": "YES"
+    },
+    {
+      "Description": "",
+      "Guid": "595cffda820ee98c228b4569",
+      "ResourceKey": "ALERT_NO_BUTTON_TITLE",
+      "ResourceValue": "NO"
+    },
+    {
+      "Description": "",
+      "Guid": "595fa140820ee9af478b4568",
+      "ResourceKey": "BASE_TEXT_ADD_PHOTO_BUTTON_TITLE",
+      "ResourceValue": "Add Media"
+    },
+    {
+      "Description": "",
+      "Guid": "595fa170820ee9d6478b4567",
+      "ResourceKey": "CREATE_ACTION_SCREEN_COMMENTS_LABEL",
+      "ResourceValue": "Type your comments"
+    },
+    {
+      "Description": "",
+      "Guid": "595fa182820ee9cc478b4567",
+      "ResourceKey": "CREATE_ACTION_SCREEN_ACTION_LABEL",
+      "ResourceValue": "Define an action"
+    },
+    {
+      "Description": "",
+      "Guid": "595fa1f8820ee9fd478b4569",
+      "ResourceKey": "CREATE_ACTION_SCREEN_REVIEW_TEXT",
+      "ResourceValue": "Review?"
+    },
+    {
+      "Description": "",
+      "Guid": "595fa256820ee9f4478b4569",
+      "ResourceKey": "BASE_TEXT_SEND",
+      "ResourceValue": "Send"
+    },
+    {
+      "Description": "",
+      "Guid": "59639843a39ff3935d8b4569",
+      "ResourceKey": "GENERAL_CHOOSE_FROM_GALLERY_TITLE",
+      "ResourceValue": "Choose from gallery"
+    },
+    {
+      "Description": "",
+      "Guid": "59639859a39ff3e25e8b4569",
+      "ResourceKey": "GENERAL_TAKE_A_FOTO_TITLE",
+      "ResourceValue": "Take a photo"
+    },
+    {
+      "Description": "",
+      "Guid": "5963a1aca39ff359608b456a",
+      "ResourceKey": "TASK_DETAILS_SCREEN_CHECKLIST_TITLE",
+      "ResourceValue": "Check"
+    },
+    {
+      "Description": "",
+      "Guid": "5964dd2ba39ff379238b4567",
+      "ResourceKey": "AUDIT_LIST_SCREEN_TITLE",
+      "ResourceValue": "Audit"
+    },
+    {
+      "Description": "",
+      "Guid": "59687d73a39ff3e1648b4569",
+      "ResourceKey": "AUDIT_SCORE_TEXT",
+      "ResourceValue": "Score:"
+    },
+    {
+      "Description": "",
+      "Guid": "59816855820ee9ba4c8b4567",
+      "ResourceKey": "ACTION_SCREEN_TITLE",
+      "ResourceValue": "Action"
+    },
+    {
+      "Description": "",
+      "Guid": "5981687f820ee9fe4c8b4567",
+      "ResourceKey": "ACTION_NOT_SYNC",
+      "ResourceValue": "Not Sync"
+    },
+    {
+      "Description": "",
+      "Guid": "598168f7820ee92b4d8b4567",
+      "ResourceKey": "BASE_TEXT_ADD",
+      "ResourceValue": "Add"
+    },
+    {
+      "Description": "",
+      "Guid": "59816a14820ee9f54c8b4567",
+      "ResourceKey": "ACTION_DETAIL_SCREEN_RESOURCES_SECTION_TITLE",
+      "ResourceValue": "Resources"
+    },
+    {
+      "Description": "",
+      "Guid": "59816a29820ee9094d8b4567",
+      "ResourceKey": "ACTION_DETAIL_SCREEN_CREATION_DATE_SECTION_TITLE",
+      "ResourceValue": "Started"
+    },
+    {
+      "Description": "",
+      "Guid": "59816a37820ee91c4d8b4568",
+      "ResourceKey": "ACTION_DETAIL_SCREEN_DUE_DATE_SECTION_TITLE",
+      "ResourceValue": "Due-date"
+    },
+    {
+      "Description": "",
+      "Guid": "59816a4b820ee9764c8b4567",
+      "ResourceKey": "BASE_TEXT_DEPARTMENT",
+      "ResourceValue": "Dept."
+    },
+    {
+      "Description": "",
+      "Guid": "59816a5c820ee9934c8b4568",
+      "ResourceKey": "BASE_TEXT_AND_MORE",
+      "ResourceValue": "and more"
+    },
+    {
+      "Description": "",
+      "Guid": "592ee40c52e1a1e2328b4567",
+      "ResourceKey": "LOGIN_SCREEN_LOGIN_BUTTON_TITLE",
+      "ResourceValue": "Login"
+    },
+    {
+      "Description": "",
+      "Guid": "59352f5152e1a1c5618b4567",
+      "ResourceKey": "AREA_SELECTION_CONTINUE_BUTTON_TITLE",
+      "ResourceValue": "CONTINUE"
+    },
+    {
+      "Description": "",
+      "Guid": "5935802c52e1a1af7f8b4568",
+      "ResourceKey": "SIDEBAR_TITLE_HOME",
+      "ResourceValue": "Home"
+    },
+    {
+      "Description": "",
+      "Guid": "5982f60e820ee9f87c8b4568",
+      "ResourceKey": "CHAT_SCREEN_YESTERDAY",
+      "ResourceValue": "Yesterday"
+    },
+    {
+      "Description": "",
+      "Guid": "5982f61c820ee99a7c8b4568",
+      "ResourceKey": "BASE_TEXT_SENDING",
+      "ResourceValue": "sending..."
+    },
+    {
+      "Description": "",
+      "Guid": "59526976820ee9c8688b456c",
+      "ResourceKey": "CHOOSE_TASKS_TITLE_WEEK",
+      "ResourceValue": "Week"
+    },
+    {
+      "Description": "",
+      "Guid": "5981e4e4820ee90d2b8b4569",
+      "ResourceKey": "ACTIONS_SCREEN_I_AM_INVOLVED_IN",
+      "ResourceValue": "My actions"
+    },
+    {
+      "Description": "",
+      "Guid": "5982f62b820ee9267d8b4567",
+      "ResourceKey": "BASE_TEXT_OK",
+      "ResourceValue": "OK"
+    },
+    {
+      "Description": "",
+      "Guid": "5982f63e820ee9a67c8b456b",
+      "ResourceKey": "BASE_TEXT_AND",
+      "ResourceValue": "and"
+    },
+    {
+      "Description": "",
+      "Guid": "59899775820ee99c468b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_PROGRESS_TITLE",
+      "ResourceValue": "Adding new task"
+    },
+    {
+      "Description": "",
+      "Guid": "598997bd820ee9cf468b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_BASIC_VIEW_TITLE_TEXT",
+      "ResourceValue": "Title"
+    },
+    {
+      "Description": "",
+      "Guid": "59899873820ee9e5468b4568",
+      "ResourceKey": "TASK_CONSTRUCTOR_BASIC_VIEW_ADD_PHOTO_TEXT",
+      "ResourceValue": "Add Media"
+    },
+    {
+      "Description": "",
+      "Guid": "59899928820ee9e5468b456a",
+      "ResourceKey": "BASE_TEXT_NEXT",
+      "ResourceValue": "Next"
+    },
+    {
+      "Description": "",
+      "Guid": "598ac3baa39ff3680f8b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_DELETE_RULE",
+      "ResourceValue": "Delete rule"
+    },
+    {
+      "Description": "",
+      "Guid": "598ac40fa39ff3760f8b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_RECURRENCE_TITLE",
+      "ResourceValue": "Recurrence"
+    },
+    {
+      "Description": "",
+      "Guid": "598ac42ea39ff34a0f8b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_RECURRENCE_ONCE",
+      "ResourceValue": "Once"
+    },
+    {
+      "Description": "",
+      "Guid": "598ac44ba39ff3320f8b4569",
+      "ResourceKey": "TASK_CONSTRUCTOR_RECURRENCE_WEEKLY",
+      "ResourceValue": "Weekly"
+    },
+    {
+      "Description": "",
+      "Guid": "598ac4bba39ff3bf0f8b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_FROM_DATE",
+      "ResourceValue": "From date"
+    },
+    {
+      "Description": "",
+      "Guid": "598ac4c3a39ff3870f8b4568",
+      "ResourceKey": "TASK_CONSTRUCTOR_TO_DATE",
+      "ResourceValue": "To date"
+    },
+    {
+      "Description": "",
+      "Guid": "598ac559a39ff3870f8b456b",
+      "ResourceKey": "TASK_CONSTRUCTOR_RECUR_EVERY",
+      "ResourceValue": "Recur every"
+    },
+    {
+      "Description": "",
+      "Guid": "598ac569a39ff32f108b4569",
+      "ResourceKey": "TASK_CONSTRUCTOR_RECUR_EVERY_WEEK_ON",
+      "ResourceValue": "week on"
+    },
+    {
+      "Description": "",
+      "Guid": "598ac59da39ff34a108b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_RECUR_DAY_OF_EVERY",
+      "ResourceValue": "day of every"
+    },
+    {
+      "Description": "",
+      "Guid": "598ac5a7a39ff32f108b456b",
+      "ResourceKey": "TASK_CONSTRUCTOR_RECUR_DAY_OF_EVERY_MONTH",
+      "ResourceValue": "month"
+    },
+    {
+      "Description": "",
+      "Guid": "598ac697a39ff34d108b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_RECUR_OF_EVERY",
+      "ResourceValue": "of every"
+    },
+    {
+      "Description": "",
+      "Guid": "5991434f820ee9f8788b4567",
+      "ResourceKey": "GENERATE_PDF_TABLE_CHECKS_COLLUMN_NAME",
+      "ResourceValue": "Checks"
+    },
+    {
+      "Description": "",
+      "Guid": "5991436d820ee9b6798b4567",
+      "ResourceKey": "GENERATE_PDF_COMMENT",
+      "ResourceValue": "Comment"
+    },
+    {
+      "Description": "",
+      "Guid": "59914379820ee9c8788b4567",
+      "ResourceKey": "GENERATE_PDF_CREATED",
+      "ResourceValue": "Created"
+    },
+    {
+      "Description": "",
+      "Guid": "59914385820ee988788b4567",
+      "ResourceKey": "GENERATE_PDF_PICTURES",
+      "ResourceValue": "Pictures"
+    },
+    {
+      "Description": "",
+      "Guid": "5991439e820ee9b0798b456b",
+      "ResourceKey": "GENERATE_PDF_DATE_AND_TIME",
+      "ResourceValue": "Date and time"
+    },
+    {
+      "Description": "",
+      "Guid": "599143ea820ee9de798b4568",
+      "ResourceKey": "GENERATE_PDF_REMARK",
+      "ResourceValue": "Remark"
+    },
+    {
+      "Description": "",
+      "Guid": "59914407820ee9b0798b456d",
+      "ResourceKey": "GENERATE_PDF_STATUS",
+      "ResourceValue": "Status"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba40820ee9d1158b4568",
+      "ResourceKey": "SYNC_STATES_VIEW_RETRY_BUTTON_TITLE",
+      "ResourceValue": "Retry"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba69820ee98c168b4567",
+      "ResourceKey": "SYNC_STATES_VIEW_UPLOADING",
+      "ResourceValue": "Uploading"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba83820ee910168b4570",
+      "ResourceKey": "SYNC_STATES_VIEW_ITEMS_FROM",
+      "ResourceValue": "items from"
+    },
+    {
+      "Description": "",
+      "Guid": "5992a227c430fea8518b4567",
+      "ResourceKey": "BASE_TEXT_PREVIOUS",
+      "ResourceValue": "Previous"
+    },
+    {
+      "Description": "",
+      "Guid": "599304c3c430fe47678b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_FOREVER_TITLE",
+      "ResourceValue": "Forever"
+    },
+    {
+      "Description": "",
+      "Guid": "5994245b820ee9eb178b4568",
+      "ResourceKey": "AUDIT_TASKS_SIGN_TEXT",
+      "ResourceValue": "Sign audit"
+    },
+    {
+      "Description": "",
+      "Guid": "59945d4e820ee9222e8b4567",
+      "ResourceKey": "BASE_TEXT_SELECT",
+      "ResourceValue": "Select"
+    },
+    {
+      "Description": "",
+      "Guid": "59948896c430fe23338b4568",
+      "ResourceKey": "TASK_CONSTRUCTOR_RECUR_ON",
+      "ResourceValue": "Recur on"
+    },
+    {
+      "Description": "",
+      "Guid": "5994895ac430fe63338b4568",
+      "ResourceKey": "TASKS_SCREEN_THE_TEXT",
+      "ResourceValue": "The"
+    },
+    {
+      "Description": "",
+      "Guid": "59954477c430fe775d8b4568",
+      "ResourceKey": "GENERAL_TEXT_FIRST",
+      "ResourceValue": "First"
+    },
+    {
+      "Description": "",
+      "Guid": "5995448bc430fe865e8b4567",
+      "ResourceKey": "GENERAL_TEXT_SECOND",
+      "ResourceValue": "Second"
+    },
+    {
+      "Description": "",
+      "Guid": "5995449ec430fe605e8b4567",
+      "ResourceKey": "GENERAL_TEXT_THIRD",
+      "ResourceValue": "Third"
+    },
+    {
+      "Description": "",
+      "Guid": "59816a95820ee9c44c8b456a",
+      "ResourceKey": "ACTIONS_SCREEN_ALL_ACTIONS",
+      "ResourceValue": "All actions"
+    },
+    {
+      "Description": "",
+      "Guid": "59816ac2820ee9c44c8b456d",
+      "ResourceKey": "ACTIONS_SCREEN_COMPLETED_ACTIONS",
+      "ResourceValue": "Completed actions"
+    },
+    {
+      "Description": "",
+      "Guid": "59819cf0c430fe99258b4568",
+      "ResourceKey": "EMPTY_SCREEN_TEXT",
+      "ResourceValue": "Nothing to display"
+    },
+    {
+      "Description": "",
+      "Guid": "59983789c430fe9c0d8b4568",
+      "ResourceKey": "TASK_CONSTRUCTOR_SHIFT_USER_ROLE",
+      "ResourceValue": "Shift leader"
+    },
+    {
+      "Description": "",
+      "Guid": "599837afc430fee90e8b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_MANAGER_ROLE",
+      "ResourceValue": "Manager"
+    },
+    {
+      "Description": "",
+      "Guid": "59a56991a39ff3dd1d8b4568",
+      "ResourceKey": "SYNC_STATES_VIEW_DOWNLOADING_MESSAGE",
+      "ResourceValue": "Downloading files"
+    },
+    {
+      "Description": "",
+      "Guid": "59a80092a39ff3d7638b4567",
+      "ResourceKey": "SYNC_STATES_VIEW_DOWNLOADING_DB_MESSAGE",
+      "ResourceValue": "Downloading data"
+    },
+    {
+      "Description": "",
+      "Guid": "5994246c820ee9be178b4567",
+      "ResourceKey": "COMPLETED_AUDITS_SCREEN_TITLE",
+      "ResourceValue": "Completed audits"
+    },
+    {
+      "Description": "",
+      "Guid": "59aa9057c430fe8f258b456a",
+      "ResourceKey": "TASK_CONSTRUCTOR_FINISH_BUTTON_TITLE",
+      "ResourceValue": "Finish"
+    },
+    {
+      "Description": "",
+      "Guid": "59b7bacaa39ff3c6578b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_ENTER_TASK_TITLE",
+      "ResourceValue": "Enter task title"
+    },
+    {
+      "Description": "",
+      "Guid": "59e85d47c430fe0d5a8b4567",
+      "ResourceKey": "NUMBER_OF_TASKS_SKIPPED_TODAY",
+      "ResourceValue": "# of tasks you skipped today"
+    },
+    {
+      "Description": "",
+      "Guid": "59e85d84c430fe235a8b4567",
+      "ResourceKey": "REPORTS_TODAY_TITLE",
+      "ResourceValue": "Today"
+    },
+    {
+      "Description": "",
+      "Guid": "59e85d93c430fef8598b456a",
+      "ResourceKey": "REPORTS_LAST_WEEK_TITLE",
+      "ResourceValue": "Last 7 d"
+    },
+    {
+      "Description": "",
+      "Guid": "59e85da6c430fedc598b4569",
+      "ResourceKey": "REPORTS_LAST_MONTH_TITLE",
+      "ResourceValue": "Last 30 d"
+    },
+    {
+      "Description": "",
+      "Guid": "59e85de9c430fedc598b456b",
+      "ResourceKey": "REPORT_ON_AREA",
+      "ResourceValue": "Report on area: %@"
+    },
+    {
+      "Description": "",
+      "Guid": "59e860ccc430fedc5a8b4567",
+      "ResourceKey": "YOUR_ACTION_STATUS",
+      "ResourceValue": "Your action status"
+    },
+    {
+      "Description": "",
+      "Guid": "59e860fbc430fe9a5a8b4567",
+      "ResourceKey": "NUMBER_STARTED",
+      "ResourceValue": "# started"
+    },
+    {
+      "Description": "",
+      "Guid": "59e8617ec430fef85a8b4567",
+      "ResourceKey": "NUMBER_COMPLETED",
+      "ResourceValue": "# completed"
+    },
+    {
+      "Description": "",
+      "Guid": "59e8619bc430feb05a8b4569",
+      "ResourceKey": "NUMBER_OPEN",
+      "ResourceValue": "# open"
+    },
+    {
+      "Description": "",
+      "Guid": "59e861bac430fe495b8b4567",
+      "ResourceKey": "NUMBER_OVERDUE",
+      "ResourceValue": "# overdue"
+    },
+    {
+      "Description": "",
+      "Guid": "59e9b68bc430fe073a8b4567",
+      "ResourceKey": "REPORTS_NEW_ACTIONS_TITLE",
+      "ResourceValue": "New"
+    },
+    {
+      "Description": "",
+      "Guid": "59e9b698c430fee8398b4567",
+      "ResourceKey": "REPORTS_DONE_ACTIONS_TITLE",
+      "ResourceValue": "Done"
+    },
+    {
+      "Description": "",
+      "Guid": "59ede0b0c430fe2c1b8b4567",
+      "ResourceKey": "TOP_5_DEVIATION_VALUE_TITLE",
+      "ResourceValue": "0-5 points"
+    },
+    {
+      "Description": "",
+      "Guid": "59f04f29820ee9fe608b4567",
+      "ResourceKey": "REPORT_DEVIATION_TITLE_ACTIONS",
+      "ResourceValue": "Actions"
+    },
+    {
+      "Description": "",
+      "Guid": "59f04f3a820ee9f3608b456e",
+      "ResourceKey": "REPORT_DEVIATION_TITLE_DONE",
+      "ResourceValue": "Done"
+    },
+    {
+      "Description": "",
+      "Guid": "59f0804ac430febc2f8b4568",
+      "ResourceKey": "REPORTS_OPEN_ACTIONS_TITLE",
+      "ResourceValue": "Open actions"
+    },
+    {
+      "Description": "",
+      "Guid": "59f08069c430fe9c2f8b4567",
+      "ResourceKey": "REPORTS_STARTED_ACTIONS_TITLE",
+      "ResourceValue": "Started actions"
+    },
+    {
+      "Description": "",
+      "Guid": "59f0d653c430fe70438b4567",
+      "ResourceKey": "REPORTS_MOSTLY_INVLOVED_ACTIONS",
+      "ResourceValue": "Who are mostly involved?"
+    },
+    {
+      "Description": "",
+      "Guid": "59f97d36820ee929088b4567",
+      "ResourceKey": "ACTION_DETAIL_SCREEN_AUTHOR_SECTION_TITLE",
+      "ResourceValue": "Author"
+    },
+    {
+      "Description": "",
+      "Guid": "59f98d4da39ff33e3a8b4567",
+      "ResourceKey": "REPORTS_TASKS_DEVIATIONS_SHOW_TITLE",
+      "ResourceValue": "Show"
+    },
+    {
+      "Description": "",
+      "Guid": "59f99c60a39ff36f3d8b4567",
+      "ResourceKey": "REPORTS_NOT_OK_FILETER",
+      "ResourceValue": "Not ok"
+    },
+    {
+      "Description": "",
+      "Guid": "59f99c6ca39ff31b3d8b4568",
+      "ResourceKey": "REPORTS_NOT_DONE_FILETER",
+      "ResourceValue": "Not done"
+    },
+    {
+      "Description": "",
+      "Guid": "59f99c96a39ff3713d8b4567",
+      "ResourceKey": "REPORTS_SKIPPED_FILETER",
+      "ResourceValue": "Skipped"
+    },
+    {
+      "Description": "",
+      "Guid": "59fc2f6d820ee9df278b456f",
+      "ResourceKey": "COMMON_OF",
+      "ResourceValue": "of"
+    },
+    {
+      "Description": "",
+      "Guid": "5a007cc6820ee9e43b8b4567",
+      "ResourceKey": "PRIVACY_CLOSE",
+      "ResourceValue": "Close"
+    },
+    {
+      "Description": "",
+      "Guid": "5a01bfff820ee97a3a8b456a",
+      "ResourceKey": "REPORTS_FILETERS_AREA_TITLE",
+      "ResourceValue": "Area"
+    },
+    {
+      "Description": "",
+      "Guid": "5a01c00b820ee9603a8b4569",
+      "ResourceKey": "REPORTS_FILETERS_PERIOD_TITLE",
+      "ResourceValue": "Period"
+    },
+    {
+      "Description": "",
+      "Guid": "5a01c01e820ee9533a8b4568",
+      "ResourceKey": "REPORTS_FILETERS_GROUPS_TITLE",
+      "ResourceValue": "Groups"
+    },
+    {
+      "Description": "",
+      "Guid": "5a01c0c8820ee9ae3a8b4567",
+      "ResourceKey": "REPORTS_FILETERS_YOUR_AUDIT_TITLE",
+      "ResourceValue": "Your audit"
+    },
+    {
+      "Description": "",
+      "Guid": "5a01c45e820ee9533b8b4567",
+      "ResourceKey": "REPOSRTS_12_DAYS_PERIOD",
+      "ResourceValue": "Last 12 days"
+    },
+    {
+      "Description": "",
+      "Guid": "594b93e0820ee936318b4569",
+      "ResourceKey": "EDIT_SCREEN_CANCEL_BUTTON_TITLE",
+      "ResourceValue": "Cancel"
+    },
+    {
+      "Description": "",
+      "Guid": "5995942fc430fea8708b4567",
+      "ResourceKey": "TASKS_CONSTRUCTOR_STEPS_STEP",
+      "ResourceValue": "Step "
+    },
+    {
+      "Description": "",
+      "Guid": "599808e1c430fe10058b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_CREATION_FAILED",
+      "ResourceValue": "Task creation failed."
+    },
+    {
+      "Description": "",
+      "Guid": "5998375fc430fe6c0d8b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_BASIC_USER_ROLE",
+      "ResourceValue": "Basic user"
+    },
+    {
+      "Description": "",
+      "Guid": "5a15429aa39ff3bf468b4567",
+      "ResourceKey": "REPORTS_SHORT_PERIOD_MONTH",
+      "ResourceValue": "MTH"
+    },
+    {
+      "Description": "",
+      "Guid": "5a1542a7a39ff3d3468b4567",
+      "ResourceKey": "REPORTS_SHORT_PERIOD_DAY",
+      "ResourceValue": "DAY"
+    },
+    {
+      "Description": "",
+      "Guid": "5a158337a39ff315568b4569",
+      "ResourceKey": "REPORTS_SHORT_PERIOD_YEAR",
+      "ResourceValue": "YR"
+    },
+    {
+      "Description": "",
+      "Guid": "5a38be01c430fe95518b4567",
+      "ResourceKey": "GENERAL_DELETE_VIDEO_BUTTON_TITLE",
+      "ResourceValue": "Delete video"
+    },
+    {
+      "Description": "",
+      "Guid": "5a38be14c430fe1a518b4569",
+      "ResourceKey": "TAKE_VIDEO_PICKER_ALERT",
+      "ResourceValue": "Take video"
+    },
+    {
+      "Description": "",
+      "Guid": "5a38be2bc430fe97518b4567",
+      "ResourceKey": "CHAT_SCREEN_INPUT_VIDEO_ATTACHED",
+      "ResourceValue": "video attached"
+    },
+    {
+      "Description": "",
+      "Guid": "5a3cf6e0c430fe7d3d8b4568",
+      "ResourceKey": "NEED_STOP_UPLOAD_VIDEO_FIRST_PICKER_ALERT",
+      "ResourceValue": "Please, cancel uploading the video first"
+    },
+    {
+      "Description": "",
+      "Guid": "5a58d249c430fe31088b4568",
+      "ResourceKey": "EDIT_TASK_INFO_TITLE",
+      "ResourceValue": "Edit task info"
+    },
+    {
+      "Description": "",
+      "Guid": "5a71e30ec430fed02e8b456a",
+      "ResourceKey": "REPORTS_PERIOD_WEEK",
+      "ResourceValue": "weeks"
+    },
+    {
+      "Description": "",
+      "Guid": "5a71e322c430fecf2e8b456a",
+      "ResourceKey": "REPORTS_PERIOD_MONTH",
+      "ResourceValue": "months"
+    },
+    {
+      "Description": "",
+      "Guid": "5a71e335c430fecf2e8b456c",
+      "ResourceKey": "REPORTS_PERIOD_DAY",
+      "ResourceValue": "days"
+    },
+    {
+      "Description": "",
+      "Guid": "5a71e343c430feca2e8b456d",
+      "ResourceKey": "REPORTS_PERIOD_YEAR",
+      "ResourceValue": "year"
+    },
+    {
+      "Description": "",
+      "Guid": "5a853c5da39ff3f3228b4567",
+      "ResourceKey": "PDF_PAGE_FIRST",
+      "ResourceValue": "Page"
+    },
+    {
+      "Description": "",
+      "Guid": "5a853c7da39ff320248b4567",
+      "ResourceKey": "PDF_PAGE_OF",
+      "ResourceValue": "of"
+    },
+    {
+      "Description": "",
+      "Guid": "5a853cbfa39ff30c248b4569",
+      "ResourceKey": "PDF_REPORTS_TOP_DEVIATIONS",
+      "ResourceValue": "Top-5 deviations"
+    },
+    {
+      "Description": "",
+      "Guid": "5a853ccba39ff31c248b4568",
+      "ResourceKey": "PDF_REPORTS_ACTION_NEW",
+      "ResourceValue": "actions new"
+    },
+    {
+      "Description": "",
+      "Guid": "5a853d3aa39ff30f248b4567",
+      "ResourceKey": "PDF_REPORTS_OWNER",
+      "ResourceValue": "owner"
+    },
+    {
+      "Description": "",
+      "Guid": "5a85928ba39ff3d2398b4567",
+      "ResourceKey": "TASKS_SCREEN_SHIFT_OVERDUE_TEXT",
+      "ResourceValue": "Overdue"
+    },
+    {
+      "Description": "",
+      "Guid": "5a86c1c8a39ff393128b4568",
+      "ResourceKey": "TASK_DETAIL_DUE",
+      "ResourceValue": "Due"
+    },
+    {
+      "Description": "",
+      "Guid": "5a86c1dca39ff39e128b4569",
+      "ResourceKey": "TASK_DETAIL_AT",
+      "ResourceValue": "at"
+    },
+    {
+      "Description": "",
+      "Guid": "5a86c1eea39ff3e0128b4568",
+      "ResourceKey": "TASK_DETAIL_MARKED",
+      "ResourceValue": "Marked"
+    },
+    {
+      "Description": "",
+      "Guid": "5a8ede1b820ee966648b456a",
+      "ResourceKey": "TASK_DETAIL_MARKED_BY",
+      "ResourceValue": "by"
+    },
+    {
+      "Description": "",
+      "Guid": "5a8f2b3c820ee9b2108b4568",
+      "ResourceKey": "ACTION_RESOURCES_EDITED",
+      "ResourceValue": "Resources"
+    },
+    {
+      "Description": "",
+      "Guid": "5a8f2b6d820ee9af108b4569",
+      "ResourceKey": "ACTION_MEDIA_EDITED",
+      "ResourceValue": "Media"
+    },
+    {
+      "Description": "",
+      "Guid": "5a8f2ba1820ee93c118b4567",
+      "ResourceKey": "ACTION_EDITED",
+      "ResourceValue": "Action"
+    },
+    {
+      "Description": "",
+      "Guid": "5b0d6aaba39ff359618b4567",
+      "ResourceKey": "TAKE_VIDEO_PICKER_CAMERA",
+      "ResourceValue": "Video"
+    },
+    {
+      "Description": "",
+      "Guid": "5b0d6adfa39ff348618b4569",
+      "ResourceKey": "TAKE_PHOTO_PICKER_CAMERA",
+      "ResourceValue": "Photo"
+    },
+    {
+      "Description": "",
+      "Guid": "5b20e02272c2c934c8624cf2",
+      "ResourceKey": "RECURRENCE_PREVIOUS_DAY_TITLE",
+      "ResourceValue": "Yesterday"
+    },
+    {
+      "Description": "",
+      "Guid": "5b20e03772c2c934c737a582",
+      "ResourceKey": "RECURRENCE_PREVIOUS_WEEK_TITLE",
+      "ResourceValue": "Previous week"
+    },
+    {
+      "Description": "",
+      "Guid": "5b20edfb72c2c937b35807a2",
+      "ResourceKey": "TASKS_REPORTS_CALLENDAR_TITLE",
+      "ResourceValue": "Calendar"
+    },
+    {
+      "Description": "",
+      "Guid": "5b20f9f372c2c939d17f0cca",
+      "ResourceKey": "COMPLETED_TASKS_TITLE",
+      "ResourceValue": "Completed tasks"
+    },
+    {
+      "Description": "",
+      "Guid": "5b21182972c2c93f4d5152d2",
+      "ResourceKey": "BASE_TEXT_TILL",
+      "ResourceValue": "till"
+    },
+    {
+      "Description": "",
+      "Guid": "5b2224b372c2c96a993a43b3",
+      "ResourceKey": "BASE_TEXT_COMPLETED",
+      "ResourceValue": "Completed"
+    },
+    {
+      "Description": "",
+      "Guid": "5b2770bd7ec8ae334942f483",
+      "ResourceKey": "CALENDAR_FROM_DATE_TEXT",
+      "ResourceValue": "From"
+    },
+    {
+      "Description": "",
+      "Guid": "5b2771a07ec8ae335c4448e3",
+      "ResourceKey": "CALENDAR_GO_TO_DATE_TEXT",
+      "ResourceValue": "Go to date"
+    },
+    {
+      "Description": "",
+      "Guid": "5b2771ab7ec8ae338420d6e2",
+      "ResourceKey": "CALENDAR_DATE_RANGE_TEXT",
+      "ResourceValue": "Date range"
+    },
+    {
+      "Description": "",
+      "Guid": "5a032bd2c430fef7088b4568",
+      "ResourceKey": "GENERAL_TEXT_APPLY",
+      "ResourceValue": "Apply"
+    },
+    {
+      "Description": "",
+      "Guid": "5a12b3f0c430fe1b498b4568",
+      "ResourceKey": "REPORTS_PDF_IN_AREA",
+      "ResourceValue": "in area"
+    },
+    {
+      "Description": "",
+      "Guid": "5a12f2e7820ee943278b456a",
+      "ResourceKey": "REPORTS_DEVIATIONS_FILETER",
+      "ResourceValue": "Deviations"
+    },
+    {
+      "Description": "",
+      "Guid": "5954bc69c430fe13518b4567",
+      "ResourceKey": "TASKS_SCREEN_MONTH_FILTER_TEXT",
+      "ResourceValue": "Month\u0027s tasks"
+    },
+    {
+      "Description": "",
+      "Guid": "5959ff25a39ff3a45b8b4568",
+      "ResourceKey": "SIGN_CHECKLIST_SCREEN_NAME_PLACEHOLDER_TEXT",
+      "ResourceValue": "Persons name"
+    },
+    {
+      "Description": "",
+      "Guid": "595b9e77a39ff3b13a8b4568",
+      "ResourceKey": "MAIN_SCREEN_CHANGE_AREA_TEXT",
+      "ResourceValue": "Change Area"
+    },
+    {
+      "Description": "",
+      "Guid": "59816aa1820ee9354d8b4567",
+      "ResourceKey": "ACTIONS_SCREEN_OPEN_ACTIONS",
+      "ResourceValue": "Open actions"
+    },
+    {
+      "Description": "",
+      "Guid": "5982f65c820ee9e27c8b4567",
+      "ResourceKey": "EDIT_SCREEN_EDIT_PHOTO_BUTTON_TITLE",
+      "ResourceValue": "Edit media"
+    },
+    {
+      "Description": "",
+      "Guid": "598998ac820ee9f3468b4568",
+      "ResourceKey": "TASK_CONSTRUCTOR_BASIC_VIEW_ROLE_TITLE",
+      "ResourceValue": "Assign to user role"
+    },
+    {
+      "Description": "",
+      "Guid": "5b2a5a2472c2c94031521942",
+      "ResourceKey": "GENERATE_PDF_TABLE_AUDIT_SCORE_TITLE",
+      "ResourceValue": "Audit score"
+    },
+    {
+      "Description": "Due date",
+      "Guid": "5a8f2f5b820ee9b7118b4567",
+      "ResourceKey": "ACTION_DATE_EDITED",
+      "ResourceValue": "Due date"
+    },
+    {
+      "Description": "Change",
+      "Guid": "5a8a7a2ec430fed94c8b4567",
+      "ResourceKey": "ACTION_DETAIL_CHANGE_BUTTON_TITLE",
+      "ResourceValue": "change"
+    },
+    {
+      "Description": "",
+      "Guid": "595618d6c430fec92a8b456a",
+      "ResourceKey": "CHECKLISTS_SCREEN_TITLE",
+      "ResourceValue": "Checklists"
+    },
+    {
+      "Description": "",
+      "Guid": "5b21126b72c2c93e56083a34",
+      "ResourceKey": "BASE_TEXT_SHIFT",
+      "ResourceValue": "Shift"
+    },
+    {
+      "Description": "",
+      "Guid": "5b2a5a9872c2c94030682173",
+      "ResourceKey": "GENERATE_PDF_TABLE_AUDIT_DONE_TITLE",
+      "ResourceValue": "Done"
+    },
+    {
+      "Description": "",
+      "Guid": "5b2a5aab72c2c9402b6c55d2",
+      "ResourceKey": "GENERATE_PDF_TABLE_AUDIT_OWNER_TITLE",
+      "ResourceValue": "Owner"
+    },
+    {
+      "Description": "",
+      "Guid": "5b2a5ac272c2c940456f20c2",
+      "ResourceKey": "GENERATE_PDF_TABLE_AUDIT_DAYS_TITLE",
+      "ResourceValue": "#days"
+    },
+    {
+      "Description": "",
+      "Guid": "5b2ba1e872c2c905ce360a43",
+      "ResourceKey": "BASE_TEXT_DAY",
+      "ResourceValue": "Day"
+    },
+    {
+      "Description": "",
+      "Guid": "5b3ddc4572c2c901fb730402",
+      "ResourceKey": "ALL_TASKS_BUTTON_TITLE",
+      "ResourceValue": "All tasks"
+    },
+    {
+      "Description": "",
+      "Guid": "5b3dfd9372c2c90837218bb2",
+      "ResourceKey": "ALL_TASKS_FILTER_TITLE",
+      "ResourceValue": "Filter"
+    },
+    {
+      "Description": "",
+      "Guid": "5b3e0c3a72c2c90b1b282d62",
+      "ResourceKey": "BASE_TEXT_MONTH",
+      "ResourceValue": "Month"
+    },
+    {
+      "Description": "",
+      "Guid": "5b4068ff7ec8ae19772f97b2",
+      "ResourceKey": "ALL_TASKS_SCREEN_TITLE",
+      "ResourceValue": "All tasks"
+    },
+    {
+      "Description": "",
+      "Guid": "5b47372f72c2c92bfa2c1bd2",
+      "ResourceKey": "GENERAL_TEXT_BACK",
+      "ResourceValue": "back"
+    },
+    {
+      "Description": "",
+      "Guid": "5b488d5772c2c9651c6c1f92",
+      "ResourceKey": "AREA_FILTER_TITLE_TEXT",
+      "ResourceValue": "Area"
+    },
+    {
+      "Description": "",
+      "Guid": "5b488d6a72c2c9652466b012",
+      "ResourceKey": "INTERVAL_FILTER_TITLE_TEXT",
+      "ResourceValue": "Interval"
+    },
+    {
+      "Description": "",
+      "Guid": "5b48a0a772c2c969093448e4",
+      "ResourceKey": "BASE_TEXT_CLOSE",
+      "ResourceValue": "Close"
+    },
+    {
+      "Description": "",
+      "Guid": "5b4df8daa08ef138fb27a5c5",
+      "ResourceKey": "TASK_CONSTRUCTOR_EDITING_TITLE",
+      "ResourceValue": "Editing..."
+    },
+    {
+      "Description": "",
+      "Guid": "5b5096c1a08ef125ac338692",
+      "ResourceKey": "AREA_FILTERS_SELECT_ALL",
+      "ResourceValue": "Select all"
+    },
+    {
+      "Description": "",
+      "Guid": "5b5096cfa08ef125ae634602",
+      "ResourceKey": "AREA_FILTERS_DESELECT_ALL",
+      "ResourceValue": "Deselect all"
+    },
+    {
+      "Description": "",
+      "Guid": "5b50d0aba08ef12e594784e2",
+      "ResourceKey": "DELETE_BASE_TEXT",
+      "ResourceValue": "Delete"
+    },
+    {
+      "Description": "",
+      "Guid": "5be18667a08ef1087a68bd43",
+      "ResourceKey": "EDIT_PROFILE_NAME_TITLE",
+      "ResourceValue": "Name"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1867ca08ef108ff5f9ef2",
+      "ResourceKey": "EDIT_PROFILE_SURNAME_TITLE",
+      "ResourceValue": "Surname"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1868ba08ef1091c637232",
+      "ResourceKey": "EDIT_PROFILE_EMAIL_TITLE",
+      "ResourceValue": "Email"
+    },
+    {
+      "Description": "",
+      "Guid": "5be186ada08ef109002223e2",
+      "ResourceKey": "EDIT_PROFILE_NEW_PASSWORD_TITLE",
+      "ResourceValue": "New password"
+    },
+    {
+      "Description": "",
+      "Guid": "5be186bea08ef109243a8f42",
+      "ResourceKey": "EDIT_PROFILE_REPEATE_PASSWORD_TITLE",
+      "ResourceValue": "Repeat new password"
+    },
+    {
+      "Description": "",
+      "Guid": "5be18760a08ef10923438536",
+      "ResourceKey": "EDIT_PROFILE_CANCEL_BUTTON_TITLE",
+      "ResourceValue": "CANCEL"
+    },
+    {
+      "Description": "",
+      "Guid": "5be18776a08ef10943335042",
+      "ResourceKey": "EDIT_PROFILE_SAVE_BUTTON_TITLE",
+      "ResourceValue": "SAVE"
+    },
+    {
+      "Description": "",
+      "Guid": "5c82415c72c2c914e5436275",
+      "ResourceKey": "TASK_MINUTES_LABEL_TEXT",
+      "ResourceValue": "min"
+    },
+    {
+      "Description": "",
+      "Guid": "5c82415c72c2c914e5436276",
+      "ResourceKey": "ACTIONS_FILTER_OPEN_ACTIONS_TITLE",
+      "ResourceValue": "Open actions"
+    },
+    {
+      "Description": "",
+      "Guid": "5c82415c72c2c914e5436277",
+      "ResourceKey": "ACTIONS_FILTER_ADD_ACTION",
+      "ResourceValue": "\u002B Add action"
+    },
+    {
+      "Description": "",
+      "Guid": "5c82415c72c2c914e5436278",
+      "ResourceKey": "TASK_REALIZED_TIME_IN",
+      "ResourceValue": "in"
+    },
+    {
+      "Description": "",
+      "Guid": "5c82415c72c2c914e5436280",
+      "ResourceKey": "TASK_REALIZED_TIME_WATCH",
+      "ResourceValue": "Timer"
+    },
+    {
+      "Description": "",
+      "Guid": "5c82415c72c2c914e5436281",
+      "ResourceKey": "TASK_REALIZED_TIME_PAUSE",
+      "ResourceValue": "Pause"
+    },
+    {
+      "Description": "",
+      "Guid": "5c82415c72c2c914e5436282",
+      "ResourceKey": "TASK_REALIZED_TIME_STOP",
+      "ResourceValue": "Stop"
+    },
+    {
+      "Description": "",
+      "Guid": "5935808c52e1a173018b4568",
+      "ResourceKey": "SIDEBAR_TITLE_REPORT",
+      "ResourceValue": "Report"
+    },
+    {
+      "Description": "",
+      "Guid": "594b940b820ee94c318b456b",
+      "ResourceKey": "EDIT_SCREEN_CHANGE_TEXT_BUTTON_TITLE",
+      "ResourceValue": "Edit text"
+    },
+    {
+      "Description": "",
+      "Guid": "5c82415c72c2c914e5436284",
+      "ResourceKey": "TASK_DETAIL_MARKED_ON",
+      "ResourceValue": "on"
+    },
+    {
+      "Description": "",
+      "Guid": "5943d15ca39ff396178b4567",
+      "ResourceKey": "TOTAL_TASKS_COUNT_TEXT",
+      "ResourceValue": "Total tasks:"
+    },
+    {
+      "Description": "",
+      "Guid": "597f10fca39ff3580e8b4569",
+      "ResourceKey": "SIGNED_CHECHLIST_COMPLETED_BY",
+      "ResourceValue": "Completed by:"
+    },
+    {
+      "Description": "",
+      "Guid": "59816a85820ee9c44c8b4568",
+      "ResourceKey": "ACTIONS_SCREEN_MOST_RECENT",
+      "ResourceValue": "Most recent"
+    },
+    {
+      "Description": "",
+      "Guid": "59899835820ee9e6468b4569",
+      "ResourceKey": "TASK_CONSTRUCTOR_BASIC_VIEW_DESCRIPTION_PLACEHOLDER",
+      "ResourceValue": "Enter task description"
+    },
+    {
+      "Description": "",
+      "Guid": "598ac512a39ff32f108b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_CHANGE_AREA",
+      "ResourceValue": "Change area"
+    },
+    {
+      "Description": "",
+      "Guid": "59914391820ee9b0798b4569",
+      "ResourceKey": "GENERATE_PDF_AUDIT_SCORE",
+      "ResourceValue": "Audit score"
+    },
+    {
+      "Description": "",
+      "Guid": "599544aac430fe855e8b4567",
+      "ResourceKey": "GENERAL_TEXT_FOURTH",
+      "ResourceValue": "Fourth"
+    },
+    {
+      "Description": "",
+      "Guid": "5981e5e4820ee90d2b8b4569",
+      "ResourceKey": "ACTIONS_SCREEN_STARTED_BY_ME",
+      "ResourceValue": "Started by me"
+    },
+    {
+      "Description": "",
+      "Guid": "5994244b820ee98b178b4567",
+      "ResourceKey": "AUDITS_SCREEN_COMPLETED_ITEMS_TITLE",
+      "ResourceValue": "Completed audits"
+    },
+    {
+      "Description": "",
+      "Guid": "5c82415c72c2c914e5436274",
+      "ResourceKey": "TASK_TIME_LABEL_TEXT",
+      "ResourceValue": "time"
+    },
+    {
+      "Description": "",
+      "Guid": "5be19d95a08ef115832431b2",
+      "ResourceKey": "EDIT_PROFILE_CHANGE_PASSWORD_TITLE",
+      "ResourceValue": "Change password"
+    },
+    {
+      "Description": "",
+      "Guid": "59e86076c430feb05a8b4567",
+      "ResourceKey": "DO_WE_FOLLOW_UP_ON_DEVIATIONS",
+      "ResourceValue": "Do we follow-up on deviations?"
+    },
+    {
+      "Description": "",
+      "Guid": "59ede007c430fe9d188b4585",
+      "ResourceKey": "WHO_INITIATE_THE_MOST_ACTIONS",
+      "ResourceValue": "Who initiate the most actions?"
+    },
+    {
+      "Description": "",
+      "Guid": "59f080a1c430febc2f8b456a",
+      "ResourceKey": "REPORTS_YOUR_ACTION_STATUS",
+      "ResourceValue": "Your action status"
+    },
+    {
+      "Description": "",
+      "Guid": "5a01c038820ee95f3a8b456a",
+      "ResourceKey": "REPORTS_FILETERS_YOUR_AREA_TITLE",
+      "ResourceValue": "Your area"
+    },
+    {
+      "Description": "",
+      "Guid": "5a01c47d820ee9443b8b4569",
+      "ResourceKey": "REPOSRTS_12_WEEKS_PERIOD",
+      "ResourceValue": "Last 12 weeks"
+    },
+    {
+      "Description": "",
+      "Guid": "5a154242a39ff362468b4568",
+      "ResourceKey": "REPORTS_SHORT_PERIOD_WEEK",
+      "ResourceValue": "WK"
+    },
+    {
+      "Description": "",
+      "Guid": "5a38e36fc430fe5a588b456a",
+      "ResourceKey": "YOUR_VIDEO_WAS_UPLOADED",
+      "ResourceValue": "Your video was uploaded"
+    },
+    {
+      "Description": "",
+      "Guid": "5a853d2ea39ff31b248b4568",
+      "ResourceKey": "PDF_REPORTS_MOST_RECENT_ACTIONS_DONE",
+      "ResourceValue": "the most recent actions done"
+    },
+    {
+      "Description": "",
+      "Guid": "5a8a7a44c430fe074d8b4568",
+      "ResourceKey": "EDIT_ACTION_SCREEN_TITLE",
+      "ResourceValue": "Edit the non-conformity"
+    },
+    {
+      "Description": "",
+      "Guid": "5b0d6af4a39ff358618b4567",
+      "ResourceKey": "TAKE_PHOTO_PICKER_GALLERY",
+      "ResourceValue": "Take Photo From Gallery"
+    },
+    {
+      "Description": "",
+      "Guid": "5b21181272c2c93f52413a82",
+      "ResourceKey": "BASE_TEXT_WEEK",
+      "ResourceValue": "Week"
+    },
+    {
+      "Description": "",
+      "Guid": "5b2770f47ec8ae33386fade5",
+      "ResourceKey": "CALENDAR_TO_DATE_TEXT",
+      "ResourceValue": "To"
+    },
+    {
+      "Description": "",
+      "Guid": "5b2a21747ec8ae3a3c228372",
+      "ResourceKey": "IMAGE_PICKER_DELETE_MEDIA",
+      "ResourceValue": "Delete media"
+    },
+    {
+      "Description": "",
+      "Guid": "5b2a5ae872c2c94031521944",
+      "ResourceKey": "GENERATE_PDF_TABLE_AUDIT_ACTIONS_NEW_TITLE",
+      "ResourceValue": "actions new"
+    },
+    {
+      "Description": "",
+      "Guid": "5b2a5b1872c2c94031521946",
+      "ResourceKey": "GENERATE_PDF_TABLE_AUDIT_ACTIONS_DONE_TITLE",
+      "ResourceValue": "actions done"
+    },
+    {
+      "Description": "",
+      "Guid": "5b4893fa72c2c966c02b53a2",
+      "ResourceKey": "BASE_TEXT_ONCE",
+      "ResourceValue": "Once"
+    },
+    {
+      "Description": "",
+      "Guid": "5b51a61aa08ef150224d8892",
+      "ResourceKey": "TASK_DETAILS_NO_MEDIA",
+      "ResourceValue": "No media"
+    },
+    {
+      "Description": "",
+      "Guid": "5be186a0a08ef108fe0b3b92",
+      "ResourceKey": "EDIT_PROFILE_OLD_PASSWORD_TITLE",
+      "ResourceValue": "Current password"
+    },
+    {
+      "Description": "",
+      "Guid": "592ec03352e1a16e248b4568",
+      "ResourceKey": "LOGIN_SCREEN_PASSWORD_TITLE",
+      "ResourceValue": "Password"
+    },
+    {
+      "Description": "",
+      "Guid": "594b941f820ee977318b4567",
+      "ResourceKey": "EDIT_SCREEN_CHANGE_PHOTO_BUTTON_TITLE",
+      "ResourceValue": "Change Media"
+    },
+    {
+      "Description": "",
+      "Guid": "595fa127820ee92d478b4569",
+      "ResourceKey": "CHAT_SCREEN_INPUT_PICTURE_ATTACHED",
+      "ResourceValue": "picture attached"
+    },
+    {
+      "Description": "",
+      "Guid": "595fa1aa820ee9ae478b4568",
+      "ResourceKey": "CREATE_ACTION_SCREEN_DUE_DATE_BUTTON_TITLE",
+      "ResourceValue": "Define due-date"
+    },
+    {
+      "Description": "",
+      "Guid": "5954bc38c430fe14518b4567",
+      "ResourceKey": "TASKS_SCREEN_TODAY_FILTER_TEXT",
+      "ResourceValue": "Today\u0027s tasks"
+    },
+    {
+      "Description": "",
+      "Guid": "595fa1c6820ee9fd478b4567",
+      "ResourceKey": "CREATE_ACTION_SCREEN_DUE_DATE_LABEL",
+      "ResourceValue": "You must define issue due-date."
+    },
+    {
+      "Description": "",
+      "Guid": "59816905820ee9fe4c8b4569",
+      "ResourceKey": "ACTION_DETAIL_SCREEN_ACTION_IS_LINKED_TO_TASK",
+      "ResourceValue": "Action is linked to task"
+    },
+    {
+      "Description": "",
+      "Guid": "59816aad820ee91c4d8b456b",
+      "ResourceKey": "ACTIONS_SCREEN_OVERDUE_ACTIONS",
+      "ResourceValue": "Overdue actions"
+    },
+    {
+      "Description": "",
+      "Guid": "5991435c820ee9f8788b4569",
+      "ResourceKey": "GENERATE_PDF_TABLE_COMMENTS_ACTIONS_TITLE",
+      "ResourceValue": "Comments \u0026 Actions"
+    },
+    {
+      "Description": "",
+      "Guid": "59e85cf6c430fef8598b4567",
+      "ResourceKey": "NUMBER_OF_TASKS_YOU_EXECUTE_TODAY",
+      "ResourceValue": "# of tasks you executed today"
+    },
+    {
+      "Description": "",
+      "Guid": "59f07f9cc430fe962f8b4567",
+      "ResourceKey": "HOW_DO_WE_ACT_TITLE",
+      "ResourceValue": "Do we act in time?"
+    },
+    {
+      "Description": "",
+      "Guid": "59561893c430feb42a8b4568",
+      "ResourceKey": "CHECKLIST_TASKS_SIGN_TEXT",
+      "ResourceValue": "Sign checklist"
+    },
+    {
+      "Description": "",
+      "Guid": "5a007cfd820ee9e23b8b4567",
+      "ResourceKey": "PRIVACY_BUTTON",
+      "ResourceValue": "Privacy statement"
+    },
+    {
+      "Description": "",
+      "Guid": "5a01c053820ee9843a8b4568",
+      "ResourceKey": "REPORTS_FILETERS_YOUR_AREA_PLACEHOLDER",
+      "ResourceValue": "Start typing your area name"
+    },
+    {
+      "Description": "",
+      "Guid": "5a01c495820ee9463b8b4568",
+      "ResourceKey": "REPOSRTS_12_MONTHS_PERIOD",
+      "ResourceValue": "Last 12 months"
+    },
+    {
+      "Description": "",
+      "Guid": "5a158983c430fe56718b4567",
+      "ResourceKey": "REPORTS_OVERDUE_TITLE",
+      "ResourceValue": "Open Overdue\\nactions"
+    },
+    {
+      "Description": "",
+      "Guid": "5a38be35c430fe0f518b4567",
+      "ResourceKey": "EDIT_SCREEN_EDIT_VIDEO_BUTTON_TITLE",
+      "ResourceValue": "Edit video"
+    },
+    {
+      "Description": "",
+      "Guid": "5a853cdda39ff30d248b4567",
+      "ResourceKey": "PDF_REPORTS_TACTION_DONE",
+      "ResourceValue": "actions done"
+    },
+    {
+      "Description": "",
+      "Guid": "5a8a7a56c430feb14c8b4567",
+      "ResourceKey": "ACTION_DETAIL_SCREEN_MODIFIED_DATE_SECTION_TITLE",
+      "ResourceValue": "Modification date"
+    },
+    {
+      "Description": "",
+      "Guid": "592ec04e52e1a15e248b4569",
+      "ResourceKey": "LOGIN_SCREEN_USERNAME_TITLE",
+      "ResourceValue": "Username"
+    },
+    {
+      "Description": "",
+      "Guid": "5b0d6ab9a39ff35f618b4567",
+      "ResourceKey": "TAKE_VIDEO_PICKER_GALLERY",
+      "ResourceValue": "Take Video From Gallery"
+    },
+    {
+      "Description": "",
+      "Guid": "5b27c7e07ec8ae464815fd52",
+      "ResourceKey": "COMPLETED_TASKS_SEARCH_RESULTS",
+      "ResourceValue": "Search results"
+    },
+    {
+      "Description": "",
+      "Guid": "5b4364c17ec8ae1c66264512",
+      "ResourceKey": "TAKS_DETAILS_CHANGE_BUTTON",
+      "ResourceValue": "Change"
+    },
+    {
+      "Description": "",
+      "Guid": "5b50cfc9a08ef12ea1405c52",
+      "ResourceKey": "INSTRUCTIONS_IN_FILE_TITLTE",
+      "ResourceValue": "Instructions in PDF file"
+    },
+    {
+      "Description": "",
+      "Guid": "592fe89a52e1a1197b8b4567",
+      "ResourceKey": "AREA_SELECTION_SCREEN_TITLE",
+      "ResourceValue": "Please, choose your work area"
+    },
+    {
+      "Description": "",
+      "Guid": "5943d3a9a39ff3f5178b4568",
+      "ResourceKey": "MAIN_SCREEN_LOGOUT_MESSAGE_TITLE",
+      "ResourceValue": "Are you sure you want to logout?"
+    },
+    {
+      "Description": "",
+      "Guid": "5948d830a39ff30d5b8b4568",
+      "ResourceKey": "TASK_DETAILS_SCREEN_TITLE",
+      "ResourceValue": "Task #"
+    },
+    {
+      "Description": "",
+      "Guid": "59844ae3820ee98e438b456f",
+      "ResourceKey": "LOGIN_SCREEN_AUTHORIZATION_FAILED",
+      "ResourceValue": "Authorization failed. Please try again."
+    },
+    {
+      "Description": "",
+      "Guid": "598ac43ea39ff36b0f8b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_RECURRENCE_BY_SHIFT",
+      "ResourceValue": "By Shifts"
+    },
+    {
+      "Description": "",
+      "Guid": "598ac46ca39ff34b0f8b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_RECURRENCE_MONTHLY",
+      "ResourceValue": "Monthly"
+    },
+    {
+      "Description": "",
+      "Guid": "598ac4f4a39ff32e108b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_SELECT_ALL_SHIFTS",
+      "ResourceValue": "Select all shifts"
+    },
+    {
+      "Description": "",
+      "Guid": "5991433e820ee9b0798b4567",
+      "ResourceKey": "GENERAL_GENERATE_PDF_BUTTON_TITLE",
+      "ResourceValue": "GENERATE PDF"
+    },
+    {
+      "Description": "",
+      "Guid": "5995944ac430fed8708b4569",
+      "ResourceKey": "TASKS_CONSTRUCTOR_STEPS_DELETE_STEP",
+      "ResourceValue": "Delete step"
+    },
+    {
+      "Description": "",
+      "Guid": "59e85c3ac430fe6a598b4569",
+      "ResourceKey": "DE_WE_EXECUTE_PLANNED_TASKS",
+      "ResourceValue": "Do we execute planned tasks?"
+    },
+    {
+      "Description": "",
+      "Guid": "59f08087c430fec62f8b4568",
+      "ResourceKey": "REPORTS_COMPLETED_ACTIONS_TITLE",
+      "ResourceValue": "Completed actions"
+    },
+    {
+      "Description": "",
+      "Guid": "5a01a994820ee97e348b4569",
+      "ResourceKey": "ACTIONS_WE_STARTED_AND_COMPLETED",
+      "ResourceValue": "Actions we started and completed"
+    },
+    {
+      "Description": "",
+      "Guid": "5a01c0d5820ee9a03a8b4567",
+      "ResourceKey": "REPORTS_FILETERS_YOUR_AUDIT_PLACEHOLEDER",
+      "ResourceValue": "Start typing your audit name"
+    },
+    {
+      "Description": "",
+      "Guid": "5a15341ca39ff32d438b456e",
+      "ResourceKey": "REPORT_PERIOD",
+      "ResourceValue": "for %@ %@ till %@"
+    },
+    {
+      "Description": "",
+      "Guid": "5a38be3ec430fe3f518b4568",
+      "ResourceKey": "BASE_TEXT_ADD_VIDEO_BUTTON_TITLE",
+      "ResourceValue": "Add video"
+    },
+    {
+      "Description": "",
+      "Guid": "5a3b680ac430fed8618b4567",
+      "ResourceKey": "PICKER_PREPARATION_VIDEO",
+      "ResourceValue": "Processing the video"
+    },
+    {
+      "Description": "",
+      "Guid": "5a853ce7a39ff310248b4568",
+      "ResourceKey": "PDF_REPORTS_FOLLOW_UP_DEVIATIONS",
+      "ResourceValue": "Follow-up on deviations:"
+    },
+    {
+      "Description": "",
+      "Guid": "5a8fce94820ee971348b4567",
+      "ResourceKey": "REMOVED_FROM_ACTION_MESSAGE",
+      "ResourceValue": "You have been removed from this action"
+    },
+    {
+      "Description": "",
+      "Guid": "5b715c2ea08ef113e52dcd32",
+      "ResourceKey": "STEP_DESCRIPTION_IS_MANDATORY",
+      "ResourceValue": "Description text is mandatory for all instructions"
+    },
+    {
+      "Description": "",
+      "Guid": "5ba0b9dda08ef149163cc8e3",
+      "ResourceKey": "LIST_FOOTER_VIEW_CONNECTION_MESSAGE",
+      "ResourceValue": "You can load more items when connected to network"
+    },
+    {
+      "Description": "",
+      "Guid": "5c82415c72c2c914e5436279",
+      "ResourceKey": "TASK_REALIZED_TIME_TITLE",
+      "ResourceValue": "Realized Time (minutes)"
+    },
+    {
+      "Description": "",
+      "Guid": "595cffe8820ee984228b4567",
+      "ResourceKey": "ALERT_CONFIRM_ACTION",
+      "ResourceValue": "Please, confirm that the action is closed"
+    },
+    {
+      "Description": "",
+      "Guid": "595fa155820ee94e478b4568",
+      "ResourceKey": "CREATE_ACTION_SCREEN_TITLE",
+      "ResourceValue": "Specify the non-conformity"
+    },
+    {
+      "Description": "",
+      "Guid": "595fa18f820ee9f4478b4567",
+      "ResourceKey": "CREATE_ACTION_SCREEN_COMMENTS_PLACEHOLDER",
+      "ResourceValue": "Type here your comments on the non-conformity"
+    },
+    {
+      "Description": "",
+      "Guid": "595fa19c820ee94e478b456a",
+      "ResourceKey": "CREATE_ACTION_SCREEN_ADD_RESOURCES_BUTTON_TITLE",
+      "ResourceValue": "Add resources"
+    },
+    {
+      "Description": "",
+      "Guid": "595fa1d7820ee9f3478b456a",
+      "ResourceKey": "CREATE_ACTION_SCREEN_ADD_RESOURCES_SELECTED_BUTTON_TITLE",
+      "ResourceValue": "Resources defined."
+    },
+    {
+      "Description": "",
+      "Guid": "59816914820ee9eb4c8b4567",
+      "ResourceKey": "ACTION_DETAIL_SCREEN_COMMENTS_SECTION_TITLE",
+      "ResourceValue": "Comments"
+    },
+    {
+      "Description": "",
+      "Guid": "59816a77820ee9874c8b4567",
+      "ResourceKey": "ACTIONS_SCREEN_DUE_DATE",
+      "ResourceValue": "Due date"
+    },
+    {
+      "Description": "",
+      "Guid": "5982f652820ee9367d8b4568",
+      "ResourceKey": "BASE_TEXT_IS_REQUIRED",
+      "ResourceValue": "is required"
+    },
+    {
+      "Description": "",
+      "Guid": "598997fc820ee9e6468b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_BASIC_VIEW_DESCRIPTION_TITLE_TEXT",
+      "ResourceValue": "Description"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba74820ee910168b456e",
+      "ResourceKey": "SYNC_STATES_VIEW_DOWNLOADING",
+      "ResourceValue": "Downloading"
+    },
+    {
+      "Description": "",
+      "Guid": "59959473c430fed7708b4569",
+      "ResourceKey": "TASKS_CONSTRUCTOR_STEPS_PLACEHOLDER",
+      "ResourceValue": "Enter step description"
+    },
+    {
+      "Description": "",
+      "Guid": "59959411c430fe79708b4567",
+      "ResourceKey": "TASKS_CONSTRUCTOR_STEPS_TITLE",
+      "ResourceValue": "Task instructions"
+    },
+    {
+      "Description": "",
+      "Guid": "5995e3b1c430fe02098b4567",
+      "ResourceKey": "TASKS_CONSTRUCTOR_NO_TASK_NAME_ERROR",
+      "ResourceValue": "You must provide task name"
+    },
+    {
+      "Description": "",
+      "Guid": "59d35d09a39ff3ff698b4569",
+      "ResourceKey": "LOG_OF_REASON_USED_ON_ANOTHER_DEVICE_MESSAGE",
+      "ResourceValue": "You were logged off because your account was used on the other device."
+    },
+    {
+      "Description": "",
+      "Guid": "59e85e03c430fe035a8b4567",
+      "ResourceKey": "WHAT_DID_OUR_CHECKS_SHOW",
+      "ResourceValue": "What did our checks show?"
+    },
+    {
+      "Description": "",
+      "Guid": "59ede07fc430fe371b8b4567",
+      "ResourceKey": "WHICH_TOP_5_DEVIATIONS",
+      "ResourceValue": "Which is the top-5 deviations?"
+    },
+    {
+      "Description": "",
+      "Guid": "5a01c09b820ee9a33a8b4567",
+      "ResourceKey": "REPORTS_FILETERS_RECENTLY_AREAS_TITLE",
+      "ResourceValue": "Recently picked areas"
+    },
+    {
+      "Description": "",
+      "Guid": "5a01c4a5820ee97a3b8b4568",
+      "ResourceKey": "REPOSRTS_THIS_YEAR_PERIOD",
+      "ResourceValue": "This year"
+    },
+    {
+      "Description": "",
+      "Guid": "5a0d87c3c430fe2c048b4567",
+      "ResourceKey": "REPORTS_EXPORT_PDF",
+      "ResourceValue": "Export to PDF"
+    },
+    {
+      "Description": "",
+      "Guid": "59a97d98820ee97d5e8b4567",
+      "ResourceKey": "AUDIT_TASKS_CLOSE_TEXT",
+      "ResourceValue": "Audit completed. Click to save Audit."
+    },
+    {
+      "Description": "",
+      "Guid": "5a38be1fc430fe96518b4567",
+      "ResourceKey": "TAKE_PHOTO_PICKER_ALERT",
+      "ResourceValue": "Take photo"
+    },
+    {
+      "Description": "",
+      "Guid": "5a3a33c2c430fefa228b4568",
+      "ResourceKey": "LONG_VIDEO_PICKER_ALERT",
+      "ResourceValue": "You cannot upload videos longer than 30 seconds"
+    },
+    {
+      "Description": "",
+      "Guid": "5a3a6ecbc430fe47318b4568",
+      "ResourceKey": "VIDEO_NOT_READY_PICKER_ALERT",
+      "ResourceValue": "Video is not ready for upload"
+    },
+    {
+      "Description": "",
+      "Guid": "5a86c1baa39ff39e128b4567",
+      "ResourceKey": "LOGIN_SCREEN_EG_SITE_BUTTON",
+      "ResourceValue": "Dutch quality by EZ Factory B.V."
+    },
+    {
+      "Description": "",
+      "Guid": "5b235d58a08ef143ba1786e2",
+      "ResourceKey": "COMPLETED_TASKS_NOT_DONE_SECTION_TITLE",
+      "ResourceValue": "tasks not done"
+    },
+    {
+      "Description": "",
+      "Guid": "5b2b532e72c2c972262994d4",
+      "ResourceKey": "GENERATE_PDF_TABLE_AUDIT_AREA_WEEK_TITLE",
+      "ResourceValue": "%@ in area %@ for week %@ till %@"
+    },
+    {
+      "Description": "",
+      "Guid": "5be05090a08ef109fd6dbf03",
+      "ResourceKey": "MAIN_SCREEN_EDIT_PROFILE_MESSAGE_TEXT",
+      "ResourceValue": "Edit profile"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bd62a08ef129af7dd802",
+      "ResourceKey": "EDIT_PROFILE_EMPTY_CURRENT_PASSWORD",
+      "ResourceValue": "Please provide current password."
+    },
+    {
+      "Description": "",
+      "Guid": "5c82415c72c2c914e5436283",
+      "ResourceKey": "TASK_REALIZED_TIME_RESUME",
+      "ResourceValue": "Resume"
+    },
+    {
+      "Description": "",
+      "Guid": "5991b9e4820ee972168b4567",
+      "ResourceKey": "SYNC_STATES_VIEW_SYNSING_MESSAGE",
+      "ResourceValue": "Syncing data"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba5c820ee910168b456c",
+      "ResourceKey": "SYNC_STATES_VIEW_UPDATE_FAILED_MESSAGE",
+      "ResourceValue": "Content ;UPDATE failed. You can try again or use available data from last session."
+    },
+    {
+      "Description": "",
+      "Guid": "598c1c2ba39ff372648b4568",
+      "ResourceKey": "TASK_CONSTRUCTOR_RECUR_AND_AREA_TITLE",
+      "ResourceValue": "Work areas and recurrence"
+    },
+    {
+      "Description": "",
+      "Guid": "595b3c44820ee9b33f8b4567",
+      "ResourceKey": "PICK_PHOTO_TAKE_FROM_GALLERY",
+      "ResourceValue": "Upload from gallery"
+    },
+    {
+      "Description": "",
+      "Guid": "595fa1b9820ee9af478b456b",
+      "ResourceKey": "CREATE_ACTION_SCREEN_INVOLVED_LABEL",
+      "ResourceValue": "Define who should be involved."
+    },
+    {
+      "Description": "",
+      "Guid": "5982f66b820ee99b7c8b4569",
+      "ResourceKey": "GENERAL_DELETE_PHOTO_BUTTON_TITLE",
+      "ResourceValue": "Delete photo"
+    },
+    {
+      "Description": "",
+      "Guid": "59899952820ee9b9468b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_BASIC_VIEW_DEGAULT_IMAGE_TEXT",
+      "ResourceValue": "If none, default photo will be used."
+    },
+    {
+      "Description": "",
+      "Guid": "598ac3dda39ff36c0f8b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_SELECT_AREA",
+      "ResourceValue": "Selected working area"
+    },
+    {
+      "Description": "",
+      "Guid": "598ac534a39ff3a50f8b456a",
+      "ResourceKey": "TASK_CONSTRUCTOR_ADD_MORE_RULE",
+      "ResourceValue": "Add more area and reccurence rule"
+    },
+    {
+      "Description": "",
+      "Guid": "5995945dc430fecf708b4568",
+      "ResourceKey": "TASKS_CONSTRUCTOR_STEPS_ADD",
+      "ResourceValue": "Add one more step"
+    },
+    {
+      "Description": "",
+      "Guid": "59a92247c430fed1088b4568",
+      "ResourceKey": "TASK_CONSTRUCTOR_NO_SHIFTS_FOR_COMPANY",
+      "ResourceValue": "There are no shifts set up for this company."
+    },
+    {
+      "Description": "",
+      "Guid": "59ede133c430fe4a1b8b4567",
+      "ResourceKey": "HOW_OFTEN_DID_WE_DO_AUDITS",
+      "ResourceValue": "How often did we do audits?"
+    },
+    {
+      "Description": "",
+      "Guid": "59e86022c430feac5a8b4567",
+      "ResourceKey": "NUMBER_OF_AUDITS_YOU_COMPLETED_TODAY",
+      "ResourceValue": "# of audits you completed today"
+    },
+    {
+      "Description": "",
+      "Guid": "5a01c10d820ee99f3a8b4567",
+      "ResourceKey": "REPORTS_FILETERS_GROUP_PERFORMACNE_TITLE",
+      "ResourceValue": "Your perfomance graph"
+    },
+    {
+      "Description": "",
+      "Guid": "5a02f172c430fe456e8b4567",
+      "ResourceKey": "REPORTS_FILTES_AREA_NOT_EXIST_ERROR_TITLE",
+      "ResourceValue": "Area with such name does not exist. \\\\nPlease try again."
+    },
+    {
+      "Description": "",
+      "Guid": "5a12f07e820ee9de268b4568",
+      "ResourceKey": "HOW_OFTEN_DID_WE_DO_TASKS",
+      "ResourceValue": "How often did we do tasks?"
+    },
+    {
+      "Description": "",
+      "Guid": "5a3a81c8c430feac368b4567",
+      "ResourceKey": "SYNC_STATES_VIEW_VIDEO_UPLOADING",
+      "ResourceValue": "Uploading a video file"
+    },
+    {
+      "Description": "",
+      "Guid": "5a853caea39ff350238b4567",
+      "ResourceKey": "PDF_REPORTS_AUDIT_SCORE_MOVING_AVERAGE",
+      "ResourceValue": "audit score (%), moving average (3 periods)"
+    },
+    {
+      "Description": "",
+      "Guid": "5a950cc0a39ff336088b4567",
+      "ResourceKey": "GALLERY_SCREEN_SHIFT_OVERDUE_TEXT",
+      "ResourceValue": "Overdue"
+    },
+    {
+      "Description": "",
+      "Guid": "5b2770857ec8ae33386fade3",
+      "ResourceKey": "CALENDAR_PICK_DATE_TEXT",
+      "ResourceValue": "Pick a date"
+    },
+    {
+      "Description": "",
+      "Guid": "59a927f5c430fea7098b4569",
+      "ResourceKey": "ONLY_ONLINE_ACTION",
+      "ResourceValue": "This action is available only with internet connection."
+    },
+    {
+      "Description": "",
+      "Guid": "5c82415c72c2c914e1154605",
+      "ResourceKey": "SAML_LOGIN_INCORECT_CREDENTIALS_ERROR",
+      "ResourceValue": "Incorrect credentials"
+    },
+    {
+      "Description": "",
+      "Guid": "59522166820ee99a508b4568",
+      "ResourceKey": "CHOOSE_TASKS_SCREEN_TITLE",
+      "ResourceValue": "Choose your tasks"
+    },
+    {
+      "Description": "",
+      "Guid": "595a11a1a39ff366608b4567",
+      "ResourceKey": "SIGN_CHECKLIST_SCREEN_NO_NAMES_ERROR",
+      "ResourceValue": "Please enter a name for the user."
+    },
+    {
+      "Description": "",
+      "Guid": "595b3c55820ee9933f8b4567",
+      "ResourceKey": "ALERT_ENABLE_CAMETA",
+      "ResourceValue": "Please enable camera in settings."
+    },
+    {
+      "Description": "",
+      "Guid": "595fa1eb820ee9f2478b456a",
+      "ResourceKey": "CREATE_ACTION_SCREEN_DUE_DATE_SELECTED_BUTTON_TITLE",
+      "ResourceValue": "Due-date defined."
+    },
+    {
+      "Description": "",
+      "Guid": "59816a66820ee9c54c8b4567",
+      "ResourceKey": "ACTIONS_SCREEN_TOTAL_ACTIONS",
+      "ResourceValue": "Total actions"
+    },
+    {
+      "Description": "",
+      "Guid": "5981e4d0820ee90f2b8b456c",
+      "ResourceKey": "ACTIONS_SCREEN_ASSIGNED_TO_ME",
+      "ResourceValue": "Assigned to me"
+    },
+    {
+      "Description": "",
+      "Guid": "5982f5fa820ee9a67c8b4569",
+      "ResourceKey": "CREATE_ACTION_SCREEN_ALERT_ARE_YOU_SURE",
+      "ResourceValue": "Are you sure you want to discard all changes?"
+    },
+    {
+      "Description": "",
+      "Guid": "598ac4dba39ff3a50f8b4568",
+      "ResourceKey": "TASK_CONSTRUCTOR_SELECT_SHIFT",
+      "ResourceValue": "Select shifts below"
+    },
+    {
+      "Description": "",
+      "Guid": "5992f9abc430fe72648b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_NO_SHIFTS",
+      "ResourceValue": "No shifts for this date"
+    },
+    {
+      "Description": "",
+      "Guid": "59981b37c430fe81098b4567",
+      "ResourceKey": "TASKS_CONSTRUCTOR_RECURRENCE_VALIDATION_ERROR",
+      "ResourceValue": "Please fill all fields"
+    },
+    {
+      "Description": "",
+      "Guid": "59a7b040820ee9342d8b4569",
+      "ResourceKey": "ALERT_ENABLE_PHOTO",
+      "ResourceValue": "Please enable photo in settings."
+    },
+    {
+      "Description": "",
+      "Guid": "595a13c8a39ff3ba608b4567",
+      "ResourceKey": "SIGN_CHECKLIST_SCREEN_NO_SIGNATURE_ERROR",
+      "ResourceValue": "Please sign the Checklist"
+    },
+    {
+      "Description": "",
+      "Guid": "595a5940a39ff3ae748b4568",
+      "ResourceKey": "COMPLETED_CHECKLISTS_SCREEN_TITLE",
+      "ResourceValue": "Completed checklists"
+    },
+    {
+      "Description": "",
+      "Guid": "599304ca820ee96f5d8b4567",
+      "ResourceKey": "SIGN_AUDIT_SCREEN_NO_SIGNATURE_ERROR",
+      "ResourceValue": "Please sign the Checklist"
+    },
+    {
+      "Description": "",
+      "Guid": "59ede192c430fe321b8b456c",
+      "ResourceKey": "HOW_OFTEN_DID_WE_DO_CHECKLISTS",
+      "ResourceValue": "How often did we do checklists?"
+    },
+    {
+      "Description": "",
+      "Guid": "5a01c12b820ee9a13a8b456a",
+      "ResourceKey": "REPORTS_FILETERS_GROUP_PERFORMACNE_PLACEHOLDER",
+      "ResourceValue": "Start typing keywords"
+    },
+    {
+      "Description": "",
+      "Guid": "5a156101c430fec4678b4568",
+      "ResourceKey": "NO_INTERNET_CONNECTION_REPORTS_UNAVAILABLE",
+      "ResourceValue": "Reports module is not available. You need stabile internet connection for reports."
+    },
+    {
+      "Description": "",
+      "Guid": "5b51ac5fa08ef1512155a1c3",
+      "ResourceKey": "TASK_DETAILS_NO_DESCRIPTION_PLACEHOLDER",
+      "ResourceValue": "No description"
+    },
+    {
+      "Description": "",
+      "Guid": "592ee44252e1a1d7328b4568",
+      "ResourceKey": "LOGIN_SCREEN_FORGOT_PASS_BUTTON_TITLE",
+      "ResourceValue": "Forgot password?"
+    },
+    {
+      "Description": "",
+      "Guid": "594a2da4820ee985448b4567",
+      "ResourceKey": "TASK_DETAILS_SCREEN_INFO_BUTTON_TITLE",
+      "ResourceValue": "Task info"
+    },
+    {
+      "Description": "",
+      "Guid": "595b3c65820ee9b33f8b4569",
+      "ResourceKey": "ALERT_SOURCE_NOT_AVALIBLE",
+      "ResourceValue": "You can\u0027t do this on your device"
+    },
+    {
+      "Description": "",
+      "Guid": "59899747820ee932468b4567",
+      "ResourceKey": "TASK_CONSTRUCTOR_BASIC_SCREEN_TITLE",
+      "ResourceValue": "Basic task information"
+    },
+    {
+      "Description": "",
+      "Guid": "59915468820ee9537e8b4569",
+      "ResourceKey": "GENERATE_PDF_TABLE_QUESTIONS_COLLUMN_NAME",
+      "ResourceValue": "Questions"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "SYNC_STATES_VIEW_CONNECTION_PROBLEM_MESSAGE",
+      "ResourceValue": "You are working offline"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba53820ee967168b4567",
+      "ResourceKey": "SYNC_STATES_VIEW_SYNC_FAILED_MESSAGE",
+      "ResourceValue": "Data sync failed. Data will be stored on the device and synced during next login attempt"
+    },
+    {
+      "Description": "",
+      "Guid": "5a393a03c430fed7728b4569",
+      "ResourceKey": "PICK_VIDEO_TAKE_FROM_GALLERY",
+      "ResourceValue": "Upload a video from gallery"
+    },
+    {
+      "Description": "",
+      "Guid": "5a3a83dac430feeb368b4567",
+      "ResourceKey": "SYNC_STATES_VIEW_VIDEO_FALED_MESSAGE",
+      "ResourceValue": "Video upload failed. You need stable internet connection to upload a video. "
+    },
+    {
+      "Description": "",
+      "Guid": "5b2a50d572c2c93dfb34f213",
+      "ResourceKey": "TASK_HAS_BEEN_CHANGED",
+      "ResourceValue": "This task has been changed by another user. Refreshing..."
+    },
+    {
+      "Description": "",
+      "Guid": "5b2a5bee72c2c9407b534a82",
+      "ResourceKey": "GENERATE_PDF_TABLE_AUDIT_SCORE_MOVING_AVARAGE_TITLE",
+      "ResourceValue": "audit score (%), moving average (3 periods)"
+    },
+    {
+      "Description": "",
+      "Guid": "5b30ccb6a08ef116e210def2",
+      "ResourceKey": "FILE_CAN_NOT_BE_USED",
+      "ResourceValue": "This kind of files can not be used."
+    },
+    {
+      "Description": "",
+      "Guid": "59ede15bc430fe301b8b456a",
+      "ResourceKey": "HOW_DID_WE_PERFORM",
+      "ResourceValue": "How did we perform?"
+    },
+    {
+      "Description": "",
+      "Guid": "5b20e00672c2c934c61dea98",
+      "ResourceKey": "RECURRENCE_PREVIOUS_SHIFT_TITLE",
+      "ResourceValue": "Previous shift"
+    },
+    {
+      "Description": "",
+      "Guid": "5b40687a7ec8ae19693871b2",
+      "ResourceKey": "SEARCH_TEXT_PLACEHOLDER",
+      "ResourceValue": "Enter text"
+    },
+    {
+      "Description": "",
+      "Guid": "5bac957e72c2c9145d68dd14",
+      "ResourceKey": "AREAS_PRELOAD_MEDIA_TITLE",
+      "ResourceValue": "Download media"
+    },
+    {
+      "Description": "",
+      "Guid": "5bfe8be27ec8ae7659621782",
+      "ResourceKey": "EDIT_PROFILE_INVALID_PASSWORD",
+      "ResourceValue": "The password should be 6 characters long, must contain uppercase and lowercase letters and numbers."
+    },
+    {
+      "Description": "",
+      "Guid": "599593e5c430fed8708b4567",
+      "ResourceKey": "TASKS_CONSTRUCTOR_STEPS_INSTRUCTION",
+      "ResourceValue": "Enter instructions for the task that will appear in the app for this task. If left blank no instructions for this task will be shown."
+    },
+    {
+      "Description": "",
+      "Guid": "5995e3d8c430fe03098b4567",
+      "ResourceKey": "TASKS_CONSTRUCTOR_NO_TASK_DESCRIPTION_ERROR",
+      "ResourceValue": "You must provide task description"
+    },
+    {
+      "Description": "",
+      "Guid": "59abf294820ee978198b4568",
+      "ResourceKey": "ACTION_DETAIL_SCREEN_ACTION_IS_LINKED_TO_AUDIT_ITEM",
+      "ResourceValue": "Action is linked to audit item"
+    },
+    {
+      "Description": "",
+      "Guid": "59e85febc430feaf5a8b4567",
+      "ResourceKey": "WHAT_ARE_THE_LATEST_AUDITS_RESULTS",
+      "ResourceValue": "What are the latest audit results?"
+    },
+    {
+      "Description": "",
+      "Guid": "5a005a1b820ee9b8338b4567",
+      "ResourceKey": "CHOOSE_YOUR_FILTER_SETTINGS",
+      "ResourceValue": "Choose your filter settings"
+    },
+    {
+      "Description": "",
+      "Guid": "5a1c1788c430fe6f658b4574",
+      "ResourceKey": "NO_DATA_TO_DISPLAY",
+      "ResourceValue": "No data to display"
+    },
+    {
+      "Description": "",
+      "Guid": "5a38bdd8c430fe2b518b4567",
+      "ResourceKey": "EDIT_SCREEN_CHANGE_VIDEO_BUTTON_TITLE",
+      "ResourceValue": "Change video"
+    },
+    {
+      "Description": "",
+      "Guid": "5a3939f3c430fef7728b4567",
+      "ResourceKey": "PICK_VIDEO_TAKE_FROM_CAMERA",
+      "ResourceValue": "Upload a video from camera"
+    },
+    {
+      "Description": "",
+      "Guid": "5a3a33d1c430fef3228b4567",
+      "ResourceKey": "ONLY_ONE_VIDEO_PICKER_ALERT",
+      "ResourceValue": "You can only upload one video at the moment"
+    },
+    {
+      "Description": "",
+      "Guid": "5a8f2bcc820ee93c118b4569",
+      "ResourceKey": "ACTION_EDITED_TITLE",
+      "ResourceValue": "The following items of this action have been changed:"
+    },
+    {
+      "Description": "",
+      "Guid": "5b2a10f77ec8ae35c76ddf93",
+      "ResourceKey": "PHOTO_AND_VIDEO_GALLERY",
+      "ResourceValue": "Photo and video gallery"
+    },
+    {
+      "Description": "",
+      "Guid": "5b50cfe6a08ef12e4f074d92",
+      "ResourceKey": "INSTRUCTIONS_DELETE_TEXT",
+      "ResourceValue": "You can delete the PDF and then add instructions with media, or you can add or change the PDF in the CMS"
+    },
+    {
+      "Description": "",
+      "Guid": "5be04f4da08ef109a045a5a4",
+      "ResourceKey": "USER_PROFILE_SCREEN_TITLE",
+      "ResourceValue": "Profile of user %@"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210ef2",
+      "ResourceKey": "EDIT_PROFILE_NOT_MATCH_PASSWORD",
+      "ResourceValue": "Password does not match the confirm password"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e03",
+      "ResourceKey": "CONTEXT_MENU_ITEM_VIDEO_GALLERY",
+      "ResourceValue": "Video gallery"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e04",
+      "ResourceKey": "CONTEXT_MENU_ITEM_VIDEO",
+      "ResourceValue": "Video"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e06",
+      "ResourceKey": "CONTEXT_MENU_CHOOSE_MEDIA_DIALOG_TITLE",
+      "ResourceValue": "Choose media source"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e07",
+      "ResourceKey": "CONTEXT_MENU_CHOOSE_MEDIA_DIALOG_CANCEL",
+      "ResourceValue": "Cancel"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e09",
+      "ResourceKey": "SECURITY_PERMISSION_PHOTOS",
+      "ResourceValue": "Photos permission needed"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e10",
+      "ResourceKey": "SECURITY_PERMISSION_OK",
+      "ResourceValue": "Ok"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e14",
+      "ResourceKey": "SHIFT_TYPE_MONTH",
+      "ResourceValue": "Month"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e15",
+      "ResourceKey": "SHIFT_TYPE_WEEK",
+      "ResourceValue": "Week"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "CONTEXT_MENU_ITEM_PHOTO",
+      "ResourceValue": "Photo"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e02",
+      "ResourceKey": "CONTEXT_MENU_ITEM_PHOTO_GALLERY",
+      "ResourceValue": "Photo gallery"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e05",
+      "ResourceKey": "CONTEXT_MENU_ITEM_REMOVE_MEDIA",
+      "ResourceValue": "Remove media"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e08",
+      "ResourceKey": "SECURITY_PERMISSION_CAMERA",
+      "ResourceValue": "Camera permission needed"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e11",
+      "ResourceKey": "SECURITY_PERMISSION_NOT_SUPPORTED",
+      "ResourceValue": "Not supported"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e12",
+      "ResourceKey": "SECURITY_PERMISSION_NOT_SUPPORTED_DECS",
+      "ResourceValue": "The action you try to execute is not supported"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e13",
+      "ResourceKey": "LOG_OF_REASON_TOKEN_EXPIRED_MESSAGE",
+      "ResourceValue": "You have been signed off automatically because the EZ-GO has been idle for a longer period."
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e17",
+      "ResourceKey": "SHIFT_TYPE_SHIFT",
+      "ResourceValue": "Shift"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "TASK_PAGE_NUMBER_TEXT",
+      "ResourceValue": "Task %@ of %@"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e19",
+      "ResourceKey": "TASK_CONSTRUCTOR_RECUR_FIRST",
+      "ResourceValue": "First"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e20",
+      "ResourceKey": "TASK_CONSTRUCTOR_RECUR_SECOND",
+      "ResourceValue": "Second"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e21",
+      "ResourceKey": "TASK_CONSTRUCTOR_RECUR_THIRD",
+      "ResourceValue": "Third"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e22",
+      "ResourceKey": "TASK_CONSTRUCTOR_RECUR_FHOURTH",
+      "ResourceValue": "Fourth"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e23",
+      "ResourceKey": "WEEKDAY_MONDAY",
+      "ResourceValue": "Monday"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e24",
+      "ResourceKey": "WEEKDAY_SUNDAY",
+      "ResourceValue": "Sunday"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e25",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_NO_SHIFTS",
+      "ResourceValue": "No shifts selected"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e26",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_GREATER_THAN_0",
+      "ResourceValue": "{0} value must be greater than 0"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e27",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_MONTH",
+      "ResourceValue": "Month"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e28",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_DAY",
+      "ResourceValue": "Day"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e29",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_NO_WEEK_DAY",
+      "ResourceValue": "No week day selected"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e31",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_WEEK_DAY_SET",
+      "ResourceValue": "Week day number must be set"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e33",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_TITLE",
+      "ResourceValue": "Validation errors"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e34",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_CLOSE",
+      "ResourceValue": "Close"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e36",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_NAME",
+      "ResourceValue": "Name"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e16",
+      "ResourceKey": "SHIFT_TYPE_ONCE",
+      "ResourceValue": "Only once"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e37",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_DESCRIPTION",
+      "ResourceValue": "Description"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e39",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_EMPTY_STEP",
+      "ResourceValue": "Step {0} is empty"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e41",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_ERROR",
+      "ResourceValue": "Error"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e42",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_NO_RECURRENCY",
+      "ResourceValue": "No recurrency type selected"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e43",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_WEEK",
+      "ResourceValue": "Week"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e46",
+      "ResourceKey": "WEEKDAY_TUESDAY",
+      "ResourceValue": "Tuesday"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e47",
+      "ResourceKey": "WEEKDAY_WEDNESDAY",
+      "ResourceValue": "Wednesday"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e48",
+      "ResourceKey": "WEEKDAY_THURSDAY",
+      "ResourceValue": "Thursday"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e49",
+      "ResourceKey": "WEEKDAY_FRIDAY",
+      "ResourceValue": "Friday"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e50",
+      "ResourceKey": "WEEKDAY_SATURDAY",
+      "ResourceValue": "Saturday"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e451",
+      "ResourceKey": "SHIFTS_TOTAL",
+      "ResourceValue": "{0} shifts total"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e30",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_DAY_OF_WEEK",
+      "ResourceValue": "Day of week must be set"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e32",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_MESSAGE",
+      "ResourceValue": "Following errors were found"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e35",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_EMPTY",
+      "ResourceValue": "{0} cannot be empty"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e38",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_NO_WORK_AREA",
+      "ResourceValue": "You must choose a work area"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e40",
+      "ResourceKey": "TASK_CONSTRUCTOR_VALIDATION_UPDATE_ERROR",
+      "ResourceValue": "Failed to update the template"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e44",
+      "ResourceKey": "DOWNLOADING_MEDIA_PROGRESS",
+      "ResourceValue": "Downloading media. Completed: {0} out of {1}."
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e45",
+      "ResourceKey": "DOWNLOADING_MEDIA_FINISHED",
+      "ResourceValue": "Finished downloading media."
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e53",
+      "ResourceKey": "SHIFT_CHANGE_COMPLETED",
+      "ResourceValue": "Shift change completed."
+    },
+    {
+      "Description": "Comments",
+      "Guid": "5a8f2afc820ee9b9108b4568",
+      "ResourceKey": "ACTION_COMMENTS_EDITED",
+      "ResourceValue": "Comments"
+    },
+    {
+      "Description": "Action is audit-link",
+      "Guid": "599c3a28820ee927208b4567",
+      "ResourceKey": "ACTION_DETAIL_SCREEN_ACTION_IS_LINKED_TO_AUDIT",
+      "ResourceValue": "Action is linked to audit"
+    },
+    {
+      "Description": "Checklist title",
+      "Guid": "5935805252e1a1ed7f8b4567",
+      "ResourceKey": "SIDEBAR_TITLE_CHECKLIST",
+      "ResourceValue": "Checklist"
+    },
+    {
+      "Description": "",
+      "Guid": "593ff1aa52e1a161118b4567",
+      "ResourceKey": "HOME_SCREEN_WELCOM_TEXT",
+      "ResourceValue": "Welcome %@!"
+    },
+    {
+      "Description": "",
+      "Guid": "59565034c430feec378b4567",
+      "ResourceKey": "CHECKLISTS_SCREEN_COMPLETED_ITEMS_TITLE",
+      "ResourceValue": "Completed checklists"
+    },
+    {
+      "Description": "",
+      "Guid": "59885328820ee94d778b4567",
+      "ResourceKey": "ADD_NEW_TASK_TITLE",
+      "ResourceValue": "\u002B Add new task"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e56",
+      "ResourceKey": "TASKS_CONSTRUCTOR_PDF_TITLE",
+      "ResourceValue": "Instructions in PDF file"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e58",
+      "ResourceKey": "TASKS_CONSTRUCTOR_PDF_ERROR",
+      "ResourceValue": "Instructions file cannot be empty."
+    },
+    {
+      "Description": "",
+      "Guid": "598c23bfa39ff3bf668b4568",
+      "ResourceKey": "TASKS_SCREEN_SHIFT_FILTER_TEXT",
+      "ResourceValue": "This shift"
+    },
+    {
+      "Description": "",
+      "Guid": "599c3a39820ee903208b4577",
+      "ResourceKey": "ACTION_DETAIL_SCREEN_ACTION_IS_LINKED_TO_CHECKLIST",
+      "ResourceValue": "Action is linked to checklist"
+    },
+    {
+      "Description": "",
+      "Guid": "59aaa7cdc430feba268b4568",
+      "ResourceKey": "COMPLETE_AUDIT_BUTTON_TEXT",
+      "ResourceValue": "Audit completed. Close it."
+    },
+    {
+      "Description": "",
+      "Guid": "59abf26e820ee97a198b4567",
+      "ResourceKey": "ACTION_DETAIL_SCREEN_ACTION_IS_LINKED_TO_CHECKLIST_ITEM",
+      "ResourceValue": "Action is linked to checklist item"
+    },
+    {
+      "Description": "",
+      "Guid": "59e85e18c430fe175a8b4567",
+      "ResourceKey": "NUMBER_OF_CHECKLISTS_YOU_COMPLETED_TODAY",
+      "ResourceValue": "# of checklists you completed today"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210ef9",
+      "ResourceKey": "COMPLETE_CHECKLIST_BUTTON_TEXT",
+      "ResourceValue": "Checklist completed. Click to save Checklist."
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e54",
+      "ResourceKey": "TASKS_CONSTRUCTOR_PDF_ADD",
+      "ResourceValue": "Add PDF instructions"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e55",
+      "ResourceKey": "TASKS_CONSTRUCTOR_PDF_INFO",
+      "ResourceValue": "You can delete the PDF and then add instructions with media."
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e57",
+      "ResourceKey": "TASKS_CONSTRUCTOR_PDF_FILE_NAME",
+      "ResourceValue": "File name: (please include a space at the end of the string \u0027FileName: \u0027)"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e52",
+      "ResourceKey": "SHIFT_CHANGE_STARTED",
+      "ResourceValue": "Shift change in progress. Syncing new data..."
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdghh08ef129d0630e58",
+      "ResourceKey": "ADD_NEW_ACTION",
+      "ResourceValue": "+ Add action"
+    },
+    {
+      "Description": "",
+      "Guid": "5jy5bdgh348ef129d0630e58",
+      "ResourceKey": "TASK_PROPERTY_POPUP_TITLE",
+      "ResourceValue": "Please enter the actual value"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e16",
+      "ResourceKey": "CREATE_COMMENT_SCREEN_TITLE",
+      "ResourceValue": "Specify the comment"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e17",
+      "ResourceKey": "CREATE_COMMENT_SCREEN_COMMENTS_LABEL",
+      "ResourceValue": "Your comment"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "CREATE_COMMENT_SCREEN_COMMENTS_PLACEHOLDER",
+      "ResourceValue": "Start typing here..."
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e19",
+      "ResourceKey": "COMMENT_CREATED_ON",
+      "ResourceValue": "Created on:"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e20",
+      "ResourceKey": "TASK_COMMENT_VALIDATION_ERROR_TITLE",
+      "ResourceValue": "Cannot save your comment"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e21",
+      "ResourceKey": "TASK_COMMENT_VALIDATION_ERROR_TEXT",
+      "ResourceValue": "You must provide either a media element or a comment text."
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e21",
+      "ResourceKey": "ACTION_SEGMENT",
+      "ResourceValue": "Actions"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e21",
+      "ResourceKey": "COMMENT_SEGMENT",
+      "ResourceValue": "Comments"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e22",
+      "ResourceKey": "ACTIONS_SCREEN_OPEN_ACTIONS_FORMATTED",
+      "ResourceValue": "Open actions ({0})"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1nhr4a08ed567d4210e22",
+      "ResourceKey": "ACTIONS_SCREEN_ACTIONS_FORMATTED",
+      "ResourceValue": "Actions ({0})"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e23",
+      "ResourceKey": "ACTIONS_SCREEN_OPEN_COMMENTS_FORMATTED",
+      "ResourceValue": "Comments ({0})"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e24",
+      "ResourceKey": "TASK_COMMENT_ERROR_TITLE",
+      "ResourceValue": "Unexpected error"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e25",
+      "ResourceKey": "TASK_COMMENT_ERROR_TEXT",
+      "ResourceValue": "Your changes could not be saved at this moment."
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e25",
+      "ResourceKey": "POPUP_ADD_ACTION",
+      "ResourceValue": "Add action"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e25",
+      "ResourceKey": "POPUP_ADD_COMMENT",
+      "ResourceValue": "Add comment"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e25",
+      "ResourceKey": "ACTIONS_FILTER_ADD_COMMENT",
+      "ResourceValue": "+ Add comment"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e25",
+      "ResourceKey": "OPEN_FIELDS_TITLE",
+      "ResourceValue": "Enter the required fields for this checklist"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e25",
+      "ResourceKey": "OPEN_FIELDS_TITLE_AUDITS",
+      "ResourceValue": "Enter the required fields for this audit"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210421",
+      "ResourceKey": "ACTIONS_RESOURCE_NAME",
+      "ResourceValue": "Resources name"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4213e26",
+      "ResourceKey": "INSTRUCTIONS_SCREEN_TITLE",
+      "ResourceValue": "Instructions"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4211e28",
+      "ResourceKey": "SIDEBAR_TITLE_INSTRUCTIONS",
+      "ResourceValue": "Work Instruction"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "INSTRUCTION_PAGE_NUMBER_TEXT",
+      "ResourceValue": "Instruction step %@ of %@"
+    },
+    {
+      "Guid": "5be1bdb8a08ef129d4210e25",
+      "ResourceKey": "ACTIONS_ON_THE_SPOT_NAME",
+      "ResourceValue": "On the spot actions"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e25",
+      "ResourceKey": "ACTIONS_SCREEN_ALL_AREAS",
+      "ResourceValue": "All areas"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e25",
+      "ResourceKey": "CHANGE_AREA_NO_INTERNET",
+      "ResourceValue": "It’s not possible to switch from area without internet connection."
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4211e28",
+      "ResourceKey": "SIDEBAR_TITLE_ASSESSMENTS",
+      "ResourceValue": "Assessment"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4213e26",
+      "ResourceKey": "ASSESSMENTS_SCREEN_TITLE",
+      "ResourceValue": "Assessment"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4213e26",
+      "ResourceKey": "ASSESSMENT_ON_AREA",
+      "ResourceValue": "Assessment on area: %@"
+    },
+    {
+      "Description": "",
+      "Guid": "59aaa7cdc430feba268b4568",
+      "ResourceKey": "COMPLETE_ASSESSMENT_BUTTON_TEXT",
+      "ResourceValue": "Assessment completed. Close it."
+    },
+    {
+      "Description": "",
+      "Guid": "5994245b820ee9eb178b4568",
+      "ResourceKey": "ASSESSMENT_TASKS_SIGN_TEXT",
+      "ResourceValue": "Sign assessment"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4213e26",
+      "ResourceKey": "ASSESSMENTS_SCREEN_COMPLETED_ITEMS_TITLE",
+      "ResourceValue": "Completed Assessments"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4213e26",
+      "ResourceKey": "COMPLETED_ASSESSMENTS_FOR_AREA",
+      "ResourceValue": "Completed assessments for area: "
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4213e26",
+      "ResourceKey": "COMPLETED_ASSESSMENTS",
+      "ResourceValue": "Completed assessments"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4213e26",
+      "ResourceKey": "AVARAGE_SCORE",
+      "ResourceValue": "Avarage score"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4213e26",
+      "ResourceKey": "ONGOING_ASSESSMENT",
+      "ResourceValue": "Ongoing"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4213e26",
+      "ResourceKey": "ASSESSMENTS_COMPLETED_INSTRUCTIONS",
+      "ResourceValue": "Completed Instructions: %@"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4213e26",
+      "ResourceKey": "ASSESSMENTS_ALL_INSTRUCTIONS",
+      "ResourceValue": "All Instructions: %@"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4213e26",
+      "ResourceKey": "ASSESSOR",
+      "ResourceValue": "Assessor"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4213e26",
+      "ResourceKey": "ADD_PARTICIPANTS",
+      "ResourceValue": "Add participants"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4213e26",
+      "ResourceKey": "PARTICIPANT_NAME",
+      "ResourceValue": "Participant name"
+    },
+    {
+      "Description": "",
+      "Guid": "5a156101c430fec4678b4568",
+      "ResourceKey": "NO_INTERNET_CONNECTION_ASSESSMENTS_UNAVAILABLE",
+      "ResourceValue": "Assessments module is not available. You need stabile internet connection for assessments."
+    },
+    {
+      "Description": "",
+      "Guid": "5a156101c430fec4678b4568",
+      "ResourceKey": "DELETE_PARTICIPANT_MESSAGE",
+      "ResourceValue": "Are you sure you want to remove this participant from this ongoing assessment? Current progress will be lost."
+    },
+    {
+      "Description": "",
+      "Guid": "5a156101c430fec4678b4568",
+      "ResourceKey": "ASSESSEE",
+      "ResourceValue": "Assessee"
+    },
+    {
+      "Description": "",
+      "Guid": "5a156101c430fec4678b4568",
+      "ResourceKey": "USER_ACTIONS_TITLE",
+      "ResourceValue": "User actions"
+    },
+    {
+      "Description": "",
+      "Guid": "5a156101c430fec4678b4568",
+      "ResourceKey": "TASK_ACTIONS_TITLE",
+      "ResourceValue": "Task actions"
+    },
+    {
+      "Description": "",
+      "Guid": "5a156101c430fec4678b4568",
+      "ResourceKey": "CHECKLIST_ACTIONS_TITLE",
+      "ResourceValue": "Checklist actions"
+    },
+    {
+      "Description": "",
+      "Guid": "5a156101c430fec4678b4568",
+      "ResourceKey": "AUDIT_ACTIONS_TITLE",
+      "ResourceValue": "Audit actions"
+    },
+    {
+      "Description": "",
+      "Guid": "5a156101c430fec4678b4568",
+      "ResourceKey": "COMPLETED_ALL_INSTRUCTIONS",
+      "ResourceValue": "You've completed all instructions"
+    },
+    {
+      "Description": "",
+      "Guid": "5a156101c430fec4678b4568",
+      "ResourceKey": "COMPLETED_ALL_TASKS",
+      "ResourceValue": "You've completed all tasks"
+    },
+    {
+      "Description": "",
+      "Guid": "5a156101c430fec4678b4568",
+      "ResourceKey": "CHECKLIST_ADDED",
+      "ResourceValue": "Checklist added!"
+    },
+    {
+      "Description": "",
+      "Guid": "5a156101c430fec4678b4568",
+      "ResourceKey": "AUDIT_ADDED",
+      "ResourceValue": "Audit added!"
+    },
+    {
+      "Description": "",
+      "Guid": "5a156101c430fec4678b4568",
+      "ResourceKey": "ACTION_ADDED",
+      "ResourceValue": "Action added!"
+    },
+    {
+      "Description": "",
+      "Guid": "5a156101c430fec4678b4568",
+      "ResourceKey": "ACTION_CHANGED",
+      "ResourceValue": "Action changed!"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "MAX_DATE_RANGE_TEXT",
+      "ResourceValue": "The maximum date range is %@ days"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "APP_ASSESSMENTS_PARTICIPANTS",
+      "ResourceValue": "Participants"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "BASE_TEXT_ALL",
+      "ResourceValue": "All"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "BASE_TEXT_NONE",
+      "ResourceValue": "None"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "BASE_TEXT_SUBMIT",
+      "ResourceValue": "Submit"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "EDIT_PROFILE_LANGUAGE",
+      "ResourceValue": "Language"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "FOR_AUDIT_ITEM",
+      "ResourceValue": "For audit item"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "BASE_TEXT_CONFIRMATION",
+      "ResourceValue": "Confirmation"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "FOR_CHECKLIST_ITEM",
+      "ResourceValue": "For checklist item"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "CHANGE_TASK_STATUS_POPUP_TEXT",
+      "ResourceValue": "You are about to change the status of this item"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "FOR_TASK_ITEM",
+      "ResourceValue": "For task item"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "CHANGE_TASK_STATUS_POPUP_KEEP_PICTURES_TEXT",
+      "ResourceValue": "Do you want to keep your taken pictures as proof?"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "BASE_TEXT_REMOVE",
+      "ResourceValue": "Remove"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "BASE_TEXT_KEEP",
+      "ResourceValue": "Keep"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "SKIP_TASK_POPUP_TEXT",
+      "ResourceValue": "A picture is mandatory, by skipping this step NO picture will be included. Are you sure you want to skip this step?"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "UNTAP_TASK_TEXT",
+      "ResourceValue": "Untap task"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "SEE_PICTURES_TEXT",
+      "ResourceValue": "See Picture Proof"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "TASK_CANT_TAP_TEXT",
+      "ResourceValue": "You cannot change status of this task"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e21",
+      "ResourceKey": "PICTURE_PROOF_VALIDATION_ERROR_TEXT",
+      "ResourceValue": "You must provide a media element."
+    },
+    {
+      "Description": "",
+      "Guid": "5991435c820ee9f8788b4569",
+      "ResourceKey": "GENERATE_PDF_TABLE_PICTURE_PROOF_TITLE",
+      "ResourceValue": "Picture proof"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "PICTURE_PROOF_EDIT_CHANGE",
+      "ResourceValue": "Edit and change"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "UNTAP_TASK_CONFIRMATION",
+      "ResourceValue": "Are you sure you want to untap this task?"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "SKIP_ALL_TASKS",
+      "ResourceValue": "Skip all"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "CONFIRMATION_OF_SKIP_ALL_TASKS",
+      "ResourceValue": "You are about to skip all tasks"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "REASON_TO_SKIP_ALL_TASKS",
+      "ResourceValue": "Reason for skipping all tasks:"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "APP_ASSESSMENTS_NOT_ADDED",
+      "ResourceValue": "Assessments for following users were not added: "
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "SHIFT_TYPE_DAILY_INTERVAL",
+      "ResourceValue": "Daily interval"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "SHIFT_TYPE_DYNAMIC_DAILY_INTERVAL",
+      "ResourceValue": "Dynamic daily interval"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e18",
+      "ResourceKey": "MAIN_SCREEN_QRSCANNER_TEXT",
+      "ResourceValue": "QR Scanner"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e25",
+      "ResourceKey": "QR_SCANNER_NO_INTERNET",
+      "ResourceValue": "It’s not possible to use QR Scanner without internet connection."
+    },
+    {
+      "Description": "",
+      "Guid": "595fa18f820ee9f4478b4567",
+      "ResourceKey": "QR_SCANNER_NO_ACCESS",
+      "ResourceValue": "You have no rights to view that item"
+    },
+    {
+      "Description": "",
+      "Guid": "595fa18f820ee9f4478b4567",
+      "ResourceKey": "PLACEHOLDER_FOR_SKIP_ALL_TASKS_REASON",
+      "ResourceValue": "Type here your reason for skipping all tasks"
+    },
+    {
+      "Description": "",
+      "Guid": "595fa18f820ee9f4478b4567",
+      "ResourceKey": "MULTISKIP_TASK_COMMENT",
+      "ResourceValue": "Reason behind skipping this task:"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "SYNC_LOCAL_DATA",
+      "ResourceValue": "Uploading local data"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "SYNC_LOCAL_DATA_FINISHED",
+      "ResourceValue": "Uploading local data finished."
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "SIDEBAR_TITLE_FEED",
+      "ResourceValue": "Feed"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "TAGS_CHOOSE_TAG",
+      "ResourceValue": "Choose tag"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "FEED_GOOD_JOB",
+      "ResourceValue": "Good job"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "FEED_FACTORY_UPDATES",
+      "ResourceValue": "Factory updates"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "FEED_COMMENT_DELETE_CONFIRMATION",
+      "ResourceValue": "Are you sure you want to delete this comment?"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "FEED_EDITED_BY",
+      "ResourceValue": "Edited by: "
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "FEED_POSTS",
+      "ResourceValue": "Posts"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "FEED_LIKES",
+      "ResourceValue": "Likes"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "FEED_DESCRIPTION_PLACEHOLDER",
+      "ResourceValue": "What do you want to share"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "FEED_PIN_TO_TOP",
+      "ResourceValue": "Pin to top"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "FEED_POST_DELETE_CONFIRMATION",
+      "ResourceValue": "Are you sure you want to delete this post?"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "FEED_POST_DELETE_BUTTON",
+      "ResourceValue": "Delete post"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "FEED_POST_EDIT_BUTTON",
+      "ResourceValue": "Edit post"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "BASE_TEXT_TAGS",
+      "ResourceValue": "Tags"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "AUDIT_LAST_COMPLETED",
+      "ResourceValue": "Last completed"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "ULTIMO_SEND",
+      "ResourceValue": "Send to Ultimo"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "ULTIMO_SENT",
+      "ResourceValue": "Sent to Ultimo at"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "ULTIMO_NOT_SENT",
+      "ResourceValue": "Not sent to Ultimo"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "ULTIMO_READY_SENT",
+      "ResourceValue": "Ready to be sent to Ultimo at"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "ULTIMO_ERROR_SENDING",
+      "ResourceValue": "Error sending to Ultimo at"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "CONTEXT_MENU_ITEM_PDF",
+      "ResourceValue": "PDF"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "FEED_MAX_NR_ATTACHMENTS",
+      "ResourceValue": "You have added the maximum number of attachments"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "CHECKLIST_NEW_OR_CONTINUE",
+      "ResourceValue": "Continue or start new checklist"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "CHECKLIST_START_NEW",
+      "ResourceValue": "Start new checklist"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "BASE_TEXT_STARTED_BY",
+      "ResourceValue": "Started by"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "BASE_TEXT_LAST_CHANGE",
+      "ResourceValue": "Last change"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "CHECKLIST_SAVE_CHANGES",
+      "ResourceValue": "Save your progress?"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "CHECKLIST_SYNC_AND_UPDATE_CHANGES",
+      "ResourceValue": "Sync your progress and see updates from others?"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "CHECKLIST_UPDATE_CHANGES",
+      "ResourceValue": "See updates from others?"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "CHECKLIST_SAVE_PROGRESS",
+      "ResourceValue": "Save the checklist with your progress?"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "BASE_TEXT_SYNC",
+      "ResourceValue": "Sync"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "BASE_TEXT_DISCARD_PROGRESS",
+      "ResourceValue": "Discard progress"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "DISCARD_HEADER_POPUP",
+      "ResourceValue": "Do you want to save changes and continue later?"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "DISCARD_BODY_POPUP",
+      "ResourceValue": "Anyone can continue your work."
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "MAX_NR_ATTACHMENTS",
+      "ResourceValue": "You have added the maximum number of attachments of this type"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "SIGN_STAGE",
+      "ResourceValue": "Sign stage"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "SIGN_STAGE_AGAIN",
+      "ResourceValue": "You can sign again"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "BASE_TEXT_NOTES",
+      "ResourceValue": "Notes"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "PLACEHOLDER_TEXT_NOTES",
+      "ResourceValue": "Add notes about completed stage..."
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "OPEN_FIELDS",
+      "ResourceValue": "Open fields"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "SIGN_STAGE_TO_PROCEED",
+      "ResourceValue": "Please sign stage to proceed"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "STAGE_IS_LOCKED",
+      "ResourceValue": "This stage is locked. You can not edit it."
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "DELETE_STAGE_CONFIRMATION",
+      "ResourceValue": "Do you want to delete this open checklist?"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "CANNOT_UNDO",
+      "ResourceValue": "You cannot undo it"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "ENDED_DATE",
+      "ResourceValue": "Ended"
+    },
+    {
+      "Description": "",
+      "Guid": "5be1bdb8a08ef129d4210e01",
+      "ResourceKey": "MORE_PROPERTIES",
+      "ResourceValue": "More..."
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "LAST_COMPLETED",
+      "ResourceValue": "Last completed"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "FIRSTNAME_NOT_EMPTY",
+      "ResourceValue": "Firstname should not be empty"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "FIRSTNAME_UPPERCASE_START",
+      "ResourceValue": "Each part of firstname must start with a capital letter"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "FIRSTNAME_CONSIST_LETTERS",
+      "ResourceValue": "Only letters, spaces, hyphens, and apostrophes are allowed"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "LASTNAME_NOT_EMPTY",
+      "ResourceValue": "Lastname should not be empty"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "LASTNAME_UPPERCASE_START",
+      "ResourceValue": "Each part of surname must start with a capital letter"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "LASTNAME_CONSIST_LETTERS",
+      "ResourceValue": "Only letters, spaces, hyphens, and apostrophes are allowed"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "EMAIL_FORMAT",
+      "ResourceValue": "Incorrect email format"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "CHANGES_IN_WI",
+      "ResourceValue": "There have been changes in this work instruction"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "SHOW_CHANGES",
+      "ResourceValue": "Show changes"
+    },
+    {
+      "Description": "",
+      "Guid": "5991ba33820ee9d2158b4567",
+      "ResourceKey": "BASE_TEXT_CHANGES",
+      "ResourceValue": "Changes"
+    },
+    {
+      "Description": "",
+      "Guid": "c89f23a54e7061d2a34b8f19",
+      "ResourceKey": "CHOOSE_DATE_OF_CHANGE",
+      "ResourceValue": "Choose date of change"
+    },
+    {
+      "Description": "",
+      "Guid": "c89f23a54e7061d2a34b8f19",
+      "ResourceKey": "SHOW_MORE_CHANGES",
+      "ResourceValue": "Show more unseen changes"
+    },
+    {
+      "Description": "",
+      "Guid": "c89f23a54e7061d2a34b8f19",
+      "ResourceKey": "CHANGES_IN",
+      "ResourceValue": "Changes in:"
+    },
+    {
+      "Description": "",
+      "Guid": "c89f23a54e7061d2a34b8f19",
+      "ResourceKey": "BEFORE",
+      "ResourceValue": "Before"
+    },
+    {
+      "Description": "",
+      "Guid": "c89f23a54e7061d2a34b8f19",
+      "ResourceKey": "AFTER",
+      "ResourceValue": "After"
+    },
+    {
+      "Description": "",
+      "Guid": "c89f23a54e7061d2a34b8f19",
+      "ResourceKey": "NOTE_TO_CHANGE",
+      "ResourceValue": "Note to change"
+    },
+    {
+      "Description": "",
+      "Guid": "c89f23a54e7061d2a34b8f19",
+      "ResourceKey": "BASE_TEXT_CONFIRM_ALL",
+      "ResourceValue": "Confirm all"
+    }
+  ]
+}

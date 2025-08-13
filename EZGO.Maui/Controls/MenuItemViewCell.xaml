@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ViewCell
+    x:Class="EZGO.Maui.Controls.MenuItemViewCell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:badge="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+    x:Name="MenuItem">
+    <ViewCell.View>
+        <StackLayout Orientation="Horizontal">
+            <StackLayout.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding Command, Source={x:Reference MenuItem}}" CommandParameter="{Binding MenuLocation}" />
+            </StackLayout.GestureRecognizers>
+            <StackLayout BackgroundColor="{Binding SelectedColor, Converter={StaticResource ColorToBoolConveter}, ConverterParameter={StaticResource GreenColor}}" WidthRequest="5" />
+
+            <StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
+                <Grid>
+                    <!-- Ikona -->
+                    <Image
+                        x:Name="IconImage"
+                        HeightRequest="30"
+                        WidthRequest="30"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center">
+                        <Image.Source>
+                            <FontImageSource
+                                FontFamily="MyAlias"
+                                Glyph="{Binding SelectedImage}"
+                                Color="{Binding SelectedColor}" />
+                        </Image.Source>
+                    </Image>
+
+                    <!-- Badge w rogu ikony -->
+                    <Frame
+                        IsVisible="{Binding BadgeText, Converter={StaticResource StringIsNullOrEmptyConverter}, ConverterParameter=False}"
+                        BackgroundColor="Red"
+                        CornerRadius="10"
+                        Padding="4,1"
+                        HorizontalOptions="Start"
+                        VerticalOptions="Start"
+                        Margin="25,-5,-5,0"
+                        TranslationY="-6"
+                        TranslationX="6">
+                        <Label
+                            Text="{Binding BadgeText}"
+                            FontSize="12"
+                            TextColor="White"
+                            HorizontalTextAlignment="Center"
+                            VerticalTextAlignment="Center" />
+                    </Frame>
+                </Grid>
+
+
+
+                <Label
+                    HorizontalTextAlignment="Center"
+                    LineBreakMode="TailTruncation"
+                    Text="{Binding Name}"
+                    TextColor="{Binding SelectedColor}" />
+            </StackLayout>
+        </StackLayout>
+    </ViewCell.View>
+</ViewCell>

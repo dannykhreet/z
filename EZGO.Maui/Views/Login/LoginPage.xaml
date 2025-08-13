@@ -1,0 +1,218 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Login.LoginPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes;assembly=EZGO.Maui"
+    xmlns:viewModels="clr-namespace:EZGO.Maui.Core.ViewModels;assembly=EZGO.Maui.Core"
+    xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+    xmlns:busyindicator="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+    xmlns:behaviors="clr-namespace:EZGO.Maui.Behaviors"
+    xmlns:textInputLayout="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    x:Name="Page"
+    x:DataType="viewModels:LoginViewModel"
+    HideSoftInputOnTapped="True"
+    NavigationPage.HasNavigationBar="False">
+    <ContentPage.Resources>
+        <Style TargetType="Label" Class="white-text">
+            <Setter Property="HorizontalTextAlignment" Value="Center" />
+            <Setter Property="VerticalTextAlignment" Value="Center" />
+            <Setter Property="TextColor" Value="White" />
+        </Style>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+
+        <!--  Main wrapper  -->
+        <Grid>
+
+            <!--  Background image  -->
+            <Image
+                IsOpaque="True"
+                Source="background.jpg"
+                HorizontalOptions="FillAndExpand"
+                VerticalOptions="FillAndExpand"
+                Aspect="AspectFill" 
+                Margin="0,-100,0,0" />
+
+            <!--  Login form wrapper  -->
+            <StackLayout
+                Padding="30,30,30,20"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                WidthRequest="430"
+                BackgroundColor="White">
+
+                <!--  Logo  -->
+                <Image
+                    IsOpaque="True"
+                    Source="ez_go_ipad.png"
+                    HorizontalOptions="FillAndExpand" />
+
+                <!--  Username label  -->
+                <Label Margin="0,20,0,10" Text="{classes:Translate LOGIN_SCREEN_USERNAME_TITLE}" />
+
+                <!--  Username input  -->
+                <textInputLayout:SfTextInputLayout InputViewPadding="10,0,10,4" Style="{StaticResource LoginTextEntryStyle}">
+
+                    <editors:SfAutocomplete
+                        x:Name="usernameAC"
+                        IsClearButtonVisible="False"
+                        DropDownBackground="White"
+                        DropDownPlacement="Bottom"
+                        SelectedDropDownItemBackground="White"
+                        Text="{Binding Username, Mode=TwoWay}"
+                        ItemsSource="{Binding Usernames}"
+                        TextSearchMode="Contains"
+                        TextColor="{StaticResource GreenColor}">
+                        <!--  Platform-specific height  -->
+                        <editors:SfAutocomplete.HeightRequest>
+                            <OnPlatform x:TypeArguments="x:Double">
+                                <On Platform="iOS">35</On>
+                                <On Platform="Android,Windows">40</On>
+                            </OnPlatform>
+                        </editors:SfAutocomplete.HeightRequest>
+
+
+                        <!--  Behaviors  -->
+                        <editors:SfAutocomplete.Behaviors>
+                            <!--  Disable these commands when the password entry is visible to prevent automatic login when the user changes username value  -->
+                            <!--  When the user click done button  -->
+                            <behaviors:EventToCommandBehavior
+                                EventName="Completed"
+                                Command="{Binding SubmitCommand}"
+                                IsEnabled="{Binding IsPasswordVisible, Converter={StaticResource ReverseBooleanConverter}}" />
+                            <!--  When the user selects a value from autocomplete dropdown  -->
+                            <behaviors:EventToCommandBehavior
+                                EventName="SelectionChanged"
+                                Command="{Binding SubmitCommand}"
+                                IsEnabled="{Binding IsPasswordVisible, Converter={StaticResource ReverseBooleanConverter}}" />
+                            <!--  When the user types in the input  -->
+                            <!--<behaviors:EventToCommandBehavior
+                                EventName="ValueChanged"
+                                Command="{Binding UsernameInputChangedCommand}"/>-->
+                            <!--<behaviors:EventToCommandBehavior
+                                EventName="Unfocused"
+                                Command="{Binding FocusOnPasswordCommand}"
+                                CommandParameter="{x:Reference passwordAC}" />-->
+                        </editors:SfAutocomplete.Behaviors>
+
+                    </editors:SfAutocomplete>
+                </textInputLayout:SfTextInputLayout>
+
+                <!--  Password  -->
+                <Label Margin="0,0,0,10" Text="{classes:Translate LOGIN_SCREEN_PASSWORD_TITLE}" />
+
+                <textInputLayout:SfTextInputLayout
+                    x:Name="passwordTextInput"
+                    Style="{StaticResource LoginTextEntryStyle}"
+                    InputViewPadding="10,0,10,4">
+
+                    <!--  Entry  -->
+                    <Entry
+                        x:Name="passwordAC"
+                        IsPassword="True"
+                        Text="{Binding Password}"
+                        Keyboard="Plain"
+                        TextColor="{StaticResource GreenColor}"
+                        ReturnType="Done"
+                        ReturnCommand="{Binding SubmitCommand}">
+
+                        <!--  Platform-specyfic height  -->
+                        <Entry.HeightRequest>
+                            <OnPlatform x:TypeArguments="x:Double">
+                                <On Platform="iOS">35</On>
+                                <On Platform="Android,Windows">40</On>
+                            </OnPlatform>
+                        </Entry.HeightRequest>
+                    </Entry>
+                </textInputLayout:SfTextInputLayout>
+
+                <!--  Login Button  -->
+                <!--<customButtons:SubmitButton
+                    HorizontalOptions="EndAndExpand"
+                    Command="{Binding SubmitCommand}"
+                    ButtonText="{classes:Translate LOGIN_SCREEN_LOGIN_BUTTON_TITLE}"
+                    TextSize="Medium"
+                    IsLoading="{Binding IsBusy}"/>-->
+                <buttons:SfButton
+                    Background="{StaticResource GreenColor}"
+                    Command="{Binding SubmitCommand}"
+                    CornerRadius="5"
+                    HeightRequest="40"
+                    HorizontalOptions="End"
+                    WidthRequest="150">
+                    <buttons:SfButton.Content>
+                        <DataTemplate>
+                            <Grid Padding="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <busyindicator:SfBusyIndicator
+                                    Grid.Row="0"
+                                    AnimationType="Cupertino"
+                                    IndicatorColor="White"
+                                    IsRunning="{Binding IsBusy}"
+                                    SizeFactor="0.3" />
+                                <Label
+                                    FontSize="Medium"
+                                    HorizontalOptions="Center"
+                                    IsVisible="{Binding IsBusy, Converter={StaticResource ReverseBooleanConverter}}"
+                                    Text="{classes:Translate LOGIN_SCREEN_LOGIN_BUTTON_TITLE}"
+                                    TextColor="White"
+                                    TextTransform="Uppercase"
+                                    VerticalOptions="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </buttons:SfButton.Content>
+                </buttons:SfButton>
+            </StackLayout>
+
+            <!--  Bottom Button  -->
+            <Grid
+                Padding="20,0,20,20"
+                HorizontalOptions="Fill"
+                VerticalOptions="End">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!--  Footer text left  -->
+                <Label
+                    Grid.Column="0"
+                    Text="{classes:Translate LOGIN_SCREEN_EG_SITE_BUTTON}"
+                    StyleClass="white-text"
+                    HorizontalTextAlignment="Start"
+                    Opacity="0.85">
+                    <!--  Link  -->
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenLinkCommand}" CommandParameter="https://ezfactory.nl/" />
+                    </Label.GestureRecognizers>
+                </Label>
+
+                <!--  Version  -->
+                <Label
+                    Grid.Column="1"
+                    Opacity="0.5"
+                    StyleClass="light, white-text"
+                    Text="{Binding Version}" />
+
+                <!--  Privacy  -->
+                <Label
+                    Grid.Column="2"
+                    Text="{classes:Translate PRIVACY_BUTTON}"
+                    StyleClass="white-text"
+                    HorizontalTextAlignment="End"
+                    Opacity="0.85">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenLinkCommand}" CommandParameter="https://ezfactory.nl/en/privacy-statement/" />
+                    </Label.GestureRecognizers>
+                </Label>
+
+            </Grid>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

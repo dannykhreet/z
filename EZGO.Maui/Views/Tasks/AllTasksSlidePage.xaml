@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Tasks.AllTasksSlidePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:behaviors="clr-namespace:EZGO.Maui.Behaviors"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons"
+    xmlns:datatemplates="clr-namespace:EZGO.Maui.Controls.DataTemplates"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:labels="clr-namespace:EZGO.Maui.Controls.CustomLabels"
+    xmlns:listview="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    xmlns:panCardView="clr-namespace:PanCardView;assembly=PanCardView"
+    xmlns:processors="clr-namespace:PanCardView.Processors;assembly=PanCardView"
+    xmlns:settings="clr-namespace:EZGO.Maui.Core.Classes;assembly=EZGO.Maui.Core"
+    xmlns:tasks="clr-namespace:EZGO.Maui.Core.Models.Tasks;assembly=EZGO.Maui.Core"
+    xmlns:viewmodels="clr-namespace:EZGO.Maui.Core.ViewModels.AllTasks;assembly=EZGO.Maui.Core"
+    x:Name="Page"
+    Title="AllTasksSlidePage"
+    ios:Page.UseSafeArea="true"
+    x:DataType="viewmodels:AllTasksSlideViewModel"
+    NavigationPage.HasBackButton="True"
+    NavigationPage.HasNavigationBar="False">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <DataTemplate x:Key="AllTasksSlideTemplate" x:DataType="tasks:BasicTaskModel">
+                <Grid
+                    HeightRequest="530"
+                    HorizontalOptions="CenterAndExpand"
+                    VerticalOptions="CenterAndExpand"
+                    WidthRequest="800">
+                    <Grid.RowDefinitions>
+                        <!--  Image Row  -->
+                        <RowDefinition Height="65*" />
+                        <!--  Description && Overlay Row  -->
+                        <RowDefinition Height="35*" />
+                    </Grid.RowDefinitions>
+
+                    <!--  Image  -->
+                    <controls:CustomImageOnline
+                        x:Name="DetailImage"
+                        Grid.Row="0"
+                        Grid.RowSpan="2"
+                        Aspect="Fill"
+                        ImageUrl="{Binding Picture}">
+                        <controls:CustomImage.GestureRecognizers>
+                            <TapGestureRecognizer
+                                x:Name="ImageGesture"
+                                Command="{Binding BindingContext.DetailCommand, Source={x:Reference Page}}"
+                                CommandParameter="{Binding}" />
+                        </controls:CustomImage.GestureRecognizers>
+                    </controls:CustomImageOnline>
+
+                    <!--  Scroll Overlay  -->
+                    <ScrollView
+                        Grid.Row="1"
+                        Padding="20,15"
+                        BackgroundColor="{StaticResource TransparentBlackColor}"
+                        VerticalOptions="End">
+
+                        <!--  Task Name & Description  -->
+                        <StackLayout>
+                            <!--  Task Name  -->
+                            <Label
+                                x:Name="TaskName"
+                                FontFamily="{StaticResource RobotoBold}"
+                                FontSize="Large"
+                                Text="{Binding Name}"
+                                TextColor="White" />
+
+                            <!--  Task Description  -->
+                            <Label
+                                FontFamily="{StaticResource RobotoLight}"
+                                FontSize="Small"
+                                Text="{Binding Description}"
+                                TextColor="White" />
+                        </StackLayout>
+
+                    </ScrollView>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+        <Grid
+            x:Name="MainGrid"
+            BackgroundColor="{StaticResource BackgroundColor}"
+            RowSpacing="30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.127*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="0100" />
+            </Grid.RowDefinitions>
+            <Grid
+                Grid.Row="0"
+                ColumnSpacing="0"
+                RowSpacing="30"
+                StyleClass="header, bg-white, m-0, pr-15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="280" />
+                </Grid.ColumnDefinitions>
+
+                <!--  Back Button  -->
+                <customButtons:BackButton Grid.Column="0" Command="{Binding CancelCommand}" />
+
+                <!--  Instruction Name  -->
+                <labels:TitleLabel
+                    Grid.Column="1"
+                    HorizontalOptions="StartAndExpand"
+                    Text="{Binding SelectedTask.AreaPath}" />
+
+                <labels:TitleLabel
+                    Grid.Column="2"
+                    HorizontalOptions="Center"
+                    Text="{Binding SelectedTask.RecurrencyType, Converter={StaticResource ShiftTypeNameConverter}}"
+                    VerticalOptions="CenterAndExpand" />
+
+                <!--  Pager  -->
+                <Label
+                    Grid.Column="3"
+                    Padding="10,0"
+                    HorizontalTextAlignment="End"
+                    Text="{Binding Pager}"
+                    VerticalTextAlignment="Center" />
+            </Grid>
+
+            <!--  Detail Page  -->
+            <panCardView:CoverFlowView
+                x:Name="CoverFlow"
+                Grid.Row="1"
+                Margin="0,15,0,0"
+                IsCyclical="False"
+                IsRightToLeftFlowDirectionEnabled="{Binding Source={x:Static settings:Settings.IsRightToLeftLanguage}}"
+                ItemSwipedCommand="{Binding SelectionChangedCommand}"
+                ItemTemplate="{StaticResource AllTasksSlideTemplate}"
+                ItemsSource="{Binding AllTasks}"
+                SelectedItem="{Binding SelectedTask}"
+                SelectedIndex="{Binding CurrentIndex}">
+
+                <x:Arguments>
+                    <processors:CoverFlowProcessor OpacityFactor="0.25" ScaleFactor="0.50" />
+                </x:Arguments>
+
+                <panCardView:CardsView.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding DetailCommand}" CommandParameter="{Binding}" />
+                </panCardView:CardsView.GestureRecognizers>
+
+                <panCardView:CoverFlowView.Behaviors>
+                    <behaviors:CornerFlowViewShiftAsMarginBehavior Margin="150" />
+                </panCardView:CoverFlowView.Behaviors>
+            </panCardView:CoverFlowView>
+
+            <!--  Attachments Button  -->
+            <StackLayout
+                Grid.Row="2"
+                Margin="0,20,0,0"
+                HorizontalOptions="Center"
+                IsVisible="{Binding SelectedTask.HasExtraInformation}"
+                Orientation="Horizontal"
+                Spacing="10"
+                VerticalOptions="Center">
+                <buttons:SfButton
+                    Command="{Binding AttachmentsCommand}"
+                    Background="Transparent"
+                    Style="{StaticResource DarkerGreyBorderButton}">
+                    <buttons:SfButton.Content>
+                        <DataTemplate>
+
+
+                            <Label
+                                FontFamily="{StaticResource RobotoBold}"
+                                FontSize="26"
+                                HorizontalTextAlignment="Center"
+                                Text="?"
+                                TextColor="{StaticResource DarkerGreyColor}"
+                                VerticalTextAlignment="Center" />
+                        </DataTemplate>
+                    </buttons:SfButton.Content>
+                </buttons:SfButton>
+            </StackLayout>
+
+            <!--  Tags  -->
+            <listview:SfListView
+                Grid.Row="3"
+                Margin="40,0,40,20"
+                HeightRequest="55"
+                HorizontalOptions="Start"
+                ItemSize="166"
+                ItemsSource="{Binding SelectedTask.Tags}"
+                Orientation="Horizontal"
+                ScrollBarVisibility="Never"
+                VerticalOptions="Center">
+                <listview:SfListView.ItemTemplate>
+                    <datatemplates:TagDataTemplate />
+                </listview:SfListView.ItemTemplate>
+            </listview:SfListView>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>
