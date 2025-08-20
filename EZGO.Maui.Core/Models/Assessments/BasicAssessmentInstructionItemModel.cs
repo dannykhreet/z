@@ -39,6 +39,8 @@ namespace EZGO.Maui.Core.Models.Assessments
         public string Picture { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public DateTime? StartDate { get; set; }
+
         public DateTime? CompletedAt { get; set; }
         public LocalDateTime LocalCompletedAt => Settings.ConvertDateTimeToLocal(CompletedAt.Value.ToLocalTime());
         public string Video { get; set; }

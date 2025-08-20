@@ -11,7 +11,23 @@ namespace EZGO.Maui.Core.Models.Assessments
     {
         [JsonIgnore]
         public SkillTypeEnum FilterStatus { get; set; } = SkillTypeEnum.Mandatory;
-        public new List<BasicAssessmentInstructionItemModel> InstructionItems { get; set; }
+        private List<BasicAssessmentInstructionItemModel> _instructionItems;
+        public new List<BasicAssessmentInstructionItemModel> InstructionItems
+        {
+            get => _instructionItems;
+            set
+            {
+                _instructionItems = value;
+                if (_instructionItems != null && _instructionItems.All(i => i.StartDate.HasValue))
+                {
+                    StartDate = _instructionItems.Min(i => i.StartDate);
+                }
+                else
+                {
+                    StartDate = null;
+                }
+            }
+        }
         public new bool IsCompleted => InstructionItems != null && !InstructionItems.Any(i => !(i.IsCompleted ?? false));
 
         public new int? TotalScore { get => InstructionItems.Sum(i => i.Score); }

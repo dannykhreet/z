@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using EZGO.Maui.Core.Interfaces.Sign;
+﻿using EZGO.Maui.Core.Interfaces.Sign;
 using EZGO.Maui.Core.Models.Assessments;
 
 namespace EZGO.Maui.Core.Interfaces.Assessments
@@ -21,5 +18,7 @@ namespace EZGO.Maui.Core.Interfaces.Assessments
         Task SetAssessmentScore(BasicAssessmentModel selectedUserAssessment, BasicAssessmentInstructionItemModel assessmentInstructionItem);
         Task UpdateAssessmentCache(int id);
         Task<bool> HaveAnyCompletedAssessments(bool refresh = true);
+        Task SetSkillInstructionStartDate(BasicAssessmentModel assessment, AssessmentSkillInstructionModel instruction);
+        Task SetSkillInstructionEndDate(BasicAssessmentModel assessment, AssessmentSkillInstructionModel instruction);
     }
 }
