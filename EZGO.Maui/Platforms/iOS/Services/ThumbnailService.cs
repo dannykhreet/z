@@ -12,7 +12,6 @@ namespace EZGO.Maui.Platforms.iOS.Services
         public byte[] GenerateThumbnail(string filePath)
         {
             AVAsset asset = AVAsset.FromUrl(NSUrl.FromFilename(filePath));
-
             AVAssetImageGenerator imageGenerator = AVAssetImageGenerator.FromAsset(asset);
             imageGenerator.AppliesPreferredTrackTransform = true;
 
@@ -22,9 +21,23 @@ namespace EZGO.Maui.Platforms.iOS.Services
 
             CGImage cgImage = imageGenerator.CopyCGImageAtTime(cmTime, out actualTime, out error);
 
-            byte[] bytes = new UIImage(cgImage).AsPNG().ToArray();
+            try
+            {
+                if (cgImage == null)
+                {
+                    Console.WriteLine($"Failed to generate thumbnail: {error?.LocalizedDescription ?? "Unknown error"}");
+                    return null;
+                }
 
-            return bytes;
+                byte[] bytes = new UIImage(cgImage).AsPNG().ToArray();
+                return bytes;
+            }
+            finally
+            {
+                cgImage?.Dispose();
+                imageGenerator.Dispose();
+                asset.Dispose();
+            }
         }
     }
 }
