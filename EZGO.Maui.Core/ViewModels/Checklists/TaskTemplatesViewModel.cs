@@ -524,7 +524,8 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
 
         private void LoadStages()
         {
-            bool hasStages = IncompleteChecklist != null ? IncompleteChecklist.HasStages : selectedChecklist?.StageTemplates?.Count > 0;
+            bool hasStages = selectedChecklist?.StageTemplates != null &&
+                             (IncompleteChecklist != null ? IncompleteChecklist.HasStages : selectedChecklist.StageTemplates.Count > 0);
             if (!hasStages)
                 return;
 
@@ -534,7 +535,7 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
                 selectedChecklist.SelectedChecklistId = IncompleteChecklist.Id;
             }
 
-            if (IncompleteChecklist != null && IncompleteChecklist.Stages != null)
+            if (IncompleteChecklist != null && IncompleteChecklist.Stages != null && selectedChecklist?.StageTemplates != null)
             {
                 foreach (var item in selectedChecklist.StageTemplates)
                 {
@@ -556,7 +557,7 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
                     }
                 }
             }
-            if (TaskFilter != null)
+            if (TaskFilter != null && selectedChecklist?.StageTemplates != null)
             {
                 Stages = new StagesControl(selectedChecklist.StageTemplates, TaskFilter.UnfilteredItems, TaskFilter.FilteredList);
                 Stages.SetStages(TaskFilter.FilteredList);
