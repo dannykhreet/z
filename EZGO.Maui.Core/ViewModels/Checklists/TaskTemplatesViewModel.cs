@@ -1285,6 +1285,12 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
 
         private async Task SaveChecklistAsync()
         {
+            if (OpenFields == null)
+            {
+                _messageService?.SendClosableInfo("No checklist opened. Save skipped.");
+                return;
+            }
+
             if (OpenFields.IsSyncing)
                 return;
 
