@@ -109,18 +109,15 @@ namespace EZGO.Maui.Controls
                 else
                 {
                     // Use FFImageLoading features here
-                    Source = new UriImageSource
-                    {
-                        Uri = new Uri(imageUrl),
-                        CachingEnabled = true,
-                        CacheValidity = TimeSpan.FromDays(5)
-                    };
+                    Source = imageUrl;
                 }
 
                 Placeholder = Constants.PlaceholderImage;
+
                 CacheType = FFImageLoading.Cache.CacheType.Disk;
                 CacheDuration = TimeSpan.FromDays(5);
                 FadeAnimationForCachedImages = false;
+
                 ErrorPlaceholder = HidePlaceholder ? null : Constants.PlaceholderImage;
             }
             catch (Exception ex)
@@ -136,7 +133,7 @@ namespace EZGO.Maui.Controls
                 ? Placeholder
                 : Constants.PlaceholderImage;
 
-            Source = ImageSource.FromFile(placeholder);
+            Source = placeholder;
         }
     }
 }

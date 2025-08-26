@@ -17,30 +17,34 @@ namespace EZGO.Maui.Core.Classes.LanguageResources.ResourceTypes
         /// <returns>Returns LanguageResource</returns>
         public override LanguageResource GetLanguageResource()
         {
-            LanguageResource language = null;
             try
             {
-                string languageJson = string.Empty;
                 string languageFile = "DefaultLanguage.json";
-
                 var assembly = Assembly.GetExecutingAssembly();
-                Stream stream = assembly.GetManifestResourceStream($"EZGO.Maui.Core.{languageFile}");
 
-                using (var reader = new StreamReader(stream))
+                using Stream? stream = assembly.GetManifestResourceStream($"EZGO.Maui.Core.{languageFile}");
+                if (stream == null)
                 {
-                    languageJson = reader.ReadToEnd();
+                    DebugService.WriteLine($"Resource not found: {languageFile}", "EmbeddedLanguageResource");
+                    return new LanguageResource(); // fallback
                 }
+
+                using var reader = new StreamReader(stream);
+                string languageJson = reader.ReadToEnd();
 
                 if (!languageJson.IsNullOrEmpty())
                 {
-                    language = JsonSerializer.Deserialize<LanguageResource>(languageJson);
+                    return JsonSerializer.Deserialize<LanguageResource>(languageJson) ?? new LanguageResource();
                 }
+
+                DebugService.WriteLine($"Resource {languageFile} is empty.", "EmbeddedLanguageResource");
+                return new LanguageResource();
             }
             catch (Exception ex)
             {
-                DebugService.WriteLine(ex.Message, "EmbeddedLanguageResource");
+                DebugService.WriteLine($"Failed to load language resource. Exception: {ex}", "EmbeddedLanguageResource");
+                return new LanguageResource(); // fallback
             }
-            return language;
         }
     }
 }

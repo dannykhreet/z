@@ -111,6 +111,8 @@ namespace EZGO.Maui.Core.ViewModels
 
         private void InitializeSteps()
         {
+            if (Steps == null) return;
+
             int i = 1;
             Steps.ForEach(x => { x.Index = i; i++; });
 

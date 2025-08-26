@@ -1,78 +1,3 @@
-using EZGO.Api.Models.Enumerations;
-using EZGO.Api.Models.Tags;
-using EZGO.Api.Models.WorkInstructions;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace EZGO.Api.Models.Skills.Base
-{
-    public class AssessmentBase
-    {
-        public int Id { get; set; }
-        public int CompanyId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Picture { get; set; } //note first item in media collection (db)
-        public AssessmentTypeEnum AssessmentType { get; set; }
-        public int? AreaId { get; set; }
-        public string AreaPath { get; set; }
-        public string AreaPathIds { get; set; }
-        public List<string> Media { get; set; }
-        public int? TotalScore { get; set; }
-        public RoleTypeEnum? Role { get; set; }
-        public RequiredSignatureTypeEnum SignatureType { get; set; }
-        public bool SignatureRequired { get; set; }
-        public int NumberOfSkillInstructions { get; set; }
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? ModifiedAt { get; set; }
-        public string CreatedBy { get; set; }
-        public string ModifiedBy { get; set; }
-        public int? CreatedById { get; set; }
-        public int? ModifiedById { get; set; }
-        /// <summary>
-        /// Tags; Tags that are added to this assessment (item) template
-        /// </summary>
-        public List<Tag> Tags { get; set; }
-        /// <summary>
-        /// Version; The version of this instance of the object. Format VyyyyMMddHHmmsss (e.g. V202403131215347 when generated on 13 march 2024 at 13:15:34.7)
-        /// </summary>
-        public string Version { get; set; }
-    }
-}
-
-
-using EZGO.Api.Models.Basic;
-using System;
-using System.Collections.Generic;
-
-namespace EZGO.Api.Models.Skills
-{
-    /// <summary>
-    /// 
-    /// DB: assessments
-    /// </summary>
-    public class Assessment : Base.AssessmentBase
-    {
-        public List<Signature> Signatures { get; set; }
-        public List<AssessmentSkillInstruction> SkillInstructions { get; set; }
-        public int NumberOfSignatures { get; set; }
-        public DateTime? CompletedAt { get; set; }
-        public bool IsCompleted { get; set; }
-        public int? CompletedForId { get; set; }
-        public string CompletedFor { get; set; }
-        public string CompletedForPicture { get; set; }
-        public int? AssessorId { get; set; }
-        public string Assessor { get; set; }
-        public List<UserBasic> Assessors { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
-        public string AssessorPicture { get; set; }
-        public int TemplateId { get; set; }
-    }
-}
-
-
 using EEZGO.Api.Utils.Data;
 using EZGO.Api.Data.Enumerations;
 using EZGO.Api.Interfaces.Data;
@@ -108,6 +33,9 @@ namespace EZGO.Api.Logic.Managers
             get { return culture; }
             set { culture = _tagManager.Culture = value; }
         }
+        private static readonly StringSplitOptions IncOpts = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
+        private static HashSet<string> ParseIncludes(string include) => new HashSet<string>((include ?? string.Empty).ToLowerInvariant().Split(',', IncOpts));
+
         #endregion
 
         #region - privates -
@@ -184,7 +112,7 @@ namespace EZGO.Api.Logic.Managers
                 if (dr != null) { if (!dr.IsClosed) await dr.CloseAsync(); await dr.DisposeAsync(); }
             }
 
-            if (assessment.Id > 0)
+            if (assessment?.Id > 0)
             {
                 if (!useStaticStorage)
                 {
@@ -196,8 +124,28 @@ namespace EZGO.Api.Logic.Managers
                     {
                         assessment = await ApplyTemplateVersionToAssessment(assessment, companyId, include);
                     }
+                    if (assessment.Assessors?.Count > 0 && assessment.SkillInstructions != null)
+                    {
+                        var map = assessment.Assessors
+                            .Where(a => a != null)
+                            .GroupBy(a => a.Id).Select(g => g.First())
+                            .ToDictionary(a => a.Id);
+
+                        foreach (var si in assessment.SkillInstructions)
+                        {
+                            if (si?.Assessors == null) continue;
+                            foreach (var a in si.Assessors)
+                            {
+                                if (a == null) continue;
+                                if (map.TryGetValue(a.Id, out var full))
+                                {
+                                    a.Name = full.Name;
+                                    a.Picture = full.Picture;
+                                }
+                            }
+                        }
+                    }
                 }
-                assessment.Assessors = await GetAssessorsForAssessmentAsync(companyId, assessment.Id, connectionKind);
 
                 return assessment;
             }
@@ -604,10 +552,6 @@ namespace EZGO.Api.Logic.Managers
                 if (dr != null) { if (!dr.IsClosed) await dr.CloseAsync(); await dr.DisposeAsync(); }
             }
 
-            foreach (var skillInstruction in output)
-            {
-                skillInstruction.Assessors = await GetAssessorsForSkillInstructionAsync(companyId, skillInstruction.Id, connectionKind);
-            }
 
             if (output.Count > 0)
             {
@@ -984,119 +928,103 @@ namespace EZGO.Api.Logic.Managers
         {
             if (assessment == null) assessment = new Assessment();
 
-            //"id" int4, "signatures" varchar, "completed_for_id" int4, "completed_at" timestamp, "completedfor" varchar, "is_completed" bool, "assessment_template_id" int4,
-            //"company_id" int4, "area_id" int4, "role" int4, "assessment_type" int4,
-            //"name" varchar, "description" text, "media" text, "signature_type" int4, "signature_required" bool,
-            //"created_at" timestamp, "modified_at" timestamp, "created_by_id" int4, "modified_by_id" int4, "created_by" varchar, "modified_by" varchar, "nr_of_skillinstructions" int4
-
             assessment.Id = Convert.ToInt32(dr["id"]);
-            if (dr["signatures"] != DBNull.Value)
-            {
+
+            if (dr.HasColumn("signatures") && dr["signatures"] != DBNull.Value)
                 assessment.Signatures = dr["signatures"].ToString().ToObjectFromJson<List<Signature>>();
-            }
-            if (dr["completed_for_id"] != DBNull.Value)
-            {
+
+            if (dr.HasColumn("completed_for_id") && dr["completed_for_id"] != DBNull.Value)
                 assessment.CompletedForId = Convert.ToInt32(dr["completed_for_id"]);
-            }
-            if (dr["completed_at"] != DBNull.Value)
-            {
+
+            if (dr.HasColumn("completed_at") && dr["completed_at"] != DBNull.Value)
                 assessment.CompletedAt = Convert.ToDateTime(dr["completed_at"]);
-            }
-            if (dr["completedfor"] != DBNull.Value)
-            {
+
+            if (dr.HasColumn("completedfor") && dr["completedfor"] != DBNull.Value)
                 assessment.CompletedFor = dr["completedfor"].ToString();
-            }
-            if (dr.HasColumn("completedfor_picture"))
-            {
-                if (dr["completedfor_picture"] != DBNull.Value)
-                {
-                    assessment.CompletedForPicture = dr["completedfor_picture"].ToString();
-                }
-            }
 
-            if (dr["assessor_id"] != DBNull.Value)
-            {
-                assessment.AssessorId = Convert.ToInt32(dr["assessor_id"].ToString());
-            }
-            if (dr["assessor"] != DBNull.Value)
-            {
+            if (dr.HasColumn("completedfor_picture") && dr["completedfor_picture"] != DBNull.Value)
+                assessment.CompletedForPicture = dr["completedfor_picture"].ToString();
+
+            if (dr.HasColumn("assessor_id") && dr["assessor_id"] != DBNull.Value)
+                assessment.AssessorId = Convert.ToInt32(dr["assessor_id"]);
+            if (dr.HasColumn("assessor") && dr["assessor"] != DBNull.Value)
                 assessment.Assessor = dr["assessor"].ToString();
-            }
-            if (dr.HasColumn("assessor_picture"))
-            {
-                if (dr["assessor_picture"] != DBNull.Value)
-                {
-                    assessment.AssessorPicture = dr["assessor_picture"].ToString();
-                }
-            }
-            if (dr["start_at"] != DBNull.Value)
-            {
+            if (dr.HasColumn("assessor_picture") && dr["assessor_picture"] != DBNull.Value)
+                assessment.AssessorPicture = dr["assessor_picture"].ToString();
+
+            if (dr.HasColumn("start_at") && dr["start_at"] != DBNull.Value)
                 assessment.StartDate = Convert.ToDateTime(dr["start_at"]);
-            }
-            if (dr["end_at"] != DBNull.Value)
-            {
+            if (dr.HasColumn("end_at") && dr["end_at"] != DBNull.Value)
                 assessment.EndDate = Convert.ToDateTime(dr["end_at"]);
-            }
-            assessment.IsCompleted = Convert.ToBoolean(dr["is_completed"]);
-            assessment.TemplateId = Convert.ToInt32(dr["assessment_template_id"]);
-            assessment.CompanyId = Convert.ToInt32(dr["company_id"]);
-            if (dr["area_id"] != null)
-            {
+
+            if (dr.HasColumn("is_completed") && dr["is_completed"] != DBNull.Value)
+                assessment.IsCompleted = Convert.ToBoolean(dr["is_completed"]);
+
+            if (dr.HasColumn("assessment_template_id") && dr["assessment_template_id"] != DBNull.Value)
+                assessment.TemplateId = Convert.ToInt32(dr["assessment_template_id"]);
+
+            if (dr.HasColumn("company_id") && dr["company_id"] != DBNull.Value)
+                assessment.CompanyId = Convert.ToInt32(dr["company_id"]);
+
+            if (dr.HasColumn("area_id") && dr["area_id"] != DBNull.Value)
                 assessment.AreaId = Convert.ToInt32(dr["area_id"]);
-            }
-            if (dr["role"] != DBNull.Value)
-            {
-                assessment.Role = (RoleTypeEnum)dr["role"];
-            }
-            if (dr["assessment_type"] != DBNull.Value)
-            {
-                assessment.AssessmentType = (AssessmentTypeEnum)dr["assessment_type"];
-            }
 
+            if (dr.HasColumn("role") && dr["role"] != DBNull.Value)
+                assessment.Role = (RoleTypeEnum)Convert.ToInt32(dr["role"]);
 
-            assessment.Name = dr["name"].ToString();
-            if (dr["description"] != DBNull.Value && !string.IsNullOrEmpty(dr["description"].ToString()))
-            {
+            if (dr.HasColumn("assessment_type") && dr["assessment_type"] != DBNull.Value)
+                assessment.AssessmentType = (AssessmentTypeEnum)Convert.ToInt32(dr["assessment_type"]);
+
+            if (dr.HasColumn("name") && dr["name"] != DBNull.Value)
+                assessment.Name = dr["name"].ToString();
+
+            if (dr.HasColumn("description") && dr["description"] != DBNull.Value && !string.IsNullOrWhiteSpace(dr["description"].ToString()))
                 assessment.Description = dr["description"].ToString();
-            }
 
-            if (dr["media"] != DBNull.Value)
-            {
+            if (dr.HasColumn("media") && dr["media"] != DBNull.Value && !string.IsNullOrWhiteSpace(dr["media"].ToString()))
                 assessment.Media = dr["media"].ToString().ToObjectFromJson<List<string>>();
-            }
 
             if (assessment.Media != null && assessment.Media.Count > 0)
-            {
                 assessment.Picture = assessment.Media[0];
-            }
 
-            assessment.SignatureType = (RequiredSignatureTypeEnum)dr["signature_type"];
-            assessment.SignatureRequired = Convert.ToBoolean(dr["signature_required"]);
+            if (dr.HasColumn("signature_type") && dr["signature_type"] != DBNull.Value)
+                assessment.SignatureType = (RequiredSignatureTypeEnum)Convert.ToInt32(dr["signature_type"]);
 
-            assessment.NumberOfSignatures = assessment.Signatures != null ? assessment.Signatures.Count : 0;
-            assessment.NumberOfSkillInstructions = Convert.ToInt32(dr["nr_of_skillinstructions"]);
+            if (dr.HasColumn("signature_required") && dr["signature_required"] != DBNull.Value)
+                assessment.SignatureRequired = Convert.ToBoolean(dr["signature_required"]);
 
-            if (dr.HasColumn("total_score")) assessment.TotalScore = Convert.ToInt32(dr["total_score"]);
+            assessment.NumberOfSignatures = assessment.Signatures?.Count ?? 0;
 
-            if (!string.IsNullOrEmpty(include))
+            if (dr.HasColumn("nr_of_skillinstructions") && dr["nr_of_skillinstructions"] != DBNull.Value)
+                assessment.NumberOfSkillInstructions = Convert.ToInt32(dr["nr_of_skillinstructions"]);
+
+            if (dr.HasColumn("total_score") && dr["total_score"] != DBNull.Value)
+                assessment.TotalScore = Convert.ToInt32(dr["total_score"]);
+
+            if (dr.HasColumn("assessors") && dr["assessors"] != DBNull.Value && !string.IsNullOrWhiteSpace(dr["assessors"].ToString()))
+                assessment.Assessors = dr["assessors"].ToString().ToObjectFromJson<List<UserBasic>>();
+
+            var inc = ParseIncludes(include);
+
+            if (inc.Contains(nameof(IncludesEnum.MutationInformation).ToLowerInvariant()))
             {
-                if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.MutationInformation.ToString().ToLower()))
-                {
+                if (dr.HasColumn("created_at") && dr["created_at"] != DBNull.Value)
                     assessment.CreatedAt = Convert.ToDateTime(dr["created_at"]);
+                if (dr.HasColumn("created_by") && dr["created_by"] != DBNull.Value)
                     assessment.CreatedBy = dr["created_by"].ToString();
+                if (dr.HasColumn("created_by_id") && dr["created_by_id"] != DBNull.Value)
                     assessment.CreatedById = Convert.ToInt32(dr["created_by_id"]);
 
+                if (dr.HasColumn("modified_at") && dr["modified_at"] != DBNull.Value)
                     assessment.ModifiedAt = Convert.ToDateTime(dr["modified_at"]);
+                if (dr.HasColumn("modified_by") && dr["modified_by"] != DBNull.Value)
                     assessment.ModifiedBy = dr["modified_by"].ToString();
+                if (dr.HasColumn("modified_by_id") && dr["modified_by_id"] != DBNull.Value)
                     assessment.ModifiedById = Convert.ToInt32(dr["modified_by_id"]);
-                }
             }
-
 
             if (dr.HasColumn("version") && dr["version"] != DBNull.Value)
-            {
                 assessment.Version = dr["version"].ToString();
-            }
 
             return assessment;
         }
@@ -1152,6 +1080,9 @@ namespace EZGO.Api.Logic.Managers
             {
                 skillInstruction.Description = dr["description"].ToString();
             }
+
+            if (dr.HasColumn("assessors") && dr["assessors"] != DBNull.Value && !string.IsNullOrWhiteSpace(dr["assessors"].ToString()))
+                skillInstruction.Assessors = dr["assessors"].ToString().ToObjectFromJson<List<UserBasic>>();
 
             if (dr["media"] != DBNull.Value)
             {
@@ -1219,11 +1150,17 @@ namespace EZGO.Api.Logic.Managers
             {
                 instructionItem.Description = dr["description"].ToString();
             }
+
             if (dr["assessor_id"] != DBNull.Value)
             {
+                if (instructionItem.Assessor == null)
+                    instructionItem.Assessor = new UserBasic();
                 instructionItem.Assessor.Id = Convert.ToInt32(dr["assessor_id"]);
-                //instructionItem.Assessor = await GetUserInfo(companyId: instructionItem.CompanyId, userId: instructionItem.Assessor.Id);
+                instructionItem.Assessor = await GetUserInfo(companyId: instructionItem.CompanyId, userId: instructionItem.Assessor.Id);
             }
+
+
+
             if (dr["media"] != DBNull.Value && !string.IsNullOrEmpty(dr["media"].ToString()))
             {
                 instructionItem.Media = dr["media"].ToString().ToObjectFromJson<List<string>>();
@@ -1310,30 +1247,6 @@ namespace EZGO.Api.Logic.Managers
             return assessors;
         }
 
-        private async Task<List<UserBasic>> GetAssessorsForAssessmentAsync(int companyId, int assessmentId, ConnectionKind connectionKind)
-        {
-            var assessors = new List<UserBasic>();
-
-            var parameters = new List<NpgsqlParameter>
-            {
-                new NpgsqlParameter("@_companyid", companyId),
-                new NpgsqlParameter("@_assessmentid", assessmentId)
-            };
-
-            using (var dr = await _manager.GetDataReader("get_assessors_for_assessment", commandType: CommandType.StoredProcedure, parameters: parameters, connectionKind: connectionKind))
-            {
-                while (await dr.ReadAsync())
-                {
-                    assessors.Add(new UserBasic
-                    {
-                        Id = Convert.ToInt32(dr["assessorid"]),
-                        Name = dr["assessor"].ToString(),
-                        Picture = dr["assessorpicture"]?.ToString()
-                    });
-                }
-            }
-            return assessors;
-        }
 
         /// <summary>
         /// GetNpgsqlParametersFromAssessment; Creates a list of NpgsqlParameters, and fills it based on the supplied Assessment object.
@@ -1360,8 +1273,7 @@ namespace EZGO.Api.Logic.Managers
             parameters.Add(new NpgsqlParameter("@_userid", userId));
             parameters.Add(new NpgsqlParameter("@_iscompleted", assessment.IsCompleted));
             parameters.Add(new NpgsqlParameter("@_totalscore", Convert.ToInt16(assessment.TotalScore)));
-            parameters.Add(new NpgsqlParameter("@start_at", assessment.StartDate));
-            parameters.Add(new NpgsqlParameter("@end_at", assessment.EndDate));
+
             //"_companyid" int4, "_userid" int4, "_assessmenttemplateid" int4, "_iscompleted" bool, "_signatures" text = NULL::text, "_completedat" timestamptz = NULL::timestamp with time zone, "_completedforid" int4 = NULL::integer, "_totalscore" int4 = NULL::integer
             return parameters;
         }
@@ -1385,8 +1297,7 @@ namespace EZGO.Api.Logic.Managers
 
             parameters.Add(new NpgsqlParameter("@_iscompleted", assessmentInstruction.IsCompleted));
             parameters.Add(new NpgsqlParameter("@_completedat", assessmentInstruction.CompletedAt));
-            parameters.Add(new NpgsqlParameter("@start_at", assessmentInstruction.StartDate));
-            parameters.Add(new NpgsqlParameter("@end_at", assessmentInstruction.EndDate));
+
 
             parameters.Add(new NpgsqlParameter("@_completedforid", assessmentInstruction.CompletedForId));
             parameters.Add(new NpgsqlParameter("@_totalscore", assessmentInstruction.TotalScore));
@@ -1411,13 +1322,12 @@ namespace EZGO.Api.Logic.Managers
             parameters.Add(new NpgsqlParameter("@_assessmentskillinstructionid", assessmentInstructionItem.AssessmentSkillInstructionId));
             parameters.Add(new NpgsqlParameter("@_workinstructiontemplateid", assessmentInstructionItem.WorkInstructionTemplateId));
             parameters.Add(new NpgsqlParameter("@_workinstructiontemplateitemid", assessmentInstructionItem.WorkInstructionTemplateItemId));
-
             parameters.Add(new NpgsqlParameter("@_iscompleted", assessmentInstructionItem.IsCompleted));
             parameters.Add(new NpgsqlParameter("@_completedat", assessmentInstructionItem.CompletedAt));
-            parameters.Add(new NpgsqlParameter("@assessor_id", assessmentInstructionItem.Assessor.Id));
-            parameters.Add(new NpgsqlParameter("@scored_at", assessmentInstructionItem.ScoredAt));
             parameters.Add(new NpgsqlParameter("@_completedforid", assessmentInstructionItem.CompletedForId));
             parameters.Add(new NpgsqlParameter("@_score", assessmentInstructionItem.Score));
+            parameters.Add(new NpgsqlParameter("@_assessor_id", (object?)assessmentInstructionItem.Assessor?.Id ?? DBNull.Value));
+            parameters.Add(new NpgsqlParameter("@_scored_at", (object?)assessmentInstructionItem.ScoredAt ?? DBNull.Value));
 
             return parameters;
         }
@@ -2461,6 +2371,37 @@ namespace EZGO.Api.Logic.Managers
 }
 
 
+using EZGO.Api.Models.Basic;
+using System;
+
+namespace EZGO.Api.Models.WorkInstructions
+{
+    /// <summary>
+    /// WorkInstructionItem; Currently only used with Assessments as a AssessmentSkillInstruction <see cref="EZGO.Api.Models.Skills.AssessmentSkillInstruction"/>
+    /// </summary>
+    public class InstructionItem : Base.InstructionItemBase
+    {
+        //public int InstructionId { get; set; } //
+
+        #region - for assessments -
+        public int? Score { get; set; } //Score filled in by user
+        public int? AssessmentId { get; set; } //Assessment where this instruction item belongs to
+        public int? AssessmentTemplateId { get; set; } //Assessment where this instruction item belongs to
+        public int? AssessmentSkillInstructionId { get; set; } //the skill instruction where this instruction item belongs to
+        public int? WorkInstructionTemplateId { get; set; } //the workinstruction template where the item is based on belongs to
+        public int? WorkInstructionTemplateItemId { get; set; } //the workinstruction template item where the item is based on
+        public DateTime? CompletedAt { get; set; } //When completed for user with assessment (UTC)
+        public bool? IsCompleted { get; set; } //Always true when date filled, normally always the case
+        public string CompletedFor { get; set; }
+        public UserBasic Assessor { get; set; }
+        public DateTime? ScoredAt { get; set; }
+        public int? CompletedForId { get; set; } //UserId of the user where the item is completed for (NOTE! not the assessor!)
+        //TODO add assessment skill instruction item fields
+        #endregion
+    }
+}
+
+
 
 using Elastic.Apm;
 using Elastic.Apm.Api;
@@ -2798,35 +2739,112 @@ namespace EZGO.Api.Controllers.V1
     }
 }
 
+
+
 using EZGO.Api.Models.Basic;
 using System;
+using System.Collections.Generic;
 
-namespace EZGO.Api.Models.WorkInstructions
+namespace EZGO.Api.Models.Skills
 {
     /// <summary>
-    /// WorkInstructionItem; Currently only used with Assessments as a AssessmentSkillInstruction <see cref="EZGO.Api.Models.Skills.AssessmentSkillInstruction"/>
+    /// 
+    /// DB: assessments
     /// </summary>
-    public class InstructionItem : Base.InstructionItemBase
+    public class Assessment : Base.AssessmentBase
     {
-        //public int InstructionId { get; set; } //
-
-        #region - for assessments -
-        public int? Score { get; set; } //Score filled in by user
-        public int? AssessmentId { get; set; } //Assessment where this instruction item belongs to
-        public int? AssessmentTemplateId { get; set; } //Assessment where this instruction item belongs to
-        public int? AssessmentSkillInstructionId { get; set; } //the skill instruction where this instruction item belongs to
-        public int? WorkInstructionTemplateId { get; set; } //the workinstruction template where the item is based on belongs to
-        public int? WorkInstructionTemplateItemId { get; set; } //the workinstruction template item where the item is based on
-        public DateTime? CompletedAt { get; set; } //When completed for user with assessment (UTC)
-        public bool? IsCompleted { get; set; } //Always true when date filled, normally always the case
+        public List<Signature> Signatures { get; set; }
+        public List<AssessmentSkillInstruction> SkillInstructions { get; set; }
+        public int NumberOfSignatures { get; set; }
+        public DateTime? CompletedAt { get; set; }
+        public bool IsCompleted { get; set; }
+        public int? CompletedForId { get; set; }
         public string CompletedFor { get; set; }
-        public UserBasic Assessor { get; set; }
-        public DateTime? ScoredAt { get; set; }
-        public int? CompletedForId { get; set; } //UserId of the user where the item is completed for (NOTE! not the assessor!)
-        //TODO add assessment skill instruction item fields
-        #endregion
+        public string CompletedForPicture { get; set; }
+        public int? AssessorId { get; set; }
+        public string Assessor { get; set; }
+        public List<UserBasic> Assessors { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string AssessorPicture { get; set; }
+        public int TemplateId { get; set; }
     }
 }
+
+
+using EZGO.Api.Models.Enumerations;
+using EZGO.Api.Models.Tags;
+using EZGO.Api.Models.WorkInstructions;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace EZGO.Api.Models.Skills.Base
+{
+    public class AssessmentBase
+    {
+        public int Id { get; set; }
+        public int CompanyId { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Picture { get; set; } //note first item in media collection (db)
+        public AssessmentTypeEnum AssessmentType { get; set; }
+        public int? AreaId { get; set; }
+        public string AreaPath { get; set; }
+        public string AreaPathIds { get; set; }
+        public List<string> Media { get; set; }
+        public int? TotalScore { get; set; }
+        public RoleTypeEnum? Role { get; set; }
+        public RequiredSignatureTypeEnum SignatureType { get; set; }
+        public bool SignatureRequired { get; set; }
+        public int NumberOfSkillInstructions { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? ModifiedAt { get; set; }
+        public string CreatedBy { get; set; }
+        public string ModifiedBy { get; set; }
+        public int? CreatedById { get; set; }
+        public int? ModifiedById { get; set; }
+        /// <summary>
+        /// Tags; Tags that are added to this assessment (item) template
+        /// </summary>
+        public List<Tag> Tags { get; set; }
+        /// <summary>
+        /// Version; The version of this instance of the object. Format VyyyyMMddHHmmsss (e.g. V202403131215347 when generated on 13 march 2024 at 13:15:34.7)
+        /// </summary>
+        public string Version { get; set; }
+    }
+}
+
+
+
+using EZGO.Api.Models.Basic;
+using System;
+using System.Collections.Generic;
+
+namespace EZGO.Api.Models.Skills
+{
+    /// <summary>
+    /// SkillInstruction; Skill instruction is based on a work instruction of the type 'skill instruction'. 
+    /// DB: assessments_skillinstructions
+    /// </summary>
+    public class AssessmentSkillInstruction : WorkInstructions.WorkInstruction
+    {
+        public int AssessmentTemplateId { get; set; }
+        public int WorkInstructionTemplateId { get; set; }
+        public int AssessmentTemplateSkillInstructionId { get; set; }
+        public int AssessmentId { get; set; }
+        public int? CompletedForId { get; set; }
+        public DateTime? CompletedAt { get; set; }
+        public string CompletedFor { get; set; }
+        public bool IsCompleted { get; set; }
+        public int Index { get; set; }
+        public List<UserBasic> Assessors { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+
+    }
+}
+
 
 
 

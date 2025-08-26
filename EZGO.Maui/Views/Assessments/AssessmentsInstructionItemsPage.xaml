@@ -15,8 +15,7 @@
     xmlns:popup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
     xmlns:xForms="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
     xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
-		xmlns:images="clr-namespace:EZGO.Maui.Controls.Images"
-	ios:Page.UseSafeArea="true"
+    ios:Page.UseSafeArea="true"
     x:DataType="viewModels:AssessmentInstructionItemsViewModel"
     NavigationPage.HasBackButton="True"
     NavigationPage.HasNavigationBar="False"
@@ -32,7 +31,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="5" />
                         <RowDefinition Height="*" />
-                        <RowDefinition Height="100" />
+                        <RowDefinition Height="55" />
                     </Grid.RowDefinitions>
 
                     <!--  Image  -->
@@ -44,75 +43,18 @@
                         IsOpaque="True" />
 
                     <!--  Overlay  -->
-                    <BoxView Grid.Row="2" BackgroundColor="LightGray" Opacity="0.6"/>
+                    <BoxView Grid.Row="2" BackgroundColor="{StaticResource TransparentBlackColor}" />
 
                     <!--  Name  -->
-                    <StackLayout Grid.Row="2" VerticalOptions="CenterAndExpand" Margin="10">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition Width="200"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height ="30"/>
-                                <RowDefinition Height ="30"/>
-                                <RowDefinition Height ="30"/>
-                            </Grid.RowDefinitions>
-
-                            <Label
-                                Grid.Column="0"
-                                Grid.Row="0"
-                                VerticalOptions="Center"
-                                FontFamily="FAR"
-                                FontSize="Large"
-                                Text="input-text"/>
-                            <Label
-                                Grid.Column="1"
-                                Grid.Row="0"
-                                FontSize="Body"
-                                MaxLines="2"
-                                Text="{Binding Name}"
-                                VerticalOptions="Center"
-                                TextColor="Black"/>
-                            <Label
-                                Grid.Column="0"
-                                Grid.Row="1"
-                                VerticalOptions="Center"
-                                FontFamily="FAR"
-                                FontSize="Medium"
-                                IsVisible="{Binding IsCompleted}"
-                                Text="user-group"/>
-                            <Label 
-                                Grid.Column="1"
-                                Grid.Row="1"
-                                Text="{Binding ModifiedByName}"
-                                IsVisible="{Binding IsCompleted}"
-                                FontSize="Medium"/>
-                            <Label
-                                Grid.Column="0"
-                                Grid.Row="2"
-                                VerticalOptions="Center"
-                                FontFamily="FAR"
-                                FontSize="Medium"
-                                IsVisible="{Binding IsCompleted}"
-                                Text="calendar"/>
-                            <Label
-                                Grid.Column="1"
-                                Grid.Row="2"
-                                IsVisible="{Binding IsCompleted}"
-                                FontSize="Medium"
-                                VerticalOptions="Center"
-                                Text ="{Binding LocalCompletedAt, Converter={StaticResource DateTimeShortMonthToStringConverter}}"/>
-                            <Label
-                                Grid.Column="1"
-                                Grid.Row="2"
-                                TextColor="GreenYellow"
-                                IsVisible="{Binding IsCompleted ,Converter={StaticResource ReverseBooleanConverter}}"
-                                FontSize="Medium"
-                                VerticalOptions="Center"
-                                Text="Score Instructions"/>
-                        </Grid>
-
+                    <StackLayout Grid.Row="2" VerticalOptions="CenterAndExpand">
+                        <Label
+                            Grid.Row="1"
+                            Padding="10"
+                            FontSize="Body"
+                            MaxLines="2"
+                            Text="{Binding Name}"
+                            TextColor="White"
+                            VerticalOptions="CenterAndExpand" />
                     </StackLayout>
 
                     <!--  Buttons  -->
@@ -144,10 +86,7 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="100"/>
-                        <RowDefinition Height="30"/>
-                    </Grid.RowDefinitions>
+
                     <!--  Item Start  -->
 
                     <!--  Item Image  -->
@@ -159,34 +98,12 @@
                         IsOpaque="True" />
 
                     <!--  Item Name  -->
-                    <VerticalStackLayout 
-                        Grid.Column="1" 
-                        Grid.Row="0" 
-                        VerticalOptions="Center"
-                        Margin="20,0,0,0" >
-                        <Label
-                            Text="{Binding Name}"
-                            TextColor="Black"
-                            FontSize="Medium"/>
-                        <HorizontalStackLayout Margin="10,20,0,0">
-                            <images:RoundUserImage
-                                Grid.Column="1"
-                                HorizontalOptions="Start"
-                                UserId="{Binding ModifiedById}"/>
-                            <Label 
-                                Margin="10,0,0,0"
-                                FontSize="Medium"
-                                IsVisible="{Binding IsCompleted}"
-                                Text ="Assessors: "/>
-                            <Label 
-                                Text="{Binding ModifiedByName}"
-                                FontSize="Medium"/>
-                            <Label
-                                IsVisible="{Binding IsCompleted}"
-                                FontSize="Medium"
-                                Text ="{Binding LocalCompletedAt, StringFormat=', {0}', Converter={StaticResource DateTimeShortMonthToStringConverter}}"/>
-                        </HorizontalStackLayout>
-                    </VerticalStackLayout>
+                    <Label
+                        Grid.Column="1"
+                        Margin="20,0,0,0"
+                        Text="{Binding Name}"
+                        TextColor="Black"
+                        VerticalOptions="Center" />
 
                     <!--  Item Buttons  -->
                     <!--  Score Button  -->

@@ -15,6 +15,9 @@ namespace EZGO.Maui.Platforms.Android.Services
 
         public Tuple<double, double> MeasureTextSize(string text, double fontSize, string fontName = null)
         {
+            if (string.IsNullOrEmpty(text))
+                return new Tuple<double, double>(0, 0);
+
             var textView = new TextView(global::Android.App.Application.Context);
             textView.Typeface = GetTypeface(fontName);
             textView.SetText(text, TextView.BufferType.Normal);

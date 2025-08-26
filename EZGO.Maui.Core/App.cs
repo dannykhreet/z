@@ -22,7 +22,7 @@ namespace EZGO.Maui.Core
             if (!Constants.ApiBaseUrl.Equals("https://ezgo.testapi.ezfactory.nl/") &&
                 !Constants.ApiBaseUrl.Equals("https://ezgo.accapi.ezfactory.nl/"))
             {
-                SentrySdk.Close();
+                // SentrySdk.Close();
             }
         }
 

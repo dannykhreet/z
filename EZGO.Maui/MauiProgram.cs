@@ -113,24 +113,24 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
-        if (Config.CurrentEnv != Env.PRODUCTION)
+#if !DEBUG
+        builder.UseSentry(options =>
         {
-            builder.UseSentry(options =>
-            {
-                options.Dsn = "https://aa59a6b5359b2f99727e07d019e4570d@o4509287261863936.ingest.de.sentry.io/4509287263502416";
-                options.Debug = true;
-                options.SendDefaultPii = true;
-                options.AutoSessionTracking = true;
-                options.IsGlobalModeEnabled = false;
-                options.TracesSampleRate = 1.0;
-                options.SampleRate = 1;
-            });
-        }
+            options.Dsn = "https://aa59a6b5359b2f99727e07d019e4570d@o4509287261863936.ingest.de.sentry.io/4509287263502416";
+            options.Debug = false;
+            options.SendDefaultPii = true;
+            options.AutoSessionTracking = true;
+            options.IsGlobalModeEnabled = false;
+            options.TracesSampleRate = 1.0;
+            options.SampleRate = 1;
+            options.Environment = Config.CurrentEnv.ToString();
+        });
+#endif
 
         return builder.Build();
     }
 }
-//MAUI Has it own dependency injection but since we have one from maui I wanted to try use old one
+
 public class MyServiceProviderFactory : IServiceProviderFactory<Autofac.ContainerBuilder>
 {
     public ContainerBuilder CreateBuilder(IServiceCollection services)
@@ -200,19 +200,19 @@ public class MyServiceProviderFactory : IServiceProviderFactory<Autofac.Containe
         containerBuilder.RegisterType<MenuViewModel>().ExternallyOwned().SingleInstance();
         containerBuilder.RegisterType<HomeViewModel>().ExternallyOwned();
 
-        /// Media
+        // Media
         containerBuilder.RegisterType<PdfViewerViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<VideoPlayerViewModel>().ExternallyOwned();
 
-        /// Authentication
+        // Authentication
         containerBuilder.RegisterType<LoginViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<ChangePassViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<ProfileViewModel>().ExternallyOwned();
 
-        /// Areas
+        // Areas
         containerBuilder.RegisterType<WorkAreaViewModel>().ExternallyOwned();
 
-        /// Checklists
+        // Checklists
         containerBuilder.RegisterType<ChecklistTemplatesViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<TaskTemplatesViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<ChecklistPdfViewModel>().ExternallyOwned();
@@ -221,14 +221,14 @@ public class MyServiceProviderFactory : IServiceProviderFactory<Autofac.Containe
         containerBuilder.RegisterType<CompletedChecklistsViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<IncompleteChecklistsViewModel>().ExternallyOwned();
 
-        /// Audits
+        // Audits
         containerBuilder.RegisterType<AuditViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<AuditSlideViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<AuditSignViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<AuditTaskTemplatesViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<CompletedAuditViewModel>().ExternallyOwned();
 
-        /// Actions
+        // Actions
         containerBuilder.RegisterType<ActionViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<ActionConversationViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<ActionDetailViewModel>().ExternallyOwned();
@@ -238,7 +238,7 @@ public class MyServiceProviderFactory : IServiceProviderFactory<Autofac.Containe
         containerBuilder.RegisterType<ActionTaskTemplateDetailViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<ActionTaskTemplateFullDetailViewModel>().ExternallyOwned();
 
-        /// Instructions
+        // Instructions
         containerBuilder.RegisterType<InstructionsViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<InstructionsItemsViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<InstructionsSlideViewModel>().ExternallyOwned();
@@ -257,7 +257,7 @@ public class MyServiceProviderFactory : IServiceProviderFactory<Autofac.Containe
         containerBuilder.RegisterType<TaskInfoViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<TaskSlideDetailViewModel>().ExternallyOwned();
 
-        /// Reports
+        // Reports
         containerBuilder.RegisterType<ReportViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<ActionReportViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<ActionReportActionsViewModel>().ExternallyOwned();
@@ -266,10 +266,10 @@ public class MyServiceProviderFactory : IServiceProviderFactory<Autofac.Containe
         containerBuilder.RegisterType<TaskReportViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<ReportFilterViewModel>().ExternallyOwned();
 
-        /// Steps
+        // Steps
         containerBuilder.RegisterType<StepsViewModel>().ExternallyOwned();
 
-        /// Assessments
+        // Assessments
         containerBuilder.RegisterType<AssessmentsViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<AssessmentsTemplatesViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<AssessmentInstructionItemsViewModel>().ExternallyOwned();
@@ -279,18 +279,18 @@ public class MyServiceProviderFactory : IServiceProviderFactory<Autofac.Containe
 
         containerBuilder.RegisterType<WorkAreaFilterControl>().As<IWorkAreaFilterControl>();
 
-        /// Shared
+        // Shared
         containerBuilder.RegisterType<ItemsDetailViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<PictureProofViewModel>().ExternallyOwned();
         containerBuilder.RegisterType<StageSignViewModel>().ExternallyOwned();
 
-        /// Startup
+        // Startup
         containerBuilder.RegisterType<StartupViewModel>().ExternallyOwned();
 
-        /// Bookmarks
+        // Bookmarks
         containerBuilder.RegisterType<BookmarkViewModel>().ExternallyOwned();
 
-        /// Feed
+        // Feed
         containerBuilder.RegisterType<FeedViewModel>().ExternallyOwned();
 
         var container = containerBuilder.Build();

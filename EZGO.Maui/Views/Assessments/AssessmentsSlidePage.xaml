@@ -17,8 +17,7 @@
              x:Name="Page"
              xmlns:models="clr-namespace:EZGO.Maui.Core.Models.Assessments;assembly=EZGO.Maui.Core"
              xmlns:controls="clr-namespace:EZGO.Maui.Controls"
-		xmlns:images="clr-namespace:EZGO.Maui.Controls.Images"
-			 ios:Page.UseSafeArea="true"
+    ios:Page.UseSafeArea="true"
     NavigationPage.HasBackButton="True"
     NavigationPage.HasNavigationBar="False">
     <ContentPage.Resources>
@@ -62,50 +61,26 @@
                     <!-- Scroll Overlay -->
                     <ScrollView
                         Grid.Row="1" Padding="20,15"
-                        BackgroundColor="{StaticResource LightGreyColor}"
-                        Opacity="0.6"
+                        BackgroundColor="{StaticResource TransparentBlackColor}"
                         VerticalOptions="End">
-                        <VerticalStackLayout>
 
                         <!-- Task Name & Description -->
-                        <HorizontalStackLayout Margin="5" Spacing="10">
+                        <StackLayout>
                             <!-- Task Name -->
-                             <Label
-                                VerticalOptions="Center"
-                                FontFamily="FAR"
-                                FontSize="Medium"
-                                Text="input-text"/>
                             <Label
                                 x:Name="TaskName"
                                 FontFamily="{StaticResource RobotoBold}"
-                                FontSize="Medium"
+                                FontSize="Large"
                                 Text="{Binding Name}"
-                                TextColor="Black" />
-                        </HorizontalStackLayout>
-                        <HorizontalStackLayout Spacing="10">
-                            <images:RoundUserImage
-                                HorizontalOptions="Start"
-                                UserId="{Binding ModifiedById}"/>
-                             <Label 
-                                VerticalOptions="Center"
-                                Text="{Binding ModifiedByName}"
-                                FontSize="Medium"/>
-                            <Label
-                                IsVisible="{Binding IsCompleted}"
-                                FontSize="Medium"
-                                Text ="{Binding LocalCompletedAt, StringFormat=', {0}', Converter={StaticResource DateTimeShortMonthToStringConverter}}"
-                                VerticalOptions="Center"/>
-                        </HorizontalStackLayout>
-                        <HorizontalStackLayout>
+                                TextColor="White" />
+
                             <!-- Task Description -->
                             <Label
-                                FontFamily="{StaticResource RobotoMedium}"
-                                FontSize="Micro"
+                                FontFamily="{StaticResource RobotoLight}"
+                                FontSize="Small"
                                 Text="{Binding Description}"
-                                TextColor="Black" />
-                        </HorizontalStackLayout>
-                        
-                        </VerticalStackLayout>
+                                TextColor="White" />
+                        </StackLayout>
 
                     </ScrollView>
                 </Grid>

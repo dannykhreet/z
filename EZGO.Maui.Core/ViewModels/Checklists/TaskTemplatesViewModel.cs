@@ -227,14 +227,14 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
 
             ActionCommand = new Command<BasicTaskTemplateModel>(task => ExecuteLoadingAction(async () => await OpenPopupOrNavigateToActionsAsync(task)), CanExecuteCommands);
 
-            TaskSkippedCommand = new Command<BasicTaskTemplateModel>(taskTemplate =>
-                ExecuteLoadingAction(async () => await ToggleTaskStatus(taskTemplate, TaskStatusEnum.Skipped)), CanExecuteCommands);
+            TaskSkippedCommand = new Command<BasicTaskTemplateModel>(async taskTemplate =>
+                await ExecuteLoadingAction(async () => await ToggleTaskStatus(taskTemplate, TaskStatusEnum.Skipped)), CanExecuteCommands);
 
-            TaskNotOkCommand = new Command<BasicTaskTemplateModel>(taskTemplate =>
-                ExecuteLoadingAction(async () => await ToggleTaskStatus(taskTemplate, TaskStatusEnum.NotOk)), CanExecuteCommands);
+            TaskNotOkCommand = new Command<BasicTaskTemplateModel>(async taskTemplate =>
+                await ExecuteLoadingAction(async () => await ToggleTaskStatus(taskTemplate, TaskStatusEnum.NotOk)), CanExecuteCommands);
 
-            TaskOkCommand = new Command<BasicTaskTemplateModel>(taskTemplate =>
-                ExecuteLoadingAction(async () => await ToggleTaskStatus(taskTemplate, TaskStatusEnum.Ok)), CanExecuteCommands);
+            TaskOkCommand = new Command<BasicTaskTemplateModel>(async taskTemplate =>
+               await ExecuteLoadingAction(async () => await ToggleTaskStatus(taskTemplate, TaskStatusEnum.Ok)), CanExecuteCommands);
 
             FilterCommand = new Command<TaskStatusEnum?>(newStatus => ExecuteLoadingAction(() =>
             {
@@ -243,8 +243,8 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
 
             ListViewLayoutCommand = new Command<object>(obj => ExecuteLoadingAction(() => SetListViewLayout(obj)), CanExecuteCommands);
 
-            DetailCommand = new Command<object>(obj =>
-                ExecuteLoadingAction(async () => await NavigateToDetailCarouselAsync(obj)), CanExecuteCommands);
+            DetailCommand = new Command<object>(async obj =>
+                await ExecuteLoadingAction(async () => await NavigateToDetailCarouselAsync(obj)), CanExecuteCommands);
 
             DeleteTagCommand = new Command<ItemTappedEventArgs>(obj =>
             {
@@ -269,20 +269,20 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
 
             }, CanExecuteCommands);
 
-            SignCommand = new Command(() =>
+            SignCommand = new Command(async () =>
             {
-                ExecuteLoadingAction(NavigateToSignPageOrFinishChecklistAsync);
+                await ExecuteLoadingAction(NavigateToSignPageOrFinishChecklistAsync);
             }, CanExecuteCommands);
 
             SaveCommand = new MvvmHelpers.Commands.AsyncCommand(SaveChecklistAsync, CanExecuteCommands);
 
-            NavigateToNewActionCommand = new Command(() => ExecuteLoadingAction(async () => await NavigateToNewActionAsync()), CanExecuteCommands);
+            NavigateToNewActionCommand = new Command(async () => await ExecuteLoadingAction(async () => await NavigateToNewActionAsync()), CanExecuteCommands);
 
-            NavigateToNewCommentCommand = new Command(() => ExecuteLoadingAction(async () => await NavigateToNewCommentAsync()), CanExecuteCommands);
+            NavigateToNewCommentCommand = new Command(async () => await ExecuteLoadingAction(async () => await NavigateToNewCommentAsync()), CanExecuteCommands);
 
-            StepsCommand = new Command<BasicTaskTemplateModel>(obj =>
+            StepsCommand = new Command<BasicTaskTemplateModel>(async obj =>
             {
-                ExecuteLoadingAction(async () => await NavigateToMoreInfoAsync(obj));
+                await ExecuteLoadingAction(async () => await NavigateToMoreInfoAsync(obj));
             }, CanExecuteCommands);
 
             SignStageCommand = new Command<BasicTaskTemplateModel>(async (taskTemplate) =>
@@ -391,16 +391,22 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
 
                         if (selectedChecklist.SelectedChecklistId == 0 && selectedChecklist.LocalGuid != checklist.LocalGuid)
                         {
-                            OpenFields.IsSyncing = false;
-                            OpenFields.CalculateTasksDone();
+                            if (OpenFields != null)
+                            {
+                                OpenFields.IsSyncing = false;
+                                OpenFields.CalculateTasksDone();
+                            }
                             return;
                         }
 
                         if (selectedChecklist.SelectedChecklistId > 0 && selectedChecklist.SelectedChecklistId != checklist.Id)
                         {
-                            OpenFields.IsSyncing = false;
-                            OpenFields.CalculateTasksDone();
-                            return;
+                            if (OpenFields != null)
+                            {
+                                OpenFields.IsSyncing = false;
+                                OpenFields.CalculateTasksDone();
+                                return;
+                            }
                         }
 
                         IncompleteChecklist = checklist;
@@ -425,7 +431,7 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
                             OpenFields?.SetPropertyValues(open);
                         }
 
-                        if (IncompleteChecklist.Stages != null)
+                        if (IncompleteChecklist.Stages != null && Stages != null)
                             Stages.UpdateStages(IncompleteChecklist.Stages);
 
                         OnPropertyChanged(nameof(FirstTimeSaving));
@@ -444,7 +450,8 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
                     MessagingCenter.Subscribe<ChecklistsService, string>(this, Constants.ErrorSendingChecklist, async (sender, reason) =>
                     {
                         _messageService.SendClosableWarning($"Error: {reason}");
-                        OpenFields.IsSyncing = false;
+                        if (OpenFields != null)
+                            OpenFields.IsSyncing = false;
                         await UpdateTaskStatuses(IncompleteChecklist?.Id).ConfigureAwait(false);
                         MainThread.BeginInvokeOnMainThread(() =>
                         {
@@ -502,14 +509,16 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
                 if (!OpenedFromDeepLink)
                 {
                     SelectedChecklist = ChecklistTemplates?.FirstOrDefault(x => selectedChecklist.Id == x.Id);
-                    SelectedChecklist.Tags = selectedChecklist.Tags;
+                    if (selectedChecklist.Tags != null)
+                        SelectedChecklist.Tags = selectedChecklist.Tags;
                 }
             }
 
             LoadStages();
             OpenFields?.CalculateTasksDone();
+            if (selectedChecklist != null)
+                selectedChecklist.LocalGuid = Guid.NewGuid();
 
-            selectedChecklist.LocalGuid = Guid.NewGuid();
             await base.Init();
         }
 
@@ -539,6 +548,7 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
                         item.LockStageAfterCompletion = stageFromApi.LockStageAfterCompletion;
                         item.UseShiftNotes = stageFromApi.UseShiftNotes;
                         item.TaskTemplateIds = stageFromApi.TaskTemplateIds;
+                        item.TaskIds = stageFromApi.TaskIds;
                         item.NumberOfSignaturesRequired = stageFromApi.NumberOfSignaturesRequired;
                         item.Name = stageFromApi.Name;
                         item.Description = stageFromApi.Description;
@@ -546,11 +556,15 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
                     }
                 }
             }
+            if (TaskFilter != null)
+            {
+                Stages = new StagesControl(selectedChecklist.StageTemplates, TaskFilter.UnfilteredItems, TaskFilter.FilteredList);
+                Stages.SetStages(TaskFilter.FilteredList);
+                TaskFilter.SetStagesControl(Stages);
+            }
 
-            Stages = new StagesControl(selectedChecklist.StageTemplates, TaskFilter.UnfilteredItems, TaskFilter.FilteredList);
-            Stages.SetStages(TaskFilter.FilteredList);
-            TaskFilter.SetStagesControl(Stages);
-            OpenFields.StagesControl = Stages;
+            if (OpenFields != null)
+                OpenFields.StagesControl = Stages;
         }
 
         private readonly SemaphoreSlim tasksSemaphore = new SemaphoreSlim(1, 1);
@@ -650,7 +664,7 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
 
         public override async void OnDisappearing(object sender, EventArgs e)
         {
-            if (!IsBusy) await OpenFields.AdaptChanges(_checklistService).ConfigureAwait(false);
+            if (!IsBusy && OpenFields != null) await OpenFields.AdaptChanges(_checklistService).ConfigureAwait(false);
             base.OnDisappearing(sender, e);
         }
 
@@ -723,8 +737,13 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
         /// </summary>
         private async Task LoadTaskTemplatesAsync()
         {
+            if (_checklistService == null)
+                return;
+
             if (!IsFromBookmark)
+            {
                 selectedChecklist = await _checklistService.GetChecklistTemplateAsync(ChecklistTemplateId, IsRefreshing).ConfigureAwait(false);
+            }
 
             if (IncompleteChecklist != null)
             {
@@ -831,7 +850,7 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
                         if (localTaskTemplate != null)
                         {
                             basicTask.FilterStatus = localTaskTemplate.Status ?? TaskStatusEnum.Todo;
-                            basicTask.PropertyValues = localTaskTemplate.PropertyUserValues ?? new List<Api.Models.PropertyValue.PropertyUserValue>();
+                            basicTask.PropertyValues = localTaskTemplate.PropertyUserValues ?? new List<PropertyUserValue>();
                             basicTask.LocalComments = localTaskTemplate.Comments ?? new List<Models.Comments.CommentModel>();
                             basicTask.HasPictureProof = localTaskTemplate.HasPictureProof;
                             basicTask.PictureProofMediaItems = localTaskTemplate.PictureProofMediaItems;
@@ -1017,6 +1036,8 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
 
         private async Task AdaptChanges(bool isFromStageSign = false)
         {
+            if (OpenFields == null) return;
+
             if (isFromStageSign)
             {
                 OpenFields.AddChangedStageSign();
@@ -1300,7 +1321,7 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
 
             IsBusy = false;
             OpenFields?.ClearChangedTasks();
-            Stages.ClearChangedStages();
+            Stages?.ClearChangedStages();
         }
 
         private async Task OpenPopupOrNavigateToActionsAsync(BasicTaskTemplateModel taskTemplate)

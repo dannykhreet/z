@@ -185,7 +185,7 @@ namespace EZGO.Maui.Core.ViewModels
             });
 
             LayoutManager.SetCurrentLayout();
-            await Task.Run(async () => await base.Init());
+            await base.Init();
         }
 
         private async Task LoadInstructionItems(int id)
@@ -236,6 +236,7 @@ namespace EZGO.Maui.Core.ViewModels
 
         protected override void Dispose(bool disposing)
         {
+            MessagingCenter.Unsubscribe<SyncService>(this, Constants.WorkInstructionsTemplateChanged);
             _instructionsService.Dispose();
             InstructionsFilter.Dispose();
             Instructions = null;

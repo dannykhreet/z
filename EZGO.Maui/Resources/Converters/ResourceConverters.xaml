@@ -73,6 +73,5 @@
     <converters:ExpanderIconVisibilityConverter x:Key="ExpanderIconVisibilityConverter" />
     <converters:ExpanderIconConverter x:Key="ExpanderIconConverter" />
     <converters:IndentationConverter x:Key="IndentationConverter" />
-    <converters:PullToRefreshListLinearIndextToColorConverter x:Key="PullToRefreshListLinearIndextToColorConverter"/>
     <converter:StageNoteStringToHeightConverter x:Key="StageNoteStringToHeightConverter"/>
 </ResourceDictionary>

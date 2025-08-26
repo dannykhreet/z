@@ -401,6 +401,12 @@ namespace EZGO.Maui.Core.ViewModels
             }
             else
             {
+                if (_actionService == null)
+                {
+                    using var scope = App.Container.CreateScope();
+                    _actionService = scope.ServiceProvider.GetRequiredService<IActionsService>();
+                }
+
                 _Actions = await _actionService.GetActionsAsync(refresh: IsRefreshing);
                 if (SelectedWorkArea?.Id == 0 && SelectedWorkArea?.Children == null)
                 {

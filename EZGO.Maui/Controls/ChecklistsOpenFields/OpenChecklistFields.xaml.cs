@@ -147,7 +147,9 @@ public partial class OpenChecklistFields : ContentView
     {
         const float maxTitlePercentage = 0.7f;
 
-        if (openFields.IsCompleted && !openFields.PropertyList.IsNullOrEmpty())
+        if (openFields.PropertyList.IsNullOrEmpty() || openFields.listView.Width <= 0) return;
+
+        if (openFields.IsCompleted)
         {
             openFields._maxTitleWidth = 0;
 
@@ -170,12 +172,15 @@ public partial class OpenChecklistFields : ContentView
                 float titlePercentage = Math.Clamp(widthT, 0f, maxTitlePercentage);
                 float valuePercentage = 1f - titlePercentage;
 
+                titlePercentage = double.IsNaN(titlePercentage) ? 0.7f : titlePercentage;
+                valuePercentage = double.IsNaN(valuePercentage) ? 0.3f : valuePercentage;
+
                 openFields.TitlePercentage = new FlexBasis(titlePercentage, true);
                 openFields.ValuePercentage = new FlexBasis(valuePercentage, true);
                 openFields.OnPropertyChanged();
             }
         }
-        else if (!openFields.PropertyList.IsNullOrEmpty())
+        else
         {
             openFields._maxTitleWidth = 0;
 
@@ -205,6 +210,9 @@ public partial class OpenChecklistFields : ContentView
 
                 titlePercentage = Math.Clamp(titlePercentage, 0f, maxTitlePercentage);
                 float valuePercentage = 1f - titlePercentage;
+
+                titlePercentage = double.IsNaN(titlePercentage) ? 0.7f : titlePercentage;
+                valuePercentage = double.IsNaN(valuePercentage) ? 0.3f : valuePercentage;
 
                 openFields.TitlePercentage = new FlexBasis(titlePercentage, true);
                 openFields.ValuePercentage = new FlexBasis(valuePercentage, true);

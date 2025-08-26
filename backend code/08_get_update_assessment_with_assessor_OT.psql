@@ -15,57 +15,11 @@ COMMIT;
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
--- DROP FUNCTION IF EXISTS public.get_assessors_for_skillinstruction(int4, int4);
-CREATE OR REPLACE FUNCTION public.get_assessors_for_skillinstruction(_companyid integer,_skillinstructionid integer)
-RETURNS TABLE(assessorid integer, assessor text, assessorpicture text)
-LANGUAGE plpgsql
-STABLE
-AS $function$
-BEGIN
-    RETURN QUERY
-    SELECT DISTINCT
-        pu.id::integer AS assessorid,
-        pu.username::text AS assessor,
-        pu.picture::text AS assessorpicture
-    FROM assessment_skillinstruction_items asii
-    JOIN profiles_user pu ON pu.id = asii.assessor_id AND pu.company_id = _companyid
-    WHERE asii.assessment_skillinstruction_id = _skillinstructionid
-      AND asii.assessor_id IS NOT NULL;
-END
-$function$;
-
-
--- DROP FUNCTION IF EXISTS public.get_assessors_for_assessment(int4, int4);
-
-CREATE OR REPLACE FUNCTION public.get_assessors_for_assessment(_companyid integer,_assessmentid integer)
-RETURNS TABLE(assessorid integer, assessor text, assessorpicture text)
-LANGUAGE plpgsql
-STABLE
-AS $function$
-BEGIN
-    RETURN QUERY
-    SELECT DISTINCT
-        pu.id::integer AS assessorid,
-        pu.username::text AS assessor,
-        pu.picture::text AS assessorpicture
-    FROM assessment_skillinstructions asi
-    JOIN assessment_skillinstruction_items asii ON asii.assessment_skillinstruction_id = asi.id
-    JOIN profiles_user pu ON pu.id = asii.assessor_id AND pu.company_id = _companyid
-    WHERE asi.assessment_id = _assessmentid
-      AND asii.assessor_id IS NOT NULL;
-END
-$function$;
-
-
-
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
- DROP FUNCTION public.get_assessment(int4, int4);
+  DROP FUNCTION public.get_assessment(int4, int4);
 
 CREATE OR REPLACE FUNCTION public.get_assessment(_companyid integer, _id integer)
- RETURNS TABLE(id integer, signatures character varying, completed_for_id integer, completed_at timestamp without time zone, completedfor character varying, completedfor_picture character varying, assessor_id integer, assessor character varying, assessor_picture character varying, is_completed boolean, total_score integer, assessment_template_id integer, company_id integer, area_id integer, role integer, assessment_type integer, name character varying, description text, media text, signature_type integer, signature_required boolean, created_at timestamp without time zone, modified_at timestamp without time zone, created_by_id integer, modified_by_id integer, created_by character varying, modified_by character varying, nr_of_skillinstructions integer, version character varying,start_at timestamp without time zone,
-    end_at timestamp without time zone)
+ RETURNS TABLE(id integer, signatures character varying, completed_for_id integer, completed_at timestamp without time zone, completedfor character varying, completedfor_picture character varying, assessor_id integer, assessor character varying, assessor_picture character varying, is_completed boolean, total_score integer, assessment_template_id integer, company_id integer, area_id integer, role integer, assessment_type integer, name character varying, description text, media text, signature_type integer, signature_required boolean, created_at timestamp without time zone, modified_at timestamp without time zone, created_by_id integer, modified_by_id integer, created_by character varying, modified_by character varying, nr_of_skillinstructions integer, version character varying, start_at timestamp without time zone, end_at timestamp without time zone, assessors text)
  LANGUAGE plpgsql
  STABLE
 AS $function$BEGIN
@@ -101,7 +55,31 @@ CONCAT(PUM.first_name, ' ', PUM.last_name)::varchar AS modified_by,
 (SELECT (COUNT(ASI.id))::int4 FROM assessment_skillinstructions ASI WHERE ASI.assessment_id = A.id AND ASI.company_id = _companyid AND ASI.is_active = true) AS nr_of_skillinstructions,
 A."version",
 A.start_at,
-A.end_at
+A.end_at,
+COALESCE((
+      SELECT json_agg(
+               json_build_object(
+                 'Id',      uu.id,
+                 'Name',    TRIM(BOTH FROM COALESCE(
+                               NULLIF(CONCAT(uu.first_name,' ',uu.last_name),' '),
+                               NULLIF(uu.username,''),
+                               'User '||uu.id::text
+                             )),
+                 'Picture', NULLIF(uu.picture,'')
+               )
+               ORDER BY uu.id
+             )
+      FROM (
+        SELECT DISTINCT u.id, u.first_name, u.last_name, u.username, u.picture
+          FROM assessment_skillinstruction_items asii
+          JOIN profiles_user u
+            ON u.id = asii.assessor_id
+           AND u.company_id = _companyid
+         WHERE asii.company_id   = _companyid
+           AND asii.assessment_id= A.id
+           AND asii.assessor_id IS NOT NULL
+      ) uu
+    )::text, '[]') AS assessors
 FROM assessments A
 INNER JOIN assessment_templates AST ON AST.id = A.assessment_template_id
 INNER JOIN profiles_user PUC ON PUC.id = A.created_by_id AND PUC.company_id = _companyid
@@ -116,73 +94,123 @@ AND A.id = _id
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-DROP FUNCTION public.get_assessment_skillinstructions(int4, int4, int4, int4, bool, int4, int4, int4, timestamp, timestamp, timestamp, int4, int4, int4, int4);
+ -- DROP FUNCTION public.get_assessment_skillinstructions(int4, int4, int4, int4, bool, int4, int4, int4, timestamp, timestamp, timestamp, int4, int4, int4, int4);
 
 CREATE OR REPLACE FUNCTION public.get_assessment_skillinstructions(_companyid integer, _assessmentid integer DEFAULT NULL::integer, _completedforid integer DEFAULT NULL::integer, _templateid integer DEFAULT NULL::integer, _iscompleted boolean DEFAULT NULL::boolean, _assessmenttype integer DEFAULT NULL::integer, _role integer DEFAULT NULL::integer, _areaid integer DEFAULT 0, _timestamp timestamp without time zone DEFAULT NULL::timestamp without time zone, _starttimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone, _endtimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone, _timespanindays integer DEFAULT 0, _userid integer DEFAULT 0, _limit integer DEFAULT 0, _offset integer DEFAULT 0)
- RETURNS TABLE(id integer, assessment_id integer, assessment_template_skillinstruction_id integer, completed_for_id integer, completed_at timestamp without time zone, completedfor character varying, is_completed boolean, total_score integer, company_id integer, assessment_template_id integer, workinstruction_template_id integer, index integer, created_at timestamp without time zone, modified_at timestamp without time zone, created_by_id integer, modified_by_id integer, created_by character varying, modified_by character varying, media text, name character varying, description text,start_at timestamp without time zone,end_at timestamp without time zone)
+ RETURNS TABLE(id integer, assessment_id integer, assessment_template_skillinstruction_id integer, completed_for_id integer, completed_at timestamp without time zone, completedfor character varying, is_completed boolean, total_score integer, company_id integer, assessment_template_id integer, workinstruction_template_id integer, index integer, created_at timestamp without time zone, modified_at timestamp without time zone, created_by_id integer, modified_by_id integer, created_by character varying, modified_by character varying, media text, name character varying, description text, start_at timestamp without time zone, end_at timestamp without time zone, assessors text)
  LANGUAGE plpgsql
  STABLE
-AS $function$BEGIN
-	RETURN QUERY
-SELECT 
-ASS.id, 
-ASS.assessment_id, 
-ASTS.id AS assessment_template_skillinstruction_id, 
-ASS.completed_for_id, 
-ASS.completed_at::timestamp, 
-CONCAT(PUF.first_name, ' ', PUF.last_name)::varchar AS completedfor,
-ASS.is_completed,
-ASS.total_score, 
-A.company_id,
-A.assessment_template_id,
-ASTS.workinstruction_template_id,
-ASTS.index,
-ASS.created_at,
-ASS.modified_at,
-ASS.created_by_id,
-ASS.modified_by_id,
-CONCAT(PUC.first_name, ' ', PUC.last_name)::varchar AS created_by,
-CONCAT(PUM.first_name, ' ', PUM.last_name)::varchar AS modified_by,
-WIT.media,
-WIT.name,
-WIT.description,
-ASS.start_at,
-ASS.end_at
-FROM assessments A
-INNER JOIN assessment_skillinstructions ASS ON ASS.assessment_id = A.id AND ASS.company_id = _companyid
-INNER JOIN assessment_templates AST ON AST.id = A.assessment_template_id 
-INNER JOIN assessment_template_skillinstructions ASTS ON ASTS.assessment_template_id = AST.id AND ASTS.company_id = _companyid AND ASTS.id = ASS.assessment_template_skillinstruction_id
-INNER JOIN workinstruction_templates WIT ON WIT.id = ASTS.workinstruction_template_id AND WIT.instruction_type = 1 AND WIT.company_id = _companyid
-INNER JOIN profiles_user PUC ON PUC.id = ASS.created_by_id AND PUC.company_id = _companyid
-INNER JOIN profiles_user PUM ON PUM.id = ASS.modified_by_id AND PUM.company_id = _companyid
-LEFT JOIN profiles_user PUF ON PUF.id = ASS.completed_for_id AND PUF.company_id = _companyid
-WHERE A.company_id = _companyid AND AST.company_id = _companyid AND A.is_active = true 
-AND (A.id = _assessmentid OR _assessmentid IS NULL)
-AND (EXISTS ( 
-		SELECT A2.id
-		FROM assessments A2
-		INNER JOIN assessment_templates AST2 ON AST2.id = A2.assessment_template_id
-		WHERE AST.company_id = _companyid AND A2.is_active = true AND A2.company_id = _companyid
-		AND (EXISTS (SELECT areas.id FROM get_area_nodes_from_root_to_leaf(_companyid, _areaid) areas WHERE areas.id = AST2.area_id) OR _areaid= 0) 
-		AND (EXISTS (SELECT allowedtemplates.id FROM get_user_allowed_assessmenttemplateids(_companyid, _userid) allowedtemplates WHERE allowedtemplates.id = AST2.id) OR _userid = 0) 
-		AND (AST2.assessment_type = _assessmenttype OR _assessmenttype IS NULL)
-		AND (AST2.role = _role OR _role IS NULL)
-		AND (A2.completed_at::timestamp < get_timestamp_without_companytimezone(_companyid ,_timestamp) OR _timestamp IS NULL)
-		AND (A2.completed_at >= get_timestamp_without_companytimezone(_companyid ,_starttimestamp) OR _starttimestamp IS NULL)
-		AND (A2.completed_at <= get_timestamp_without_companytimezone(_companyid ,_endtimestamp) OR _endtimestamp IS NULL)
-		AND (A2.completed_at > (NOW()::date - CONCAT(_timespanindays,' days')::interval) OR _timespanindays = 0) -- note when partial items can be submitted, this must change
-		AND (A2.is_completed = _iscompleted OR _iscompleted IS NULL)
-		AND (A2.completed_for_id = _completedforid OR _completedforid IS NULL)
-		AND (A2.assessment_template_id = _templateid OR _templateid IS NULL)
-		AND (A2.id = _assessmentid OR _assessmentid IS NULL)
-		ORDER BY A2.completed_at, AST2.name ASC, AST2.id
-		LIMIT CASE WHEN (_limit > 0) THEN _limit END 
-		OFFSET CASE WHEN (_offset > 0) THEN _offset END
-))
-ORDER BY ASS.assessment_id, ASTS.index, ASTS.assessment_template_id, ASTS.workinstruction_template_id
-;END$function$
+AS $function$
+BEGIN
+  RETURN QUERY
+  SELECT
+    ASS.id,
+    ASS.assessment_id,
+    ASTS.id AS assessment_template_skillinstruction_id,
+    ASS.completed_for_id,
+    ASS.completed_at::timestamp,
+    CONCAT(PUF.first_name, ' ', PUF.last_name)::varchar AS completedfor,
+    ASS.is_completed,
+    ASS.total_score,
+    A.company_id,
+    A.assessment_template_id,
+    ASTS.workinstruction_template_id,
+    ASTS.index,
+    ASS.created_at,
+    ASS.modified_at,
+    ASS.created_by_id,
+    ASS.modified_by_id,
+    CONCAT(PUC.first_name, ' ', PUC.last_name)::varchar AS created_by,
+    CONCAT(PUM.first_name, ' ', PUM.last_name)::varchar AS modified_by,
+    WIT.media,
+    WIT.name,
+    WIT.description,
+    ASS.start_at,
+    ASS.end_at,
+    COALESCE((
+	  SELECT json_agg(
+	           json_build_object(
+	             'Id',      UU.id,
+	             'Name',    TRIM(BOTH FROM COALESCE(
+	                           NULLIF(CONCAT(UU.first_name,' ',UU.last_name),' '),
+	                           NULLIF(UU.username,''),
+	                           'User '||UU.id::text
+	                         )),
+	             'Picture', NULLIF(UU.picture,'')
+	           )
+	           ORDER BY UU.id
+	         )
+	  FROM (
+	    SELECT DISTINCT U.id, U.first_name, U.last_name, U.username, U.picture
+	      FROM assessment_skillinstruction_items ASII
+	      JOIN profiles_user U
+	        ON U.id = ASII.assessor_id
+	       AND U.company_id = _companyid
+	     WHERE ASII.company_id = _companyid
+	       AND ASII.assessment_skillinstruction_id = ASS.id
+	       AND ASII.assessor_id IS NOT NULL
+	  ) UU
+	)::text, '[]') AS assessors
+  FROM assessments A
+  INNER JOIN assessment_skillinstructions ASS
+    ON ASS.assessment_id = A.id AND ASS.company_id = _companyid
+  INNER JOIN assessment_templates AST
+    ON AST.id = A.assessment_template_id
+  INNER JOIN assessment_template_skillinstructions ASTS
+    ON ASTS.assessment_template_id = AST.id
+   AND ASTS.company_id = _companyid
+   AND ASTS.id = ASS.assessment_template_skillinstruction_id
+  INNER JOIN workinstruction_templates WIT
+    ON WIT.id = ASTS.workinstruction_template_id
+   AND WIT.instruction_type = 1
+   AND WIT.company_id = _companyid
+  INNER JOIN profiles_user PUC
+    ON PUC.id = ASS.created_by_id AND PUC.company_id = _companyid
+  INNER JOIN profiles_user PUM
+    ON PUM.id = ASS.modified_by_id AND PUM.company_id = _companyid
+  LEFT JOIN profiles_user PUF
+    ON PUF.id = ASS.completed_for_id AND PUF.company_id = _companyid
+  -- NEW: aggregate assessor ids from items for this skill-instruction
+  LEFT JOIN LATERAL (
+    SELECT ARRAY_AGG(DISTINCT asii.assessor_id)
+           FILTER (WHERE asii.assessor_id IS NOT NULL) AS assessor_ids
+    FROM assessment_skillinstruction_items asii
+    WHERE asii.company_id = _companyid
+      AND asii.assessment_skillinstruction_id = ASS.id
+  ) assr ON TRUE
+  WHERE A.company_id = _companyid
+    AND AST.company_id = _companyid
+    AND A.is_active = true
+    AND (A.id = _assessmentid OR _assessmentid IS NULL)
+    AND (EXISTS (
+          SELECT A2.id
+          FROM assessments A2
+          INNER JOIN assessment_templates AST2 ON AST2.id = A2.assessment_template_id
+          WHERE AST.company_id = _companyid
+            AND A2.is_active = true
+            AND A2.company_id = _companyid
+            AND (EXISTS (SELECT areas.id FROM get_area_nodes_from_root_to_leaf(_companyid, _areaid) areas WHERE areas.id = AST2.area_id) OR _areaid = 0)
+            AND (EXISTS (SELECT allowedtemplates.id FROM get_user_allowed_assessmenttemplateids(_companyid, _userid) allowedtemplates WHERE allowedtemplates.id = AST2.id) OR _userid = 0)
+            AND (AST2.assessment_type = _assessmenttype OR _assessmenttype IS NULL)
+            AND (AST2.role = _role OR _role IS NULL)
+            AND (A2.completed_at::timestamp < get_timestamp_without_companytimezone(_companyid, _timestamp) OR _timestamp IS NULL)
+            AND (A2.completed_at >= get_timestamp_without_companytimezone(_companyid, _starttimestamp) OR _starttimestamp IS NULL)
+            AND (A2.completed_at <= get_timestamp_without_companytimezone(_companyid, _endtimestamp) OR _endtimestamp IS NULL)
+            AND (A2.completed_at > (NOW()::date - CONCAT(_timespanindays,' days')::interval) OR _timespanindays = 0)
+            AND (A2.is_completed = _iscompleted OR _iscompleted IS NULL)
+            AND (A2.completed_for_id = _completedforid OR _completedforid IS NULL)
+            AND (A2.assessment_template_id = _templateid OR _templateid IS NULL)
+            AND (A2.id = _assessmentid OR _assessmentid IS NULL)
+          ORDER BY A2.completed_at, AST2.name ASC, AST2.id
+          LIMIT CASE WHEN (_limit > 0) THEN _limit END
+          OFFSET CASE WHEN (_offset > 0) THEN _offset END
+        ))
+  ORDER BY ASS.assessment_id, ASTS.index, ASTS.assessment_template_id, ASTS.workinstruction_template_id;
+END
+$function$
 ;
+;
+
 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -271,66 +299,112 @@ OFFSET CASE WHEN (_offset > 0) THEN _offset END
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-  DROP FUNCTION public.get_assessment_skillinstructions_v2(int4, _int4);
+   DROP FUNCTION public.get_assessment_skillinstructions_v2(int4, _int4);
 
 CREATE OR REPLACE FUNCTION public.get_assessment_skillinstructions_v2(_companyid integer, _assessmentids integer[])
- RETURNS TABLE(id integer, assessment_id integer, assessment_template_skillinstruction_id integer, completed_for_id integer, completed_at timestamp without time zone, completedfor character varying, is_completed boolean, total_score integer, company_id integer, assessment_template_id integer, workinstruction_template_id integer, index integer, created_at timestamp without time zone, modified_at timestamp without time zone, created_by_id integer, modified_by_id integer, created_by character varying, modified_by character varying, media text, name character varying, description text,start_at timestamp without time zone,
-    end_at timestamp without time zone)
+ RETURNS TABLE(id integer, assessment_id integer, assessment_template_skillinstruction_id integer, completed_for_id integer, completed_at timestamp without time zone, completedfor character varying, is_completed boolean, total_score integer, company_id integer, assessment_template_id integer, workinstruction_template_id integer, index integer, created_at timestamp without time zone, modified_at timestamp without time zone, created_by_id integer, modified_by_id integer, created_by character varying, modified_by character varying, media text, name character varying, description text, start_at timestamp without time zone, end_at timestamp without time zone, assessors text)
  LANGUAGE plpgsql
  STABLE
-AS $function$BEGIN
-	RETURN QUERY
-SELECT 
-ASS.id, 
-ASS.assessment_id, 
-ASTS.id AS assessment_template_skillinstruction_id, 
-ASS.completed_for_id, 
-ASS.completed_at::timestamp, 
-CONCAT(PUF.first_name, ' ', PUF.last_name)::varchar AS completedfor,
-ASS.is_completed,
-ASS.total_score, 
-A.company_id,
-A.assessment_template_id,
-ASTS.workinstruction_template_id,
-ASTS.index,
-ASS.created_at,
-ASS.modified_at,
-ASS.created_by_id,
-ASS.modified_by_id,
-CONCAT(PUC.first_name, ' ', PUC.last_name)::varchar AS created_by,
-CONCAT(PUM.first_name, ' ', PUM.last_name)::varchar AS modified_by,
-WIT.media,
-WIT.name,
-WIT.description,
-ASS.start_at,
-ASS.end_at
-FROM assessment_skillinstructions ASS
-INNER JOIN assessments A ON A.id = ASS.assessment_id AND A.company_id = _companyid
-INNER JOIN assessment_templates AST ON AST.id = A.assessment_template_id 
-INNER JOIN assessment_template_skillinstructions ASTS ON ASTS.assessment_template_id = AST.id AND ASTS.company_id = _companyid AND ASTS.id = ASS.assessment_template_skillinstruction_id
-INNER JOIN workinstruction_templates WIT ON WIT.id = ASTS.workinstruction_template_id AND WIT.instruction_type = 1 AND WIT.company_id = _companyid --TODO remove type check
-INNER JOIN profiles_user PUC ON PUC.id = ASS.created_by_id AND PUC.company_id = _companyid
-INNER JOIN profiles_user PUM ON PUM.id = ASS.modified_by_id AND PUM.company_id = _companyid
-LEFT JOIN profiles_user PUF ON PUF.id = ASS.completed_for_id AND PUF.company_id = _companyid
-WHERE A.company_id = _companyid AND AST.company_id = _companyid AND A.is_active = true 
-AND (_assessmentids IS NULL --filter on assessmentids start
-		OR (ASS."id" IN (
-			SELECT DISTINCT ASS2."id"
-			FROM assessment_skillinstructions ASS2
-			WHERE ASS2.assessment_id = ANY(_assessmentids)
-		)
-	)) --filter on assessmentids end
-ORDER BY ASS.assessment_id, ASTS.index, ASTS.assessment_template_id, ASTS.workinstruction_template_id
-;END$function$
+AS $function$
+BEGIN
+  RETURN QUERY
+  SELECT
+    ASS.id,
+    ASS.assessment_id,
+    ASTS.id AS assessment_template_skillinstruction_id,
+    ASS.completed_for_id,
+    ASS.completed_at::timestamp,
+    CONCAT(PUF.first_name, ' ', PUF.last_name)::varchar AS completedfor,
+    ASS.is_completed,
+    ASS.total_score,
+    A.company_id,
+    A.assessment_template_id,
+    ASTS.workinstruction_template_id,
+    ASTS.index,
+    ASS.created_at,
+    ASS.modified_at,
+    ASS.created_by_id,
+    ASS.modified_by_id,
+    CONCAT(PUC.first_name, ' ', PUC.last_name)::varchar AS created_by,
+    CONCAT(PUM.first_name, ' ', PUM.last_name)::varchar AS modified_by,
+    WIT.media,
+    WIT.name,
+    WIT.description,
+    ASS.start_at,
+    ASS.end_at,
+   COALESCE((
+		  SELECT json_agg(
+		           json_build_object(
+		             'Id',      UU.id,
+		             'Name',    TRIM(BOTH FROM COALESCE(
+		                           NULLIF(CONCAT(UU.first_name,' ',UU.last_name),' '),
+		                           NULLIF(UU.username,''),
+		                           'User '||UU.id::text
+		                         )),
+		             'Picture', NULLIF(UU.picture,'')
+		           )
+		           ORDER BY UU.id
+		         )
+		  FROM (
+		    SELECT DISTINCT U.id, U.first_name, U.last_name, U.username, U.picture
+		      FROM assessment_skillinstruction_items ASII
+		      JOIN profiles_user U
+		        ON U.id = ASII.assessor_id
+		       AND U.company_id = _companyid
+		     WHERE ASII.company_id = _companyid
+		       AND ASII.assessment_skillinstruction_id = ASS.id
+		       AND ASII.assessor_id IS NOT NULL
+		  ) UU
+		)::text, '[]') AS assessors
+  FROM assessment_skillinstructions ASS
+  INNER JOIN assessments A
+    ON A.id = ASS.assessment_id AND A.company_id = _companyid
+  INNER JOIN assessment_templates AST
+    ON AST.id = A.assessment_template_id
+  INNER JOIN assessment_template_skillinstructions ASTS
+    ON ASTS.assessment_template_id = AST.id
+   AND ASTS.company_id = _companyid
+   AND ASTS.id = ASS.assessment_template_skillinstruction_id
+  INNER JOIN workinstruction_templates WIT
+    ON WIT.id = ASTS.workinstruction_template_id
+   AND WIT.instruction_type = 1
+   AND WIT.company_id = _companyid
+  INNER JOIN profiles_user PUC
+    ON PUC.id = ASS.created_by_id AND PUC.company_id = _companyid
+  INNER JOIN profiles_user PUM
+    ON PUM.id = ASS.modified_by_id AND PUM.company_id = _companyid
+  LEFT JOIN profiles_user PUF
+    ON PUF.id = ASS.completed_for_id AND PUF.company_id = _companyid
+  -- NEW: aggregate assessor ids from items for this skill-instruction
+  LEFT JOIN LATERAL (
+    SELECT ARRAY_AGG(DISTINCT asii.assessor_id)
+           FILTER (WHERE asii.assessor_id IS NOT NULL) AS assessor_ids
+    FROM assessment_skillinstruction_items asii
+    WHERE asii.company_id = _companyid
+      AND asii.assessment_skillinstruction_id = ASS.id
+  ) assr ON TRUE
+  WHERE A.company_id = _companyid
+    AND AST.company_id = _companyid
+    AND A.is_active = true
+    AND (
+      _assessmentids IS NULL
+      OR ASS.id IN (
+          SELECT DISTINCT ASS2.id
+          FROM assessment_skillinstructions ASS2
+          WHERE ASS2.assessment_id = ANY(_assessmentids)
+        )
+    )
+  ORDER BY ASS.assessment_id, ASTS.index, ASTS.assessment_template_id, ASTS.workinstruction_template_id;
+END
+$function$
 ;
 
 
-
 ------------------------------------------------------------------------------------------------------------------------------------
- DROP FUNCTION public.get_assessment_skillinstruction_items_v2(int4, _int4);
+  DROP FUNCTION public.get_assessment_skillinstruction_items_v2(int4, _int4);
 
 CREATE OR REPLACE FUNCTION public.get_assessment_skillinstruction_items_v2(_companyid integer, _assessmentinstructionids integer[])
- RETURNS TABLE(id integer, assessment_id integer, assessment_template_skillinstruction_id integer, assessment_skillinstruction_id integer, completed_for_id integer, completed_at timestamp without time zone, completedfor character varying, is_completed boolean, assessor_id integer,score integer, company_id integer, assessment_template_id integer, workinstruction_template_id integer, workinstruction_template_item_id integer, index integer, created_at timestamp without time zone, modified_at timestamp without time zone, created_by_id integer, modified_by_id integer, created_by character varying, modified_by character varying, media text, name character varying, description text, attachments text,scored_at timestamp without time zone)
+ RETURNS TABLE(id integer, assessment_id integer, assessment_template_skillinstruction_id integer, assessment_skillinstruction_id integer, completed_for_id integer, completed_at timestamp without time zone, completedfor character varying, is_completed boolean, score integer, company_id integer, assessment_template_id integer, workinstruction_template_id integer, workinstruction_template_item_id integer, index integer, created_at timestamp without time zone, modified_at timestamp without time zone, created_by_id integer, modified_by_id integer, created_by character varying, modified_by character varying, media text, name character varying, description text, attachments text, assessor_id integer, scored_at timestamp without time zone)
  LANGUAGE plpgsql
  STABLE
 AS $function$BEGIN
@@ -361,7 +435,7 @@ WITI.media,
 WITI.name,
 WITI.description,
 WITI.attachments,
-ASSI.scored_at
+ASSI.scored_at                       -- NEW
 FROM assessment_skillinstruction_items ASSI
 INNER JOIN assessments A ON A.id = ASSI.assessment_id AND A.company_id = _companyid
 INNER JOIN assessment_skillinstructions ASS ON ASS.assessment_id = ASSI.assessment_id AND ASS.company_id = _companyid
@@ -383,6 +457,7 @@ AND (_assessmentinstructionids IS NULL --filter on assessmentinstructionids star
 ORDER BY ASS.assessment_id, ASTS.index, ASTS.assessment_template_id, ASTS.workinstruction_template_id
 ;END$function$
 ;
+
 
 
 
@@ -492,21 +567,27 @@ END$function$
 ----------------------------------------------------------------------------------------------------------------------------
 DROP FUNCTION public.change_assessment_skillinstruction_item(int4, int4, int4, int4, int4, int4, int4, bool, timestamptz, int4, int4);
 
-CREATE OR REPLACE FUNCTION public.change_assessment_skillinstruction_item(_id integer, _companyid integer, _userid integer, _assessmentid integer, _assessmentskillinstructionid integer, _workinstructiontemplateid integer, _workinstructiontemplateitemid integer, _iscompleted boolean, _completedat timestamp with time zone DEFAULT NULL::timestamp with time zone, _completedforid integer DEFAULT NULL::integer, _score integer DEFAULT NULL::integer,_assessorid integer DEFAULT NULL::integer,
-    _scoredat timestamp DEFAULT NULL::timestamp)
+CREATE OR REPLACE FUNCTION public.change_assessment_skillinstruction_item(_id integer, _companyid integer, 
+									 _userid integer, _assessmentid integer, 
+									 _assessmentskillinstructionid integer, _workinstructiontemplateid integer,
+									 _workinstructiontemplateitemid integer, _iscompleted boolean, 
+									 _completedat timestamp with time zone DEFAULT NULL::timestamp with time zone, 
+									 _completedforid integer DEFAULT NULL::integer, _score integer DEFAULT NULL::integer, 
+									 _assessor_id integer DEFAULT NULL::integer, _scored_at timestamp with time zone DEFAULT NULL::timestamp with time zone)
  RETURNS integer
  LANGUAGE plpgsql
 AS $function$
 	DECLARE
 		_rowcount int4;
 	BEGIN
-	UPDATE assessment_skillinstruction_items SET
+	UPDATE assessment_skillinstruction_items 
+SET
 	completed_at = _completedat,
 	completed_for_id = _completedforid,
 	is_completed = _iscompleted,
 	score = _score,
-    assessor_id = _assessorid,
-    scored_at  = _scoredat,
+    assessor_id = _assessor_id,
+    scored_at  = _scored_at,
 	modified_by_id = _userid,
 	modified_at = now()::timestamp
 	WHERE id = _id AND company_id = _companyid AND assessment_id = _assessmentid;
@@ -514,3 +595,4 @@ GET DIAGNOSTICS _rowcount = ROW_COUNT;
 	 RETURN _rowcount;
 END$function$
 ;
+

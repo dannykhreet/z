@@ -429,8 +429,8 @@ namespace EZGO.Maui.Core.ViewModels
             {
                 if (disposing)
                 {
-                    _actionService.Dispose();
-                    _userService.Dispose();
+                    _actionService?.Dispose();
+                    _userService?.Dispose();
                 }
 
                 _statusBarService = null;

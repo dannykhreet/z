@@ -430,7 +430,7 @@ namespace EZGO.Maui.Core.ViewModels.Assessments
 
         private async Task NavigateToSignPageOrFinishAssessmentAsync()
         {
-            if (SelectedUserAssessment == null)
+            if (SelectedUserAssessment == null || _assessmentsService == null)
             {
                 _messageService?.SendMessage("No assessment selected", Colors.Red, MessageIconTypeEnum.Warning);
                 return;

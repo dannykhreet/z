@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using EZGO.Api.Models.Basic;
 using EZGO.Api.Models.Enumerations;
 using EZGO.Maui.Core.Classes;
 using EZGO.Maui.Core.Classes.Filters;
@@ -58,26 +57,18 @@ namespace EZGO.Maui.Core.ViewModels.Assessments
         public ICommand NavigateToCarouselViewCommand { get; set; }
 
 
-        public IAsyncRelayCommand<BasicAssessmentInstructionItemModel> OpenScoreCommand =>
-               new AsyncRelayCommand<BasicAssessmentInstructionItemModel>(async instructionItem =>
-               {
-                   await ExecuteLoadingActionAsync(async () =>
-                   {
-                       instructionItem.Assessor = new UserBasic
-                       {
-                           Id = UserSettings.Id,
-                           Name = UserSettings.Fullname,
-                           Picture = UserSettings.UserPictureUrl
-                       };
-                       instructionItem.CompletedAt = DateTime.UtcNow;
-                       _instructionItem = instructionItem;
-                       await MainThread.InvokeOnMainThreadAsync(() =>
-                       {
-                           MessagingCenter.Send(this, Constants.ScorePopupMessage);
-                       });
-                   });
-               }, CanExecuteCommands);
+        public ICommand OpenScoreCommand => new Command<BasicAssessmentInstructionItemModel>((instructionItem) =>
+        {
+            ExecuteLoadingAction(async () =>
+            {
+                _instructionItem = instructionItem;
+                await MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    MessagingCenter.Send(this, Constants.ScorePopupMessage);
+                });
 
+            });
+        });
 
         #endregion
         public List<ScoreModel> Scores { get; set; } = new List<ScoreModel>();
@@ -145,11 +136,7 @@ namespace EZGO.Maui.Core.ViewModels.Assessments
 
             UserSkillInstructions = SelectedUserAssessment.SkillInstructions ?? new List<AssessmentSkillInstructionModel>();
             CurrentAssessmentSkillInstruction = UserSkillInstructions.FirstOrDefault(s => s.Id == AssessmentSkillInstructionId) ?? new AssessmentSkillInstructionModel();
-            //if (CurrentAssessmentSkillInstruction.StartDate == null)
-            //{
-            //    CurrentAssessmentSkillInstruction.StartDate = DateTime.UtcNow;
-            //    await _assessmentsService.SetSkillInstructionStartDate(SelectedUserAssessment, CurrentAssessmentSkillInstruction);
-            //}
+
             InstructionItems = CurrentAssessmentSkillInstruction.InstructionItems.OrderBy(x => x.Id).ToList();
             InstructionsFilter.SetUnfilteredItems(InstructionItems);
             InstructionsFilter.RefreshStatusFilter();
@@ -231,8 +218,6 @@ namespace EZGO.Maui.Core.ViewModels.Assessments
                 if (myscore == assessmentInstructionItem.Score)
                 {
                     assessmentInstructionItem.Score = null;
-                    assessmentInstructionItem.Assessor = null;
-                    assessmentInstructionItem.CompletedAt = null;
                 }
                 else
                 {
@@ -240,12 +225,7 @@ namespace EZGO.Maui.Core.ViewModels.Assessments
                 }
                 assessmentInstructionItem.NewScore = new ScoreModel { Number = myscore, MinimalScore = _minScore, NumberOfScores = Math.Abs(_maxScore - 0 + 1) };
                 SelectedUserAssessment.SkillInstructions = UserSkillInstructions;
-                await _assessmentsService.SetAssessmentScore(SelectedUserAssessment, assessmentInstructionItem);
-                if (CurrentAssessmentSkillInstruction.IsCompleted && CurrentAssessmentSkillInstruction.EndDate == null)
-                {
-                    CurrentAssessmentSkillInstruction.EndDate = DateTime.UtcNow;
-                    await _assessmentsService.SetSkillInstructionEndDate(SelectedUserAssessment, CurrentAssessmentSkillInstruction);
-                }
+                _assessmentsService.SetAssessmentScore(SelectedUserAssessment, assessmentInstructionItem);
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
                     MessagingCenter.Send(this, Constants.HideScorePopupMessage);

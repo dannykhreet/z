@@ -45,21 +45,8 @@ public class PullToRefreshList<T> : ContentView, IDisposable
         set
         {
             SetValue(ListItemsSourceProperty, value);
-            OnPropertyChanged();
         }
     }
-    public static readonly BindableProperty HeaderItemTemplateProperty = BindableProperty.Create(
-        nameof(HeaderItemTemplate),
-        typeof(DataTemplate),
-        typeof(PullToRefreshList<T>),
-        propertyChanged: OnListViewLayoutPropertyChanged);
-
-    public DataTemplate HeaderItemTemplate
-    {
-        get => (DataTemplate)GetValue(HeaderItemTemplateProperty);
-        set => SetValue(HeaderItemTemplateProperty, value);
-    }
-    
 
     #endregion
 
@@ -76,7 +63,6 @@ public class PullToRefreshList<T> : ContentView, IDisposable
         get => (DataTemplate)GetValue(GridItemTemplateProperty);
         set => SetValue(GridItemTemplateProperty, value);
     }
-   
 
     #endregion
 
@@ -93,7 +79,6 @@ public class PullToRefreshList<T> : ContentView, IDisposable
     private static void OnLinearItemTemplatePropertyChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var obj = bindable as PullToRefreshList<T>;
-        obj.LinearItemTemplate = newValue as DataTemplate;
         obj.SetTemplate();
     }
 
@@ -124,19 +109,13 @@ public class PullToRefreshList<T> : ContentView, IDisposable
 
     private void SetTemplate()
     {
-        List.ItemSpacing = ListItemSpacing;
-        List.ItemSize = ListItemSize;
         if (ListViewLayout == ListViewLayout.Grid)
         {
             List.ItemTemplate = GridItemTemplate;
-            List.HeaderTemplate = null;
         }
         else
         {
             List.ItemTemplate = LinearItemTemplate;
-            List.HeaderTemplate = HeaderItemTemplate;
-            List.ItemSpacing = ListItemSpacingForList;
-            List.ItemSize = ListItemSizeForList;
         }
     }
 
@@ -171,7 +150,6 @@ public class PullToRefreshList<T> : ContentView, IDisposable
         set
         {
             SetValue(SpanCountProperty, value);
-            OnPropertyChanged();
         }
     }
 
@@ -197,22 +175,6 @@ public class PullToRefreshList<T> : ContentView, IDisposable
         set
         {
             SetValue(ListItemSpacingProperty, value);
-            OnPropertyChanged();
-        }
-    }
-
-    public static readonly BindableProperty ListItemSpacingForListProperty = BindableProperty.Create(
-        nameof(ListItemSpacingForList),
-        typeof(int),
-        typeof(PullToRefreshList<T>));
-
-    public int ListItemSpacingForList
-    {
-        get => (int)GetValue(ListItemSpacingForListProperty);
-        set
-        {
-            SetValue(ListItemSpacingForListProperty, value);
-            OnPropertyChanged();
         }
     }
 
@@ -223,37 +185,14 @@ public class PullToRefreshList<T> : ContentView, IDisposable
     public static readonly BindableProperty ListItemSizeProperty = BindableProperty.Create(
         nameof(ListItemSize),
         typeof(int),
-        typeof(PullToRefreshList<T>),
-        propertyChanged: OnListItemSizePropertyChanged);
+        typeof(PullToRefreshList<T>));
 
-    private static void OnListItemSizePropertyChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        var obj = bindable as PullToRefreshList<T>;
-        obj.List.ItemSize = obj.ListItemSize;
-    }
+
     public int ListItemSize
     {
         get => (int)GetValue(ListItemSizeProperty);
         set => SetValue(ListItemSizeProperty, value);
     }
-
-     public static readonly BindableProperty ListItemSizeForListProperty = BindableProperty.Create(
-        nameof(ListItemSizeForList),
-        typeof(int),
-        typeof(PullToRefreshList<T>),
-        propertyChanged: OnListItemForSizePropertyChanged);
-
-    private static void OnListItemForSizePropertyChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        var obj = bindable as PullToRefreshList<T>;
-        obj.List.ItemSize = obj.ListItemSizeForList;
-    }
-    public int ListItemSizeForList
-    {
-        get => (int)GetValue(ListItemSizeForListProperty);
-        set => SetValue(ListItemSizeForListProperty, value);
-    }
-
 
     #endregion
 
@@ -261,19 +200,28 @@ public class PullToRefreshList<T> : ContentView, IDisposable
 
     public static readonly BindableProperty NrOfItemsVisibleProperty = BindableProperty.Create(nameof(NrOfItemsVisible), typeof(double), typeof(PullToRefreshList<T>), propertyChanged: OnNrOfItemsVisiblePropertyChanged);
 
+    private ScalableItemSizeListViewBehavior _scalableBehavior;
+
     private static void OnNrOfItemsVisiblePropertyChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var obj = bindable as PullToRefreshList<T>;
-        obj.List.Behaviors.Add(new ScalableItemSizeListViewBehavior { NumberOfItemsVisible = obj.NrOfItemsVisible });
-    }
+        if (obj?.List == null)
+            return;
 
+        if (obj._scalableBehavior == null)
+        {
+            obj._scalableBehavior = new ScalableItemSizeListViewBehavior();
+            obj.List.Behaviors.Add(obj._scalableBehavior);
+        }
+
+        obj._scalableBehavior.NumberOfItemsVisible = obj.NrOfItemsVisible;
+    }
     public double NrOfItemsVisible
     {
         get => (double)GetValue(NrOfItemsVisibleProperty);
         set
         {
             SetValue(NrOfItemsVisibleProperty, value);
-            OnPropertyChanged();
         }
     }
 
@@ -416,7 +364,6 @@ public class PullToRefreshList<T> : ContentView, IDisposable
         set
         {
             SetValue(IsRefreshingProperty, value);
-            OnPropertyChanged();
         }
     }
 
@@ -529,7 +476,7 @@ public class PullToRefreshList<T> : ContentView, IDisposable
             RefreshViewHeight = 30,
             RefreshViewThreshold = 30,
             RefreshViewWidth = 30,
-            ProgressColor= Color.FromArgb("#0003E8"),
+            ProgressColor = Color.FromArgb("#0003E8"),
             BackgroundColor = ResourceHelper.GetValueFromResources<Color>(nameof(BackgroundColor)),
             RefreshCommand = RefreshCommand,
             IsRefreshing = IsRefreshing,
@@ -554,6 +501,7 @@ public class PullToRefreshList<T> : ContentView, IDisposable
         List.SetBinding(SfListView.FooterTemplateProperty, new Binding(nameof(FooterTemplate)));
         List.SetBinding(SfListView.FooterSizeProperty, new Binding(nameof(FooterSize)));
         List.SetBinding(SfListView.IsVisibleProperty, new Binding(nameof(HasItems)));
+        List.SetBinding(SfListView.ItemSizeProperty, new Binding(nameof(ListItemSize)));
         List.SetBinding(SfListView.LoadMoreCommandProperty, new Binding(nameof(LoadMoreCommand)));
         List.SetBinding(SfListView.CachingStrategyProperty, new Binding(nameof(ListCachingStrategy)));
         List.SetBinding(SfListView.SelectedItemProperty, new Binding(nameof(SelectedItem)));

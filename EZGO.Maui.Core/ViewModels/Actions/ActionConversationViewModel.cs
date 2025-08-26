@@ -403,8 +403,13 @@ namespace EZGO.Maui.Core.ViewModels
             // Always fetch both backend and local comments for the selected action
             if (SelectedAction != null)
             {
-                var allComments = await _actionService.GetActionCommentsAsync(SelectedAction.Id, includeLocalActionComments: true, refresh: await InternetHelper.HasInternetConnection());
+                if (_actionService == null)
+                {
+                    using var scope = App.Container.CreateScope();
+                    _actionService = scope.ServiceProvider.GetRequiredService<IActionsService>();
+                }
 
+                var allComments = await _actionService.GetActionCommentsAsync(SelectedAction.Id, includeLocalActionComments: true, refresh: await InternetHelper.HasInternetConnection());
 
                 if (allComments != null && allComments.Any())
                 {

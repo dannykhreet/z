@@ -62,7 +62,7 @@ namespace EZGO.Maui.Core.ViewModels.Shared
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                MessagingCenter.Send(SenderClassName, Constants.UpdateSlideIndex, Items.IndexOf(SelectedItem));
+                MessagingCenter.Send(SenderClassName, Constants.UpdateSlideIndex, Items?.IndexOf(SelectedItem));
                 MessagingCenter.Send(SenderClassName, Constants.UpdateSlideIndex, SelectedItem);
             });
             await base.CancelAsync();

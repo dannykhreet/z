@@ -22,72 +22,62 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <DataTemplate x:Key="GridInstructionsTemplate" x:DataType="instructionModels:InstructionItem">
-                <button:SfButton
-                    Background="{StaticResource DarkBlueColor}"
-                    Command="{Binding BindingContext.NavigateToCarouselViewCommand, Source={x:Reference Page}}"
-                    CommandParameter="{Binding}"
-                    CornerRadius="0">
-                    <button:SfButton.Content>
-                        <DataTemplate>
+                <Grid>
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding BindingContext.NavigateToCarouselViewCommand, Source={x:Reference Page}}" CommandParameter="{Binding}" />
+                    </Grid.GestureRecognizers>
 
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="55" />
+                    </Grid.RowDefinitions>
 
-                            <Grid CompressedLayout.IsHeadless="True">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*" />
-                                    <RowDefinition Height="55" />
-                                </Grid.RowDefinitions>
+                    <!--  Background Image  -->
+                    <controls:CustomImageOnline
+                        Grid.RowSpan="2"
+                        Aspect="Fill"
+                        ImageUrl="{Binding DisplayPicture}"
+                        IsOpaque="True" />
 
-                                <!--  Background Image  -->
-                                <controls:CustomImageOnline
-                                    Grid.Row="0"
-                                    Grid.RowSpan="2"
-                                    Aspect="Fill"
-                                    ImageUrl="{Binding DisplayPicture}"
-                                    IsOpaque="True" />
+                    <!--  Bottom overlay  -->
+                    <BoxView Grid.Row="1" BackgroundColor="{StaticResource TransparentBlackColor}" />
 
-                                <!--  Overlay  -->
-                                <BoxView Grid.Row="1" BackgroundColor="{StaticResource TransparentBlackColor}" />
-
-                                <!--  Instruction Name  -->
-                                <Label
-                                    Grid.Row="1"
-                                    Padding="10"
-                                    MaxLines="2"
-                                    Text="{Binding Name}"
-                                    TextColor="White"
-                                    VerticalOptions="CenterAndExpand" />
-                            </Grid>
-                        </DataTemplate>
-                    </button:SfButton.Content>
-                </button:SfButton>
+                    <!--  Instruction Name  -->
+                    <Label
+                        Grid.Row="1"
+                        Padding="10"
+                        MaxLines="2"
+                        Text="{Binding Name}"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                </Grid>
             </DataTemplate>
+
             <DataTemplate x:Key="LinearInstructionsTemplate" x:DataType="instructionModels:InstructionItem">
                 <Grid BackgroundColor="White">
                     <Grid.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding BindingContext.NavigateToCarouselViewCommand, Source={x:Reference Page}}" CommandParameter="{Binding}" />
                     </Grid.GestureRecognizers>
+
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="160" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <!--  Background Image  -->
+                    <!--  Left image  -->
                     <controls:CustomImageOnline
                         Grid.Column="0"
-                        Aspect="Fill"
+                        Aspect="AspectFill"
                         ImageUrl="{Binding DisplayPicture}"
                         IsOpaque="True" />
 
                     <!--  Instruction Info  -->
-                    <StackLayout
-                        Grid.Column="1"
+                    <Label
+                        Text="{Binding Name}"
+                        LineBreakMode="TailTruncation"
                         Margin="20"
-                        Spacing="10">
-
-                        <!--  Instruction Name  -->
-                        <Label Text="{Binding Name}" VerticalOptions="CenterAndExpand" />
-
-                    </StackLayout>
+                        Grid.Column="1"
+                        VerticalOptions="Center" />
                 </Grid>
             </DataTemplate>
         </ResourceDictionary>

@@ -1,4 +1,5 @@
-﻿namespace EZGO.Maui.Core.Classes.DateFormats
+﻿using System;
+namespace EZGO.Maui.Core.Classes.DateFormats
 {
     public class StandardDateFormats : BaseDateFormats
     {
@@ -9,7 +10,7 @@
         private const string dayFirstShortMonthDateTimeFormat = "d MMM yyyy, HH:mm";
         private const string shiftDateFormat = "dddd, dd MMMM yyyy";
         private const string weekDateFormat = "MMM dd";
-        private const string dateTimeMonthShortNameFormat = "MMM dd, yyyy ,HH:mm";
+        private const string dateTimeMonthShortNameFormat = "HH:mm, MMM dd, yyyy";
 
         public StandardDateFormats()
         {

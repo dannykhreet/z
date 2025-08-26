@@ -27,7 +27,7 @@
                         <!--  Required Star  -->
                         <Label
                             Padding="3,10,0,0"
-                            FlexLayout.Basis="10% "
+                            FlexLayout.Basis="10%"
                             IsVisible="{Binding IsRequired}"
                             Text="*"
                             TextColor="{StaticResource RedColor}" />

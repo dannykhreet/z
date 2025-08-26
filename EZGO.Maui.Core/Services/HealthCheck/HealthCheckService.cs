@@ -1,18 +1,7 @@
 ﻿using EZGO.Maui.Core.Classes;
-using EZGO.Maui.Core.Extensions;
-using EZGO.Maui.Core.Interfaces.Api;
 using EZGO.Maui.Core.Interfaces.HealthCheck;
 using EZGO.Maui.Core.Utils;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EZGO.Maui.Core.Services.HealthCheck
 {
@@ -36,37 +25,54 @@ namespace EZGO.Maui.Core.Services.HealthCheck
         {
             try
             {
-                // If there is not token then it's not valid
+                //Token cannot be empty
                 if (string.IsNullOrWhiteSpace(jwtToken))
                     return false;
 
-                // Get the expiration date from it first
-                var handler = new JwtSecurityTokenHandler();
-                var token = handler.ReadJwtToken(jwtToken);
-
-                string expiration = token.Claims.FirstOrDefault(x => x.Type.Equals("exp"))?.Value;
-
-                if (!string.IsNullOrEmpty(expiration))
+                //Try to parse the token
+                JwtSecurityToken token;
+                try
                 {
-                    if (long.TryParse(expiration, out long exp))
-                    {
-                        var expirationDate = DateTimeOffset.FromUnixTimeSeconds(exp);
-                        var expired = expirationDate.UtcDateTime < DateTime.UtcNow;
+                    var handler = new JwtSecurityTokenHandler();
+                    token = handler.ReadJwtToken(jwtToken);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[ValidateTokenAsync] Invalid token format: {ex.Message}");
+                    return false;
+                }
 
-                        // If the token is expired there's not point checking it against the API 
-                        if (expired)
-                            return false;
+                //Check expiration date
+                var expiration = token.Claims.FirstOrDefault(x => x.Type.Equals("exp"))?.Value;
+                if (!string.IsNullOrEmpty(expiration) && long.TryParse(expiration, out long exp))
+                {
+                    var expirationDate = DateTimeOffset.FromUnixTimeSeconds(exp);
+                    if (expirationDate.UtcDateTime < DateTime.UtcNow)
+                    {
+                        Console.WriteLine("[ValidateTokenAsync] Token has expired.");
+                        return false;
                     }
                 }
 
-                // If we have Internet
+                //Check internet connection
                 if (await InternetHelper.HasInternetAndApiConnectionIgnoreTokenAsync())
                 {
-
-                    // Validate the token against the API
-                    var result = await httpClient.GetAsync("health/userconnection");
-
-                    return result.IsSuccessStatusCode;
+                    //Validate token against the API
+                    try
+                    {
+                        var result = await httpClient.GetAsync("health/userconnection");
+                        return result.IsSuccessStatusCode;
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        Console.WriteLine($"[ValidateTokenAsync] HTTP request failed: {ex.Message}");
+                        return false;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[ValidateTokenAsync] Network error: {ex.Message}");
+                        return false;
+                    }
                 }
 
                 // We don't have the Internet but the token is not yet expired.
@@ -75,12 +81,11 @@ namespace EZGO.Maui.Core.Services.HealthCheck
                 // the API.
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Debugger.Break();
+                Console.WriteLine($"[ValidateTokenAsync] Unexpected error: {ex}");
                 return false;
             }
         }
-
     }
 }

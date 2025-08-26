@@ -1,7 +1,14 @@
-﻿using Autofac;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using Autofac;
 using EZGO.Api.Models;
 using EZGO.Api.Models.Enumerations;
+using EZGO.Api.Models.Skills;
 using EZGO.Maui.Core.Classes;
+using EZGO.Maui.Core.Enumerations;
 using EZGO.Maui.Core.Extensions;
 using EZGO.Maui.Core.Interfaces.ApiRequestHandlers;
 using EZGO.Maui.Core.Interfaces.Assessments;
@@ -11,10 +18,12 @@ using EZGO.Maui.Core.Interfaces.Message;
 using EZGO.Maui.Core.Interfaces.Utils;
 using EZGO.Maui.Core.Models;
 using EZGO.Maui.Core.Models.Assessments;
+using EZGO.Maui.Core.Models.Checklists;
 using EZGO.Maui.Core.Models.OpenFields;
 using EZGO.Maui.Core.Models.Tasks;
 using EZGO.Maui.Core.Utils;
-using System.Diagnostics;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui;
 
 namespace EZGO.Maui.Core.Services.Assessments
 {
@@ -105,9 +114,10 @@ namespace EZGO.Maui.Core.Services.Assessments
                 return false;
 
             string action = $"assessment/change/{assessmentsModel.Id}?fulloutput=true";
-
             var model = assessmentsModel.ToModel();
-
+            model.AssessorId = UserSettings.Id;
+            model.AssessorPicture = UserSettings.UserPictureUrl;
+            model.Assessor = UserSettings.Username;
 
             var response = await _apiRequestHandler.HandlePostRequest(action, model).ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
@@ -347,11 +357,7 @@ namespace EZGO.Maui.Core.Services.Assessments
                    .InstructionItems.FirstOrDefault(i => i.Id == assessmentInstructionItem.Id);
 
             if (instructionItem != null)
-            {
                 instructionItem.Score = assessmentInstructionItem.Score;
-                instructionItem.Assessor = assessmentInstructionItem.Assessor;
-                instructionItem.CompletedAt = assessmentInstructionItem.CompletedAt;
-            }
 
             var result = await PostChangeAssessment(assessmentFromApi.ToBasic()).ConfigureAwait(false);
 
@@ -368,40 +374,6 @@ namespace EZGO.Maui.Core.Services.Assessments
             {
                 string message = TranslateExtension.GetValueFromDictionary(LanguageConstants.completedAllInstructions);
                 _messageService?.SendClosableInfo(message);
-            }
-        }
-
-        private static void CalculateAssessmentDates(AssessmentsModel assessment)
-        {
-            assessment.StartDate = assessment.SkillInstructions.Select(s => s.StartDate).Min();
-            assessment.EndDate = assessment.SkillInstructions.Select(s => s.EndDate).Max();
-        }
-
-        public async Task SetSkillInstructionStartDate(BasicAssessmentModel assessment, AssessmentSkillInstructionModel instruction)
-        {
-            var assessmentFromApi = await GetAssessment(assessment.Id, true).ConfigureAwait(false);
-            var instructionFromApi = assessmentFromApi.SkillInstructions.FirstOrDefault(s => s.Id == instruction.Id);
-            if (instructionFromApi != null)
-            {
-                instructionFromApi.StartDate = instruction.StartDate;
-                CalculateAssessmentDates(assessmentFromApi);
-                await PostChangeAssessment(assessmentFromApi.ToBasic()).ConfigureAwait(false);
-                assessment.StartDate = assessmentFromApi.StartDate;
-                assessment.EndDate = assessmentFromApi.EndDate;
-            }
-        }
-
-        public async Task SetSkillInstructionEndDate(BasicAssessmentModel assessment, AssessmentSkillInstructionModel instruction)
-        {
-            var assessmentFromApi = await GetAssessment(assessment.Id, true).ConfigureAwait(false);
-            var instructionFromApi = assessmentFromApi.SkillInstructions.FirstOrDefault(s => s.Id == instruction.Id);
-            if (instructionFromApi != null)
-            {
-                instructionFromApi.EndDate = instruction.EndDate;
-                CalculateAssessmentDates(assessmentFromApi);
-                await PostChangeAssessment(assessmentFromApi.ToBasic()).ConfigureAwait(false);
-                assessment.StartDate = assessmentFromApi.StartDate;
-                assessment.EndDate = assessmentFromApi.EndDate;
             }
         }
 

@@ -1,7 +1,5 @@
-﻿using EZGO.Api.Models.Basic;
-using EZGO.Maui.Core.Classes;
+﻿using EZGO.Maui.Core.Classes;
 using NodaTime;
-using System.Text.Json.Serialization;
 
 namespace EZGO.Maui.Core.Models.Assessments
 {
@@ -30,26 +28,8 @@ namespace EZGO.Maui.Core.Models.Assessments
         public List<SignatureModel> Signatures { get; set; }
         public int? TotalScore { get => SkillInstructions?.Sum(i => i.TotalScore); }
         public string Version { get; set; }
-        public List<UserBasic> Assessors { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
 
-        [JsonIgnore]
-        public bool HasAssessors => Assessors?.Any() == true;
 
-        [JsonIgnore]
-        public List<int> EditedByUsersId =>
-            Assessors?.Where(a => a != null).Select(a => a.Id).Distinct().ToList() ?? new();
-
-        [JsonIgnore]
-        public string ReturnListOfUsers =>
-            Assessors == null
-                ? string.Empty
-                : string.Join(", ",
-                    Assessors
-                        .Where(a => !string.IsNullOrWhiteSpace(a?.Name))
-                        .Select(a => a.Name!.Trim())
-                        .Distinct(StringComparer.OrdinalIgnoreCase));
         public AssessmentsModel ToModel()
         {
             AssessmentsModel result = new AssessmentsModel
@@ -70,11 +50,9 @@ namespace EZGO.Maui.Core.Models.Assessments
                 Signatures = this.Signatures,
                 SignatureRequired = this.SignatureRequired,
                 TotalScore = this.TotalScore,
-                Version = this.Version,
-                Assessors = this.Assessors,
-                StartDate = this.StartDate,
-                EndDate = this.EndDate,
+                Version = this.Version
             };
+
             return result;
         }
     }

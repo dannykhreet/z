@@ -1,4 +1,7 @@
-﻿using EZGO.Api.Models.Skills;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using EZGO.Api.Models.Skills;
 using EZGO.Maui.Core.Classes;
 using EZGO.Maui.Core.Models.ModelInterfaces;
 using NodaTime;
@@ -31,9 +34,6 @@ namespace EZGO.Maui.Core.Models.Assessments
                 TemplateId = this.TemplateId,
                 Signatures = this.Signatures,
                 SignatureRequired = this.SignatureRequired,
-                Assessors = this.Assessors,
-                StartDate = this.StartDate,
-                EndDate = this.EndDate
             };
         }
         public new List<SignatureModel> Signatures { get; set; }

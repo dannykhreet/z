@@ -47,7 +47,11 @@ public class StagesControl : NotifyPropertyChanged, IStagesControl
             if (item == null)
                 continue;
 
-            item.TaskTemplates = TaskTemplates?.Where(x => item.TaskTemplateIds != null && item.TaskTemplateIds.Contains(x.Id)).ToList();
+            if (item.TaskIds != null)
+                item.TaskTemplates = TaskTemplates?.Where(x => item.TaskIds != null && item.TaskIds.Contains((int)x.ItemId)).ToList();
+            else
+                item.TaskTemplates = TaskTemplates?.Where(x => item.TaskTemplateIds != null && item.TaskTemplateIds.Contains(x.Id)).ToList();
+
             item.TaskTemplates.ForEach(x => x.StageTemplateId = item.Id);
 
             //Add sign item

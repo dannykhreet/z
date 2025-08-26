@@ -299,12 +299,9 @@ namespace EZGO.Maui.Core.ViewModels.Audits
         {
             if (PagesFromDeepLink > 0 || IsFromBookmark)
                 OpenedFromDeepLink = true;
+            await LoadTaskTemplatesAsync();
 
             OpenFields = new ChecklistOpenFields(TaskTemplates, AuditTemplateId);
-            await Task.Run(async () =>
-            {
-                await LoadTaskTemplatesAsync();
-            });
 
             if (auditTemplate == null)
             {
@@ -358,7 +355,7 @@ namespace EZGO.Maui.Core.ViewModels.Audits
             }
 
             OpenFields.CalculateTasksDone();
-            await Task.Run(async () => await base.Init());
+            await base.Init();
         }
 
         protected override void Dispose(bool disposing)
@@ -385,7 +382,7 @@ namespace EZGO.Maui.Core.ViewModels.Audits
 
         public override async void OnDisappearing(object sender, EventArgs e)
         {
-            if (!IsBusy) await OpenFields.AdaptChanges(_auditService);
+            if (!IsBusy && _auditService != null) await OpenFields?.AdaptChanges(_auditService);
             base.OnDisappearing(sender, e);
         }
 
@@ -401,12 +398,12 @@ namespace EZGO.Maui.Core.ViewModels.Audits
 
             if (auditTemplate != null)
             {
-                if (AuditTemplates != null)
+                if (AuditTemplates != null && TaskFilter != null)
                 {
                     TaskFilter.FilterCollection = AuditTemplates?.Select(x => new FilterModel(x.Name, x.Id)).ToList();
                     TaskFilter.SetSelectedFilter(filterName: auditTemplate.Name, id: auditTemplate.Id);
                 }
-                else
+                else if (TaskFilter != null)
                     TaskFilter.SelectedFilter = new FilterModel(auditTemplate.Name, auditTemplate.Id);
 
                 auditTemplate.TaskTemplates ??= new List<TaskTemplateModel>();
@@ -853,6 +850,7 @@ namespace EZGO.Maui.Core.ViewModels.Audits
 
         private async Task NavigateToSignPageOrFinishAuditAsync()
         {
+            if (OpenFields == null) return;
             if (OpenFields.TasksDone)
             {
                 if (IsSignatureRequired)

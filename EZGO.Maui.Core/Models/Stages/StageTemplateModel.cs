@@ -24,5 +24,6 @@ namespace EZGO.Maui.Core.Models.Stages
         public bool AnyStageChanges { get; set; }
         public string ShiftNotes { get; set; }
         public bool HasTags => Tags?.Any() ?? false;
+        public List<int> TaskIds { get; set; }
     }
 }
