@@ -31,6 +31,7 @@ using EZGO.Maui.Core.Utils;
 using EZGO.Maui.Core.ViewModels.Shared;
 using EZGO.Maui.Core.ViewModels.Tasks;
 using MvvmHelpers.Interfaces;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 using ItemTappedEventArgs = Syncfusion.Maui.ListView.ItemTappedEventArgs;
 
@@ -77,6 +78,8 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
         public bool IsBusy { get; set; }
 
         public FilterControl<BasicTaskTemplateModel, TaskStatusEnum> TaskFilter { get; set; } = new FilterControl<BasicTaskTemplateModel, TaskStatusEnum>(null);
+
+        public ObservableCollection<TagModel> SearchTags => TaskFilter.SearchedTags;
 
         public StagesControl Stages { get; set; } = new StagesControl(null, null, null);
 
@@ -224,6 +227,8 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
             _propertySerice = propertyService;
             _updateService = updateService;
             _commentService = commentService;
+
+            TaskFilter.SearchedTags.CollectionChanged += (s, e) => OnPropertyChanged(nameof(SearchTags));
 
             ActionCommand = new Command<BasicTaskTemplateModel>(task => ExecuteLoadingAction(async () => await OpenPopupOrNavigateToActionsAsync(task)), CanExecuteCommands);
 
