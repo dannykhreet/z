@@ -20,7 +20,9 @@ namespace EZGO.Maui.Core.Utils.AWS
             {
                 var settingsService = scope.ServiceProvider.GetService<ISettingsService>();
 
+                bool lockTaken = false;
                 await HandleCredentialsSemaphore.WaitAsync();
+                lockTaken = true;
                 try
                 {
                     var credentialsRefreshed = await settingsService.HandleAWSCredentials();
@@ -32,7 +34,10 @@ namespace EZGO.Maui.Core.Utils.AWS
                 }
                 finally
                 {
-                    HandleCredentialsSemaphore.Release();
+                    if (lockTaken)
+                    {
+                        HandleCredentialsSemaphore.Release();
+                    }
                 }
             }
         }
