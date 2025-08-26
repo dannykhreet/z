@@ -747,6 +747,9 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
 
             if (IncompleteChecklist != null)
             {
+                if (selectedChecklist == null)
+                    selectedChecklist = new ChecklistTemplateModel();
+
                 selectedChecklist.Name = IncompleteChecklist.Name;
                 selectedChecklist.Version = IncompleteChecklist.Version;
                 selectedChecklist.Tags = IncompleteChecklist.Tags;
