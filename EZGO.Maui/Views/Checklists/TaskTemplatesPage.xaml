@@ -261,10 +261,10 @@
 
                         <!--  Save progress  -->
                         <controls:ItemsSyncBar
-                            AnyRemoteChanges="{Binding AnyRemoteChanges, Mode=TwoWay}"
-                            FirstTimeSaving="{Binding FirstTimeSaving, Mode=TwoWay}"
+                            AnyRemoteChanges="{Binding AnyRemoteChanges, Mode=OneWay}"
+                            FirstTimeSaving="{Binding FirstTimeSaving, Mode=OneWay}"
                             HeightRequest="45"
-                            AnyLocalChanges="{Binding OpenFields.AnyLocalChanges, Mode=TwoWay}"
+                            AnyLocalChanges="{Binding OpenFields.AnyLocalChanges, Mode=OneWay}"
                             IsSyncing="{Binding OpenFields.IsSyncing}"
                             SyncButtonCommand="{Binding SaveCommand}" />
 
