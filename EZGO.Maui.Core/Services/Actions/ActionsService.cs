@@ -1012,10 +1012,12 @@ namespace EZGO.Maui.Core.Services.Actions
                 return new List<string>();
 
             localActionCommentsBusy = true;
+            bool lockTaken = false;
 
             try
             {
                 await PostLocalActionsSemaphore.WaitAsync().ConfigureAwait(false);
+                lockTaken = true;
                 localComments = await GetLocalActionCommentsAsync().ConfigureAwait(false);
                 localComments ??= new List<ActionCommentModel>();
 
@@ -1062,7 +1064,8 @@ namespace EZGO.Maui.Core.Services.Actions
             finally
             {
                 localActionCommentsBusy = false;
-                PostLocalActionsSemaphore.Release();
+                if (lockTaken)
+                    PostLocalActionsSemaphore.Release();
             }
 
             return localids;
