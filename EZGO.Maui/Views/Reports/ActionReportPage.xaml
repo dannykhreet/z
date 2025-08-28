@@ -1,0 +1,835 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Actions.ActionReportPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:behaviors="clr-namespace:EZGO.Maui.Behaviors;assembly=EZGO.Maui"
+    xmlns:busyindicator="http://schemas.syncfusion.com/maui"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls;assembly=EZGO.Maui"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:listview="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    xmlns:maui="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:partial="clr-namespace:EZGO.Maui.Views.Partial"
+    xmlns:syncfusion="http://schemas.syncfusion.com/maui"
+    xmlns:treeview="clr-namespace:Syncfusion.Maui.TreeView;assembly=Syncfusion.Maui.TreeView"
+    x:Name="Page"
+    Title="Action Report"
+    ios:Page.UseSafeArea="true"
+    maui:NavigationPage.HasBackButton="True"
+    maui:NavigationPage.HasNavigationBar="False">
+    <ContentPage.Content>
+        <AbsoluteLayout AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="WidthProportional,HeightProportional">
+
+            <Grid
+                AbsoluteLayout.LayoutBounds="0,0,1,1"
+                AbsoluteLayout.LayoutFlags="WidthProportional,HeightProportional"
+                ColumnSpacing="0"
+                RowSpacing="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="0.127*" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <Grid
+                    ColumnSpacing="0"
+                    RowSpacing="0"
+                    StyleClass="header, bg-white, m-0, pr-15">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="200" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackLayout
+                        Grid.Column="0"
+                        StyleClass="column0"
+                        VerticalOptions="CenterAndExpand">
+                        <Button
+                            Command="{Binding BindingContext.CancelCommand, Source={x:Reference Page}}"
+                            FontFamily="{StaticResource MaterialFontFamily}"
+                            StyleClass="fontButton, fs-42, fc-darkgrey"
+                            Text="{x:Static classes:IconFont.ChevronLeft}"
+                            VerticalOptions="CenterAndExpand" />
+                    </StackLayout>
+
+                    <StackLayout
+                        Grid.Column="1"
+                        Orientation="Horizontal"
+                        StyleClass="column1">
+                        <StackLayout.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleDropdownCommand}" />
+                        </StackLayout.GestureRecognizers>
+
+                        <Label
+                            FontFamily="{StaticResource RobotoLight}"
+                            StyleClass="title, fs-large, fc-darkgrey"
+                            Text="{classes:Translate SIDEBAR_TITLE_ACTIONS}"
+                            VerticalOptions="CenterAndExpand" />
+                        <Label
+                            Margin="5,0,0,0"
+                            FontFamily="{StaticResource RobotoLight}"
+                            StyleClass="title, fs-large, fc-darkgrey"
+                            Text="{Binding Title}"
+                            VerticalOptions="CenterAndExpand" />
+                        <Label
+                            FontFamily="{StaticResource MaterialFontFamily}"
+                            StyleClass="title, font, fs-large, pt-5"
+                            Text="{x:Static classes:IconFont.ExpandMore}"
+                            VerticalOptions="CenterAndExpand" />
+
+                    </StackLayout>
+
+                    <StackLayout
+                        Grid.Column="2"
+                        HorizontalOptions="EndAndExpand"
+                        Orientation="Horizontal">
+                        <Label
+                            FontFamily="{StaticResource RobotoLight}"
+                            StyleClass="title, fs-small, fc-darkgrey"
+                            Text="{Binding Interval}"
+                            VerticalOptions="CenterAndExpand" />
+                        <Button
+                            Command="{Binding NavigateToReportFilterCommand}"
+                            FontFamily="{DynamicResource MaterialFontFamily}"
+                            StyleClass="fontButton, fs-42, fc-darkgrey"
+                            Text="{x:Static classes:IconFont.FilterList}"
+                            VerticalOptions="CenterAndExpand" />
+                    </StackLayout>
+                </Grid>
+
+                <Grid Grid.Row="1" ColumnSpacing="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.098*" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <!--  Side menu  -->
+                    <partial:MenuNewControl Grid.Column="0" StyleClass="bg-darkblue, fc-white" />
+
+                    <!--  Detail Page  -->
+                    <syncfusion:SfPullToRefresh
+                        Grid.Column="1"
+                        BackgroundColor="{StaticResource BackgroundColor}"
+                        IsRefreshing="{Binding IsRefreshing}"
+                        ProgressColor="#0003E8"
+                        PullingThreshold="100"
+                        RefreshCommand="{Binding RefreshCommand}"
+                        RefreshViewHeight="30"
+                        RefreshViewThreshold="30"
+                        RefreshViewWidth="30"
+                        VerticalOptions="FillAndExpand">
+
+                        <syncfusion:SfPullToRefresh.PullableContent>
+
+                            <Grid>
+                                <!--  Detail Page  -->
+                                <Grid
+                                    Padding="20"
+                                    ColumnSpacing="20"
+                                    RowSpacing="20">
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50*" />
+                                        <ColumnDefinition Width="50*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="50*" />
+                                        <RowDefinition Height="50*" />
+                                    </Grid.RowDefinitions>
+
+                                    <!--  Quadrant 1  -->
+                                    <Grid
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        Padding="20"
+                                        BackgroundColor="White"
+                                        RowSpacing="0">
+
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="50" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+
+                                        <Label
+                                            Grid.Row="0"
+                                            FontFamily="{StaticResource RobotoMedium}"
+                                            HorizontalOptions="Center"
+                                            HorizontalTextAlignment="Center"
+                                            StyleClass="fs-20, fc-dimgray"
+                                            Text="{classes:Translate ACTIONS_WE_STARTED_AND_COMPLETED}"
+                                            VerticalOptions="Center" />
+
+                                        <Grid Grid.Row="1" IsVisible="{Binding HasItems, Converter={StaticResource ReverseBooleanConverter}}">
+                                            <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                                                <Image Source="nolcn.png" />
+                                                <Label
+                                                    FontFamily="{StaticResource RobotoLight}"
+                                                    StyleClass="fs-22"
+                                                    Text="{classes:Translate EMPTY_SCREEN_TEXT}" />
+                                            </StackLayout>
+                                        </Grid>
+
+                                        <listview:SfListView
+                                            Grid.Row="1"
+                                            Padding="0"
+                                            AutoFitMode="None"
+                                            ItemSize="200"
+                                            ItemSpacing="6"
+                                            ItemsSource="{Binding BindingContext.Actions, Source={x:Reference Page}}"
+                                            SelectionMode="None">
+                                            <listview:SfListView.ItemsLayout>
+                                                <listview:GridLayout x:Name="GridLayout" />
+                                            </listview:SfListView.ItemsLayout>
+                                            <listview:SfListView.ItemTemplate>
+                                                <DataTemplate>
+
+                                                    <Grid HorizontalOptions="FillAndExpand">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*" />
+                                                            <RowDefinition Height="15" />
+                                                        </Grid.RowDefinitions>
+
+                                                        <Border
+                                                            Grid.Row="0"
+                                                            Padding="0"
+                                                            Stroke="Transparent"
+                                                            StrokeThickness="0">
+
+                                                            <Border.StrokeShape>
+                                                                <RoundRectangle CornerRadius="1" />
+                                                            </Border.StrokeShape>
+                                                            <Grid RowSpacing="0">
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition Height="{Binding PercentageRelative, Converter={StaticResource PercentToGridLengthConverter}, ConverterParameter=False}" />
+                                                                    <RowDefinition Height="{Binding PercentageRelative, Converter={StaticResource PercentToGridLengthConverter}}" />
+                                                                </Grid.RowDefinitions>
+                                                                <Border
+                                                                    Grid.Row="1"
+                                                                    BackgroundColor="{StaticResource GreyColor}"
+                                                                    StrokeThickness="0">
+                                                                    <Grid RowSpacing="0">
+                                                                        <Grid.RowDefinitions>
+                                                                            <RowDefinition Height="{Binding PercentageOk, Converter={StaticResource PercentToGridLengthConverter}, ConverterParameter=False}" />
+                                                                            <RowDefinition Height="{Binding PercentageOk, Converter={StaticResource PercentToGridLengthConverter}}" />
+                                                                        </Grid.RowDefinitions>
+                                                                        <Label
+                                                                            HorizontalOptions="Center"
+                                                                            StyleClass="fs-10"
+                                                                            Text="{Binding CountNrUnresolved, Converter={StaticResource AboveThousandsConverter}}"
+                                                                            TextColor="White"
+                                                                            VerticalOptions="Center" />
+                                                                        <Border
+                                                                            Grid.Row="1"
+                                                                            BackgroundColor="{StaticResource GreenColor}"
+                                                                            StrokeThickness="0" />
+                                                                    </Grid>
+                                                                </Border>
+
+                                                            </Grid>
+
+                                                        </Border>
+                                                        <Label
+                                                            FontFamily="{StaticResource RobotoRegular}"
+                                                            HorizontalOptions="Center"
+                                                            StyleClass="fs-10"
+                                                            Text="{Binding CountNrResolved, Converter={StaticResource AboveThousandsConverter}}"
+                                                            TextColor="{StaticResource WhiteColor}"
+                                                            VerticalOptions="End" />
+                                                        <Label
+                                                            Grid.Row="1"
+                                                            FontFamily="{StaticResource RobotoLight}"
+                                                            HorizontalOptions="Center"
+                                                            LineBreakMode="NoWrap"
+                                                            StyleClass="fs-8"
+                                                            Text="{Binding Subscript}"
+                                                            VerticalOptions="Start" />
+                                                    </Grid>
+
+                                                </DataTemplate>
+                                            </listview:SfListView.ItemTemplate>
+                                        </listview:SfListView>
+                                    </Grid>
+                                    <Grid
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        IsVisible="{Binding IsBusyQ1}">
+
+                                        <Grid BackgroundColor="White" Opacity="0.9" />
+                                        <busyindicator:SfBusyIndicator
+                                            AnimationType="Cupertino"
+                                            IndicatorColor="{StaticResource BusyIndicatorColor}"
+                                            IsRunning="{Binding IsBusyQ1}"
+                                            SizeFactor="0.3" />
+
+                                    </Grid>
+
+                                    <!--  Quadrant 2  -->
+                                    <Grid
+                                        Grid.Row="0"
+                                        Grid.Column="1"
+                                        Padding="20"
+                                        BackgroundColor="White"
+                                        RowSpacing="0">
+
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="50" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+
+                                        <Label
+                                            Grid.Row="0"
+                                            FontFamily="{StaticResource RobotoMedium}"
+                                            HorizontalTextAlignment="Center"
+                                            StyleClass="fs-20, fc-dimgray"
+                                            Text="{classes:Translate HOW_DO_WE_ACT_TITLE}" />
+
+                                        <Grid Grid.Row="1">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*" />
+                                                <!--  row 0  -->
+                                                <RowDefinition Height="1" />
+                                                <!--  row 1  -->
+                                                <RowDefinition Height="*" />
+                                                <!--  row 2  -->
+                                                <RowDefinition Height="1" />
+                                                <!--  row 3  -->
+                                                <RowDefinition Height="*" />
+                                                <!--  row 4  -->
+                                                <RowDefinition Height="1" />
+                                                <!--  row 5  -->
+                                                <RowDefinition Height="*" />
+                                                <!--  row 6  -->
+                                                <RowDefinition Height="15" />
+                                                <!--  row 7  -->
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="20" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="0.5*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackLayout
+                                                Grid.Row="1"
+                                                Grid.ColumnSpan="3"
+                                                BackgroundColor="{StaticResource BackgroundColor}" />
+                                            <StackLayout
+                                                Grid.Row="3"
+                                                Grid.ColumnSpan="3"
+                                                BackgroundColor="{StaticResource BackgroundColor}" />
+                                            <StackLayout
+                                                Grid.Row="5"
+                                                Grid.ColumnSpan="3"
+                                                BackgroundColor="{StaticResource BackgroundColor}" />
+
+                                            <Grid Grid.Row="2" Grid.Column="0">
+                                                <Border
+                                                    BackgroundColor="{StaticResource GreenColor}"
+                                                    HeightRequest="10"
+                                                    HorizontalOptions="Center"
+                                                    StrokeShape="RoundRectangle 5"
+                                                    StrokeThickness="0"
+                                                    VerticalOptions="Center"
+                                                    WidthRequest="10" />
+                                            </Grid>
+                                            <Grid Grid.Row="4" Grid.Column="0">
+                                                <Border
+                                                    BackgroundColor="{StaticResource GreyColor}"
+                                                    HeightRequest="10"
+                                                    HorizontalOptions="Center"
+                                                    StrokeShape="RoundRectangle 5"
+                                                    StrokeThickness="0"
+                                                    VerticalOptions="Center"
+                                                    WidthRequest="10" />
+                                            </Grid>
+                                            <Grid Grid.Row="6" Grid.Column="0">
+                                                <Border
+                                                    BackgroundColor="{StaticResource RedColor}"
+                                                    HeightRequest="10"
+                                                    HorizontalOptions="Center"
+                                                    StrokeShape="RoundRectangle 5"
+                                                    StrokeThickness="0"
+                                                    VerticalOptions="Center"
+                                                    WidthRequest="10" />
+                                            </Grid>
+
+                                            <Label
+                                                Grid.Row="0"
+                                                Grid.Column="1"
+                                                FontFamily="{StaticResource RobotoLight}"
+                                                FontSize="10"
+                                                Text="{classes:Translate REPORTS_STARTED_ACTIONS_TITLE}"
+                                                TextColor="{StaticResource DarkGreyColor}"
+                                                VerticalOptions="Center" />
+                                            <Label
+                                                Grid.Row="2"
+                                                Grid.Column="1"
+                                                FontFamily="{StaticResource RobotoLight}"
+                                                FontSize="10"
+                                                Text="{classes:Translate REPORTS_COMPLETED_ACTIONS_TITLE}"
+                                                TextColor="{StaticResource DarkGreyColor}"
+                                                VerticalOptions="Center" />
+                                            <Label
+                                                Grid.Row="4"
+                                                Grid.Column="1"
+                                                FontFamily="{StaticResource RobotoLight}"
+                                                FontSize="10"
+                                                Text="{classes:Translate REPORTS_OPEN_ACTIONS_TITLE}"
+                                                TextColor="{StaticResource DarkGreyColor}"
+                                                VerticalOptions="Center" />
+                                            <Label
+                                                Grid.Row="6"
+                                                Grid.Column="1"
+                                                FontFamily="{StaticResource RobotoLight}"
+                                                FontSize="10"
+                                                Text="{classes:Translate REPORTS_OVERDUE_TITLE}"
+                                                TextColor="{StaticResource DarkGreyColor}"
+                                                VerticalOptions="Center" />
+
+                                            <Label
+                                                Grid.Row="0"
+                                                Grid.Column="2"
+                                                FontFamily="{StaticResource RobotoRegular}"
+                                                FontSize="Large"
+                                                HorizontalOptions="Center"
+                                                Text="{Binding AllActions.CountNr}"
+                                                TextColor="{StaticResource DarkGreyColor}"
+                                                VerticalOptions="Center" />
+                                            <Label
+                                                Grid.Row="2"
+                                                Grid.Column="2"
+                                                FontFamily="{StaticResource RobotoRegular}"
+                                                FontSize="Large"
+                                                HorizontalOptions="Center"
+                                                Text="{Binding AllActions.CountNrResolved}"
+                                                TextColor="{StaticResource DarkGreyColor}"
+                                                VerticalOptions="Center" />
+                                            <Label
+                                                Grid.Row="4"
+                                                Grid.Column="2"
+                                                FontFamily="{StaticResource RobotoRegular}"
+                                                FontSize="Large"
+                                                HorizontalOptions="Center"
+                                                Text="{Binding AllActions.CountNrUnresolvedNotOverdue}"
+                                                TextColor="{StaticResource DarkGreyColor}"
+                                                VerticalOptions="Center" />
+                                            <Label
+                                                Grid.Row="6"
+                                                Grid.Column="2"
+                                                FontFamily="{StaticResource RobotoRegular}"
+                                                FontSize="Large"
+                                                HorizontalOptions="Center"
+                                                Text="{Binding AllActions.CountNrOverdue}"
+                                                TextColor="{StaticResource DarkGreyColor}"
+                                                VerticalOptions="Center" />
+
+                                            <Border
+                                                Grid.Row="0"
+                                                Grid.RowSpan="7"
+                                                Grid.Column="3"
+                                                Margin="0"
+                                                Padding="0"
+                                                BackgroundColor="{StaticResource GreyColor}"
+                                                StrokeThickness="0">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="3" />
+                                                </Border.StrokeShape>
+                                                <Grid ColumnSpacing="0" RowSpacing="0">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="{Binding AllActions.PercentageResolved, Converter={StaticResource PercentToGridLengthConverter}}" />
+                                                        <RowDefinition Height="{Binding AllActions.PercentageResolved, Converter={StaticResource PercentToGridLengthConverter}, ConverterParameter=False}" />
+                                                    </Grid.RowDefinitions>
+
+                                                    <Grid Grid.Row="0" BackgroundColor="{StaticResource GreenColor}">
+                                                        <Label
+                                                            HorizontalOptions="Center"
+                                                            Text="{Binding AllActions.CountNrResolved}"
+                                                            TextColor="White"
+                                                            VerticalOptions="Center" />
+                                                    </Grid>
+                                                    <Grid Grid.Row="1">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="{Binding AllActions.PercentageOverdue, Converter={StaticResource PercentToGridLengthConverter}, ConverterParameter=False}" />
+                                                            <RowDefinition Height="{Binding AllActions.PercentageOverdue, Converter={StaticResource PercentToGridLengthConverter}}" />
+
+                                                        </Grid.RowDefinitions>
+                                                        <Grid Grid.Row="0">
+                                                            <Label
+                                                                HorizontalOptions="Center"
+                                                                Text="{Binding AllActions.CountNrUnresolvedNotOverdue}"
+                                                                TextColor="White"
+                                                                VerticalOptions="Center" />
+                                                        </Grid>
+                                                        <Grid Grid.Row="1" BackgroundColor="{StaticResource RedColor}">
+                                                            <Label
+                                                                HorizontalOptions="Center"
+                                                                Text="{Binding AllActions.CountNrOverdue}"
+                                                                TextColor="White"
+                                                                VerticalOptions="Center" />
+                                                        </Grid>
+                                                    </Grid>
+
+                                                </Grid>
+                                            </Border>
+
+                                        </Grid>
+                                    </Grid>
+                                    <Grid
+                                        Grid.Row="0"
+                                        Grid.Column="1"
+                                        IsVisible="{Binding IsBusyQ2}">
+
+                                        <Grid BackgroundColor="White" Opacity="0.9" />
+                                        <busyindicator:SfBusyIndicator
+                                            AnimationType="Cupertino"
+                                            IndicatorColor="{StaticResource BusyIndicatorColor}"
+                                            IsRunning="{Binding IsBusyQ2}"
+                                            SizeFactor="0.3" />
+
+                                    </Grid>
+
+                                    <!--  Quadrant 3  -->
+                                    <Grid
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        Padding="20"
+                                        BackgroundColor="White"
+                                        RowSpacing="0">
+
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="40" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+
+                                        <Label
+                                            Grid.Row="0"
+                                            FontFamily="{StaticResource RobotoMedium}"
+                                            HorizontalTextAlignment="Center"
+                                            StyleClass="fs-20, fc-dimgray"
+                                            Text="{classes:Translate WHO_INITIATE_THE_MOST_ACTIONS}" />
+
+                                        <Grid Grid.Row="1" IsVisible="{Binding HasItemsQ3, Converter={StaticResource ReverseBooleanConverter}}">
+                                            <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                                                <Image Source="nolcn.png" />
+                                                <Label
+                                                    FontFamily="{StaticResource RobotoLight}"
+                                                    StyleClass="fs-22"
+                                                    Text="{classes:Translate EMPTY_SCREEN_TEXT}" />
+                                            </StackLayout>
+                                        </Grid>
+
+                                        <Grid
+                                            Grid.Row="1"
+                                            ColumnSpacing="0"
+                                            IsVisible="{Binding HasItemsQ3}"
+                                            RowSpacing="0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="20" />
+                                                <RowDefinition Height="*" />
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="50" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <Grid Grid.Row="0" Grid.Column="1" />
+                                            <Label
+                                                Grid.Row="0"
+                                                Grid.Column="1"
+                                                FontFamily="{StaticResource RobotoLight}"
+                                                FontSize="10"
+                                                Text="{classes:Translate SIDEBAR_TITLE_ACTIONS}"
+                                                TextColor="{StaticResource DarkGreyColor}" />
+
+                                            <listview:SfListView
+                                                Grid.Row="1"
+                                                Grid.ColumnSpan="2"
+                                                Padding="0"
+                                                AutoFitMode="None"
+                                                ItemSize="36"
+                                                ItemSpacing="0"
+                                                ItemsSource="{Binding BindingContext.ActionsTop, Source={x:Reference Page}}"
+                                                SelectionMode="None"
+                                                TapCommand="{Binding NavigateToUserActionsCommand}">
+                                                <listview:SfListView.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Grid ColumnSpacing="0" RowSpacing="0">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="*" />
+                                                                <RowDefinition Height="1" />
+                                                            </Grid.RowDefinitions>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="50" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <Grid>
+                                                                <Grid Padding="0,3,10,3">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="{Binding PercentageRelative, Converter={StaticResource PercentToGridLengthConverter}}" />
+                                                                        <ColumnDefinition Width="{Binding PercentageRelative, Converter={StaticResource PercentToGridLengthConverter}, ConverterParameter=False}" />
+                                                                    </Grid.ColumnDefinitions>
+
+                                                                    <Grid BackgroundColor="{StaticResource BlueColor}" Opacity="0.1" />
+
+                                                                </Grid>
+                                                                <Label
+                                                                    Grid.Row="0"
+                                                                    Padding="10,0,0,0"
+                                                                    FontFamily="{StaticResource RobotoRegular}"
+                                                                    FontSize="12"
+                                                                    HorizontalOptions="Start"
+                                                                    Text="{Binding Name}"
+                                                                    TextColor="{StaticResource DarkerGreyColor}"
+                                                                    VerticalOptions="Center" />
+                                                            </Grid>
+                                                            <Label
+                                                                Grid.Row="0"
+                                                                Grid.Column="1"
+                                                                FontFamily="{StaticResource RobotoRegular}"
+                                                                FontSize="Medium"
+                                                                HorizontalOptions="Start"
+                                                                Text="{Binding CountNr}"
+                                                                TextColor="{StaticResource DarkGreyColor}"
+                                                                VerticalOptions="Center" />
+                                                            <Grid
+                                                                Grid.Row="1"
+                                                                Grid.ColumnSpan="2"
+                                                                BackgroundColor="{StaticResource BackgroundColor}" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </listview:SfListView.ItemTemplate>
+                                            </listview:SfListView>
+
+                                        </Grid>
+
+                                    </Grid>
+                                    <Grid
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        IsVisible="{Binding IsBusyQ3}">
+
+                                        <Grid BackgroundColor="White" Opacity="0.9" />
+                                        <busyindicator:SfBusyIndicator
+                                            AnimationType="Cupertino"
+                                            IndicatorColor="{StaticResource BusyIndicatorColor}"
+                                            IsRunning="{Binding IsBusyQ3}"
+                                            SizeFactor="0.3" />
+
+                                    </Grid>
+
+                                    <!--  Quadrant 4  -->
+                                    <Grid
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Padding="20"
+                                        BackgroundColor="White"
+                                        RowSpacing="0">
+
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="40" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+
+                                        <Label
+                                            Grid.Row="0"
+                                            FontFamily="{StaticResource RobotoMedium}"
+                                            HorizontalTextAlignment="Center"
+                                            StyleClass="fs-20, fc-dimgray"
+                                            Text="{classes:Translate REPORTS_MOSTLY_INVLOVED_ACTIONS}" />
+
+                                        <Grid Grid.Row="1" IsVisible="{Binding HasItemsQ4, Converter={StaticResource ReverseBooleanConverter}}">
+                                            <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                                                <Image Source="nolcn.png" />
+                                                <Label
+                                                    FontFamily="{StaticResource RobotoLight}"
+                                                    StyleClass="fs-22"
+                                                    Text="{classes:Translate EMPTY_SCREEN_TEXT}" />
+                                            </StackLayout>
+                                        </Grid>
+
+                                        <Grid
+                                            Grid.Row="1"
+                                            ColumnSpacing="0"
+                                            IsVisible="{Binding HasItemsQ4}"
+                                            RowSpacing="0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="20" />
+                                                <RowDefinition Height="*" />
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="50" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <Grid Grid.Row="0" Grid.Column="1" />
+                                            <Label
+                                                Grid.Row="0"
+                                                Grid.Column="1"
+                                                FontFamily="{StaticResource RobotoLight}"
+                                                FontSize="10"
+                                                Text="{classes:Translate SIDEBAR_TITLE_ACTIONS}"
+                                                TextColor="{StaticResource DarkGreyColor}" />
+
+                                            <listview:SfListView
+                                                Grid.Row="1"
+                                                Grid.ColumnSpan="2"
+                                                Padding="0"
+                                                AutoFitMode="None"
+                                                ItemSize="36"
+                                                ItemSpacing="0"
+                                                ItemsSource="{Binding BindingContext.ActionsInvolved, Source={x:Reference Page}}"
+                                                SelectionMode="None"
+                                                TapCommand="{Binding NavigateToAssignedUserActionsCommand}">
+                                                <listview:SfListView.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Grid ColumnSpacing="0" RowSpacing="0">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="*" />
+                                                                <RowDefinition Height="1" />
+                                                            </Grid.RowDefinitions>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="50" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <Grid>
+                                                                <Grid Padding="0,3,10,3">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="{Binding PercentageRelative, Converter={StaticResource PercentToGridLengthConverter}}" />
+                                                                        <ColumnDefinition Width="{Binding PercentageRelative, Converter={StaticResource PercentToGridLengthConverter}, ConverterParameter=False}" />
+                                                                    </Grid.ColumnDefinitions>
+
+                                                                    <Grid BackgroundColor="{StaticResource BlueColor}" Opacity="0.1" />
+
+                                                                </Grid>
+                                                                <Label
+                                                                    Grid.Row="0"
+                                                                    Padding="10,0,0,0"
+                                                                    FontFamily="{StaticResource RobotoRegular}"
+                                                                    FontSize="12"
+                                                                    HorizontalOptions="Start"
+                                                                    Text="{Binding Name}"
+                                                                    TextColor="{StaticResource DarkerGreyColor}"
+                                                                    VerticalOptions="Center" />
+                                                            </Grid>
+                                                            <Label
+                                                                Grid.Row="0"
+                                                                Grid.Column="1"
+                                                                FontFamily="{StaticResource RobotoRegular}"
+                                                                FontSize="Medium"
+                                                                HorizontalOptions="Start"
+                                                                Text="{Binding CountNr}"
+                                                                TextColor="{StaticResource DarkGreyColor}"
+                                                                VerticalOptions="Center" />
+                                                            <Grid
+                                                                Grid.Row="1"
+                                                                Grid.ColumnSpan="2"
+                                                                BackgroundColor="{StaticResource BackgroundColor}" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </listview:SfListView.ItemTemplate>
+                                            </listview:SfListView>
+
+                                        </Grid>
+
+                                    </Grid>
+                                    <Grid
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        IsVisible="{Binding IsBusyQ4}">
+
+                                        <Grid BackgroundColor="White" Opacity="0.9" />
+                                        <busyindicator:SfBusyIndicator
+                                            AnimationType="Cupertino"
+                                            IndicatorColor="{StaticResource BusyIndicatorColor}"
+                                            IsRunning="{Binding IsBusyQ4}"
+                                            SizeFactor="0.3" />
+
+                                    </Grid>
+
+                                </Grid>
+
+                                <StackLayout CascadeInputTransparent="False" InputTransparent="True">
+                                    <controls:MessageCenter />
+                                </StackLayout>
+
+                            </Grid>
+
+                        </syncfusion:SfPullToRefresh.PullableContent>
+
+                    </syncfusion:SfPullToRefresh>
+
+                </Grid>
+
+            </Grid>
+
+            <Grid
+                AbsoluteLayout.LayoutBounds="0,0,1,1"
+                AbsoluteLayout.LayoutFlags="WidthProportional,HeightProportional"
+                IsVisible="{Binding IsDropdownOpen}">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding BindingContext.CloseDropdownCommand, Source={x:Reference Page}}" />
+                </Grid.GestureRecognizers>
+            </Grid>
+
+            <!--  Filter Dropdown  -->
+            <Border
+                BackgroundColor="Transparent"
+                StrokeThickness="0"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                IsVisible="{Binding IsDropdownOpen}"
+                AbsoluteLayout.LayoutBounds="{Binding Rect}"
+                AbsoluteLayout.LayoutFlags="WidthProportional,HeightProportional,YProportional">
+
+                <treeview:SfTreeView
+                    x:Name="treeView"
+                    Grid.Row="1"
+                    BackgroundColor="White"
+                    ChildPropertyName="Children"
+                    ItemsSource="{Binding WorkAreas}"
+                    NodeSizeMode="Dynamic"
+                    TapCommand="{Binding DropdownTapCommand}">
+                    <treeview:SfTreeView.Behaviors>
+                        <behaviors:TreeViewAutoSizeBehavior>
+                            <behaviors:TreeViewAutoSizeBehavior.ZeroLevelNodeHeight>
+                                <OnPlatform x:TypeArguments="x:Int32">
+                                    <On Platform="iOS">60</On>
+                                    <On Platform="Android,Windows">100</On>
+                                </OnPlatform>
+                            </behaviors:TreeViewAutoSizeBehavior.ZeroLevelNodeHeight>
+                        </behaviors:TreeViewAutoSizeBehavior>
+                    </treeview:SfTreeView.Behaviors>
+                    <treeview:SfTreeView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <ViewCell.View>
+                                    <Grid
+                                        Grid.Column="1"
+                                        Padding="10,6,0,6"
+                                        RowSpacing="1"
+                                        VerticalOptions="Center">
+                                        <Label
+                                            FontFamily="{StaticResource RobotoLight}"
+                                            FontSize="Title"
+                                            Text="{Binding Name}"
+                                            TextColor="Black"
+                                            VerticalOptions="CenterAndExpand"
+                                            VerticalTextAlignment="Center" />
+                                    </Grid>
+                                </ViewCell.View>
+                            </ViewCell>
+                        </DataTemplate>
+                    </treeview:SfTreeView.ItemTemplate>
+                </treeview:SfTreeView>
+            </Border>
+
+        </AbsoluteLayout>
+    </ContentPage.Content>
+</ContentPage>

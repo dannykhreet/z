@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Grid
+    x:Class="EZGO.Maui.Controls.ViewCells.Templates.SignButtonTemplate"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    x:Name="SignButton">
+    <Grid.Triggers>
+        <DataTrigger
+            Binding="{Binding TasksDone, Source={x:Reference SignButton}}"
+            TargetType="Grid"
+            Value="True">
+            <Setter Property="BackgroundColor" Value="{StaticResource GreenColor}" />
+        </DataTrigger>
+        <DataTrigger
+            Binding="{Binding TasksDone, Source={x:Reference SignButton}}"
+            TargetType="Grid"
+            Value="False">
+            <Setter Property="BackgroundColor" Value="{StaticResource GreyColor}" />
+        </DataTrigger>
+    </Grid.Triggers>
+    <Grid.GestureRecognizers>
+        <TapGestureRecognizer Command="{Binding SignCommand, Source={x:Reference SignButton}}" />
+    </Grid.GestureRecognizers>
+    <Label
+        x:Name="TitleLabel"
+        Padding="0,0,20,0"
+        FontSize="{Binding FontSize, Source={x:Reference SignButton}}"
+        HorizontalOptions="{Binding TextHorizontalOption, Source={x:Reference SignButton}}"
+        HorizontalTextAlignment="Center"
+        IsVisible="{Binding IsSyncing, Source={x:Reference SignButton}, Converter={StaticResource ReverseBooleanConverter}}"
+        Text="{Binding Text, Source={x:Reference SignButton}}"
+        TextColor="White"
+        VerticalOptions="Center" />
+    <Label
+        Padding="0,0,20,0"
+        FontSize="{Binding FontSize, Source={x:Reference SignButton}}"
+        HorizontalOptions="{Binding TextHorizontalOption, Source={x:Reference SignButton}}"
+        HorizontalTextAlignment="Center"
+        IsVisible="{Binding IsSyncing, Source={x:Reference SignButton}}"
+        Text="{classes:Translate SYNC_STATES_VIEW_SYNSING_MESSAGE}"
+        TextColor="White"
+        VerticalOptions="Center" />
+</Grid>
+
+
+<!--  User assessments column  -->
+<!-- <Grid Grid.Column="1"> -->
+<!--  Detail Page  -->
+<!-- <list:PullToRefreshList
+        x:TypeArguments="viewModels:AssessmentsViewModel"
+        BackgroundColor="White"
+        FooterSize="100"
+        FooterTemplate="{StaticResource AssessmentsFooterTemplate}"
+        GridItemTemplate="{StaticResource GridItemTemplate}"
+        HasItems="{Binding UserSkillInstructionsFilter.HasItems}"
+        IsRefreshing="{Binding IsRefreshing}"
+        LinearItemTemplate="{StaticResource LinearItemTemplate}"
+        ListDataSource="{Binding UserSkillInstructionsFilter.ListSource}"
+        ListItemSize="{Binding LayoutManager.CurrentLayout.ItemSize}"
+        ListItemSpacing="{Binding LayoutManager.CurrentLayout.ItemSpacing}"
+        ListItemsSource="{Binding UserSkillInstructionsFilter.FilteredList}"
+        ListViewLayout="{Binding LayoutManager.ListLayout}"
+        RefreshCommand="{Binding RefreshCommand}"
+        SpanCount="{Binding LayoutManager.CurrentLayout.SpanCount}" />-->
+<!-- </Grid> -->

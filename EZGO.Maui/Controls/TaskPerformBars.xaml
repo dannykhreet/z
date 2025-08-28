@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="EZGO.Maui.Controls.TaskPerformBars"
+    x:Name="Page">
+    <ContentView.Content>
+
+        <Grid HorizontalOptions="FillAndExpand" CompressedLayout.IsHeadless="True">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="15" />
+            </Grid.RowDefinitions>
+
+            <Border
+                BackgroundColor="White"
+                StrokeThickness="0"
+                Padding="0"
+                Grid.Row="0"
+                IsVisible="{Binding BarVisible, Source={x:Reference Page}}">
+
+                <Grid RowSpacing="0" CompressedLayout.IsHeadless="True">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="{Binding SkippedPercentage, Source={x:Reference Page}, Converter={StaticResource PercentToGridLengthConverter}}" />
+                        <RowDefinition Height="{Binding NotOkPercentage, Source={x:Reference Page}, Converter={StaticResource PercentToGridLengthConverter}}" />
+                        <RowDefinition Height="{Binding OkPercentage, Source={x:Reference Page}, Converter={StaticResource PercentToGridLengthConverter}}" />
+                    </Grid.RowDefinitions>
+
+                    <Border
+                        Grid.Row="0"
+                        BackgroundColor="{StaticResource SkippedColor}"
+                        StrokeThickness="0">
+                        <Label
+                            Text="{Binding Skipped, Source={x:Reference Page}, Converter={StaticResource AboveThousandsConverter}}"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center"
+                            TextColor="White"
+                            StyleClass="fs-10"
+                            FontFamily="{StaticResource RobotoRegular}" />
+                    </Border>
+
+                    <Border
+                        Grid.Row="1"
+                        BackgroundColor="{StaticResource RedColor}"
+                        StrokeThickness="0">
+                        <Label
+                            Text="{Binding NotOk, Source={x:Reference Page}, Converter={StaticResource AboveThousandsConverter}}"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center"
+                            TextColor="White"
+                            StyleClass="fs-10"
+                            FontFamily="{StaticResource RobotoRegular}" />
+                    </Border>
+
+                    <Border
+                        Grid.Row="2"
+                        BackgroundColor="{StaticResource GreenColor}"
+                        StrokeThickness="0">
+                        <Label
+                            Text="{Binding Ok, Source={x:Reference Page}, Converter={StaticResource AboveThousandsConverter}}"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center"
+                            TextColor="White"
+                            StyleClass="fs-10"
+                            FontFamily="{StaticResource RobotoRegular}" />
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Label
+                Text="{Binding Subscript}"
+                Grid.Row="1"
+                StyleClass="fs-8"
+                FontFamily="{StaticResource RobotoLight}"
+                VerticalOptions="Start"
+                HorizontalOptions="Center"
+                LineBreakMode="NoWrap" />
+        </Grid>
+
+    </ContentView.Content>
+</ContentView>

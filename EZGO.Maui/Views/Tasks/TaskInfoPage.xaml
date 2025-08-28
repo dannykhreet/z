@@ -1,0 +1,401 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Tasks.TaskInfoPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:converter="clr-namespace:EZGO.Maui.Core.Converter;assembly=EZGO.Maui.Core"
+    xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons"
+    xmlns:datatemplates="clr-namespace:EZGO.Maui.Controls.DataTemplates"
+    xmlns:enumerations="clr-namespace:EZGO.Api.Models.Enumerations;assembly=EZGO.Api.Models"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:syncfusion="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    xmlns:taskProperties="clr-namespace:EZGO.Maui.Controls.TaskProperties"
+    xmlns:viewmodels="clr-namespace:EZGO.Maui.Core.ViewModels;assembly=EZGO.Maui.Core"
+    x:Name="Page"
+    Title="TaskInfoPage"
+    ios:Page.UseSafeArea="true"
+    x:DataType="viewmodels:TaskInfoViewModel"
+    NavigationPage.HasBackButton="True"
+    NavigationPage.HasNavigationBar="false">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converter:ReverseBooleanConverter x:Key="ReverseBooleanConverter" />
+            <converter:BooleanToWidthConverter x:Key="BooleanToWidthConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid StyleClass="bg-lightgrey" RowSpacing="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  App Bar  -->
+        <Grid
+            Grid.Row="0"
+            ColumnSpacing="0"
+            RowSpacing="0"
+            StyleClass="header, bg-white, m-0, pr-15">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="120" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!--  Back button  -->
+            <customButtons:BackButton
+                Grid.Column="0"
+                Command="{Binding CancelCommand}"
+                VerticalOptions="CenterAndExpand" />
+
+            <ScrollView Grid.Column="1" StyleClass="column1">
+                <StackLayout>
+                    <Label
+                        x:Name="SlideTitle"
+                        FontFamily="{StaticResource RobotoLight}"
+                        HorizontalOptions="StartAndExpand"
+                        StyleClass="title, fs-large, fc-darkgrey"
+                        Text="{Binding Task.Name}"
+                        VerticalOptions="CenterAndExpand" />
+                </StackLayout>
+            </ScrollView>
+        </Grid>
+
+        <!--  Detail Page  -->
+        <Grid
+            Grid.Row="1"
+            HorizontalOptions="Fill"
+            RowSpacing="0"
+            VerticalOptions="Fill">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.70*" />
+                <RowDefinition Height="0.13*" />
+                <RowDefinition Height="0.17*" />
+            </Grid.RowDefinitions>
+
+            <Grid
+                Grid.Row="0"
+                HorizontalOptions="Center"
+                HeightRequest="450"
+                VerticalOptions="Center">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="65*" />
+                    <RowDefinition Height="35*" />
+                    <RowDefinition Height="7.5" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <!--  Task Property Column  -->
+                    <ColumnDefinition Width="{Binding Task.HasFeatures, Converter={StaticResource BooleanToWidthConverter}, ConverterParameter={Binding DeviceFormat.PropertyWidth}}" />
+                    <!--  Content Row  -->
+                    <ColumnDefinition Width="{Binding DeviceFormat.ItemWidth}" />
+                </Grid.ColumnDefinitions>
+
+                <!--  Task Property Popup List  -->
+                <taskProperties:TaskPropertyPopupListView
+                    x:Name="PropertyPopupList"
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="0"
+                    IsVisible="{Binding Task.HasFeatures}"
+                    PropertiesSource="{Binding Task.PropertyList}" />
+
+
+                <controls:CustomImage
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="1"
+                    Aspect="Fill"
+                    ImageUrl="{Binding Task.DisplayPicture}">
+                    <controls:CustomImage.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding DetailCommand}" CommandParameter="{Binding}" />
+                    </controls:CustomImage.GestureRecognizers>
+                </controls:CustomImage>
+
+                <!--  Play button  -->
+                <Button
+                    Grid.RowSpan="2"
+                    Grid.Column="1"
+                    BackgroundColor="Transparent"
+                    FontFamily="{StaticResource MaterialFontFamily}"
+                    FontSize="64"
+                    HorizontalOptions="Center"
+                    InputTransparent="True"
+                    IsVisible="{Binding Task.HasVideo}"
+                    Text="{x:Static classes:IconFont.PlayCircleOutline}"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+
+                <!--  Title & description  -->
+                <Grid Grid.Row="1" Grid.Column="1">
+                    <Grid
+                        Padding="20,15"
+                        VerticalOptions="EndAndExpand"
+                        BackgroundColor="{StaticResource TransparentBlackColor}">
+                        <ScrollView Grid.Column="0">
+                            <StackLayout>
+                                <StackLayout StyleClass="fc-white">
+                                    <Label
+                                        FontFamily="{StaticResource RobotoBold}"
+                                        Text="{Binding Task.Name}"
+                                        FontSize="Large" />
+                                    <Label
+                                        FontFamily="{StaticResource RobotoLight}"
+                                        Text="{Binding Task.Description}"
+                                        FontSize="Small" />
+                                </StackLayout>
+
+
+                                <StackLayout Orientation="Vertical" StyleClass="fc-white, fs-small">
+                                    <Label
+                                        FontFamily="{StaticResource RobotoLight}"
+                                        Text="{Binding Task.DueDateString}"
+                                        TextColor="White"
+                                        FontSize="Small" />
+                                    <Label
+                                        FontFamily="{StaticResource RobotoLight}"
+                                        Text="{Binding Task.TaskMarkedString}"
+                                        TextColor="White"
+                                        FontSize="Small"
+                                        IsVisible="{Binding Task.IsTaskMarked}" />
+                                </StackLayout>
+
+                                <!--  Skip reason comment  -->
+                                <Label
+                                    FontFamily="{StaticResource RobotoLight}"
+                                    FontSize="Small"
+                                    IsVisible="{Binding Task.HasComment}"
+                                    Text="{Binding Task.CommentString}"
+                                    TextColor="White" />
+
+                                <Label
+                                    FontFamily="{StaticResource RobotoLight}"
+                                    Text="{Binding Task.PropertyValuesString}"
+                                    TextColor="White"
+                                    FontSize="Small" />
+                            </StackLayout>
+                        </ScrollView>
+                    </Grid>
+                </Grid>
+
+                <BoxView
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    BackgroundColor="{StaticResource BackgroundColor}"
+                    VerticalOptions="Fill" />
+            </Grid>
+
+            <!--  Tags  -->
+            <syncfusion:SfListView
+                Grid.Row="1"
+                Margin="40,0,40,0"
+                HeightRequest="55"
+                HorizontalOptions="FillAndExpand"
+                ItemSize="166"
+                ItemsSource="{Binding Task.Tags, Mode=TwoWay}"
+                Orientation="Horizontal"
+                ScrollBarVisibility="Never"
+                VerticalOptions="Start">
+                <syncfusion:SfListView.ItemTemplate>
+                    <datatemplates:TagDataTemplate />
+                </syncfusion:SfListView.ItemTemplate>
+            </syncfusion:SfListView>
+
+            <!--  Buttons  -->
+            <StackLayout
+                Grid.Row="2"
+                Margin="0,10,0,0"
+                HorizontalOptions="Center"
+                Orientation="Horizontal"
+                Spacing="5"
+                VerticalOptions="StartAndExpand">
+
+
+                <!--  Status  -->
+                <StackLayout
+                    Orientation="Horizontal"
+                    Spacing="10"
+                    VerticalOptions="Center">
+
+                    <!--  Action  -->
+                    <customButtons:ActionButton
+                        ActionBubbleCount="{Binding Task.ActionBubbleCount}"
+                        Command="{Binding BindingContext.NavigateToActionsCommand, Source={x:Reference Page}}"
+                        CommandParameter="{Binding Task}"
+                        IsVisible="{Binding Task.Action}"
+                        Style="{StaticResource ActionBorderButtonLarge}" />
+
+                    <!--  Score Button  -->
+                    <AbsoluteLayout IsVisible="{Binding Task.IsScoreButtonVisible}">
+                        <customButtons:ScoreButton
+                            x:Name="ScoreButton"
+                            ColorCalculator="{Binding Task.ScoreColorCalculator}"
+                            Command="{Binding BindingContext.NavigateToPictureProofDetailsCommand, Source={x:Reference Page}}"
+                            CommandParameter="{Binding Task}"
+                            Score="{Binding Task.Score}"
+                            Style="{StaticResource DarkerGreyBorderButtonLarge}" />
+                        <!--  badge  -->
+                        <buttons:SfButton
+                            Margin="40,-10,0,0"
+                            Background="{Binding Background, Source={x:Reference ScoreButton}}"
+                            CornerRadius="12"
+                            HeightRequest="24"
+                            IsVisible="{Binding Task.HasPictureProof}"
+                            Stroke="White"
+                            StrokeThickness="1"
+                            WidthRequest="24">
+                            <buttons:SfButton.Content>
+                                <DataTemplate>
+                                    <Label
+                                        FontFamily="{StaticResource MaterialFontFamily}"
+                                        FontSize="Small"
+                                        HorizontalOptions="CenterAndExpand"
+                                        HorizontalTextAlignment="Center"
+                                        Text="{x:Static classes:IconFont.CameraAlt}"
+                                        TextColor="White"
+                                        VerticalOptions="CenterAndExpand" />
+                                </DataTemplate>
+                            </buttons:SfButton.Content>
+                        </buttons:SfButton>
+                    </AbsoluteLayout>
+
+                    <!--  Taks Status Buttons  -->
+                    <AbsoluteLayout IsVisible="{Binding Task.IsScoreButtonVisible, Converter={StaticResource ReverseBooleanConverter}}" VerticalOptions="Center">
+
+                        <buttons:SfButton
+                            Margin="0,0,1,0"
+                            Background="{Binding Task.TaskStatus, Converter={StaticResource StatusToColorConverter}}"
+                            Command="{Binding BindingContext.NavigateToPictureProofDetailsCommand, Source={x:Reference Page}}"
+                            CommandParameter="{Binding Task}"
+                            IsVisible="{Binding Task.IsStatusButtonVisible}"
+                            StrokeThickness="0"
+                            Style="{StaticResource WhiteBorderButtonLarge}">
+
+                            <buttons:SfButton.Content>
+                                <DataTemplate>
+
+
+                                    <Image
+                                        HorizontalOptions="CenterAndExpand"
+                                        IsOpaque="True"
+                                        VerticalOptions="CenterAndExpand">
+                                        <Image.Source>
+                                            <FontImageSource
+                                                FontFamily="{StaticResource MaterialFontFamily}"
+                                                Glyph="{x:Static classes:IconFont.ThumbDown}"
+                                                Size="25"
+                                                Color="White" />
+                                        </Image.Source>
+                                        <Image.Triggers>
+                                            <DataTrigger
+                                                Binding="{Binding Task.TaskStatus}"
+                                                TargetType="Image"
+                                                Value="{x:Static enumerations:TaskStatusEnum.Ok}">
+                                                <Setter Property="Source">
+                                                    <FontImageSource
+                                                        FontFamily="{StaticResource MaterialFontFamily}"
+                                                        Glyph="{x:Static classes:IconFont.ThumbUp}"
+                                                        Size="25"
+                                                        Color="White" />
+                                                </Setter>
+                                            </DataTrigger>
+                                            <DataTrigger
+                                                Binding="{Binding Task.TaskStatus}"
+                                                TargetType="Image"
+                                                Value="{x:Static enumerations:TaskStatusEnum.Skipped}">
+                                                <Setter Property="Source">
+                                                    <FontImageSource
+                                                        FontFamily="{StaticResource MaterialFontFamily}"
+                                                        Glyph="{x:Static classes:IconFont.FastForward}"
+                                                        Size="30"
+                                                        Color="White" />
+                                                </Setter>
+                                            </DataTrigger>
+                                            <DataTrigger
+                                                Binding="{Binding Task.TaskStatus}"
+                                                TargetType="Image"
+                                                Value="{x:Static enumerations:TaskStatusEnum.NotOk}">
+                                                <Setter Property="Source">
+                                                    <FontImageSource
+                                                        FontFamily="{StaticResource MaterialFontFamily}"
+                                                        Glyph="{x:Static classes:IconFont.ThumbDown}"
+                                                        Size="25"
+                                                        Color="White" />
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Image.Triggers>
+                                    </Image>
+                                </DataTemplate>
+                            </buttons:SfButton.Content>
+                        </buttons:SfButton>
+
+                        <!--  badge  -->
+                        <buttons:SfButton
+                            Margin="40,-10,0,0"
+                            Background="{Binding Task.TaskStatus, Converter={StaticResource StatusToColorConverter}}"
+                            CornerRadius="12"
+                            HeightRequest="24"
+                            IsVisible="{Binding Task.HasPictureProof}"
+                            Stroke="White"
+                            StrokeThickness="1"
+                            WidthRequest="24">
+                            <buttons:SfButton.Content>
+                                <DataTemplate>
+
+
+                                    <Label
+                                        FontFamily="{StaticResource MaterialFontFamily}"
+                                        FontSize="Small"
+                                        HorizontalOptions="CenterAndExpand"
+                                        HorizontalTextAlignment="Center"
+                                        Text="{x:Static classes:IconFont.CameraAlt}"
+                                        TextColor="White"
+                                        VerticalOptions="CenterAndExpand" />
+                                </DataTemplate>
+                            </buttons:SfButton.Content>
+                        </buttons:SfButton>
+                    </AbsoluteLayout>
+
+                    <!--  Steps button  -->
+                    <StackLayout
+                        Orientation="Horizontal"
+                        Spacing="10"
+                        VerticalOptions="Center"
+                        IsVisible="{Binding Task.HasExtraInformation}">
+                        <buttons:SfButton
+                            Style="{StaticResource DarkerGreyBorderButton}"
+                            Background="Transparent"
+                            Command="{Binding BindingContext.StepsCommand, Source={x:Reference Page}}"
+                            CommandParameter="{Binding Task}">
+                            <buttons:SfButton.Content>
+                                <DataTemplate>
+                                    <Label
+                                        Text="?"
+                                        TextColor="{StaticResource DarkerGreyColor}"
+                                        FontSize="26"
+                                        HorizontalTextAlignment="Center"
+                                        VerticalTextAlignment="Center"
+                                        FontFamily="{StaticResource RobotoBold}" />
+                                </DataTemplate>
+                            </buttons:SfButton.Content>
+                        </buttons:SfButton>
+
+                        <Label
+                            Text="{classes:Translate TASK_DETAILS_SCREEN_INFO_BUTTON_TITLE}"
+                            VerticalTextAlignment="Center"
+                            IsVisible="{Binding Task.HasStepsOrWorkInstructions}"
+                            FontFamily="{StaticResource RobotoRegular}"
+                            TextColor="{StaticResource DarkerGreyColor}" />
+
+                    </StackLayout>
+                </StackLayout>
+
+            </StackLayout>
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

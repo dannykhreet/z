@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<buttons:SfButton
+    x:Class="EZGO.Maui.Controls.MediaFileInput"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:pdfviewer="clr-namespace:EZGO.Maui.Views"
+    x:Name="control"
+    Background="Transparent"
+    Style="{StaticResource MediaButton2}">
+    <buttons:SfButton.Content>
+        <DataTemplate>
+            <!--  Main content  -->
+            <Grid>
+                <!--  Image  -->
+                <controls:CustomImage
+                    WidthRequest="90"
+                    HeightRequest="90"
+                    x:Name="image"
+                    Aspect="AspectFill"
+                    HidePlaceholder="True"
+                    ImageUrl="{Binding CurrentMediaItem.PictureUrl, Source={x:Reference control}}"
+                    IsLocalFile="{Binding CurrentMediaItem.IsLocalFile, Source={x:Reference control}}"
+                    IsVisible="{Binding CurrentMediaItem.IsFile, Source={x:Reference control}, Converter={StaticResource ReverseBooleanConverter}}" />
+
+                <!--  PDF  -->
+                <pdfviewer:PdfViewerControl IsVisible="{Binding CurrentMediaItem.IsFile, Source={x:Reference control}}" PdfFileStream="{Binding CurrentMediaItem.FileStream, Source={x:Reference control}}" />
+
+                <!--  Remove item icon  -->
+                <Label
+                    x:Name="icon"
+                    FontFamily="{StaticResource MaterialFontFamily}"
+                    FontSize="Large"
+                    HorizontalOptions="Center"
+                    Text="{x:Static classes:IconFont.Delete}"
+                    TextColor="{StaticResource RedColor}"
+                    VerticalOptions="Center" />
+            </Grid>
+        </DataTemplate>
+    </buttons:SfButton.Content>
+</buttons:SfButton>
+

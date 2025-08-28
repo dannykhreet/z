@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EZGO.Maui.Views.PdfViewerPage"
+             xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+             xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+             xmlns:pdfviewer="clr-namespace:EZGO.Maui.Views"
+             xmlns:busyindicator="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             NavigationPage.HasNavigationBar="False"
+             NavigationPage.HasBackButton="True"
+             Title="PdfViewerPage">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid
+                Grid.Row="0" StyleClass="header, bg-white, m-0, pr-15" RowSpacing="0" ColumnSpacing="0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="145" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="125" />
+                </Grid.ColumnDefinitions>
+
+                <StackLayout
+                    Grid.Column="0" StyleClass="column0" VerticalOptions="CenterAndExpand">
+                    <Button
+                        Text="{x:Static classes:IconFont.ChevronLeft}"
+                        StyleClass="fontButton, fs-42, fc-darkgrey"
+                        FontFamily="{StaticResource MaterialFontFamily}"
+                        Command="{Binding CancelCommand}"
+                        VerticalOptions="CenterAndExpand" />
+                </StackLayout>
+
+                <Label
+                    Grid.Column="1"
+                    Text="{Binding Title}"
+                    StyleClass="title, fs-large, fc-darkgrey"
+                    FontFamily="{StaticResource RobotoLight}"
+                    VerticalOptions="CenterAndExpand" />
+
+                <StackLayout Grid.Column="2" StyleClass="column1">
+                    <Button
+                        Text="{x:Static classes:IconFont.Share}"
+                        StyleClass="fontButton, fs-32, fc-darkgrey"
+                        FontFamily="{StaticResource MaterialFontFamily}"
+                        VerticalOptions="CenterAndExpand"
+                        Command="{Binding ShareCommand}" />
+                </StackLayout>
+            </Grid>
+
+            <pdfviewer:PdfViewerControl Grid.Row="1" PdfFileStream="{Binding PdfDocumentStream}" />
+
+            <!-- Loading indicator -->
+            <Grid Grid.Row="1" IsVisible="{Binding IsLoading}">
+                <Grid BackgroundColor="White" Opacity="0.9" />
+                <busyindicator:SfBusyIndicator
+                    AnimationType="Cupertino"
+                    TextColor="{StaticResource DarkGreyColor}"
+                    IsRunning="{Binding IsLoading}" />
+            </Grid>
+
+            <StackLayout
+                Grid.Row="1" InputTransparent="True" CascadeInputTransparent="False">
+                <controls:MessageCenter />
+            </StackLayout>
+        </Grid>
+</ContentPage>

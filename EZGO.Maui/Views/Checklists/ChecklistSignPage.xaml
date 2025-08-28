@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Checklists.ChecklistSignPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:behaviors="clr-namespace:EZGO.Maui.Behaviors"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+    xmlns:inputLayout="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:popup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
+    xmlns:signatures="clr-namespace:EZGO.Maui.Controls.Signatures"
+    xmlns:viewModels="clr-namespace:EZGO.Maui.Core.ViewModels;assembly=EZGO.Maui.Core"
+    x:Name="Page"
+    Title="ChecklistSignPage"
+    ios:Page.UseSafeArea="true"
+    NavigationPage.HasBackButton="True"
+    NavigationPage.HasNavigationBar="false">
+    <ContentPage.Resources>
+        <DataTemplate x:Key="AutocompleteTemplate" x:Name="AutocompleteTemplate">
+            <StackLayout>
+                <StackLayout
+                    Padding="20,0"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="StartAndExpand">
+                    <inputLayout:SfTextInputLayout
+                        Margin="0,20"
+                        ContainerType="Outlined"
+                        Hint="{classes:Translate SIGN_CHECKLIST_SCREEN_NAME_PLACEHOLDER_TEXT}"
+                        OutlineCornerRadius="5">
+                        <editors:SfAutocomplete
+                            DisplayMemberPath="FullName"
+                            DropDownPlacement="Bottom"
+                            HeightRequest="35"
+                            MaxDropDownHeight="150"
+                            ItemsSource="{Binding Users}"
+                            Text="{Binding AutoCompleteText, Mode=TwoWay}"
+                            TextSearchMode="Contains">
+                            <editors:SfAutocomplete.HeightRequest>
+                                <OnPlatform x:TypeArguments="x:Double">
+                                    <On Platform="iOS">20</On>
+                                    <On Platform="Android,Windows">45</On>
+                                </OnPlatform>
+                            </editors:SfAutocomplete.HeightRequest>
+                            <editors:SfAutocomplete.Behaviors>
+                                <behaviors:EventToCommandBehavior Command="{Binding AutoCompleteSelectedCommand}" EventName="SelectionChanged" />
+                            </editors:SfAutocomplete.Behaviors>
+                        </editors:SfAutocomplete>
+                    </inputLayout:SfTextInputLayout>
+
+                    <StackLayout BindableLayout.ItemsSource="{Binding PopupUsers}" HeightRequest="200">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <StackLayout Orientation="Horizontal">
+                                    <Label HorizontalOptions="StartAndExpand" Text="{Binding FullName}" />
+
+                                    <Label
+                                        FontFamily="{StaticResource MaterialFontFamily}"
+                                        FontSize="Large"
+                                        HorizontalOptions="End"
+                                        Text="{x:Static classes:IconFont.Delete}">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding BindingContext.RemoveUserCommand, Source={x:Reference Page}}" CommandParameter="{Binding}" />
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                </StackLayout>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </StackLayout>
+                </StackLayout>
+            </StackLayout>
+        </DataTemplate>
+    </ContentPage.Resources>
+
+    <StackLayout>
+        <popup:SfPopup
+            x:Name="PopupLayout"
+            Margin="0,0,0,-300"
+            ContentTemplate="{StaticResource AutocompleteTemplate}"
+            FooterHeight="80"
+            HeaderHeight="45"
+            HeightRequest="300"
+            IsOpen="{Binding IsUserPopupOpen}"
+            Opened="PopupLayout_Opened"
+            ShowCloseButton="True"
+            ShowFooter="True"
+            WidthRequest="400">
+            <popup:SfPopup.HeaderTemplate>
+                <DataTemplate>
+                    <Label
+                        Padding="20,15,20,0"
+                        FontFamily="{StaticResource RobotoRegular}"
+                        FontSize="Medium"
+                        HorizontalTextAlignment="Start"
+                        Text="{classes:Translate CREATE_ACTION_SCREEN_ADD_RESOURCES_BUTTON_TITLE}"
+                        VerticalTextAlignment="Start" />
+                </DataTemplate>
+            </popup:SfPopup.HeaderTemplate>
+            <popup:SfPopup.FooterTemplate>
+                <DataTemplate>
+
+                    <StackLayout
+                        Padding="20"
+                        HeightRequest="80"
+                        HorizontalOptions="FillAndExpand"
+                        Orientation="Horizontal"
+                        Spacing="30"
+                        VerticalOptions="EndAndExpand">
+
+                        <Button
+                            BackgroundColor="Transparent"
+                            BorderColor="{StaticResource RedColor}"
+                            BorderWidth="3"
+                            Command="{Binding CloseUserPopupCommand}"
+                            CornerRadius="5"
+                            HorizontalOptions="FillAndExpand"
+                            Text="{classes:Translate BASE_TEXT_CANCEL}"
+                            TextColor="{StaticResource RedColor}" />
+                        <Button
+                            BackgroundColor="{StaticResource GreenColor}"
+                            BorderColor="{StaticResource GreenColor}"
+                            Command="{Binding SubmitUserPopupCommand}"
+                            CornerRadius="5"
+                            HorizontalOptions="FillAndExpand"
+                            Text="{classes:Translate BASE_TEXT_ADD}"
+                            TextColor="White" />
+                    </StackLayout>
+                </DataTemplate>
+            </popup:SfPopup.FooterTemplate>
+        </popup:SfPopup>
+
+        <signatures:SignatureControl
+            ButtonEnabled="{Binding ButtonEnabled, Mode=TwoWay}"
+            CancelOperactionCommand="{Binding CancelCommand}"
+            CoSignerName="{Binding CoSignerName, Mode=TwoWay}"
+            Fullname="{Binding Fullname}"
+            HorizontalOptions="FillAndExpand"
+            IsBusy="{Binding IsBusy, Mode=TwoWay}"
+            IsDoubleSignatureRequired="{Binding SignatureHelper.IsDoubleSignatureRequired}"
+            OpenUserPopupCommand="{Binding OpenUserPopupCommand}"
+            ResetSignature2Command="{Binding SignatureHelper.ResetSignature2Command}"
+            ResetSignatureCommand="{Binding SignatureHelper.ResetSignatureCommand}"
+            VerticalOptions="FillAndExpand" />
+    </StackLayout>
+</ContentPage>

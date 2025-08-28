@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EZGO.Maui.Views.Actions.ActionTaskTemplateFullDetailPage"
+             Title="ActionTaskTemplateFullDetailPage"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             ios:Page.UseSafeArea="true"
+             xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons"
+             xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+             xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+             NavigationPage.HasNavigationBar="False"
+             NavigationPage.HasBackButton="False">
+    <Grid StyleClass="bg-darkgrey">
+            <Grid
+                RowSpacing="0" InputTransparent="True" CascadeInputTransparent="False">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="{OnPlatform iOS=100, Android=70}" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="200" />
+                </Grid.RowDefinitions>
+
+                <!-- Picture -->
+                <controls:PinchToZoomContainer
+                    Grid.Row="0" Grid.RowSpan="3"
+                    IsVisible="{Binding SelectedTask.HasVideo, Converter={StaticResource ReverseBooleanConverter}}">
+                        <controls:CustomImageOnline
+                            IsLocalFile="{Binding SelectedTask.IsLocalMedia}"
+                            ImageUrl="{Binding SelectedTask.Picture}"
+                            Aspect="AspectFit" DownsampleToViewSize="False" />
+                    <controls:PinchToZoomContainer.GestureRecognizers>
+                        <SwipeGestureRecognizer
+                            Direction="Left"
+                            Command="{Binding SwipedLeft}"
+                            CommandParameter="Left" />
+                        <SwipeGestureRecognizer
+                            Direction="Right"
+                            Command="{Binding SwipedRight}"
+                            CommandParameter="Right" />
+                    </controls:PinchToZoomContainer.GestureRecognizers>
+                </controls:PinchToZoomContainer>
+
+                <!-- Or a video -->
+                <controls:CustomVideoView
+                    Grid.Row="0" Grid.RowSpan="3"
+                    IsVisible="{Binding SelectedTask.HasVideo}"
+                    SelectedItem="{Binding SelectedTask}">
+                </controls:CustomVideoView>
+
+                <!-- Back button -->
+                <StackLayout Grid.Row="0" VerticalOptions="End">
+                    <Frame
+                        Margin="20,0,0,0" Padding="3,5,7,5"
+                        BackgroundColor="{StaticResource GreyColor}"
+                        WidthRequest="40" CornerRadius="10" HasShadow="False"
+                        BorderColor="{StaticResource GreyColor}"
+                        HorizontalOptions="Start" VerticalOptions="CenterAndExpand">
+
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CancelCommand}" />
+                        </Frame.GestureRecognizers>
+
+                        <!-- Back arrow -->
+                        <customButtons:BackButton
+                            Command="{Binding CancelCommand}"
+                            VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" />
+                    </Frame>
+                </StackLayout>
+
+                <!-- Description -->
+                <Grid
+                    Grid.Row="2"
+                    IsVisible="{Binding SelectedTask.HasVideo, Converter={StaticResource ReverseBooleanConverter}}"
+                    BackgroundColor="Transparent">
+                    <StackLayout
+                        Padding="20,15"
+                        IsVisible="{Binding SelectedTask.Name, Converter={StaticResource StringIsNullOrEmptyConverter}, ConverterParameter=False}"
+                        VerticalOptions="EndAndExpand"
+                        BackgroundColor="{StaticResource TransparentBlackColor}">
+                        <ScrollView>
+                            <StackLayout VerticalOptions="CenterAndExpand" BackgroundColor="Transparent">
+                                <Label
+                                    Text="{Binding SelectedTask.Name}"
+                                    VerticalOptions="CenterAndExpand" StyleClass="fs-large, fc-white, mx-20"
+                                    FontFamily="{StaticResource RobotoBold}" />
+                                <Label
+                                    Text="{Binding SelectedTask.Description}"
+                                    VerticalOptions="CenterAndExpand" StyleClass="fs-small, fc-white, mx-20"
+                                    FontFamily="{StaticResource RobotoRegular}" />
+                                <StackLayout
+                                    Orientation="Horizontal" StyleClass="mx-20, mt-20" BackgroundColor="Transparent">
+                                    <Label
+                                        FontFamily="{StaticResource RobotoLight}"
+                                        Text="{Binding SelectedTask.DueDateString}"
+                                        StyleClass="fc-white, fs-small" />
+                                    <Label
+                                        FontFamily="{StaticResource RobotoLight}"
+                                        Text="{Binding SelectedTask.OverDueString}"
+                                        StyleClass="fc-white, fs-small" />
+                                    <Label
+                                        FontFamily="{StaticResource RobotoLight}"
+                                        Text="{Binding SelectedTask.TaskMarkedString}"
+                                        StyleClass="fc-white, fs-small"
+                                        IsVisible="{Binding SelectedTask.IsTaskMarked}" />
+                                </StackLayout>
+                                <Label
+                                    Padding="20,0,0,0"
+                                    FontFamily="{StaticResource RobotoLight}"
+                                    Text="{Binding CommentString}"
+                                    StyleClass="fc-white, fs-small"
+                                    IsVisible="{Binding HasComment}"
+                                    VerticalOptions="CenterAndExpand" />
+                            </StackLayout>
+                        </ScrollView>
+                    </StackLayout>
+                </Grid>
+            </Grid>
+        </Grid>
+</ContentPage>

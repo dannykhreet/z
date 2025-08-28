@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EZGO.Maui.Views.VideoPlayerPage"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             ios:Page.UseSafeArea="True"
+             xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+             xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+             NavigationPage.HasNavigationBar="False"
+             NavigationPage.HasBackButton="False"
+             Title="VideoPlayerPage">
+    <Grid StyleClass="bg-darkgrey">
+
+        <!-- Video view -->
+        <controls:CustomVideoView SelectedItem="{Binding MediaItem}" Grid.Row="0" Grid.Column="0"/>
+
+        <Grid InputTransparent="True" CascadeInputTransparent="False">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <StackLayout Grid.Row="0" >
+                <Frame BackgroundColor="{StaticResource GreyColor}"
+                                           WidthRequest="40"
+                                           HeightRequest="40"
+                                           CornerRadius="10"
+                                           HasShadow="False"
+                                           BorderColor="{StaticResource GreyColor}"
+                                           HorizontalOptions="Start"
+                                           VerticalOptions="CenterAndExpand" Padding="3,5,7,5" Margin="20,0,0,0" >
+
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding CancelCommand}" />
+                    </Frame.GestureRecognizers>
+
+                    <Label Text="{x:Static classes:IconFont.ChevronLeft}" StyleClass="fontButton, fs-42, fc-darkgrey" FontFamily="{StaticResource MaterialFontFamily}" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" />
+
+                </Frame>
+            </StackLayout>
+        </Grid>
+
+        <StackLayout InputTransparent="True" CascadeInputTransparent="False" Grid.Row="0">
+            <controls:MessageCenter />
+        </StackLayout>
+
+    </Grid>
+</ContentPage>

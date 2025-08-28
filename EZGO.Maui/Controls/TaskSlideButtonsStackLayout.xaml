@@ -1,0 +1,374 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Grid
+    x:Class="EZGO.Maui.Controls.TaskSlideButtonsStackLayout"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons"
+    xmlns:enum="clr-namespace:EZGO.Api.Models.Enumerations;assembly=EZGO.Api.Models"
+    x:Name="Page"
+    HorizontalOptions="Fill"
+    VerticalOptions="Center">
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="400" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="400" />
+    </Grid.ColumnDefinitions>
+
+    <!--  Left side buttons  -->
+    <StackLayout
+        Grid.Column="0"
+        Orientation="Horizontal"
+        HorizontalOptions="EndAndExpand">
+        <!--  Skip button  -->
+        <customButtons:SkipButton
+            ButtonColor="{StaticResource GreyColor}"
+            ButtonInitColor="{StaticResource GreyColor}"
+            Command="{Binding SkipButtonCommand, Source={x:Reference Page}}"
+            FilterStatus="{Binding TaskStatus, Source={x:Reference Page}}"
+            IsBlocked="{Binding IsBlocked, Source={x:Reference Page}}"
+            IsSkippedTextVisible="True" />
+
+        <!--  Thumbs Down button  -->
+        <AbsoluteLayout
+            x:Name="thumbsDownAbsoluteLayout"
+            IsVisible="{Binding ScoreType, Converter={StaticResource ThumbsTypeVisibilityConverter}, Source={x:Reference Page}}"
+            VerticalOptions="Center">
+            <customButtons:ThumbDownButton
+                x:Name="thumbsDownButton"
+                ButtonColor="{StaticResource RedColor}"
+                ButtonInitColor="{StaticResource RedColor}"
+                Command="{Binding ThumbsDownButtonCommand, Source={x:Reference Page}}"
+                IconColor="{StaticResource RedColor}"
+                IsBlocked="{Binding IsBlocked, Source={x:Reference Page}}"
+                Status="{Binding TaskStatus, Source={x:Reference Page}}"
+                Style="{StaticResource GreyBorderButtonLarge}" />
+
+            <!--  badge  -->
+            <buttons:SfButton
+                x:Name="thumbsDownBadge"
+                Margin="40,-10,0,0"
+                Background="{StaticResource RedColor}"
+                CornerRadius="12"
+                HeightRequest="24"
+                IsVisible="{Binding IsThumbsDownBadgeVisible, Source={x:Reference Page}}"
+                Stroke="White"
+                StrokeThickness="1"
+                WidthRequest="24">
+                <buttons:SfButton.Content>
+                    <DataTemplate>
+                        <Label
+                            FontFamily="{StaticResource MaterialFontFamily}"
+                            FontSize="Small"
+                            HorizontalOptions="CenterAndExpand"
+                            HorizontalTextAlignment="Center"
+                            Text="{x:Static classes:IconFont.CameraAlt}"
+                            TextColor="White"
+                            VerticalOptions="CenterAndExpand" />
+                    </DataTemplate>
+                </buttons:SfButton.Content>
+            </buttons:SfButton>
+
+            <!--  picture proof indicators  -->
+            <BoxView
+                x:Name="thumbsDownVerticalBoxView"
+                IsVisible="{Binding HasPictureProof, Source={x:Reference Page}}"
+                Color="{StaticResource GreyColor}" />
+            <BoxView
+                x:Name="thumbsDownHorizontalBoxView"
+                IsVisible="{Binding HasPictureProof, Source={x:Reference Page}}"
+                Color="{StaticResource GreyColor}" />
+        </AbsoluteLayout>
+
+        <!--  Action button with Score  -->
+        <AbsoluteLayout VerticalOptions="Center" IsVisible="{Binding ScoreType, Source={x:Reference Page}, Converter={StaticResource ScoreTypeVisibilityConverter}}">
+            <customButtons:ActionButton
+                x:Name="actionButtonWithScore"
+                ActionBubbleCount="{Binding ActionBubbleCount, Source={x:Reference Page}}"
+                Command="{Binding ActionButtonCommand, Source={x:Reference Page}}"
+                Stroke="{StaticResource OrangeColor}"
+                Style="{StaticResource ActionBorderButtonLarge}" />
+
+            <buttons:SfButton
+                Margin="40,-10,0,0"
+                Background="{StaticResource OrangeColor}"
+                CornerRadius="12"
+                HeightRequest="24"
+                IsVisible="{Binding ActionBubbleCount, Source={x:Reference Page}, Converter={StaticResource ZeroToBoolConverter}, ConverterParameter=False}"
+                Stroke="White"
+                StrokeThickness="1"
+                WidthRequest="24">
+                <buttons:SfButton.Content>
+                    <DataTemplate>
+                        <Label
+                            HorizontalOptions="CenterAndExpand"
+                            Text="{Binding ActionBubbleCount, Source={x:Reference Page}}"
+                            TextColor="White"
+                            VerticalOptions="CenterAndExpand" />
+                    </DataTemplate>
+                </buttons:SfButton.Content>
+            </buttons:SfButton>
+        </AbsoluteLayout>
+    </StackLayout>
+
+    <!--  Centered Button  -->
+    <AbsoluteLayout
+        Grid.Column="1"
+        HorizontalOptions="Center"
+        VerticalOptions="Center">
+        <!--  Action button  -->
+        <AbsoluteLayout
+            x:Name="actionAbsoluteLayout"
+            VerticalOptions="Center"
+            IsVisible="{Binding ScoreType, Converter={StaticResource ThumbsTypeVisibilityConverter}, Source={x:Reference Page}}">
+            <customButtons:ActionButton
+                x:Name="actionButton"
+                ActionBubbleCount="{Binding ActionBubbleCount, Source={x:Reference Page}}"
+                Command="{Binding ActionButtonCommand, Source={x:Reference Page}}"
+                Stroke="{StaticResource OrangeColor}"
+                Style="{StaticResource ActionBorderButtonLarge}" />
+
+            <buttons:SfButton
+                Margin="40,-10,0,0"
+                Background="{StaticResource OrangeColor}"
+                CornerRadius="12"
+                HeightRequest="24"
+                IsVisible="{Binding ActionBubbleCount, Source={x:Reference Page}, Converter={StaticResource ZeroToBoolConverter}, ConverterParameter=False}"
+                Stroke="White"
+                StrokeThickness="1"
+                WidthRequest="24">
+                <buttons:SfButton.Content>
+                    <DataTemplate>
+                        <Label
+                            HorizontalOptions="CenterAndExpand"
+                            Text="{Binding ActionBubbleCount, Source={x:Reference Page}}"
+                            TextColor="White"
+                            VerticalOptions="CenterAndExpand" />
+                    </DataTemplate>
+                </buttons:SfButton.Content>
+            </buttons:SfButton>
+
+            <!--  Camera icon  -->
+            <Label
+                x:Name="icon"
+                FontFamily="{StaticResource MaterialFontFamily}"
+                FontSize="Large"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                Text="{x:Static classes:IconFont.CameraAlt}"
+                TextColor="{StaticResource GreyColor}">
+                <Label.IsVisible>
+                    <MultiBinding Converter="{StaticResource CameraIconVisibilityConverter}">
+                        <Binding Path="ScoreType" Source="{x:Reference Page}" />
+                        <Binding Path="HasPictureProof" Source="{x:Reference Page}" />
+                        <Binding Source="{x:Static enum:ScoreTypeEnum.Thumbs}" />
+                    </MultiBinding>
+                </Label.IsVisible>
+            </Label>
+
+        </AbsoluteLayout>
+
+        <!--  Score Button  -->
+        <AbsoluteLayout IsVisible="{Binding ScoreType, Source={x:Reference Page}, Converter={StaticResource ScoreTypeVisibilityConverter}}" VerticalOptions="Center">
+            <customButtons:ScoreButton
+                x:Name="scoreButton"
+                ColorCalculator="{Binding ColorCalculator, Source={x:Reference Page}}"
+                Command="{Binding OpenScoreCommand, Source={x:Reference Page}}"
+                EmptyBackgroundColor="{StaticResource GreyColor}"
+                Score="{Binding Score, Source={x:Reference Page}}"
+                Style="{StaticResource DarkerGreyBorderButtonLarge}" />
+
+            <!--  badge  -->
+            <buttons:SfButton
+                x:Name="scoreBadge"
+                Margin="40,-10,0,0"
+                CornerRadius="12"
+                HeightRequest="24"
+                IsVisible="{Binding IsScoreBadgeVisible, Source={x:Reference Page}}"
+                Stroke="White"
+                StrokeThickness="1"
+                WidthRequest="24">
+                <buttons:SfButton.Background>
+                    <MultiBinding Converter="{StaticResource AuditScoreColorConverter}">
+                        <Binding Path="Score" Source="{x:Reference Page}" />
+                        <Binding Path="ColorCalculator" Source="{x:Reference Page}" />
+                        <Binding Path="TaskStatus" Source="{x:Reference Page}" />
+                    </MultiBinding>
+                </buttons:SfButton.Background>
+                <buttons:SfButton.Content>
+                    <DataTemplate>
+                        <Label
+                            FontFamily="{StaticResource MaterialFontFamily}"
+                            FontSize="Small"
+                            HorizontalOptions="CenterAndExpand"
+                            HorizontalTextAlignment="Center"
+                            Text="{x:Static classes:IconFont.CameraAlt}"
+                            TextColor="White"
+                            VerticalOptions="CenterAndExpand" />
+                    </DataTemplate>
+                </buttons:SfButton.Content>
+            </buttons:SfButton>
+
+
+            <!--  Camera icon  -->
+            <Label
+                x:Name="scoreCameraIcon"
+                AbsoluteLayout.LayoutBounds="0.5, 1, -1, -1"
+                AbsoluteLayout.LayoutFlags="PositionProportional"
+                FontFamily="{StaticResource MaterialFontFamily}"
+                FontSize="Large"
+                HorizontalOptions="Center"
+                Text="{x:Static classes:IconFont.CameraAlt}"
+                TextColor="{StaticResource GreyColor}"
+                TranslationX="-3"
+                TranslationY="30"
+                VerticalOptions="End">
+                <Label.IsVisible>
+                    <MultiBinding Converter="{StaticResource CameraIconVisibilityConverter}">
+                        <Binding Path="ScoreType" Source="{x:Reference Page}" />
+                        <Binding Path="HasPictureProof" Source="{x:Reference Page}" />
+                        <Binding Source="{x:Static enum:ScoreTypeEnum.Score}" />
+                    </MultiBinding>
+                </Label.IsVisible>
+            </Label>
+
+        </AbsoluteLayout>
+
+    </AbsoluteLayout>
+
+    <!--  Right side buttons  -->
+    <StackLayout
+        Grid.Column="2"
+        Orientation="Horizontal"
+        HorizontalOptions="StartAndExpand">
+        <!--  Thumbs Up button  -->
+        <AbsoluteLayout IsVisible="{Binding ScoreType, Source={x:Reference Page}, Converter={StaticResource ThumbsTypeVisibilityConverter}}" VerticalOptions="Center">
+
+            <customButtons:ThumbUpButton
+                x:Name="thumbsUpButton"
+                Command="{Binding ThumbsUpButtonCommand, Source={x:Reference Page}}"
+                Status="{Binding TaskStatus, Source={x:Reference Page}}"
+                Stroke="{StaticResource GreenColor}"
+                Style="{StaticResource GreyBorderButtonLarge}"
+                IsBlocked="{Binding IsBlocked, Source={x:Reference Page}}"
+                ButtonInitColor="{StaticResource GreenColor}"
+                IconColor="{StaticResource GreenColor}" />
+
+            <!--  badge  -->
+            <buttons:SfButton
+                x:Name="thumbsUpBadge"
+                Margin="40,-10,0,0"
+                Background="{StaticResource GreenColor}"
+                CornerRadius="12"
+                HeightRequest="24"
+                IsVisible="{Binding IsThumbsUpBadgeVisible, Source={x:Reference Page}}"
+                Stroke="White"
+                StrokeThickness="1"
+                WidthRequest="24">
+                <buttons:SfButton.Content>
+                    <DataTemplate>
+                        <Label
+                            FontFamily="{StaticResource MaterialFontFamily}"
+                            FontSize="Small"
+                            HorizontalOptions="CenterAndExpand"
+                            HorizontalTextAlignment="Center"
+                            Text="{x:Static classes:IconFont.CameraAlt}"
+                            TextColor="White"
+                            VerticalOptions="CenterAndExpand" />
+                    </DataTemplate>
+                </buttons:SfButton.Content>
+            </buttons:SfButton>
+
+            <!--  picture proof indicators  -->
+            <BoxView
+                x:Name="thumbsUpVerticalBoxView"
+                IsVisible="{Binding HasPictureProof, Source={x:Reference Page}}"
+                Color="{StaticResource GreyColor}" />
+            <BoxView
+                x:Name="thumbsUpHorizontalBoxView"
+                IsVisible="{Binding HasPictureProof, Source={x:Reference Page}}"
+                Color="{StaticResource GreyColor}" />
+        </AbsoluteLayout>
+
+
+
+        <!--  Deeplink button  -->
+        <AbsoluteLayout
+            x:Name="deepLinkAbsoluteLayout"
+            IsVisible="{Binding DeeplinkButtonVisible, Source={x:Reference Page}}"
+            VerticalOptions="Center">
+            <customButtons:DeepLinkButton
+                Command="{Binding DeepLinkCommand, Source={x:Reference Page}}"
+                FontSize="24"
+                InitialBorderColor="{StaticResource DarkerGreyColor}"
+                IsValid="{Binding IsDeepLinkValid, Source={x:Reference Page}}"
+                IsVisible="{Binding DeeplinkButtonVisible, Source={x:Reference Page}}"
+                Style="{StaticResource DarkerGreyBorderButton}"
+                VerticalOptions="Center" />
+
+            <!--  badge  -->
+            <Label
+                x:Name="deepLinkBadge"
+                Margin="33,-8,0,0"
+                FontFamily="FAS"
+                FontSize="Small"
+                HorizontalOptions="CenterAndExpand"
+                HorizontalTextAlignment="Center"
+                IsVisible="{Binding DeepLinkCompletionIsRequired, Source={x:Reference Page}}"
+                Text="{x:Static classes:IconFont.Asterisk}"
+                TextColor="{StaticResource RedColor}"
+                VerticalOptions="CenterAndExpand">
+                <Label.Triggers>
+                    <DataTrigger
+                        Binding="{Binding CompletedDeeplinkId, Source={x:Reference Page}, Converter={StaticResource IsNullConverter}}"
+                        TargetType="Label"
+                        Value="True">
+                        <Setter Property="TextColor" Value="{StaticResource RedColor}" />
+                    </DataTrigger>
+                    <DataTrigger
+                        Binding="{Binding CompletedDeeplinkId, Source={x:Reference Page}, Converter={StaticResource IsNullConverter}}"
+                        TargetType="Label"
+                        Value="False">
+                        <Setter Property="TextColor" Value="{StaticResource GreenColor}" />
+                    </DataTrigger>
+                </Label.Triggers>
+            </Label>
+        </AbsoluteLayout>
+
+        <!--  Extra Info Button  -->
+        <StackLayout
+            HorizontalOptions="Fill"
+            IsVisible="{Binding HasExtraInformation, Source={x:Reference Page}}"
+            Orientation="Horizontal"
+            Spacing="10"
+            VerticalOptions="Center">
+            <buttons:SfButton
+                Background="Transparent"
+                Command="{Binding StepsCommand, Source={x:Reference Page}}"
+                Style="{StaticResource DarkerGreyBorderButton}">
+                <buttons:SfButton.Content>
+                    <DataTemplate>
+                        <Label
+                            FontFamily="{StaticResource RobotoBold}"
+                            FontSize="26"
+                            HorizontalTextAlignment="Center"
+                            Text="?"
+                            TextColor="{StaticResource DarkerGreyColor}"
+                            VerticalTextAlignment="Center" />
+                    </DataTemplate>
+                </buttons:SfButton.Content>
+            </buttons:SfButton>
+
+            <Label
+                HorizontalOptions="Fill"
+                IsVisible="{Binding HasStepsOrWorkInstructions, Source={x:Reference Page}}"
+                Text="{classes:Translate TASK_DETAILS_SCREEN_INFO_BUTTON_TITLE}"
+                TextColor="{StaticResource DarkerGreyColor}"
+                VerticalOptions="Fill"
+                VerticalTextAlignment="Center" />
+        </StackLayout>
+    </StackLayout>
+
+
+</Grid>

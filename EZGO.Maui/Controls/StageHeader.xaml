@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<StackLayout
+    x:Class="EZGO.Maui.Controls.StageHeader"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    x:Name="Header"
+    Margin="0"
+    IsVisible="False"
+    HorizontalOptions="FillAndExpand">
+    <StackLayout
+        Margin="20,0,0,0"
+        HorizontalOptions="StartAndExpand"
+        VerticalOptions="CenterAndExpand"
+        Orientation="Horizontal">
+        <!--  Icon  -->
+        <Image
+            Margin="0,0,0,0"
+            HorizontalOptions="Start"
+            IsOpaque="True"
+            VerticalOptions="Center">
+            <Image.Source>
+                <FontImageSource
+                    FontFamily="FAS"
+                    Glyph="{Binding IconName, Source={x:Reference Header}}"
+                    Size="20"
+                    Color="White" />
+            </Image.Source>
+        </Image>
+        <!--  Name  -->
+        <Label
+            Grid.Row="0"
+            Margin="10,0,0,0"
+            FontSize="20"
+            HorizontalOptions="Start"
+            VerticalOptions="Center"
+            Text="{Binding StageName, Source={x:Reference Header}}"
+            TextColor="White"
+            VerticalTextAlignment="Center" />
+    </StackLayout>
+
+    <!--  Tags  -->
+    <ScrollView
+        x:Name="TagsList"
+        HeightRequest="70"
+        Orientation="Horizontal"
+        IsVisible="{Binding Tags, Source={x:Reference Header}, Converter={StaticResource IsNullConverter}, ConverterParameter=False}">
+        <controls:TagList
+            Margin="20,0,0,0"
+            BindableLayout.ItemsSource="{Binding Tags, Source={x:Reference Header}}"
+            Wrap="NoWrap" />
+    </ScrollView>
+</StackLayout>

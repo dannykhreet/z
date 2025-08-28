@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<StackLayout
+    x:Class="EZGO.Maui.Controls.Buttons.SkipButton"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:enumerations="clr-namespace:EZGO.Api.Models.Enumerations;assembly=EZGO.Api.Models"
+    x:Name="skipButton"
+    Orientation="Horizontal"
+    VerticalOptions="Center">
+
+    <!--  Skipped Text  -->
+    <Label
+        Margin="0,0,10,0"
+        FontFamily="{StaticResource RobotoRegular}"
+        IsVisible="{Binding IsSkippedTextVisible, Source={x:Reference skipButton}}"
+        Text="{classes:Translate TASK_DETAILS_SCREEN_SKIP_BUTTON_TITLE}"
+        TextColor="{StaticResource DarkerGreyColor}"
+        VerticalTextAlignment="Center" />
+
+    <!--  Skip Button  -->
+    <buttons:SfButton
+        x:Name="button"
+        Background="Transparent"
+        Command="{Binding Command, Source={x:Reference skipButton}}"
+        CommandParameter="{Binding CommandParameter, Source={x:Reference skipButton}}"
+        Stroke="{Binding ButtonColor, Source={x:Reference skipButton}}"
+        StrokeThickness="4"
+        Style="{StaticResource DarkerGreyBorderButton}">
+        <buttons:SfButton.Triggers>
+
+            <!--  Button Trigger  -->
+            <DataTrigger
+                Binding="{Binding FilterStatus, Source={x:Reference skipButton}}"
+                TargetType="buttons:SfButton"
+                Value="{x:Static enumerations:TaskStatusEnum.Skipped}">
+
+                <!--  Background Setter  -->
+                <Setter Property="Background" Value="{StaticResource SkippedColor}" />
+
+                <!--  Border Setter  -->
+                <Setter Property="Stroke" Value="{StaticResource SkippedColor}" />
+            </DataTrigger>
+        </buttons:SfButton.Triggers>
+
+        <buttons:SfButton.Content>
+            <DataTemplate>
+                <!--  Button Content  -->
+                <Image
+                    HorizontalOptions="Center"
+                    IsOpaque="True"
+                    VerticalOptions="Center">
+
+                    <!--  Skip Image Source  -->
+                    <Image.Source>
+                        <FontImageSource
+                            x:Name="imageSource"
+                            FontFamily="{StaticResource MaterialFontFamily}"
+                            Glyph="{x:Static classes:IconFont.FastForward}"
+                            Size="26"
+                            Color="{Binding IconColor, Source={x:Reference skipButton}}" />
+                    </Image.Source>
+                    <Image.Triggers>
+
+                        <!--  Image Trigger  -->
+                        <DataTrigger
+                            Binding="{Binding FilterStatus, Source={x:Reference skipButton}}"
+                            TargetType="Image"
+                            Value="{x:Static enumerations:TaskStatusEnum.Skipped}">
+
+                            <!--  Image Source Setter  -->
+                            <Setter Property="Source">
+                                <FontImageSource
+                                    FontFamily="{StaticResource MaterialFontFamily}"
+                                    Glyph="{x:Static classes:IconFont.FastForward}"
+                                    Size="26"
+                                    Color="White" />
+                            </Setter>
+                        </DataTrigger>
+                    </Image.Triggers>
+                </Image>
+            </DataTemplate>
+        </buttons:SfButton.Content>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="CommonStates">
+                <VisualState x:Name="Disabled">
+                    <VisualState.Setters />
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+    </buttons:SfButton>
+</StackLayout>

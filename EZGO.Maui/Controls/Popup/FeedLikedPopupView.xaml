@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<popup:SfPopup
+    x:Class="EZGO.Maui.Controls.Popups.FeedLikedPopupView"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:popup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup" xmlns:sfListView="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView" xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    x:Name="Page"
+    ShowFooter="False"
+    ShowCloseButton="False"
+    ShowHeader="True"
+    HeightRequest="275">
+    <popup:SfPopup.HeaderTemplate>
+        <DataTemplate>
+            <StackLayout>
+                <Label Text="Likes" FontAttributes="Bold" Margin="10,5,0,0" HorizontalTextAlignment="Start" VerticalTextAlignment="Center" FontSize="20"/>
+                <StackLayout HeightRequest="2" BackgroundColor="LightGray" HorizontalOptions="FillAndExpand"/>
+            </StackLayout>
+        </DataTemplate>
+    </popup:SfPopup.HeaderTemplate>
+
+    <popup:SfPopup.ContentTemplate>
+        <DataTemplate>
+            <sfListView:SfListView ItemsSource="{Binding LikedByUsers, Source={x:Reference Page}}" ItemSpacing="5">
+                <sfListView:SfListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackLayout Orientation="Horizontal" HorizontalOptions="Start" VerticalOptions="Center">
+                            <Border
+                                Grid.Column="0"
+                                StrokeThickness="0"                                
+                                HeightRequest="35"
+                                WidthRequest="35">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="75" />
+                                </Border.StrokeShape>
+                                <controls:CustomImageOnline
+                                    Aspect="AspectFill"
+                                    DownsampleHeight="50"
+                                    DownsampleWidth="50"
+                                    ImageUrl="{Binding Picture, Mode=OneTime}"
+                                    Placeholder="profile.png" />
+                            </Border>
+                            <Label Text="{Binding FullName}" FontSize="15" VerticalTextAlignment="Center" HorizontalTextAlignment="Center"/>
+                        </StackLayout>
+                    </DataTemplate>
+                </sfListView:SfListView.ItemTemplate>
+            </sfListView:SfListView>
+        </DataTemplate>
+    </popup:SfPopup.ContentTemplate>
+</popup:SfPopup>
+

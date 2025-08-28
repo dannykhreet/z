@@ -1,0 +1,896 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Actions.ActionConversationPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:actionModels="clr-namespace:EZGO.Maui.Core.Models.Actions;assembly=EZGO.Maui.Core"
+    xmlns:apiModels="clr-namespace:EZGO.Api.Models.Basic;assembly=EZGO.Api.Models"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:core="clr-namespace:EZGO.Maui.Core.Classes;assembly=EZGO.Maui.Core"
+    xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons"
+    xmlns:enumerations="clr-namespace:EZGO.Maui.Core.Enumerations;assembly=EZGO.Maui.Core"
+    xmlns:inputLayout="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:listview="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    xmlns:viewModels="clr-namespace:EZGO.Maui.Core.ViewModels;assembly=EZGO.Maui.Core"
+    x:Name="Page"
+    ios:Page.UseSafeArea="true"
+    x:DataType="viewModels:ActionConversationViewModel"
+    NavigationPage.HasBackButton="True"
+    NavigationPage.HasNavigationBar="false">
+    <ContentPage.Resources>
+        <Style Class="Layout_options" TargetType="StackLayout">
+            <Setter Property="HorizontalOptions" Value="EndAndExpand" />
+            <Setter Property="Orientation" Value="Horizontal" />
+        </Style>
+        <Style Class="MessageCenter_Button" TargetType="Button">
+            <Setter Property="HeightRequest" Value="20" />
+            <Setter Property="WidthRequest" Value="15" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="FontFamily" Value="{StaticResource MaterialFontFamily}" />
+            <Setter Property="Text" Value="{x:Static classes:IconFont.Delete}" />
+        </Style>
+        <Style Class="SfButtonStyle" TargetType="buttons:SfButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Shadow" Value="False" />
+            <Setter Property="Padding" Value="0,0,5,0" />
+            <Setter Property="VerticalOptions" Value="CenterAndExpand" />
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="VerticalOptions" Value="CenterAndExpand" />
+            <Setter Property="TextColor" Value="{StaticResource BlackColor}" />
+        </Style>
+        <Style Class="Header_Name" TargetType="Label">
+            <Setter Property="FontFamily" Value="{StaticResource RobotoBold}" />
+            <Setter Property="TextColor" Value="{StaticResource BlackColor}" />
+        </Style>
+        <Style Class="Value_Name" TargetType="Label">
+            <Setter Property="FontFamily" Value="{StaticResource RobotoLight}" />
+            <Setter Property="TextColor" Value="{StaticResource BlackColor}" />
+
+        </Style>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+
+        <Grid BackgroundColor="{StaticResource BackgroundColor}" RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!--  header  -->
+            <Grid
+                Grid.Row="0"
+                ColumnSpacing="0"
+                RowSpacing="0"
+                StyleClass="header, bg-white, m-0, pr-15">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <customButtons:BackButton
+                    Grid.Column="0"
+                    Command="{Binding CancelCommand}"
+                    VerticalOptions="CenterAndExpand" />
+
+                <StackLayout
+                    Grid.Column="1"
+                    CompressedLayout.IsHeadless="True"
+                    Orientation="Horizontal"
+                    StyleClass="column1">
+                    <Label StyleClass="column1 title, fs-large, fc-darkgrey, Value_Name" Text="{classes:Translate ACTION_SCREEN_TITLE}" />
+                    <Label StyleClass="column1 title, fs-large, fc-darkgrey, Value_Name" Text="{Binding SelectedAction.Id, StringFormat=' #{0}'}" />
+                </StackLayout>
+                <!--  Picture  -->
+                <ScrollView Grid.Column="2" Orientation="Horizontal">
+                    <StackLayout Margin="10,0,0,0">
+                        <StackLayout
+                            Margin="0,0,35,0"
+                            BindableLayout.ItemsSource="{Binding TopUsers}"
+                            StyleClass="Layout_options"
+                            VerticalOptions="CenterAndExpand">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="apiModels:UserBasic">
+                                    <buttons:SfButton Margin="-10,0,0,0" Style="{StaticResource ProfileImageBorder}">
+                                        <buttons:SfButton.Content>
+                                            <DataTemplate>
+                                                <controls:CustomImage
+                                                    Aspect="AspectFill"
+                                                    DownsampleHeight="200"
+                                                    DownsampleToViewSize="False"
+                                                    DownsampleWidth="200"
+                                                    ImageUrl="{Binding Picture}"
+                                                    Placeholder="profile.png" />
+                                            </DataTemplate>
+                                        </buttons:SfButton.Content>
+                                    </buttons:SfButton>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </StackLayout>
+                    </StackLayout>
+                </ScrollView>
+
+            </Grid>
+
+            <Grid
+                Grid.Row="1"
+                Margin="50,15"
+                ColumnSpacing="15"
+                CompressedLayout.IsHeadless="True">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="120" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="65*" />
+                    <ColumnDefinition Width="35*" />
+                </Grid.ColumnDefinitions>
+
+                <StackLayout
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    CompressedLayout.IsHeadless="True">
+
+                    <Grid StyleClass="bg-white" VerticalOptions="FillAndExpand">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="5" />
+                        </Grid.ColumnDefinitions>
+
+                        <ScrollView Grid.Column="0" Padding="20">
+
+                            <StackLayout Spacing="20">
+
+                                <Grid ColumnSpacing="10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="120" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Label
+                                        IsVisible="{Binding HasTaskId}"
+                                        StyleClass="Value_Name"
+                                        Text="{Binding SelectedAction.Parent, Converter={StaticResource ActionLinkTypeStringConverter}}" />
+
+                                    <Label
+                                        Grid.Column="1"
+                                        LineBreakMode="WordWrap"
+                                        Text="{Binding ParentName}"
+                                        TextDecorations="Underline">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding ParentCommand}" />
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                    <!--  Edit button  -->
+                                    <buttons:SfButton
+                                        Grid.Column="2"
+                                        Background="{StaticResource GreenColor}"
+                                        Command="{Binding EditCommand}"
+                                        CornerRadius="5"
+                                        HeightRequest="35"
+                                        IsVisible="{Binding CanCompleteAction}"
+                                        VerticalOptions="CenterAndExpand">
+
+                                        <buttons:SfButton.Triggers>
+                                            <DataTrigger
+                                                Binding="{Binding SelectedAction.FilterStatus}"
+                                                TargetType="buttons:SfButton"
+                                                Value="{x:Static enumerations:ActionStatusEnum.Solved}">
+                                                <Setter Property="IsVisible" Value="False" />
+                                            </DataTrigger>
+                                        </buttons:SfButton.Triggers>
+
+                                        <buttons:SfButton.Content>
+                                            <DataTemplate>
+                                                <Label
+                                                    HorizontalTextAlignment="Center"
+                                                    Text="{classes:Translate ACTION_DETAIL_CHANGE_BUTTON_TITLE}"
+                                                    TextColor="White"
+                                                    TextTransform="Uppercase"
+                                                    VerticalTextAlignment="Center" />
+                                            </DataTemplate>
+                                        </buttons:SfButton.Content>
+
+                                    </buttons:SfButton>
+                                </Grid>
+
+                                <StackLayout Spacing="6">
+                                    <Label StyleClass="Header_Name" Text="{classes:Translate ACTION_DETAIL_SCREEN_COMMENTS_SECTION_TITLE}" />
+                                    <Label StyleClass="Value_Name" Text="{Binding SelectedAction.Name}" />
+                                </StackLayout>
+
+                                <StackLayout Spacing="6">
+                                    <Label StyleClass="Header_Name" Text="{classes:Translate ACTION_SCREEN_TITLE}" />
+                                    <Label StyleClass="Value_Name" Text="{Binding SelectedAction.Description}" />
+                                </StackLayout>
+                                <!--  Author  -->
+                                <StackLayout Orientation="Horizontal" Spacing="5">
+                                    <Label StyleClass="Header_Name" Text="{classes:Translate ACTION_DETAIL_SCREEN_AUTHOR_SECTION_TITLE}" />
+                                    <Label StyleClass="Value_Name" Text="{Binding SelectedAction.CreatedBy}" />
+                                </StackLayout>
+                                <!--  Resources  -->
+                                <StackLayout Spacing="6">
+                                    <Label StyleClass="Header_Name" Text="{classes:Translate ACTION_DETAIL_SCREEN_RESOURCES_SECTION_TITLE}" />
+                                    <FlexLayout
+                                        BindableLayout.ItemsSource="{Binding AssignedResources}"
+                                        Direction="{Binding Converter={StaticResource FlexLayoutDirectionConverter}}"
+                                        Wrap="Wrap">
+                                        <BindableLayout.ItemTemplate>
+                                            <DataTemplate x:DataType="actionModels:ResourceSelectionModel">
+                                                <StackLayout Padding="0,0,6,6" Orientation="Horizontal">
+                                                    <Image
+                                                        Margin="0"
+                                                        IsOpaque="True"
+                                                        IsVisible="{Binding ShowIcon}">
+                                                        <Image.Source>
+                                                            <FontImageSource
+                                                                FontFamily="{StaticResource MaterialFontFamily}"
+                                                                Glyph="{x:Static classes:IconFont.Person}"
+                                                                Size="18"
+                                                                Color="Black" />
+                                                        </Image.Source>
+                                                    </Image>
+                                                    <Label
+                                                        LineBreakMode="NoWrap"
+                                                        StyleClass="Value_Name"
+                                                        Text="{Binding Text}" />
+                                                    <StackLayout.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding BindingContext.ShowMoreResourcesCommand, Source={x:Reference Page}}" CommandParameter="{Binding .}" />
+                                                    </StackLayout.GestureRecognizers>
+                                                </StackLayout>
+                                            </DataTemplate>
+                                        </BindableLayout.ItemTemplate>
+
+                                    </FlexLayout>
+                                </StackLayout>
+                                <!--  Created at  -->
+                                <StackLayout Orientation="Horizontal" Spacing="5">
+                                    <Label StyleClass="Header_Name" Text="{classes:Translate ACTION_DETAIL_SCREEN_CREATION_DATE_SECTION_TITLE}" />
+                                    <Label StyleClass="Value_Name" Text="{Binding SelectedAction.CreatedAt, Converter={StaticResource DateToShortStringConverter}}" />
+                                </StackLayout>
+
+                                <!--  Modified at  -->
+                                <StackLayout Orientation="Horizontal" Spacing="5">
+                                    <Label StyleClass="Header_Name" Text="{classes:Translate ACTION_DETAIL_SCREEN_MODIFIED_DATE_SECTION_TITLE}" />
+                                    <Label StyleClass="Value_Name" Text="{Binding SelectedAction.ModifiedAt, Converter={StaticResource DateToShortStringConverter}}" />
+                                </StackLayout>
+
+                                <!--  Due at  -->
+                                <StackLayout Orientation="Horizontal" Spacing="5">
+                                    <Label StyleClass="Header_Name" Text="{classes:Translate ACTIONS_SCREEN_DUE_DATE}" />
+                                    <Label StyleClass="Value_Name" Text="{Binding SelectedAction.DueDate, Converter={StaticResource DateToShortStringNoTimeConverter}}" />
+                                </StackLayout>
+
+                                <StackLayout IsVisible="{Binding IsUltimoVisible}">
+                                    <!--  Action sent to ultimo  -->
+                                    <StackLayout IsVisible="{Binding SelectedAction.SendToUltimo}" Orientation="Horizontal">
+                                        <Frame
+                                            Padding="0"
+                                            BackgroundColor="Black"
+                                            CornerRadius="13"
+                                            HasShadow="False"
+                                            HeightRequest="25"
+                                            WidthRequest="25">
+                                            <Image
+                                                HorizontalOptions="Center"
+                                                IsOpaque="True"
+                                                VerticalOptions="Center">
+                                                <Image.Source>
+                                                    <FontImageSource
+                                                        FontFamily="FAS"
+                                                        Glyph="check"
+                                                        Size="17"
+                                                        Color="White" />
+                                                </Image.Source>
+                                            </Image>
+                                        </Frame>
+                                        <Label Text="{Binding UltimoMessage}" TextColor="Black" />
+                                    </StackLayout>
+
+                                    <!--  Action not sent to ultimo  -->
+                                    <StackLayout IsVisible="{Binding SelectedAction.SendToUltimo, Converter={StaticResource ReverseBooleanConverter}}" Orientation="Horizontal">
+                                        <Frame
+                                            Padding="0"
+                                            BackgroundColor="Black"
+                                            CornerRadius="13"
+                                            HasShadow="False"
+                                            HeightRequest="25"
+                                            WidthRequest="25">
+                                            <Image
+                                                HorizontalOptions="Center"
+                                                IsOpaque="True"
+                                                VerticalOptions="Center">
+                                                <Image.Source>
+                                                    <FontImageSource
+                                                        FontFamily="FAS"
+                                                        Glyph="xmark"
+                                                        Size="20"
+                                                        Color="White" />
+                                                </Image.Source>
+                                            </Image>
+                                        </Frame>
+                                        <Label Text="{Binding UltimoMessage}" Margin="5" />
+                                    </StackLayout>
+                                </StackLayout>
+
+                                <!--  Tags  -->
+                                <StackLayout x:Name="TagsStackLayout" Spacing="5">
+                                    <Label StyleClass="Header_Name" Text="{classes:Translate BASE_TEXT_TAGS}" />
+                                    <controls:TagList BindableLayout.ItemsSource="{Binding SelectedAction.Tags}" />
+                                </StackLayout>
+
+                                <!--  Media Items  -->
+                                <ScrollView Orientation="Horizontal">
+                                    <StackLayout
+                                        Padding="0,0,0,10"
+                                        BindableLayout.ItemsSource="{Binding MediaItems}"
+                                        HorizontalOptions="Start"
+                                        Orientation="Horizontal">
+                                        <BindableLayout.ItemTemplate>
+                                            <DataTemplate x:DataType="core:MediaItem">
+                                                <Grid
+                                                    Margin="0,0,0,5"
+                                                    CompressedLayout.IsHeadless="True"
+                                                    HeightRequest="80"
+                                                    WidthRequest="85">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="80" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <controls:CustomImage
+                                                        Aspect="AspectFill"
+                                                        DownsampleToViewSize="False"
+                                                        ImageUrl="{Binding PictureUrl}"
+                                                        IsLocalFile="{Binding IsLocalFile}" />
+
+                                                    <Button
+                                                        Command="{Binding BindingContext.DetailCommand, Source={x:Reference Page}}"
+                                                        CommandParameter="{Binding}"
+                                                        FontFamily="{StaticResource MaterialFontFamily}"
+                                                        HorizontalOptions="Center"
+                                                        IsVisible="{Binding IsVideo, Converter={StaticResource ReverseBooleanConverter}}"
+                                                        StyleClass="fontButton, fc-green, fs-32, bg-transparent"
+                                                        Text="{x:Static classes:IconFont.Search}"
+                                                        VerticalOptions="CenterAndExpand" />
+
+                                                    <Button
+                                                        Command="{Binding BindingContext.DetailCommand, Source={x:Reference Page}}"
+                                                        CommandParameter="{Binding}"
+                                                        FontFamily="{StaticResource MaterialFontFamily}"
+                                                        HorizontalOptions="Center"
+                                                        IsVisible="{Binding IsVideo}"
+                                                        StyleClass="fontButton, fc-green, fs-32, bg-transparent"
+                                                        Text="{x:Static classes:IconFont.PlayCircleOutline}"
+                                                        VerticalOptions="CenterAndExpand" />
+
+                                                </Grid>
+                                            </DataTemplate>
+                                        </BindableLayout.ItemTemplate>
+                                    </StackLayout>
+                                </ScrollView>
+                            </StackLayout>
+                        </ScrollView>
+
+                        <StackLayout Grid.Column="1" BackgroundColor="{Binding SelectedAction.FilterStatus, Converter={StaticResource StatusToColorConverter}}" />
+
+                    </Grid>
+
+                </StackLayout>
+
+                <listview:SfListView
+                    x:Name="CommentsListView"
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Padding="10"
+                    AutoFitMode="Height"
+                    BackgroundColor="White"
+                    HorizontalOptions="FillAndExpand"
+                    ItemSpacing="0"
+                    ItemsSource="{Binding Chat}"
+                    SelectionBackground="Transparent"
+                    VerticalOptions="FillAndExpand">
+
+                    <listview:SfListView.ItemTemplate>
+                        <DataTemplate x:DataType="actionModels:BasicActionCommentModel">
+
+                            <StackLayout Margin="10,10,15,10" Spacing="0">
+
+                                <Label
+                                    FontSize="12"
+                                    StyleClass="Value_Name"
+                                    Text="{Binding ModifiedAt, Converter={StaticResource DateToShortStringConverter}}" />
+
+                                <StackLayout
+                                    Margin="0,10"
+                                    CompressedLayout.IsHeadless="True"
+                                    Orientation="Horizontal">
+                                    <Label
+                                        HorizontalOptions="StartAndExpand"
+                                        StyleClass="Header_Name"
+                                        Text="{Binding CreatedBy}" />
+                                    <Label
+                                        FontFamily="{StaticResource MaterialFontFamily}"
+                                        HorizontalOptions="End"
+                                        HorizontalTextAlignment="End"
+                                        IsVisible="{Binding UnPosted}"
+                                        Text="{x:Static classes:IconFont.HourglassEmpty}"
+                                        TextColor="{StaticResource GreyColor}" />
+                                    <Label
+                                        FontSize="12"
+                                        HorizontalOptions="End"
+                                        HorizontalTextAlignment="End"
+                                        StyleClass="Value_Name"
+                                        Text="{Binding ModifiedAt, StringFormat='{0:HH:mm}'}" />
+                                </StackLayout>
+
+                                <Label
+                                    Margin="0,0,0,6"
+                                    Padding="0,0,0,2"
+                                    LineHeight="1.2"
+                                    IsVisible="{Binding CommentIsVisible}"
+                                    Text="{Binding Comment}"
+                                    LineBreakMode="WordWrap"
+                                    HorizontalOptions="FillAndExpand"
+                                    VerticalOptions="Start"
+                                    StyleClass="Value_Name" />
+
+                                <StackLayout
+                                    Margin="0"
+                                    CompressedLayout.IsHeadless="True"
+                                    Orientation="Horizontal">
+
+                                    <Grid IsVisible="False">
+                                        <Grid.Triggers>
+                                            <DataTrigger
+                                                Binding="{Binding ImageMediaItems, Converter={StaticResource ListCountToBooleanConverter}}"
+                                                TargetType="Grid"
+                                                Value="True">
+                                                <Setter Property="IsVisible" Value="True" />
+                                            </DataTrigger>
+                                        </Grid.Triggers>
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <controls:CustomImage
+                                            Aspect="AspectFill"
+                                            DownsampleToViewSize="False"
+                                            HeightRequest="60"
+                                            ImageUrl="{Binding ImageMediaItems[0].PictureUrl}"
+                                            IsLocalFile="{Binding ImageMediaItems[0].IsLocalFile}">
+                                            <controls:CustomImage.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding BindingContext.CommentDetailCommand, Source={x:Reference Page}}" CommandParameter="{Binding ImageMediaItems}" />
+                                            </controls:CustomImage.GestureRecognizers>
+                                        </controls:CustomImage>
+                                        <Label
+                                            FontSize="32"
+                                            HorizontalOptions="CenterAndExpand"
+                                            InputTransparent="True"
+                                            IsVisible="False"
+                                            Text="{Binding ImageMediaItems.Count}"
+                                            TextColor="White">
+                                            <Label.Triggers>
+                                                <DataTrigger
+                                                    Binding="{Binding ImageMediaItems, Converter={StaticResource ListCountToBooleanConverter}, ConverterParameter=1}"
+                                                    TargetType="Label"
+                                                    Value="True">
+                                                    <Setter Property="IsVisible" Value="True" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </Grid>
+                                    <Grid IsVisible="False">
+
+                                        <Grid.Triggers>
+                                            <DataTrigger
+                                                Binding="{Binding VideoMediaItem, Converter={StaticResource IsNullConverter}}"
+                                                TargetType="Grid"
+                                                Value="False">
+                                                <Setter Property="IsVisible" Value="True" />
+                                            </DataTrigger>
+                                        </Grid.Triggers>
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <controls:CustomImage
+                                            Aspect="AspectFill"
+                                            DownsampleToViewSize="False"
+                                            HeightRequest="60"
+                                            ImageUrl="{Binding VideoMediaItem.PictureUrl}"
+                                            IsLocalFile="{Binding VideoMediaItem.IsLocalFile}" />
+                                        <Button
+                                            BackgroundColor="Transparent"
+                                            Command="{Binding BindingContext.ShowVideoCommand, Source={x:Reference Page}}"
+                                            CommandParameter="{Binding VideoMediaItem}"
+                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                            FontSize="36"
+                                            HeightRequest="60"
+                                            HorizontalOptions="Center"
+                                            Text="{x:Static classes:IconFont.PlayCircleOutline}"
+                                            TextColor="{StaticResource GreenColor}"
+                                            VerticalOptions="CenterAndExpand" />
+
+                                    </Grid>
+                                </StackLayout>
+                            </StackLayout>
+
+                        </DataTemplate>
+                    </listview:SfListView.ItemTemplate>
+
+                </listview:SfListView>
+
+                <!--  Prev/next thumbs up buttons  -->
+                <StackLayout
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    HorizontalOptions="CenterAndExpand"
+                    Orientation="Horizontal"
+                    Spacing="20">
+
+                    <StackLayout
+                        Padding="0"
+                        CompressedLayout.IsHeadless="True"
+                        Orientation="Horizontal"
+                        Spacing="4">
+                        <Label Text="{classes:Translate BASE_TEXT_PREVIOUS}" VerticalTextAlignment="Center" />
+                        <Label
+                            Text="{classes:Translate ACTION_SCREEN_TITLE}"
+                            TextTransform="Lowercase"
+                            VerticalTextAlignment="Center" />
+                    </StackLayout>
+
+                    <!--  Previous  -->
+                    <buttons:SfButton
+                        Background="{StaticResource BackgroundColor}"
+                        Command="{Binding BindingContext.PreviousCommand, Source={x:Reference Page}}"
+                        HorizontalOptions="CenterAndExpand"
+                        Style="{StaticResource GreyBorderButton}"
+                        VerticalOptions="CenterAndExpand">
+                        <buttons:SfButton.Triggers>
+                            <DataTrigger
+                                Binding="{Binding First}"
+                                TargetType="buttons:SfButton"
+                                Value="True">
+                                <Setter Property="Stroke" Value="{StaticResource GreyColor}" />
+                            </DataTrigger>
+                        </buttons:SfButton.Triggers>
+                        <buttons:SfButton.Content>
+                            <DataTemplate>
+                                <Image
+                                    x:Name="arrowBack"
+                                    HorizontalOptions="CenterAndExpand"
+                                    IsOpaque="True"
+                                    VerticalOptions="CenterAndExpand">
+                                    <Image.Source>
+                                        <FontImageSource
+                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                            Glyph="{x:Static classes:IconFont.ArrowBack}"
+                                            Size="30"
+                                            Color="{StaticResource DarkGreyColor}" />
+                                    </Image.Source>
+                                    <Image.Triggers>
+                                        <DataTrigger
+                                            Binding="{Binding First}"
+                                            TargetType="Image"
+                                            Value="True">
+                                            <Setter Property="Source">
+                                                <FontImageSource
+                                                    FontFamily="{StaticResource MaterialFontFamily}"
+                                                    Glyph="{x:Static classes:IconFont.ArrowBack}"
+                                                    Size="30"
+                                                    Color="{StaticResource GreyColor}" />
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Image.Triggers>
+                                </Image>
+                            </DataTemplate>
+
+                        </buttons:SfButton.Content>
+                    </buttons:SfButton>
+
+                    <!--  Thumb button  -->
+                    <buttons:SfButton
+                        Background="{StaticResource GreyColor}"
+                        Command="{Binding BindingContext.ActionSolvedCommand, Source={x:Reference Page}}"
+                        CornerRadius="80"
+                        HeightRequest="80"
+                        HorizontalOptions="End"
+                        IsVisible="{Binding CanCompleteAction}"
+                        Style="{StaticResource GreyBorderButton}"
+                        VerticalOptions="CenterAndExpand"
+                        WidthRequest="80">
+                        <buttons:SfButton.Triggers>
+                            <DataTrigger
+                                Binding="{Binding SelectedAction.FilterStatus}"
+                                TargetType="buttons:SfButton"
+                                Value="{x:Static enumerations:ActionStatusEnum.Solved}">
+                                <Setter Property="Background" Value="{StaticResource GreenColor}" />
+                                <Setter Property="Stroke" Value="{StaticResource GreenColor}" />
+                            </DataTrigger>
+                            <DataTrigger
+                                Binding="{Binding SelectedAction.FilterStatus}"
+                                TargetType="buttons:SfButton"
+                                Value="{x:Static enumerations:ActionStatusEnum.Unsolved}">
+                                <Setter Property="Background" Value="{StaticResource GreyColor}" />
+                                <Setter Property="Stroke" Value="{StaticResource GreyColor}" />
+                            </DataTrigger>
+                            <DataTrigger
+                                Binding="{Binding SelectedAction.FilterStatus}"
+                                TargetType="buttons:SfButton"
+                                Value="{x:Static enumerations:ActionStatusEnum.PastDue}">
+                                <Setter Property="Background" Value="{StaticResource GreyColor}" />
+                                <Setter Property="Stroke" Value="{StaticResource GreyColor}" />
+                            </DataTrigger>
+                        </buttons:SfButton.Triggers>
+                        <buttons:SfButton.Content>
+                            <DataTemplate>
+                                <Image
+                                    HorizontalOptions="CenterAndExpand"
+                                    IsOpaque="True"
+                                    VerticalOptions="CenterAndExpand">
+                                    <Image.Source>
+                                        <FontImageSource
+                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                            Glyph="{x:Static classes:IconFont.ThumbUp}"
+                                            Size="40"
+                                            Color="White" />
+                                    </Image.Source>
+                                </Image>
+                            </DataTemplate>
+                        </buttons:SfButton.Content>
+                    </buttons:SfButton>
+
+                    <!--  Next  -->
+                    <buttons:SfButton
+                        Background="{StaticResource BackgroundColor}"
+                        Command="{Binding BindingContext.NextCommand, Source={x:Reference Page}}"
+                        HorizontalOptions="End"
+                        Style="{StaticResource GreyBorderButton}"
+                        VerticalOptions="CenterAndExpand">
+                        <buttons:SfButton.Triggers>
+                            <DataTrigger
+                                Binding="{Binding Last}"
+                                TargetType="buttons:SfButton"
+                                Value="True">
+                                <Setter Property="Stroke" Value="{StaticResource GreyColor}" />
+                            </DataTrigger>
+                        </buttons:SfButton.Triggers>
+                        <buttons:SfButton.Content>
+                            <DataTemplate>
+                                <Image
+                                    x:Name="arrowForward"
+                                    HorizontalOptions="CenterAndExpand"
+                                    IsOpaque="True"
+                                    VerticalOptions="CenterAndExpand">
+                                    <Image.Source>
+                                        <FontImageSource
+                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                            Glyph="{x:Static classes:IconFont.ArrowForward}"
+                                            Size="30"
+                                            Color="{StaticResource DarkGreyColor}" />
+                                    </Image.Source>
+                                    <Image.Triggers>
+                                        <DataTrigger
+                                            Binding="{Binding Last}"
+                                            TargetType="Image"
+                                            Value="True">
+                                            <Setter Property="Source">
+                                                <FontImageSource
+                                                    FontFamily="{StaticResource MaterialFontFamily}"
+                                                    Glyph="{x:Static classes:IconFont.ArrowForward}"
+                                                    Size="30"
+                                                    Color="{StaticResource GreyColor}" />
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Image.Triggers>
+                                </Image>
+                            </DataTemplate>
+                        </buttons:SfButton.Content>
+                    </buttons:SfButton>
+
+                    <StackLayout
+                        Padding="0"
+                        CompressedLayout.IsHeadless="True"
+                        Orientation="Horizontal"
+                        Spacing="4">
+                        <Label Text="{classes:Translate BASE_TEXT_NEXT}" VerticalTextAlignment="Center" />
+                        <Label
+                            Text="{classes:Translate ACTION_SCREEN_TITLE}"
+                            TextTransform="Lowercase"
+                            VerticalTextAlignment="Center" />
+                    </StackLayout>
+
+                </StackLayout>
+
+                <!--  Input StackLayout  -->
+                <StackLayout
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    IsVisible="{Binding SelectedAction.ShowChatInput}"
+                    Spacing="0">
+
+                    <StackLayout
+                        HorizontalOptions="CenterAndExpand"
+                        IsVisible="{Binding SelectedAction.ShowChatInput}"
+                        Spacing="0"
+                        VerticalOptions="CenterAndExpand">
+
+                        <StackLayout>
+                            <inputLayout:SfTextInputLayout
+                                Padding="0"
+                                ContainerType="None"
+                                EnableHintAnimation="True"
+                                Hint="{classes:Translate CHAT_SCREEN_INPUT_INPUT_TITLE}"
+                                TrailingViewPosition="Inside">
+                                <!--  Send icon  -->
+                                <inputLayout:SfTextInputLayout.TrailingView>
+                                    <Frame
+                                        Padding="15,0,0,0"
+                                        BackgroundColor="Transparent"
+                                        HasShadow="False"
+                                        HorizontalOptions="Fill"
+                                        VerticalOptions="Fill"
+                                        WidthRequest="45">
+                                        <Frame.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding AddCommentCommand}" />
+                                        </Frame.GestureRecognizers>
+
+                                        <Image
+                                            Margin="0"
+                                            HorizontalOptions="EndAndExpand"
+                                            IsOpaque="True"
+                                            Opacity="0.3"
+                                            Rotation="{Binding Converter={StaticResource RotationInRTLConverter}}">
+
+                                            <Image.Triggers>
+                                                <DataTrigger
+                                                    Binding="{Binding Comment, Converter={StaticResource StringIsNullOrEmptyConverter}}"
+                                                    TargetType="Image"
+                                                    Value="False">
+                                                    <Setter Property="Opacity" Value="1" />
+                                                </DataTrigger>
+                                                <DataTrigger
+                                                    Binding="{Binding HasMedia}"
+                                                    TargetType="Image"
+                                                    Value="True">
+                                                    <Setter Property="Opacity" Value="1" />
+                                                </DataTrigger>
+                                            </Image.Triggers>
+                                            <Image.Source>
+                                                <FontImageSource
+                                                    FontFamily="{StaticResource MaterialFontFamily}"
+                                                    Glyph="{x:Static classes:IconFont.Send}"
+                                                    Size="25"
+                                                    Color="{StaticResource GreenColor}" />
+                                            </Image.Source>
+                                        </Image>
+                                    </Frame>
+
+                                </inputLayout:SfTextInputLayout.TrailingView>
+
+                                <Entry
+                                    FontFamily="{StaticResource RobotoRegular}"
+                                    FontSize="Small"
+                                    Text="{Binding Comment}"
+                                    TextColor="{StaticResource DarkGreyColor}" />
+
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Focused">
+                                            <VisualState.Setters>
+                                                <Setter Property="Stroke" Value="{StaticResource GreenColor}" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Normal">
+                                            <VisualState.Setters>
+                                                <Setter Property="Stroke" Value="{StaticResource BlackColor}" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                            </inputLayout:SfTextInputLayout>
+
+                        </StackLayout>
+
+                        <StackLayout Orientation="Horizontal" Spacing="10">
+
+                            <buttons:SfButton Command="{Binding TakePhotoCommand}" StyleClass="SfButtonStyle">
+                                <buttons:SfButton.Content>
+                                    <DataTemplate>
+                                        <Label
+                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                            HorizontalOptions="CenterAndExpand"
+                                            StyleClass="fontButton, fs-32, fc-darkgrey"
+                                            Text="{x:Static classes:IconFont.CameraAlt}" />
+                                    </DataTemplate>
+                                </buttons:SfButton.Content>
+                            </buttons:SfButton>
+
+                            <buttons:SfButton
+                                Command="{Binding PhotoGalleryCommand}"
+                                CommandParameter="Photo gallery"
+                                StyleClass="SfButtonStyle">
+                                <buttons:SfButton.Content>
+                                    <DataTemplate>
+                                        <Label
+                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                            HorizontalOptions="CenterAndExpand"
+                                            StyleClass="fontButton, fs-32, fc-darkgrey"
+                                            Text="{x:Static classes:IconFont.Image}" />
+                                    </DataTemplate>
+                                </buttons:SfButton.Content>
+                            </buttons:SfButton>
+
+                            <buttons:SfButton
+                                Command="{Binding VideoCommand}"
+                                CommandParameter="Video"
+                                StyleClass="SfButtonStyle">
+                                <buttons:SfButton.Content>
+                                    <DataTemplate>
+                                        <Label
+                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                            HorizontalOptions="CenterAndExpand"
+                                            Rotation="{Binding Converter={StaticResource RotationInRTLConverter}}"
+                                            StyleClass="fontButton, fs-32, fc-darkgrey"
+                                            Text="{x:Static classes:IconFont.PlayArrow}" />
+                                    </DataTemplate>
+                                </buttons:SfButton.Content>
+                            </buttons:SfButton>
+
+                            <!--  Remove attachments buttons  -->
+                            <Grid ColumnDefinitions="*,*" HorizontalOptions="FillAndExpand">
+                                <Grid Grid.Column="0" IsVisible="{Binding CommentVideo, Converter={StaticResource IsNullConverter}, ConverterParameter=False}">
+                                    <Label
+                                        Grid.Column="0"
+                                        HorizontalOptions="FillAndExpand"
+                                        HorizontalTextAlignment="Start"
+                                        LineBreakMode="WordWrap"
+                                        Text="{Binding VideoCountText}" />
+                                    <Button
+                                        Grid.Column="0"
+                                        Command="{Binding RemoveVideoCommand}"
+                                        HorizontalOptions="End"
+                                        StyleClass="bg-transparent, fs-16, fc-darkblue, MessageCenter_Button" />
+                                </Grid>
+                                <Grid Grid.Column="1" IsVisible="{Binding HasImages}">
+
+                                    <Label
+                                        Grid.Column="1"
+                                        HorizontalOptions="FillAndExpand"
+                                        HorizontalTextAlignment="Start"
+                                        LineBreakMode="WordWrap"
+                                        Text="{Binding ImageCountText}" />
+                                    <Button
+                                        Grid.Column="1"
+                                        Command="{Binding RemoveImagesCommand}"
+                                        HorizontalOptions="End"
+                                        StyleClass="bg-transparent, fs-16,MessageCenter_Button,  fc-darkblue " />
+                                </Grid>
+
+                            </Grid>
+
+                        </StackLayout>
+
+                    </StackLayout>
+
+                </StackLayout>
+
+            </Grid>
+            <StackLayout
+                Grid.Row="1"
+                CascadeInputTransparent="False"
+                InputTransparent="True">
+                <controls:MessageCenter />
+            </StackLayout>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

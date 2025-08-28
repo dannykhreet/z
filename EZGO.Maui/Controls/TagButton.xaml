@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<buttons:SfButton
+    x:Class="EZGO.Maui.Controls.TagButton"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    x:Name="ButtonTag"
+    Command="{Binding TapCommand, Source={x:Reference ButtonTag}}"
+    HeightRequest="35"
+    CornerRadius="0"
+    HorizontalOptions="Center"
+    VerticalOptions="Center"
+    WidthRequest="150">
+    <buttons:SfButton.Background>
+        <MultiBinding Converter="{StaticResource TagButtonBackgroundColorConverter}">
+            <Binding Path="IsExpanded" Source="{x:Reference ButtonTag}" />
+            <Binding Path="IsActive" Source="{x:Reference ButtonTag}" />
+        </MultiBinding>
+    </buttons:SfButton.Background>
+    <buttons:SfButton.Content>
+        <DataTemplate>
+
+
+
+
+            <StackLayout
+                HorizontalOptions="FillAndExpand"
+                Orientation="Horizontal"
+                VerticalOptions="Center">
+                <Image
+                    x:Name="Icon"
+                    Margin="5,0,0,0"
+                    IsOpaque="True"
+                    IsVisible="{Binding IconName, Converter={StaticResource StringIsNullOrEmptyConverter}, ConverterParameter=false}">
+                    <Image.Source>
+                        <FontImageSource
+                            x:Name="ImageIcon"
+                            FontFamily="FAR"
+                            Glyph="{Binding TagIconName, Source={x:Reference ButtonTag}}"
+                            Size="15"
+                            Color="Black" />
+                    </Image.Source>
+                    <Image.Triggers>
+                        <DataTrigger
+                            Binding="{Binding IsActive, Source={x:Reference ButtonTag}}"
+                            TargetType="Image"
+                            Value="True">
+                            <Setter TargetName="ImageIcon" Property="FontImageSource.Color" Value="White" />
+                        </DataTrigger>
+                        <DataTrigger
+                            Binding="{Binding TagIconStyle, Source={x:Reference ButtonTag}}"
+                            TargetType="Image"
+                            Value="solid">
+                            <Setter TargetName="ImageIcon" Property="FontImageSource.FontFamily" Value="FAS" />
+                        </DataTrigger>
+                    </Image.Triggers>
+                </Image>
+                <Label
+                    Margin="-5,0,0,0"
+                    FontSize="12"
+                    HorizontalOptions="CenterAndExpand"
+                    HorizontalTextAlignment="Center"
+                    LineBreakMode="WordWrap"
+                    Text="{Binding TagText, Source={x:Reference ButtonTag}}"
+                    TextColor="Black"
+                    VerticalOptions="Center">
+                    <Label.Triggers>
+                        <DataTrigger
+                            Binding="{Binding IsActive, Source={x:Reference ButtonTag}}"
+                            TargetType="Label"
+                            Value="True">
+                            <Setter Property="TextColor" Value="White" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </StackLayout>
+        </DataTemplate>
+
+    </buttons:SfButton.Content>
+</buttons:SfButton>

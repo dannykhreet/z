@@ -1,0 +1,21 @@
+﻿<?xml version = "1.0" encoding = "UTF-8" ?>
+<core:App xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:EZGO.Maui"
+             xmlns:core="clr-namespace:EZGO.Maui.Core;assembly=EZGO.Maui.Core"
+          xmlns:converters="clr-namespace:EZGO.Maui.Converters"
+             x:Class="EZGO.Maui.MauiEZGOApp">
+    <Application.Resources>
+        <ResourceDictionary>
+                <StyleSheet Source="Resources/Styles/styles.css" />
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+                <ResourceDictionary Source="Resources/Converters/ResourceConverters.xaml"/>
+                <ResourceDictionary Source="Resources/Styles/ResourceIcons.xaml"/>
+                <StyleSheet Source="Resources/Styles/styles.css"/>
+                <converters:BoolToLoadMoreOptionConverter x:Key="BoolToLoadMoreOptionConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</core:App>
+

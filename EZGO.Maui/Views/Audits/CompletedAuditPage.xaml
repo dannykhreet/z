@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Audits.CompletedAuditPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:auditModels="clr-namespace:EZGO.Maui.Core.Models.Audits;assembly=EZGO.Maui.Core"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:labels="clr-namespace:EZGO.Maui.Controls.CustomLabels"
+    xmlns:openFields="clr-namespace:EZGO.Maui.Controls.ChecklistsOpenFields"
+    xmlns:progressbar="clr-namespace:EZGO.Maui.Controls.ProgressBar"
+    xmlns:pulltoRefresh="clr-namespace:Syncfusion.Maui.PullToRefresh;assembly=Syncfusion.Maui.PullToRefresh"
+    xmlns:sfList="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    xmlns:syncfusion="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    xmlns:tasksModels="clr-namespace:EZGO.Maui.Core.Models.Tasks;assembly=EZGO.Maui.Core"
+    xmlns:viewCells="clr-namespace:EZGO.Maui.Controls.ViewCells"
+    xmlns:viewModels="clr-namespace:EZGO.Maui.Core.ViewModels;assembly=EZGO.Maui.Core"
+    x:Name="Page"
+    Title="Completed Audits"
+    ios:Page.UseSafeArea="true"
+    x:DataType="viewModels:CompletedAuditViewModel"
+    NavigationPage.HasBackButton="True"
+    NavigationPage.HasNavigationBar="False">
+    <ContentPage.Content>
+
+        <Grid BackgroundColor="{StaticResource BackgroundColor}" RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Style="{StaticResource HeaderStyle}">
+                <Grid.ColumnDefinitions>
+                    <!--  above left menu width = 120 else 160  -->
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="*" />
+                    <!--  width depending on number of children  -->
+                    <ColumnDefinition Width="120" />
+                </Grid.ColumnDefinitions>
+
+                <!--  Back Button  -->
+                <customButtons:BackButton Grid.Column="0" />
+
+                <!--  Title  -->
+                <labels:TitleLabel
+                    Grid.Column="1"
+                    FontSize="30"
+                    Text="{classes:Translate COMPLETED_AUDITS_SCREEN_TITLE}" />
+
+
+            </Grid>
+
+            <Grid
+                Grid.Row="1"
+                Margin="15"
+                ColumnSpacing="15"
+                RowSpacing="15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+
+                <!--  Completed Audits PullToRefreshList  -->
+                <pulltoRefresh:SfPullToRefresh
+                    x:Name="pullToRefresh"
+                    IsRefreshing="{Binding IsRefreshing}"
+                    ProgressColor="#0003E8"
+                    PullingThreshold="100"
+                    RefreshCommand="{Binding RefreshCommand}"
+                    RefreshViewHeight="30"
+                    RefreshViewThreshold="30"
+                    RefreshViewWidth="30"
+                    StyleClass="bg-lightgrey"
+                    VerticalOptions="Fill">
+
+                    <pulltoRefresh:SfPullToRefresh.PullableContent>
+
+                        <!--  Complted List  -->
+                        <syncfusion:SfListView
+                            x:Name="listView"
+                            BackgroundColor="White"
+                            IsLazyLoading="{Binding LoadMoreIsBusy}"
+                            ItemSize="135"
+                            ItemsSource="{Binding CompletedAudits}"
+                            LoadMoreCommand="{Binding LoadMoreCommand}"
+                            LoadMoreOption="{Binding CanLoadMore, Converter={StaticResource BoolToLoadMoreOptionConverter}, ConverterParameter={x:Static syncfusion:LoadMoreOption.AutoOnScroll}}"
+                            LoadMorePosition="End"
+                            SelectedItem="{Binding SelectedAudit}"
+                            SelectionBackground="LightGray"
+                            TapCommand="{Binding AuditSelectedCommand}">
+                            <syncfusion:SfListView.ItemTemplate>
+                                <DataTemplate x:DataType="auditModels:AuditsModel">
+                                    <viewCells:CompletedTemplateViewCell />
+                                </DataTemplate>
+                            </syncfusion:SfListView.ItemTemplate>
+                        </syncfusion:SfListView>
+
+                    </pulltoRefresh:SfPullToRefresh.PullableContent>
+                </pulltoRefresh:SfPullToRefresh>
+
+                <!--  Selected Audit Content  -->
+                <Grid Grid.Column="1" RowSpacing="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="150" />
+                        <RowDefinition Height="55" />
+                    </Grid.RowDefinitions>
+
+                    <!--  Tag list  -->
+                    <ScrollView
+                        Grid.Row="0"
+                        BackgroundColor="White"
+                        HeightRequest="70"
+                        IsVisible="{Binding ContainsTags}"
+                        Orientation="Horizontal">
+                        <controls:TagList
+                            Margin="20,0,0,0"
+                            BindableLayout.ItemsSource="{Binding SelectedAudit.Tags}"
+                            Wrap="NoWrap" />
+                    </ScrollView>
+
+                    <!--  Complted Tasks List  -->
+                    <syncfusion:SfListView
+                        x:Name="CompletedAuditList"
+                        Grid.Row="1"
+                        Padding="15,0"
+                        BackgroundColor="White"
+                        CachingStrategy="CreateNewTemplate"
+                        FooterSize="150"
+                        HeaderSize="{Binding OpenFields.PropertyListHeight, Converter={StaticResource CompletedOpenFieldsConverter}, ConverterParameter=true}"
+                        HorizontalOptions="Fill"
+                        IsStickyFooter="True"
+                        ItemSpacing="0"
+                        ItemsSource="{Binding SelectedAuditTasks}"
+                        QueryItemSize="CompletedAuditList_QueryItemSize"
+                        SelectionBackground="White"
+                        TapCommand="{Binding NavigateToDetailsCommand}">
+
+                        <syncfusion:SfListView.ItemsLayout>
+                            <syncfusion:GridLayout SpanCount="1" />
+                        </syncfusion:SfListView.ItemsLayout>
+
+                        <!--  Task Template  -->
+                        <syncfusion:SfListView.ItemTemplate>
+                            <DataTemplate x:DataType="tasksModels:TasksTaskModel">
+                                <viewCells:CompletedItemTemplateViewCell
+                                    ActionsCommand="{Binding BindingContext.NavigateToActionsCommand, Source={x:Reference Page}}"
+                                    ColorCalculator="{Binding BindingContext.SelectedAudit.ScoreColorCalculator, Source={x:Reference Page}}"
+                                    TapStatusCommand="{Binding BindingContext.NavigateToPictureProofDetailsCommand, Source={x:Reference Page}}" />
+                            </DataTemplate>
+                        </syncfusion:SfListView.ItemTemplate>
+
+                        <!--  Open Fields Tempalte  -->
+                        <syncfusion:SfListView.HeaderTemplate>
+                            <DataTemplate>
+                                <openFields:OpenChecklistFields
+                                    Grid.Row="1"
+                                    IsCompleted="True"
+                                    ItemHeight="{Binding BindingContext.OpenFields.FieldHeight, Source={x:Reference Page}}"
+                                    PropertyList="{Binding BindingContext.OpenFields.PropertyList, Source={x:Reference Page}}"
+                                    SpanCount="1" />
+                            </DataTemplate>
+                        </syncfusion:SfListView.HeaderTemplate>
+
+                        <!--  Signature Template  -->
+                        <syncfusion:SfListView.FooterTemplate>
+                            <DataTemplate>
+                                <StackLayout BackgroundColor="White">
+
+                                    <!--  Audit Score  -->
+                                    <Label
+                                        FontFamily="{StaticResource RobotoBold}"
+                                        HorizontalOptions="EndAndExpand"
+                                        StyleClass="fs-medium, mx-20">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{classes:Translate GENERATE_PDF_AUDIT_SCORE}" FontAttributes="Bold" />
+                                                <Span Text=": " />
+                                                <Span Text="{Binding BindingContext.SelectedAuditTotalScore, Source={x:Reference Page}, StringFormat='{0}%'}" FontAttributes="Bold" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+
+                                    <!--  Signature Images  -->
+
+                                </StackLayout>
+                            </DataTemplate>
+                        </syncfusion:SfListView.FooterTemplate>
+                    </syncfusion:SfListView>
+
+                    <controls:CompletedSignature
+                        Grid.Row="2"
+                        BackgroundColor="White"
+                        IsSignatureVisible="{Binding BindingContext.SelectedAudit.IsSignatureRequired, Source={x:Reference Page}}"
+                        SelectedSignatures="{Binding BindingContext.SelectedAudit.Signatures, Source={x:Reference Page}}" />
+                    <!--  Generate PDF Button  -->
+                    <customButtons:SubmitMauiButton
+                        x:Name="GeneratePdf"
+                        Grid.Row="3"
+                        Margin="0,15,0,0"
+                        ButtonText="{classes:Translate GENERAL_GENERATE_PDF_BUTTON_TITLE}"
+                        Clicked="{Binding GeneratePdfCommand}"
+                        HeightRequest="40"
+                        HorizontalOptions="EndAndExpand"
+                        IsLoading="{Binding IsLoadingPdf}"
+                        IsVisible="{Binding HasItem}"
+                        WidthRequest="150" />
+
+                    <!--  Empty Unselected Screen  -->
+                    <Grid
+                        Grid.Row="1"
+                        Grid.RowSpan="2"
+                        BackgroundColor="White"
+                        IsVisible="{Binding SelectedAudit, Converter={StaticResource IsNullConverter}, ConverterParameter=True}" />
+
+
+                </Grid>
+
+            </Grid>
+
+            <!--  Circular Custom Indicator  -->
+            <progressbar:CustomCircularIndicator
+                Grid.Row="1"
+                IsBusy="{Binding IsInitialized, Converter={StaticResource ReverseBooleanConverter}}"
+                IsVisible="{Binding IsInitialized, Converter={StaticResource ReverseBooleanConverter}}" />
+
+            <!--  Message Center  -->
+            <controls:MessageCenter Grid.Row="1" />
+        </Grid>
+
+    </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<listview:SfListView
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:listview="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    x:Name="Page"
+    SelectionMode="None"
+    ItemSpacing="0,0,-30,0"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls;assembly=EZGO.Maui"
+    xmlns:users="clr-namespace:EZGO.Maui.Core.Models.Users;assembly=EZGO.Maui.Core"
+    ItemsSource="{Binding UserProfiles, Source={x:Reference Page}}"
+    Orientation="Horizontal"
+    x:Class="EZGO.Maui.Controls.Images.UserImageList">
+    <listview:SfListView.ItemTemplate>
+        <DataTemplate x:DataType="users:UserProfileModel">
+            <Border
+                Padding="0"
+                Margin="0,0,10,0"
+                HeightRequest="35"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                WidthRequest="35">
+                <Grid>
+                    <controls:CustomImageOnline
+                        x:Name="UserImage"
+                        Aspect="AspectFill"
+                        ImageUrl="{Binding Picture}"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        Placeholder="profile.png"
+                        DownsampleHeight="36"
+                        DownsampleWidth="36">
+                        <controls:CustomImageOnline.Clip>
+                            <EllipseGeometry
+                                Center="16.8,16.8"
+                                RadiusX="16.5"
+                                RadiusY="16.2" />
+                        </controls:CustomImageOnline.Clip>
+                    </controls:CustomImageOnline>
+                    <BoxView
+                        IsVisible="False"
+                        Opacity="0.7"
+                        Color="{StaticResource GreenColor}">
+                        <BoxView.Triggers>
+                            <DataTrigger
+                                Binding="{Binding SuccessorId}"
+                                TargetType="BoxView"
+                                Value="-1">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </BoxView.Triggers>
+                    </BoxView>
+                    <Label
+                        FontFamily="{StaticResource RobotoBold}"
+                        TextColor="{StaticResource WhiteColor}"
+                        FontSize="17"
+                        IsVisible="False"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="+" />
+                                <Span Text="{Binding Id}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                        <Label.Triggers>
+                            <DataTrigger
+                                Binding="{Binding SuccessorId}"
+                                TargetType="Label"
+                                Value="-1">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </listview:SfListView.ItemTemplate>
+</listview:SfListView>

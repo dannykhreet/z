@@ -1,0 +1,333 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Reports.ReportFilterPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:enumerationscore="clr-namespace:EZGO.Maui.Core.Enumerations;assembly=EZGO.Maui.Core"
+    xmlns:enumerations="clr-namespace:EZGO.Api.Models.Enumerations;assembly=EZGO.Api.Models"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes;assembly=EZGO.Maui"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:inputLayout="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+    xmlns:autocomplete="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+    xmlns:behaviors="clr-namespace:EZGO.Maui.Behaviors;assembly=EZGO.Maui"
+    xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:partial="clr-namespace:EZGO.Maui.Views.Partial"
+    x:Name="Page"
+    ios:Page.UseSafeArea="true"
+    NavigationPage.HasNavigationBar="false"
+    NavigationPage.HasBackButton="True">
+    <ContentPage.Content>
+
+        <Grid
+            ColumnSpacing="0"
+            CompressedLayout.IsHeadless="True"
+            RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.127*" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <!--  header  -->
+            <StackLayout>
+                <Grid
+                    ColumnSpacing="0"
+                    RowSpacing="0"
+                    StyleClass="header, bg-white, m-0, pr-15">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="350" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackLayout
+                        Grid.Column="0"
+                        StyleClass="column0"
+                        VerticalOptions="CenterAndExpand">
+                        <customButtons:BackButton Command="{Binding BindingContext.CancelCommand, Source={x:Reference Page}}" VerticalOptions="CenterAndExpand" />
+                    </StackLayout>
+
+                    <StackLayout
+                        Grid.Column="1"
+                        Orientation="Horizontal"
+                        StyleClass="column1">
+                        <Label
+                            FontFamily="{StaticResource RobotoLight}"
+                            StyleClass="title, fs-large, fc-darkgrey"
+                            Text="{classes:Translate CHOOSE_YOUR_FILTER_SETTINGS}"
+                            VerticalTextAlignment="Center" />
+                    </StackLayout>
+
+                    <StackLayout
+                        x:Name="HeaderButtonsStackLayout"
+                        Grid.Column="2"
+                        HorizontalOptions="EndAndExpand"
+                        Spacing="5"
+                        Orientation="Horizontal"
+                        StyleClass="p-20">
+                        <buttons:SfButton
+                            Background="White"
+                            Stroke="{StaticResource RedColor}"
+                            StrokeThickness="1"
+                            Command="{Binding CancelCommand}"
+                            CornerRadius="5"
+                            FontSize="Small"
+                            StyleClass="p-10"
+                            Text="{classes:Translate BASE_TEXT_CANCEL}"
+                            TextColor="{StaticResource RedColor}"
+                            WidthRequest="100" />
+                        <buttons:SfButton
+                            Background="{StaticResource GreenColor}"
+                            Command="{Binding ApplyCommand}"
+                            CornerRadius="5"
+                            FontSize="Small"
+                            Text="{classes:Translate GENERAL_TEXT_APPLY}"
+                            WidthRequest="100" />
+                    </StackLayout>
+                </Grid>
+            </StackLayout>
+
+            <Grid Grid.Row="1" ColumnSpacing="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.098*" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <partial:MenuNewControl Grid.Column="0" StyleClass="bg-darkblue, fc-white" />
+
+                <Grid Grid.Column="1" StyleClass="bg-lightgrey">
+                    <Grid
+                        Padding="20"
+                        ColumnSpacing="20"
+                        CompressedLayout.IsHeadless="True"
+                        HorizontalOptions="FillAndExpand"
+                        RowSpacing="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!--  Quadrant 1  -->
+                        <Grid
+                            x:Name="Q1Grid"
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Padding="20"
+                            BackgroundColor="White"
+                            RowSpacing="0">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="40" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Label
+                                Grid.Row="0"
+                                FontFamily="{StaticResource RobotoRegular}"
+                                HorizontalTextAlignment="Center"
+                                StyleClass="fs-20"
+                                Text="{classes:Translate REPORTS_FILETERS_PERIOD_TITLE}"
+                                TextColor="{StaticResource DarkGreyColor}" />
+
+                            <ScrollView Grid.Row="1">
+                                <Grid CompressedLayout.IsHeadless="True" RowSpacing="5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <buttons:SfButton
+                                        Grid.Row="0"
+                                        Background="White"
+                                        Stroke="{StaticResource DarkGreyColor}"
+                                        StrokeThickness="1"
+                                        Command="{Binding BindingContext.PeriodCommand, Source={x:Reference Page}}"
+                                        CommandParameter="{x:Static enumerations:TimespanTypeEnum.LastTwelveDays}"
+                                        CornerRadius="5"
+                                        FontFamily="{StaticResource RobotoRegular}"
+                                        FontSize="Small"
+                                        Text="{classes:Translate REPOSRTS_12_DAYS_PERIOD}"
+                                        TextColor="{StaticResource DarkGreyColor}">
+                                        <buttons:SfButton.Triggers>
+                                            <DataTrigger
+                                                Binding="{Binding Period}"
+                                                TargetType="buttons:SfButton"
+                                                Value="{x:Static enumerations:TimespanTypeEnum.LastTwelveDays}">
+                                                <Setter Property="Background" Value="{StaticResource GreenColor}" />
+                                                <Setter Property="Stroke" Value="{StaticResource GreenColor}" />
+                                                <Setter Property="TextColor" Value="White" />
+                                            </DataTrigger>
+                                        </buttons:SfButton.Triggers>
+                                    </buttons:SfButton>
+                                    <buttons:SfButton
+                                        Grid.Row="1"
+                                        Background="White"
+                                        Stroke="{StaticResource DarkGreyColor}"
+                                        StrokeThickness="1"
+                                        Command="{Binding BindingContext.PeriodCommand, Source={x:Reference Page}}"
+                                        CommandParameter="{x:Static enumerations:TimespanTypeEnum.LastTwelveWeeks}"
+                                        CornerRadius="5"
+                                        FontFamily="{StaticResource RobotoRegular}"
+                                        FontSize="Small"
+                                        Text="{classes:Translate REPOSRTS_12_WEEKS_PERIOD}"
+                                        TextColor="{StaticResource DarkGreyColor}">
+                                        <buttons:SfButton.Triggers>
+                                            <DataTrigger
+                                                Binding="{Binding Period}"
+                                                TargetType="buttons:SfButton"
+                                                Value="{x:Static enumerations:TimespanTypeEnum.LastTwelveWeeks}">
+                                                <Setter Property="Background" Value="{StaticResource GreenColor}" />
+                                                <Setter Property="Stroke" Value="{StaticResource GreenColor}" />
+                                                <Setter Property="TextColor" Value="White" />
+                                            </DataTrigger>
+                                        </buttons:SfButton.Triggers>
+                                    </buttons:SfButton>
+                                    <buttons:SfButton
+                                        Grid.Row="2"
+                                        Background="White"
+                                        Stroke="{StaticResource DarkGreyColor}"
+                                        StrokeThickness="1"
+                                        Command="{Binding BindingContext.PeriodCommand, Source={x:Reference Page}}"
+                                        CommandParameter="{x:Static enumerations:TimespanTypeEnum.LastTwelveMonths}"
+                                        CornerRadius="5"
+                                        FontFamily="{StaticResource RobotoRegular}"
+                                        FontSize="Small"
+                                        Text="{classes:Translate REPOSRTS_12_MONTHS_PERIOD}"
+                                        TextColor="{StaticResource DarkGreyColor}">
+                                        <buttons:SfButton.Triggers>
+                                            <DataTrigger
+                                                Binding="{Binding Period}"
+                                                TargetType="buttons:SfButton"
+                                                Value="{x:Static enumerations:TimespanTypeEnum.LastTwelveMonths}">
+                                                <Setter Property="Background" Value="{StaticResource GreenColor}" />
+                                                <Setter Property="Stroke" Value="{StaticResource GreenColor}" />
+                                                <Setter Property="TextColor" Value="White" />
+                                            </DataTrigger>
+                                        </buttons:SfButton.Triggers>
+                                    </buttons:SfButton>
+                                    <buttons:SfButton
+                                        Grid.Row="3"
+                                        Background="White"
+                                        Stroke="{StaticResource DarkGreyColor}"
+                                        StrokeThickness="1"
+                                        Command="{Binding BindingContext.PeriodCommand, Source={x:Reference Page}}"
+                                        CommandParameter="{x:Static enumerations:TimespanTypeEnum.ThisYear}"
+                                        CornerRadius="5"
+                                        FontFamily="{StaticResource RobotoRegular}"
+                                        FontSize="Small"
+                                        Text="{classes:Translate REPOSRTS_THIS_YEAR_PERIOD}"
+                                        TextColor="{StaticResource DarkGreyColor}">
+                                        <buttons:SfButton.Triggers>
+                                            <DataTrigger
+                                                Binding="{Binding Period}"
+                                                TargetType="buttons:SfButton"
+                                                Value="{x:Static enumerations:TimespanTypeEnum.ThisYear}">
+                                                <Setter Property="Background" Value="{StaticResource GreenColor}" />
+                                                <Setter Property="Stroke" Value="{StaticResource GreenColor}" />
+                                                <Setter Property="TextColor" Value="White" />
+                                            </DataTrigger>
+                                        </buttons:SfButton.Triggers>
+                                    </buttons:SfButton>
+                                </Grid>
+                            </ScrollView>
+
+                        </Grid>
+
+                        <!--  Quadrant 2  -->
+                        <Grid
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Padding="20"
+                            BackgroundColor="White"
+                            IsVisible="False"
+                            RowSpacing="0">
+
+                            <Grid.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding MyLocation}"
+                                    TargetType="Grid"
+                                    Value="{x:Static enumerationscore:MenuLocation.ReportAudits}">
+                                    <Setter Property="IsVisible" Value="True" />
+                                </DataTrigger>
+                            </Grid.Triggers>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="40" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Label
+                                Grid.Row="0"
+                                FontFamily="{StaticResource RobotoRegular}"
+                                HorizontalTextAlignment="Center"
+                                StyleClass="fs-20"
+                                Text="{classes:Translate REPORTS_FILETERS_GROUPS_TITLE}"
+                                TextColor="{StaticResource DarkGreyColor}" />
+
+                            <ScrollView Grid.Row="1">
+
+                                <StackLayout>
+                                    <Label
+                                        FontFamily="{StaticResource RobotoRegular}"
+                                        FontSize="Small"
+                                        Text="{classes:Translate REPORTS_FILETERS_YOUR_AUDIT_TITLE}"
+                                        TextColor="{StaticResource DarkGreyColor}" />
+                                    <inputLayout:SfTextInputLayout
+                                        ContainerType="Outlined"
+                                        Hint="{classes:Translate REPORTS_FILETERS_YOUR_AUDIT_PLACEHOLEDER}"
+                                        OutlineCornerRadius="5"
+                                        TrailingViewPosition="Inside">
+
+                                        <autocomplete:SfAutocomplete
+                                            ItemsSource="{Binding Audits}"
+                                            DisplayMemberPath="Name"
+                                            HeightRequest="45"
+                                            MaxDropDownHeight="150"
+                                            SelectedItem="{Binding SelectedAudit}"
+                                            DropDownPlacement="Bottom"
+                                            TextSearchMode="Contains">
+                                            <autocomplete:SfAutocomplete.HeightRequest>
+                                                <OnPlatform x:TypeArguments="x:Double">
+                                                    <On Platform="iOS">20</On>
+                                                    <On Platform="Android,Windows">45</On>
+                                                </OnPlatform>
+                                            </autocomplete:SfAutocomplete.HeightRequest>
+                                        </autocomplete:SfAutocomplete>
+
+                                    </inputLayout:SfTextInputLayout>
+
+                                    <StackLayout IsVisible="False">
+                                        <Label Text="{classes:Translate REPORTS_FILETERS_GROUP_PERFORMACNE_TITLE}" />
+                                        <inputLayout:SfTextInputLayout
+                                            ContainerType="Outlined"
+                                            HeightRequest="45"
+                                            Hint="{classes:Translate REPORTS_FILETERS_GROUP_PERFORMACNE_PLACEHOLDER}"
+                                            OutlineCornerRadius="5"
+                                            TrailingViewPosition="Inside">
+                                            <Entry>
+                                                <Entry.HeightRequest>
+                                                    <OnPlatform x:TypeArguments="x:Double">
+                                                        <On Platform="iOS">20</On>
+                                                        <On Platform="Android,Windows">45</On>
+                                                    </OnPlatform>
+                                                </Entry.HeightRequest>
+                                            </Entry>
+                                        </inputLayout:SfTextInputLayout>
+                                    </StackLayout>
+                                </StackLayout>
+                            </ScrollView>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

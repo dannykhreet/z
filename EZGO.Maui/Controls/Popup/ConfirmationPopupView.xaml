@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<popup:SfPopup
+    x:Class="EZGO.Maui.Controls.Popups.ConfirmationPopupView"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:popup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    x:Name="ConfirmationPopup"
+    FooterHeight="80"
+    ShowHeader="False"
+    ShowFooter="True"
+    MinimumHeightRequest="200"
+    WidthRequest="500">
+
+    <!-- Content -->
+    <popup:SfPopup.ContentTemplate>
+        <DataTemplate>
+            <Label
+                Padding="20" HorizontalOptions="Center" VerticalOptions="Center"
+                Text="{Binding Text, Source={x:Reference ConfirmationPopup}}"
+                FontSize="Medium"
+                FontFamily="{StaticResource RobotoRegular}"
+                HorizontalTextAlignment="Start" VerticalTextAlignment="Start" />
+        </DataTemplate>
+    </popup:SfPopup.ContentTemplate>
+
+    <!-- Footer -->
+    <popup:SfPopup.FooterTemplate>
+        <DataTemplate>
+            <Grid Padding="20,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5*" />
+                    <ColumnDefinition Width="5*" />
+                    <ColumnDefinition Width="5*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Cancel button -->
+                <buttons:SfButton
+                    Grid.Column="0" CornerRadius="3"
+                    Background="{StaticResource DarkerGreyColor}"
+                    Text="{Binding CancelButtonText, Source={x:Reference ConfirmationPopup}}"
+                    TextColor="Black"
+                    Command="{Binding CancelButtonCommand, Source={x:Reference ConfirmationPopup}}" />
+
+                <!-- Keep button -->
+                <buttons:SfButton
+                    Grid.Column="2" CornerRadius="3"
+                    Text="{Binding SubmitButtonText, Source={x:Reference ConfirmationPopup}}"
+                    Background="{StaticResource GreenColor}"
+                    Command="{Binding OkButtonCommand, Source={x:Reference ConfirmationPopup}}"
+                    IsVisible="{Binding IsInputValid, Source={x:Reference ConfirmationPopup}}" />
+            </Grid>
+        </DataTemplate>
+    </popup:SfPopup.FooterTemplate>
+</popup:SfPopup>

@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Grid
+    x:Class="EZGO.Maui.Controls.DataTemplates.ActionListTemplate"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:enumerations="clr-namespace:EZGO.Maui.Core.Enumerations;assembly=EZGO.Maui.Core"
+    x:Name="ActionViewCell"
+    HeightRequest="160"
+    StyleClass="bg-white">
+    <Grid.ColumnDefinitions>
+        <!--  Image Column  -->
+        <ColumnDefinition Width="140" />
+        <!--  Title Column  -->
+        <ColumnDefinition Width="8*" />
+        <!--  Unseen Comments Column  -->
+        <ColumnDefinition Width="2*" />
+        <!--  Status Bar  -->
+        <ColumnDefinition Width="5" />
+    </Grid.ColumnDefinitions>
+
+    <Grid.RowDefinitions>
+        <RowDefinition Height="160" />
+    </Grid.RowDefinitions>
+
+    <!--  thumbnails  -->
+    <Grid Grid.Column="0" IsVisible="{Binding HasImages}">
+
+        <controls:CustomImageOnline
+            Aspect="AspectFill"
+            DownsampleHeight="600"
+            DownsampleToViewSize="False"
+            DownsampleWidth="600"
+            ImageUrl="{Binding Image1}"
+            IsLocalFile="{Binding RetrieveImagesOffline}"
+            IsVisible="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=1}" />
+
+        <Grid
+            ColumnSpacing="1"
+            IsVisible="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=2}"
+            RowSpacing="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="50*" />
+            </Grid.ColumnDefinitions>
+            <controls:CustomImageOnline
+                Aspect="AspectFill"
+                DownsampleHeight="600"
+                DownsampleToViewSize="False"
+                DownsampleWidth="600"
+                IsLocalFile="{Binding RetrieveImagesOffline}"
+                ImageUrl="{Binding Image1}" />
+            <controls:CustomImageOnline
+                Grid.Column="1"
+                Aspect="AspectFill"
+                DownsampleHeight="600"
+                DownsampleToViewSize="False"
+                DownsampleWidth="600"
+                IsLocalFile="{Binding RetrieveImagesOffline}"
+                ImageUrl="{Binding Image2}" />
+        </Grid>
+
+        <Grid
+            ColumnSpacing="1"
+            IsVisible="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=3}"
+            RowSpacing="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50*" />
+                <RowDefinition Height="50*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="50*" />
+            </Grid.ColumnDefinitions>
+            <controls:CustomImageOnline
+                Grid.RowSpan="2"
+                Aspect="AspectFill"
+                DownsampleHeight="600"
+                DownsampleToViewSize="False"
+                DownsampleWidth="600"
+                ImageUrl="{Binding Image1}"
+                IsLocalFile="{Binding RetrieveImagesOffline}" />
+            <controls:CustomImageOnline
+                Grid.Row="0"
+                Grid.Column="1"
+                Aspect="AspectFill"
+                DownsampleHeight="600"
+                DownsampleToViewSize="False"
+                DownsampleWidth="600"
+                ImageUrl="{Binding Image2}"
+                IsLocalFile="{Binding RetrieveImagesOffline}" />
+            <controls:CustomImageOnline
+                Grid.Row="1"
+                Grid.Column="1"
+                Aspect="AspectFill"
+                DownsampleHeight="600"
+                DownsampleToViewSize="False"
+                DownsampleWidth="600"
+                ImageUrl="{Binding Image3}"
+                IsLocalFile="{Binding RetrieveImagesOffline}" />
+        </Grid>
+
+        <Grid
+            ColumnSpacing="1"
+            IsVisible="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=4}"
+            RowSpacing="1">
+            <Grid.Triggers>
+                <DataTrigger
+                    Binding="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=5}"
+                    TargetType="Grid"
+                    Value="True">
+                    <Setter Property="IsVisible" Value="True" />
+                </DataTrigger>
+                <DataTrigger
+                    Binding="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=6}"
+                    TargetType="Grid"
+                    Value="True">
+                    <Setter Property="IsVisible" Value="True" />
+                </DataTrigger>
+            </Grid.Triggers>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50*" />
+                <RowDefinition Height="50*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="50*" />
+            </Grid.ColumnDefinitions>
+            <controls:CustomImageOnline
+                Grid.Row="0"
+                Grid.Column="0"
+                Aspect="AspectFill"
+                DownsampleHeight="600"
+                DownsampleToViewSize="False"
+                DownsampleWidth="600"
+                ImageUrl="{Binding Image1}"
+                IsLocalFile="{Binding RetrieveImagesOffline}" />
+            <controls:CustomImageOnline
+                Grid.Row="0"
+                Grid.Column="1"
+                Aspect="AspectFill"
+                DownsampleHeight="600"
+                DownsampleToViewSize="False"
+                DownsampleWidth="600"
+                ImageUrl="{Binding Image2}"
+                IsLocalFile="{Binding RetrieveImagesOffline}" />
+            <controls:CustomImageOnline
+                Grid.Row="1"
+                Grid.Column="0"
+                Aspect="AspectFill"
+                DownsampleHeight="600"
+                DownsampleToViewSize="False"
+                DownsampleWidth="600"
+                ImageUrl="{Binding Image3}"
+                IsLocalFile="{Binding RetrieveImagesOffline}" />
+            <Grid Grid.Row="1" Grid.Column="1">
+                <controls:CustomImageOnline
+                    Aspect="AspectFill"
+                    DownsampleHeight="600"
+                    DownsampleToViewSize="False"
+                    DownsampleWidth="600"
+                    ImageUrl="{Binding Image4}"
+                    IsLocalFile="{Binding RetrieveImagesOffline}" />
+                <BoxView
+                    HorizontalOptions="Fill"
+                    IsVisible="False"
+                    Opacity="0.45"
+                    VerticalOptions="Fill"
+                    Color="Black">
+                    <BoxView.Triggers>
+                        <DataTrigger
+                            Binding="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=5}"
+                            TargetType="BoxView"
+                            Value="True">
+                            <Setter Property="IsVisible" Value="True" />
+                        </DataTrigger>
+                        <DataTrigger
+                            Binding="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=6}"
+                            TargetType="BoxView"
+                            Value="True">
+                            <Setter Property="IsVisible" Value="True" />
+                        </DataTrigger>
+                    </BoxView.Triggers>
+                </BoxView>
+
+                <Label
+                    FontFamily="{StaticResource RobotoBold}"
+                    FontSize="Medium"
+                    HorizontalOptions="Center"
+                    IsVisible="False"
+                    Text="+1"
+                    TextColor="White"
+                    VerticalOptions="Center">
+                    <Label.Triggers>
+                        <DataTrigger
+                            Binding="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=5}"
+                            TargetType="Label"
+                            Value="True">
+                            <Setter Property="IsVisible" Value="True" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+                <Label
+                    FontFamily="{StaticResource RobotoBold}"
+                    FontSize="Medium"
+                    HorizontalOptions="Center"
+                    IsVisible="False"
+                    Text="+2"
+                    TextColor="White"
+                    VerticalOptions="Center">
+                    <Label.Triggers>
+                        <DataTrigger
+                            Binding="{Binding MediaCount, Converter={StaticResource ImageCountToBoolConverter}, ConverterParameter=6}"
+                            TargetType="Label"
+                            Value="True">
+                            <Setter Property="IsVisible" Value="True" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </Grid>
+        </Grid>
+        <Grid />
+    </Grid>
+    <!--  end thumbnails  -->
+
+    <!--  Name and CreatedBy  -->
+    <StackLayout
+        Grid.Column="1"
+        Padding="10,0,0,0"
+        Spacing="0"
+        VerticalOptions="CenterAndExpand">
+        <StackLayout.Triggers>
+            <DataTrigger
+                Binding="{Binding HasImages}"
+                TargetType="StackLayout"
+                Value="False">
+                <Setter Property="Grid.Column" Value="0" />
+                <Setter Property="Grid.ColumnSpan" Value="2" />
+                <Setter Property="Padding" Value="15,0,0,0" />
+            </DataTrigger>
+        </StackLayout.Triggers>
+
+        <!--  Action Description  -->
+        <Label
+            FontSize="Medium"
+            MaxLines="2"
+            LineBreakMode="TailTruncation"
+            Text="{Binding Name}" />
+
+        <!--  Tag list  -->
+        <ScrollView
+            Grid.Row="0"
+            Grid.Column="1"
+            IsVisible="{Binding ContainsTags}"
+            HorizontalScrollBarVisibility="Never"
+            Orientation="Horizontal">
+            <Grid>
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateToConversationCommand, Source={x:Reference ActionViewCell}}" CommandParameter="{Binding}" />
+                </Grid.GestureRecognizers>
+                <controls:TagList
+                    Margin="0,0,0,0"
+                    Wrap="NoWrap"
+                    InputTransparent="True"
+                    BindableLayout.ItemsSource="{Binding Tags}" />
+            </Grid>
+        </ScrollView>
+
+        <!--  Created By  -->
+        <StackLayout Orientation="Horizontal">
+            <Label FontFamily="{StaticResource RobotoLight}" Text="{classes:Translate ACTION_DETAIL_SCREEN_AUTHOR_SECTION_TITLE}" />
+            <Label FontFamily="{StaticResource RobotoLight}" Text="{Binding CreatedBy}" />
+        </StackLayout>
+
+        <!--  Due Date  -->
+        <StackLayout Orientation="Horizontal">
+            <Label FontFamily="{StaticResource RobotoLight}" Text="{classes:Translate ACTION_DATE_EDITED}" />
+            <Label FontFamily="{StaticResource RobotoLight}" Text="{Binding DueDate, Converter={StaticResource DateToStringConverter}}" />
+        </StackLayout>
+
+    </StackLayout>
+
+    <!--  Unseen Comments Icon  -->
+    <StackLayout
+        Grid.Column="2"
+        Margin="0,0,15,0"
+        HorizontalOptions="End"
+        Orientation="Horizontal"
+        Spacing="5"
+        VerticalOptions="Center">
+
+        <AbsoluteLayout>
+            <!--  Unseen Comments  -->
+            <buttons:SfButton
+                Command="{Binding BindingContext.NavigateToConversationCommand, Source={x:Reference ActionViewCell}}"
+                CommandParameter="{Binding}"
+                Style="{StaticResource GreyBorderButton}">
+                <buttons:SfButton.Triggers>
+                    <DataTrigger
+                        Binding="{Binding HasComments}"
+                        TargetType="buttons:SfButton"
+                        Value="True">
+                        <Setter Property="Background" Value="{StaticResource GreenColor}" />
+                        <Setter Property="Stroke" Value="{StaticResource GreenColor}" />
+                    </DataTrigger>
+                    <DataTrigger
+                        Binding="{Binding HasUnseenComments}"
+                        TargetType="buttons:SfButton"
+                        Value="True">
+                        <Setter Property="Background" Value="{StaticResource RedColor}" />
+                        <Setter Property="Stroke" Value="{StaticResource RedColor}" />
+                    </DataTrigger>
+                    <DataTrigger
+                        Binding="{Binding HasComments}"
+                        TargetType="buttons:SfButton"
+                        Value="False">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="Stroke" Value="{StaticResource GreyColor}" />
+                    </DataTrigger>
+                </buttons:SfButton.Triggers>
+                <buttons:SfButton.Content>
+                    <DataTemplate>
+                        <Image
+                            HorizontalOptions="CenterAndExpand"
+                            IsOpaque="True"
+                            VerticalOptions="CenterAndExpand">
+                            <Image.Source>
+                                <FontImageSource
+                                    FontFamily="{StaticResource MaterialFontFamily}"
+                                    Glyph="{x:Static classes:IconFont.Textsms}"
+                                    Size="25"
+                                    Color="{StaticResource GreyColor}" />
+                            </Image.Source>
+                            <Image.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding HasComments}"
+                                    TargetType="Image"
+                                    Value="True">
+                                    <Setter Property="Source">
+                                        <FontImageSource
+                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                            Glyph="{x:Static classes:IconFont.Textsms}"
+                                            Size="25"
+                                            Color="White" />
+                                    </Setter>
+                                </DataTrigger>
+                                <DataTrigger
+                                    Binding="{Binding HasComments}"
+                                    TargetType="Image"
+                                    Value="False">
+                                    <Setter Property="Source">
+                                        <FontImageSource
+                                            FontFamily="{StaticResource MaterialFontFamily}"
+                                            Glyph="{x:Static classes:IconFont.Textsms}"
+                                            Size="25"
+                                            Color="{StaticResource GreyColor}" />
+                                    </Setter>
+                                </DataTrigger>
+                            </Image.Triggers>
+                        </Image>
+                    </DataTemplate>
+                </buttons:SfButton.Content>
+            </buttons:SfButton>
+
+            <buttons:SfButton
+                Background="{StaticResource RedColor}"
+                Stroke="White"
+                StrokeThickness="1"
+                CornerRadius="12"
+                IsVisible="{Binding HasUnseenComments}"
+                StyleClass="action, count, ml-30, mtn-10">
+                <buttons:SfButton.Content>
+                    <DataTemplate>
+                        <Label
+                            HorizontalOptions="Center"
+                            StyleClass="fc-white, fs-10, counter"
+                            Text="{Binding UnviewedCommentNr}"
+                            VerticalOptions="Center" />
+                    </DataTemplate>
+                </buttons:SfButton.Content>
+            </buttons:SfButton>
+
+        </AbsoluteLayout>
+
+        <!--  Solve Button  -->
+        <buttons:SfButton
+            x:Name="SolveButton"
+            Command="{Binding ActionSolvedCommand, Source={x:Reference ActionViewCell}}"
+            CommandParameter="{Binding}"
+            IsVisible="{Binding IsMine}"
+            Background="Transparent"
+            Style="{StaticResource GreyBorderButton}">
+            <buttons:SfButton.Triggers>
+                <DataTrigger
+                    Binding="{Binding FilterStatus}"
+                    TargetType="buttons:SfButton"
+                    Value="{x:Static enumerations:ActionStatusEnum.Solved}">
+                    <Setter Property="Background" Value="{StaticResource GreenColor}" />
+                    <Setter Property="Stroke" Value="{StaticResource GreenColor}" />
+                </DataTrigger>
+            </buttons:SfButton.Triggers>
+            <buttons:SfButton.Content>
+                <DataTemplate>
+                    <Image
+                        HorizontalOptions="CenterAndExpand"
+                        IsOpaque="True"
+                        VerticalOptions="CenterAndExpand">
+                        <Image.Source>
+                            <FontImageSource
+                                FontFamily="{StaticResource MaterialFontFamily}"
+                                Glyph="{x:Static classes:IconFont.ThumbUp}"
+                                Size="25"
+                                Color="{StaticResource GreyColor}" />
+                        </Image.Source>
+                        <Image.Triggers>
+                            <DataTrigger
+                                Binding="{Binding FilterStatus}"
+                                TargetType="Image"
+                                Value="{x:Static enumerations:ActionStatusEnum.Solved}">
+                                <Setter Property="Source">
+                                    <FontImageSource
+                                        FontFamily="{StaticResource MaterialFontFamily}"
+                                        Glyph="{x:Static classes:IconFont.ThumbUp}"
+                                        Size="25"
+                                        Color="White" />
+                                </Setter>
+                            </DataTrigger>
+                        </Image.Triggers>
+                    </Image>
+                </DataTemplate>
+            </buttons:SfButton.Content>
+        </buttons:SfButton>
+    </StackLayout>
+
+    <!--  Action Status  -->
+    <StackLayout
+        Grid.Column="3"
+        BackgroundColor="{Binding FilterStatus, Converter={StaticResource StatusToColorConverter}}"
+        HorizontalOptions="FillAndExpand"
+        VerticalOptions="FillAndExpand" />
+
+    <Grid.GestureRecognizers>
+        <TapGestureRecognizer Command="{Binding NavigateToConversationCommand, Source={x:Reference ActionViewCell}}" CommandParameter="{Binding}" />
+    </Grid.GestureRecognizers>
+</Grid>

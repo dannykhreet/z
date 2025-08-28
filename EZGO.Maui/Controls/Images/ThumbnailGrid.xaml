@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+             xmlns:pdfviewer="clr-namespace:EZGO.Maui.Views"
+             xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+             x:Class="EZGO.Maui.Controls.Images.ThumbnailGrid">
+    <ContentView.Content>
+        <!-- Main grid -->
+        <Grid RowSpacing="1" 
+              ColumnSpacing="1"
+              x:Name="mainGrid">
+            
+            <!-- Rows -->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" x:Name="firstRowDef"/>
+                <RowDefinition Height="*" x:Name="secondRowDef"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Columns -->
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" x:Name="firstColDef"/>
+                <ColumnDefinition Width="*" x:Name="secondColDef"/>
+            </Grid.ColumnDefinitions>
+
+             <!-- Images -->
+            <controls:CustomImage x:Name="image1" Aspect="AspectFill" Grid.Row="0" Grid.Column="0" InputTransparent="True" />
+            <controls:CustomImage x:Name="image2" Aspect="AspectFill" Grid.Row="0" Grid.Column="1" InputTransparent="True" />
+            <controls:CustomImage x:Name="image3" Aspect="AspectFill" Grid.Row="1" Grid.Column="0" InputTransparent="True" />
+            <controls:CustomImage x:Name="image4" Aspect="AspectFill" Grid.Row="1" Grid.Column="1" InputTransparent="True" />
+            
+            <!-- Gesture Recognisers and play buttons -->
+            <Grid x:Name="grid1" Grid.Row="0" Grid.Column="0" IsVisible="True" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+                <Button
+                    x:Name="playBtn1"
+                    BackgroundColor="Transparent"
+                    FontFamily="{StaticResource MaterialFontFamily}"
+                    FontSize="64"
+                    HorizontalOptions="Center"
+                    InputTransparent="True"
+                    IsVisible="False"
+                    Text="{x:Static classes:IconFont.PlayCircleOutline}"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"
+                                          CommandParameter="0"/>
+                </Grid.GestureRecognizers>
+            </Grid>
+
+            <Grid x:Name="grid2" Grid.Row="0" Grid.Column="1" IsVisible="True" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+                <Button
+                    x:Name="playBtn2"
+                    BackgroundColor="Transparent"
+                    FontFamily="{StaticResource MaterialFontFamily}"
+                    FontSize="64"
+                    HorizontalOptions="Center"
+                    InputTransparent="True"
+                    IsVisible="False"
+                    Text="{x:Static classes:IconFont.PlayCircleOutline}"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"
+                                          CommandParameter="1"/>
+                </Grid.GestureRecognizers>
+            </Grid>
+
+            <Grid x:Name="grid3" Grid.Row="1" Grid.Column="0" IsVisible="True" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+                <Button
+                    x:Name="playBtn3"
+                    BackgroundColor="Transparent"
+                    FontFamily="{StaticResource MaterialFontFamily}"
+                    FontSize="64"
+                    HorizontalOptions="Center"
+                    InputTransparent="True"
+                    IsVisible="False"
+                    Text="{x:Static classes:IconFont.PlayCircleOutline}"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"
+                                          CommandParameter="2"/>
+                </Grid.GestureRecognizers>
+            </Grid>
+
+            <Grid x:Name="grid4" Grid.Row="1" Grid.Column="1" IsVisible="True" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+                <Button
+                    x:Name="playBtn4"
+                    BackgroundColor="Transparent"
+                    FontFamily="{StaticResource MaterialFontFamily}"
+                    FontSize="64"
+                    HorizontalOptions="Center"
+                    InputTransparent="True"
+                    IsVisible="False"
+                    Text="{x:Static classes:IconFont.PlayCircleOutline}"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"
+                                          CommandParameter="3"/>
+                </Grid.GestureRecognizers>
+            </Grid>
+
+            <!-- PDFs -->
+            <pdfviewer:PdfViewerControl x:Name="pdf1" Grid.Row="0" Grid.Column="0" IsVisible="False" InputTransparent="True" />
+            <pdfviewer:PdfViewerControl x:Name="pdf2" Grid.Row="0" Grid.Column="1" IsVisible="False" InputTransparent="True" />
+            <pdfviewer:PdfViewerControl x:Name="pdf3" Grid.Row="1" Grid.Column="0" IsVisible="False" InputTransparent="True" />
+            <pdfviewer:PdfViewerControl x:Name="pdf4" Grid.Row="1" Grid.Column="1" IsVisible="False" InputTransparent="True" />
+
+            <!-- Black overlay for the '+x' label -->
+            <BoxView Grid.Row="1" Grid.Column="1"
+                     IsVisible="{Binding Source={x:Reference additionalPhotosLabel}, Path=IsVisible}"
+                     x:Name="labelOverlay"
+                     VerticalOptions="Fill"
+                     HorizontalOptions="Fill"
+                     Color="Black"
+                     Opacity="0.45">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"
+                                          CommandParameter="3"/>
+                </BoxView.GestureRecognizers>
+            </BoxView>
+            
+            <!-- More items available label -->
+            <Label x:Name="additionalPhotosLabel" 
+                   Grid.Row="1" Grid.Column="1"
+                   HorizontalOptions="Center" 
+                   VerticalOptions="Center" 
+                   TextColor="White" 
+                   FontFamily="{StaticResource RobotoBold}" 
+                   FontSize="Medium">
+            </Label>
+        </Grid>
+    </ContentView.Content>
+</ContentView>
+

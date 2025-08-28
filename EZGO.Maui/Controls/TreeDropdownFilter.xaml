@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Border
+    x:Class="EZGO.Maui.Controls.TreeDropdownFilter"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:behaviors="clr-namespace:EZGO.Maui.Behaviors"
+    xmlns:model="clr-namespace:EZGO.Maui.Core.Interfaces.Utils;assembly=EZGO.Maui.Core"
+    xmlns:treeview="clr-namespace:Syncfusion.Maui.TreeView;assembly=Syncfusion.Maui.TreeView"
+    BackgroundColor="Transparent"
+    HorizontalOptions="Center"
+    Stroke="Transparent"
+    StrokeThickness="0"
+    x:Name="Page"
+    VerticalOptions="Center"
+    IsVisible="{Binding IsDropdownOpen, Source={x:Reference Page}}">
+    <treeview:SfTreeView
+        x:Name="treeControl"
+        Grid.Row="1"
+        BackgroundColor="White"
+        SelectionBackground="{StaticResource LightGreyColor}"
+        ChildPropertyName="Children"
+        ItemTemplateContextType="Item"
+        NodeSizeMode="Dynamic"
+        TapCommand="{Binding DropdownTapCommand, Source={x:Reference Page}}">
+        <treeview:SfTreeView.Behaviors>
+            <behaviors:TreeViewAutoSizeBehavior>
+                <behaviors:TreeViewAutoSizeBehavior.ZeroLevelNodeHeight>
+                    <OnPlatform x:TypeArguments="x:Int32">
+                        <On Platform="iOS">60</On>
+                        <On Platform="Android,Windows">100</On>
+                    </OnPlatform>
+                </behaviors:TreeViewAutoSizeBehavior.ZeroLevelNodeHeight>
+            </behaviors:TreeViewAutoSizeBehavior>
+        </treeview:SfTreeView.Behaviors>
+        <treeview:SfTreeView.ItemTemplate>
+            <DataTemplate x:DataType="model:ITreeDropdownFilterItem">
+                <ViewCell>
+                    <ViewCell.View>
+                        <Grid
+                            Grid.Column="1"
+                            Padding="10,6,0,6"
+                            RowSpacing="1"
+                            VerticalOptions="Center">
+                            <Label
+                                FontFamily="{StaticResource RobotoLight}"
+                                FontSize="Title"
+                                Text="{Binding Name}"
+                                TextColor="Black"
+                                VerticalOptions="CenterAndExpand"
+                                VerticalTextAlignment="Center" />
+                        </Grid>
+                    </ViewCell.View>
+                </ViewCell>
+            </DataTemplate>
+        </treeview:SfTreeView.ItemTemplate>
+    </treeview:SfTreeView>
+</Border>
+

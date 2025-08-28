@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="EZGO.Maui.Controls.ChecklistsOpenFields.OpenChecklistFields"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    xmlns:inputLayout="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+    xmlns:openfields="clr-namespace:EZGO.Maui.Core.Models.OpenFields;assembly=EZGO.Maui.Core"
+    xmlns:syncfusion="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    x:Name="openTextFields">
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <DataTemplate x:Key="OpenFieldsTemplate" x:DataType="openfields:UserValuesPropertyModel">
+                <Grid Padding="20,0">
+                    <FlexLayout Direction="{Binding Converter={StaticResource FlexLayoutDirectionConverter}}">
+
+                        <!--  Open Field Title  -->
+                        <Label
+                            AutomationId="OpenFieldsLabel"
+                            FlexLayout.Basis="{Binding TitlePercentage, Source={x:Reference openTextFields}}"
+                            FontFamily="{StaticResource RobotoRegular}"
+                            LineBreakMode="TailTruncation"
+                            MaxLines="2"
+                            Text="{Binding Title}"
+                            VerticalOptions="CenterAndExpand" />
+
+                        <!--  Required Star  -->
+                        <Label
+                            Padding="3,10,0,0"
+                            FlexLayout.Basis="10%"
+                            IsVisible="{Binding IsRequired}"
+                            Text="*"
+                            TextColor="{StaticResource RedColor}" />
+                        <Border
+                            x:Name="inputLayout"
+                            Grid.Column="1"
+                            AutomationId="OpenFieldsInput"
+                            Background="White"
+                            FlexLayout.AlignSelf="Center"
+                            FlexLayout.Basis="{Binding ValuePercentage, Source={x:Reference openTextFields}}"
+                            HeightRequest="36"
+                            VerticalOptions="End">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="5,5,5,5" />
+                            </Border.StrokeShape>
+                            <Entry
+                                Margin="{OnPlatform Android='0,-5,0,-5',
+                                                    iOS='0,0,0,0'}"
+                                IsReadOnly="{Binding IsReadonly}"
+                                Keyboard="Plain"
+                                ReturnType="Done"
+                                Text="{Binding TextInput}"
+                                TextColor="{StaticResource BlackColor}"
+                                VerticalOptions="{OnPlatform Android='End',
+                                                             iOS='Center'}"
+                                VerticalTextAlignment="{OnPlatform Android='End',
+                                                                   iOS='Center'}" />
+                        </Border>
+
+                    </FlexLayout>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Key="CompletedFields" x:DataType="openfields:UserValuesPropertyModel">
+                <Grid>
+                    <StackLayout
+                        Orientation="Horizontal"
+                        Margin="20,0"
+                        VerticalOptions="CenterAndExpand">
+                        <!--  Label for required fields  -->
+                        <Label
+                            IsVisible="{Binding IsRequired}"
+                            FontFamily="{StaticResource RobotoRegular}"
+                            LineBreakMode="TailTruncation"
+                            MaximumWidthRequest="180"
+                            VerticalOptions="CenterAndExpand"
+                            VerticalTextAlignment="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="*" TextColor="{StaticResource RedColor}" />
+                                    <Span Text="{Binding Title}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+
+                        <!--  Colon separator  -->
+                        <Label
+                            IsVisible="{Binding IsRequired}"
+                            Text=" : "
+                            FontFamily="{StaticResource RobotoRegular}"
+                            VerticalOptions="CenterAndExpand"
+                            VerticalTextAlignment="Center" />
+
+                        <!--  Label for non-required fields  -->
+                        <Label
+                            IsVisible="{Binding IsRequired, Converter={StaticResource ReverseBooleanConverter}}"
+                            FontFamily="{StaticResource RobotoRegular}"
+                            LineBreakMode="TailTruncation"
+                            MaximumWidthRequest="600"
+                            VerticalOptions="CenterAndExpand"
+                            VerticalTextAlignment="Center"
+                            Text="{Binding Title}" />
+
+                        <!--  Colon separator for non-required  -->
+                        <Label
+                            IsVisible="{Binding IsRequired, Converter={StaticResource ReverseBooleanConverter}}"
+                            Text=" : "
+                            FontFamily="{StaticResource RobotoRegular}"
+                            VerticalOptions="CenterAndExpand"
+                            VerticalTextAlignment="Center" />
+
+                        <!--  Value Label - immediately after the colon  -->
+                        <Label
+                            FontFamily="{StaticResource RobotoRegular}"
+                            LineBreakMode="TailTruncation"
+                            Text="{Binding UserValueString}"
+                            VerticalOptions="CenterAndExpand"
+                            VerticalTextAlignment="Center"
+                            HorizontalOptions="Start"
+                            HorizontalTextAlignment="Start" />
+                    </StackLayout>
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding TapCommand, Source={x:Reference openTextFields}}" />
+                    </Grid.GestureRecognizers>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </ContentView.Resources>
+
+    <ContentView.Content>
+        <syncfusion:SfListView
+            x:Name="listView"
+            BackgroundColor="LightGray"
+            ItemSize="{Binding ItemHeight, Source={x:Reference openTextFields}}"
+            ItemSpacing="{Binding OpenFieldsSpacing, Source={x:Reference openTextFields}}"
+            ItemTemplate="{StaticResource OpenFieldsTemplate}"
+            SelectionMode="None"
+            TapCommand="{Binding TapCommand, Source={x:Reference openTextFields}}">
+            <syncfusion:SfListView.ItemsLayout>
+                <syncfusion:GridLayout x:Name="layoutManager" SpanCount="1" />
+            </syncfusion:SfListView.ItemsLayout>
+
+            <syncfusion:SfListView.HeaderTemplate>
+                <DataTemplate>
+                    <Label
+                        Margin="60,0,0,0"
+                        FontSize="24"
+                        HorizontalOptions="Start"
+                        Text="{classes:Translate OPEN_FIELDS_TITLE}"
+                        VerticalOptions="Center" />
+                </DataTemplate>
+            </syncfusion:SfListView.HeaderTemplate>
+        </syncfusion:SfListView>
+    </ContentView.Content>
+</ContentView>

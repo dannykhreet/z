@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Tasks.TaskSlideDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    xmlns:viewModel="clr-namespace:EZGO.Maui.Core.ViewModels.Tasks;assembly=EZGO.Maui.Core"
+    x:Name="Page"
+    Title="TaskSlideDetailPage"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    ios:Page.UseSafeArea="true"
+    x:DataType="viewModel:TaskSlideDetailViewModel"
+    Disappearing="Page_Disappearing"
+    NavigationPage.HasBackButton="True"
+    NavigationPage.HasNavigationBar="false">
+
+    <Grid StyleClass="bg-darkgrey">
+
+        <controls:PinchToZoomContainer IsVisible="{Binding SelectedTask.HasVideo, Converter={StaticResource ReverseBooleanConverter}}">
+            <controls:PinchToZoomContainer.Content>
+                <controls:CustomImage
+                    Aspect="AspectFit"
+                    DownsampleToViewSize="False"
+                    ImageUrl="{Binding SelectedTask.Picture}" />
+            </controls:PinchToZoomContainer.Content>
+        </controls:PinchToZoomContainer>
+
+        <Grid CascadeInputTransparent="False" InputTransparent="True">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="200" />
+            </Grid.RowDefinitions>
+
+            <!--<controls:CustomVideoView
+                Grid.Row="0"
+                Grid.RowSpan="3"
+                IsVisible="{Binding SelectedTask.HasVideo}" />-->
+
+            <StackLayout Grid.Row="0">
+                <Frame
+                    Margin="20,0,0,0"
+                    Padding="3,5,7,5"
+                    BackgroundColor="{StaticResource GreyColor}"
+                    BorderColor="{StaticResource GreyColor}"
+                    CornerRadius="10"
+                    HasShadow="False"
+                    HeightRequest="40"
+                    HorizontalOptions="Start"
+                    VerticalOptions="CenterAndExpand"
+                    WidthRequest="40">
+                    <Frame.Triggers>
+                        <DataTrigger
+                            Binding="{Binding SelectedTask.HasVideo}"
+                            TargetType="{x:Type Frame}"
+                            Value="True">
+                            <Setter Property="Margin" Value="20, 50, 0, 0" />
+                        </DataTrigger>
+                    </Frame.Triggers>
+
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding CancelCommand}" />
+                    </Frame.GestureRecognizers>
+
+                    <Label
+                        x:Name="BackButton"
+                        FontFamily="{StaticResource MaterialFontFamily}"
+                        HorizontalOptions="CenterAndExpand"
+                        StyleClass="fontButton, fs-42, fc-darkgrey"
+                        Text="{x:Static classes:IconFont.ChevronLeft}"
+                        VerticalOptions="CenterAndExpand" />
+
+                </Frame>
+            </StackLayout>
+
+            <Grid Grid.Row="2" IsVisible="{Binding SelectedTask.HasVideo, Converter={StaticResource ReverseBooleanConverter}}">
+                <StackLayout
+                    Padding="20,15"
+                    BackgroundColor="{StaticResource TransparentBlackColor}"
+                    VerticalOptions="EndAndExpand">
+                    <ScrollView>
+                        <StackLayout VerticalOptions="CenterAndExpand">
+                            <Label
+                                FontFamily="{StaticResource RobotoBold}"
+                                StyleClass="fs-large, fc-white, mx-20"
+                                Text="{Binding SelectedTask.Name}"
+                                VerticalOptions="CenterAndExpand" />
+                            <Label
+                                FontFamily="{StaticResource RobotoRegular}"
+                                StyleClass="fs-small, fc-white, mx-20"
+                                Text="{Binding SelectedTask.Description}"
+                                VerticalOptions="CenterAndExpand" />
+                            <StackLayout
+                                IsVisible="{Binding AreDatesVisible}"
+                                Orientation="Horizontal"
+                                StyleClass="mx-20, mt-20">
+                                <Label
+                                    FontFamily="{StaticResource RobotoLight}"
+                                    StyleClass="fc-white, fs-small"
+                                    Text="{Binding SelectedTask.DueDateString}" />
+                                <Label
+                                    FontFamily="{StaticResource RobotoLight}"
+                                    StyleClass="fc-white, fs-small"
+                                    Text="{Binding SelectedTask.OverDueString}" />
+                                <Label
+                                    FontFamily="{StaticResource RobotoLight}"
+                                    IsVisible="{Binding SelectedTask.IsTaskMarked}"
+                                    StyleClass="fc-white, fs-small"
+                                    Text="{Binding SelectedTask.TaskMarkedString}" />
+                            </StackLayout>
+                            <Label
+                                Padding="20,0,0,0"
+                                FontFamily="{StaticResource RobotoLight}"
+                                IsVisible="{Binding SelectedTask.HasComment}"
+                                StyleClass="fc-white, fs-small"
+                                Text="{Binding SelectedTask.CommentString}"
+                                VerticalOptions="CenterAndExpand" />
+                        </StackLayout>
+                    </ScrollView>
+                </StackLayout>
+            </Grid>
+        </Grid>
+    </Grid>
+</ContentPage>

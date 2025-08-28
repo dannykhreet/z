@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<button:SfButton
+    x:Class="EZGO.Maui.Controls.Buttons.DeepLinkButton"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:button="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+    x:Name="deepLinkButton"
+    Background="Transparent">
+    <button:SfButton.Triggers>
+        <DataTrigger
+            Binding="{Binding IsValid, Source={x:Reference deepLinkButton}}"
+            TargetType="button:SfButton"
+            Value="True">
+            <Setter Property="Stroke" Value="{Binding InitialBorderColor, Source={x:Reference deepLinkButton}}" />
+        </DataTrigger>
+        <DataTrigger
+            Binding="{Binding IsValid, Source={x:Reference deepLinkButton}}"
+            TargetType="button:SfButton"
+            Value="False">
+            <Setter Property="Stroke" Value="Red" />
+        </DataTrigger>
+    </button:SfButton.Triggers>
+    <button:SfButton.Content>
+        <DataTemplate>
+            <Image
+                HorizontalOptions="CenterAndExpand"
+                IsOpaque="True"
+                VerticalOptions="CenterAndExpand">
+                <Image.Source>
+                    <FontImageSource
+                        FontFamily="{StaticResource MaterialFontFamily}"
+                        Glyph="{x:Static classes:IconFont.ExitToApp}"
+                        Size="26"
+                        Color="{Binding InitialBorderColor, Source={x:Reference deepLinkButton}}" />
+                </Image.Source>
+            </Image>
+        </DataTemplate>
+    </button:SfButton.Content>
+    <VisualStateManager.VisualStateGroups>
+        <VisualStateGroup x:Name="CommonStates">
+            <VisualState x:Name="Disabled">
+                <VisualState.Setters>
+                </VisualState.Setters>
+            </VisualState>
+        </VisualStateGroup>
+    </VisualStateManager.VisualStateGroups>
+</button:SfButton>
+

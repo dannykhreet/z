@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="EZGO.Maui.Views.Bookmarks.BookmarkPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:buttons="clr-namespace:EZGO.Maui.Controls.Buttons"
+    xmlns:classes="clr-namespace:EZGO.Maui.Classes;assembly=EZGO.Maui"
+    xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    xmlns:labels="clr-namespace:EZGO.Maui.Controls.CustomLabels"
+    xmlns:scanner="clr-namespace:BarcodeScanning;assembly=BarcodeScanning.Native.Maui"
+    Title="BookmarkPage"
+    NavigationPage.HasNavigationBar="False">
+    <Grid
+        x:Name="MainGrid"
+        BackgroundColor="{StaticResource BackgroundColor}"
+        RowSpacing="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Style="{StaticResource HeaderStyle}">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="140" />
+                <ColumnDefinition Width="60" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="200" />
+            </Grid.ColumnDefinitions>
+
+            <!--  Navigation Back  -->
+            <buttons:BackButton Grid.Column="0" />
+
+            <!--  Title  -->
+            <labels:TitleLabel Grid.Column="2" Text="{classes:Translate MAIN_SCREEN_QRSCANNER_TEXT}" />
+        </Grid>
+
+        <Grid
+            x:Name="ContentGrid"
+            Grid.Row="1"
+            Padding="0,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <scanner:CameraView
+                x:Name="scanner"
+                AimMode="True"
+                BarcodeSymbologies="All"
+                CaptureQuality="High"
+                ForceInverted="True"
+                HorizontalOptions="FillAndExpand"
+                OnDetectionFinishedCommand="{Binding ScanQR}"
+                TapToFocusEnabled="True"
+                VerticalOptions="FillAndExpand" />
+
+        </Grid>
+
+        <controls:MessageCenter Grid.Row="1" />
+    </Grid>
+</ContentPage>

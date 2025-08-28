@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<buttons:SfSwitch xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+
+             x:Class="EZGO.Maui.Controls.UltimoSwitch">
+    <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="CommonStates">
+                <VisualState x:Name="Off">
+                    <VisualState.Setters>
+                        <Setter Property="SwitchSettings">
+                            <Setter.Value>
+                                <buttons:SwitchSettings
+                                    ThumbHeightRequest="21"
+                                    ThumbWidthRequest="21"
+                                    TrackWidthRequest="60"
+                                    TrackBackground="{StaticResource GreyColor}"
+                                    TrackStroke="{StaticResource GreyColor}"/>
+                            </Setter.Value>
+                        </Setter>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="On">
+                    <VisualState.Setters>
+                        <Setter Property="SwitchSettings">
+                            <Setter.Value>
+                                <buttons:SwitchSettings
+                                    ThumbHeightRequest="21"
+                                    ThumbWidthRequest="21"
+                                    TrackWidthRequest="60"
+                                    TrackBackground="{StaticResource GreenColor}"
+                                    TrackStroke="{StaticResource GreenColor}"/>
+                            </Setter.Value>
+                        </Setter>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+</buttons:SfSwitch>
+

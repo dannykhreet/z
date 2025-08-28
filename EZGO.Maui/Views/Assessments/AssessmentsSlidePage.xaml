@@ -1,0 +1,257 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EZGO.Maui.Views.Assessments.AssessmentsSlidePage"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             xmlns:popup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
+             xmlns:listview="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+             xmlns:processors="clr-namespace:PanCardView.Processors;assembly=PanCardView"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             xmlns:behaviors="clr-namespace:EZGO.Maui.Behaviors"
+             xmlns:settings="clr-namespace:EZGO.Maui.Core.Classes;assembly=EZGO.Maui.Core"
+             xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+             xmlns:customButtons="clr-namespace:EZGO.Maui.Controls.Buttons"
+             xmlns:panCardView="clr-namespace:PanCardView;assembly=PanCardView"
+             xmlns:labels="clr-namespace:EZGO.Maui.Controls.CustomLabels"
+             xmlns:auditModels="clr-namespace:EZGO.Maui.Core.Models.Audits;assembly=EZGO.Maui.Core"
+             x:Name="Page"
+             xmlns:models="clr-namespace:EZGO.Maui.Core.Models.Assessments;assembly=EZGO.Maui.Core"
+             xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+    ios:Page.UseSafeArea="true"
+    NavigationPage.HasBackButton="True"
+    NavigationPage.HasNavigationBar="False">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <DataTemplate x:Key="InstructionSlideTemplate" x:DataType="models:BasicAssessmentInstructionItemModel">
+                <Grid
+                    HeightRequest="500" WidthRequest="900" HorizontalOptions="CenterAndExpand" VerticalOptions="FillAndExpand">
+                    <Grid.RowDefinitions>
+                        <!-- Image Row -->
+                        <RowDefinition Height="65*" />
+                        <!-- Description && Overlay Row -->
+                        <RowDefinition Height="35*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Image -->
+                    <controls:CustomImageOnline
+                        x:Name="DetailImage" Grid.Row="0" Grid.RowSpan="2" Aspect="Fill"
+                        ImageUrl="{Binding DisplayPicture}">
+                        <controls:CustomImage.GestureRecognizers>
+                            <TapGestureRecognizer
+                                x:Name="ImageGesture"
+                                Command="{Binding BindingContext.DetailCommand, Source={x:Reference Page}}"
+                                CommandParameter="{Binding}" />
+                        </controls:CustomImage.GestureRecognizers>
+                    </controls:CustomImageOnline>
+
+                    <!--  Play button  -->
+                    <Button
+                        Grid.Row="0"
+                        Grid.RowSpan="2"
+                        BackgroundColor="Transparent"
+                        FontFamily="{StaticResource MaterialFontFamily}"
+                        FontSize="64"
+                        HorizontalOptions="Center"
+                        InputTransparent="True"
+                        IsVisible="{Binding HasVideo}"
+                        Text="{x:Static classes:IconFont.PlayCircleOutline}"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+
+                    <!-- Scroll Overlay -->
+                    <ScrollView
+                        Grid.Row="1" Padding="20,15"
+                        BackgroundColor="{StaticResource TransparentBlackColor}"
+                        VerticalOptions="End">
+
+                        <!-- Task Name & Description -->
+                        <StackLayout>
+                            <!-- Task Name -->
+                            <Label
+                                x:Name="TaskName"
+                                FontFamily="{StaticResource RobotoBold}"
+                                FontSize="Large"
+                                Text="{Binding Name}"
+                                TextColor="White" />
+
+                            <!-- Task Description -->
+                            <Label
+                                FontFamily="{StaticResource RobotoLight}"
+                                FontSize="Small"
+                                Text="{Binding Description}"
+                                TextColor="White" />
+                        </StackLayout>
+
+                    </ScrollView>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+        <Grid>
+            <!--  Audit score popup  -->
+        <popup:SfPopup
+            x:Name="ScorePopup"
+            Margin="0"
+            Background="White"
+            HeightRequest="75"
+            IsOpen="{Binding IsScorePopupOpen}"
+            ShowFooter="False"
+            ShowHeader="False"
+            ShowOverlayAlways="False"
+            WidthRequest="{Binding ScoreWidth}">
+            <popup:SfPopup.PopupStyle>
+                <popup:PopupStyle CornerRadius="20" />
+            </popup:SfPopup.PopupStyle>
+            <popup:SfPopup.ContentTemplate>
+                <DataTemplate>
+                    <StackLayout Padding="0">
+                        <listview:SfListView
+                            Margin="0"
+                            Padding="5"
+                            CachingStrategy="RecycleTemplate"
+                            ItemSpacing="3"
+                            ItemsSource="{Binding Scores}"
+                            Orientation="Horizontal">
+                            <listview:SfListView.ItemTemplate>
+                                <DataTemplate x:DataType="auditModels:ScoreModel">
+                                    <buttons:SfButton
+                                        Margin="0,10,0,0"
+                                        Background="{Binding Color}"
+                                        Clicked="Score_Clicked"
+                                        Command="{Binding BindingContext.TaskScoreCommand, Source={x:Reference Page}}"
+                                        CommandParameter="{Binding Number}"
+                                        Style="{StaticResource ScoreButton}"
+                                        VerticalOptions="Start">
+                                        <buttons:SfButton.Content>
+                                            <DataTemplate>
+                                                <Label
+                                                    FontSize="Medium"
+                                                    HorizontalOptions="CenterAndExpand"
+                                                    Text="{Binding Number}"
+                                                    TextColor="White"
+                                                    VerticalOptions="CenterAndExpand" />
+                                            </DataTemplate>
+                                        </buttons:SfButton.Content>
+                                    </buttons:SfButton>
+                                </DataTemplate>
+                            </listview:SfListView.ItemTemplate>
+                        </listview:SfListView>
+                    </StackLayout>
+                </DataTemplate>
+            </popup:SfPopup.ContentTemplate>
+        </popup:SfPopup>
+
+
+            <Grid
+                x:Name="MainGrid" HorizontalOptions="FillAndExpand" RowSpacing="0" StyleClass="bg-lightgrey" VerticalOptions="FillAndExpand">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="80" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="120" />
+                </Grid.RowDefinitions>
+
+                <Grid
+                    Grid.Row="0" ColumnSpacing="0" RowSpacing="0" StyleClass="header, bg-white, m-0, pr-15">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="280" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Back Button -->
+                    <customButtons:BackButton Grid.Column="0" Command="{Binding CancelCommand}" />
+
+                    <!-- Instruction Name -->
+                    <labels:TitleLabel
+                        Grid.Column="1" HorizontalOptions="StartAndExpand"
+                        Text="{Binding SelectedInstruction.Name}" />
+
+                    <!-- Pager -->
+                    <Label
+                        Grid.Column="2" Padding="10,0" HorizontalTextAlignment="End"
+                        Text="{Binding Pager}"
+                        VerticalTextAlignment="Center" />
+                </Grid>
+
+                <!-- Detail Page -->
+                <panCardView:CoverFlowView
+                    x:Name="CoverFlow" Grid.Row="1" Margin="0,15,0,0" IsCyclical="False"
+                    IsRightToLeftFlowDirectionEnabled="{Binding Source={x:Static settings:Settings.IsRightToLeftLanguage}}"
+                    ItemTemplate="{StaticResource InstructionSlideTemplate}"
+                    ItemsSource="{Binding InstructionsFilter.FilteredList}"
+                    SelectedIndex="{Binding SelectedIndex}"
+                    SelectedItem="{Binding SelectedInstruction}">
+
+                    <x:Arguments>
+                        <processors:CoverFlowProcessor OpacityFactor="0.25" ScaleFactor="0.50" />
+                    </x:Arguments>
+                    <panCardView:CoverFlowView.Behaviors>
+                        <behaviors:CornerFlowViewShiftAsMarginBehavior Margin="150" />
+                    </panCardView:CoverFlowView.Behaviors>
+                </panCardView:CoverFlowView>
+
+                <StackLayout Grid.Row="2" Grid.Column="0" Orientation="Horizontal" HorizontalOptions="Center">
+
+                    <!-- Attachments Button-->
+                    <buttons:SfButton
+                        Grid.Row="1"
+                        VerticalOptions="Center"
+                        HeightRequest="80"
+                        WidthRequest="80"
+                        Background="Transparent"
+                        CornerRadius="40"
+                        Command="{Binding AttachmentsCommand}"
+                        IsVisible="{Binding SelectedInstruction.HasAttachments}"
+                        Style="{StaticResource DarkerGreyBorderButton}">
+                        <buttons:SfButton.Content>
+                            <DataTemplate>
+                        <Image
+                            x:Name="Icon"
+                            Margin="5,0,0,0"
+                            IsOpaque="True"
+                            Scale="0.76">
+                            <Image.Source>
+                                <FontImageSource
+                                    x:Name="ImageIcon"
+                                    FontFamily="{StaticResource FAS}"
+                                    Glyph="link"
+                                    Color="{StaticResource DarkerGreyColor}" />
+                            </Image.Source>
+                            <Image.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding SelectedInstruction.AttachmentType}"
+                                    TargetType="Image"
+                                    Value="1">
+                                    <Setter TargetName="ImageIcon" Property="FontImageSource.Glyph" Value="file-pdf" />
+                                </DataTrigger>
+                            </Image.Triggers>
+                        </Image>
+                            </DataTemplate>
+                        </buttons:SfButton.Content>
+                    </buttons:SfButton>
+
+                    <!-- Score Button -->
+                    <customButtons:ScoreButton
+                        x:Name="ScoreButton" 
+                        EmptyBackgroundColor="{StaticResource GreyColor}"
+                        ColorCalculator="{Binding BindingContext.ColorCalculator, Source={x:Reference Page}}"
+                        Command="{Binding BindingContext.OpenScoreCommand, Source={x:Reference Page}}"
+                        CommandParameter="{Binding .}"
+                        CornerRadius="40" HeightRequest="80" HorizontalOptions="CenterAndExpand"
+                        Score="{Binding SelectedInstruction.Score}"
+                        Style="{StaticResource GreyBorderButton}"
+                        VerticalOptions="CenterAndExpand" WidthRequest="80" />
+                </StackLayout>
+
+                <!-- Message Center -->
+                <controls:MessageCenter Grid.Row="1" />
+
+            </Grid>
+
+        </Grid>
+
+    </ContentPage.Content>
+</ContentPage>

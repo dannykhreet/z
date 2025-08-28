@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:EZGO.Maui.Controls"
+             xmlns:classes="clr-namespace:EZGO.Maui.Classes"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             x:Class="EZGO.Maui.Controls.ImageInput"
+             x:Name="control">
+    <buttons:SfButton
+        Style="{StaticResource MediaButton2}"
+        BackgroundColor="Transparent"
+        Command="{Binding Command, Source={x:Reference control}}"
+        CommandParameter="{Binding CurrentMediaItem, Source={x:Reference control}}">
+        <buttons:SfButton.Content>
+            <DataTemplate>
+                <!-- Main content -->
+                <Grid>
+
+                    <!-- Image -->
+                    <controls:CustomImage
+                        x:Name="image"
+                        IsLocalFile="{Binding CurrentMediaItem.IsLocalFile, Source={x:Reference control}}"
+                        ImageUrl="{Binding CurrentMediaItem.PictureUrl, Source={x:Reference control}}"
+                        Aspect="AspectFill" HidePlaceholder="True" />
+
+                    <!-- Text wrapper -->
+                    <StackLayout
+                        VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"
+                        IsVisible="{Binding ShowMediaOverlay, Source={x:Reference control}}">
+
+                        <!-- Camera/change icon -->
+                        <Label
+                            x:Name="icon"
+                            TextColor="{StaticResource GreenColor}"
+                            Text="{x:Static classes:IconFont.CameraAlt}"
+                            FontFamily="{StaticResource MaterialFontFamily}"
+                            HorizontalOptions="Center" FontSize="Medium">
+                            <Label.Triggers>
+                                <DataTrigger
+                                    TargetType="Label"
+                                    Binding="{Binding CurrentMediaItem.IsEmpty, Source={x:Reference control}}"
+                                    Value="False">
+                                    <Setter Property="Text" Value="{x:Static classes:IconFont.Sync}" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+
+                        <!-- Add/change photo label -->
+                        <Label
+                            Text="{classes:Translate TASK_CONSTRUCTOR_BASIC_VIEW_ADD_PHOTO_TEXT}"
+                            FontFamily="{StaticResource RobotoRegular}"
+                            TextColor="{StaticResource GreenColor}"
+                            HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="Small">
+                            <Label.Triggers>
+                                <DataTrigger
+                                    TargetType="Label"
+                                    Binding="{Binding CurrentMediaItem.IsEmpty, Source={x:Reference control}}"
+                                    Value="False">
+                                    <Setter Property="Text" Value="{classes:Translate EDIT_SCREEN_EDIT_PHOTO_BUTTON_TITLE}" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </StackLayout>
+                </Grid>
+            </DataTemplate>
+        </buttons:SfButton.Content>
+    </buttons:SfButton>
+</ContentView>
+
