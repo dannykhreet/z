@@ -76,6 +76,10 @@ namespace EZGO.Maui.Core.ViewModels.Assessments
             {
                 Fullname = UserSettings.Fullname;
                 assessment = await _assessmentsService.GetAssessment(AssessmentId);
+                if (assessment == null) {
+                    // display message or navigate away
+                    return;
+                }
 
                 if (assessment.SignatureType == Api.Models.Enumerations.RequiredSignatureTypeEnum.TwoSignatureRequired)
                 {
