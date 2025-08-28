@@ -995,7 +995,7 @@ namespace EZGO.Maui.Core.ViewModels
         /// </summary>
         private void SubmitUserPopup()
         {
-            SelectedResources = PopupResources.ToList();
+            SelectedResources = PopupResources?.ToList() ?? new List<ResourceModel>();
             var SelectedResourceNamesList = new List<ResourceSelectionModel>();
 
             if (SelectedResources.Any())
