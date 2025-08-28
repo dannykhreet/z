@@ -9,7 +9,9 @@ public partial class AuditSignPage : ContentPage
 
     void PopupLayout_Opened(System.Object sender, System.EventArgs e)
     {
-        PopupLayout.ContentTemplate = new DataTemplate();
-        PopupLayout.ContentTemplate = AutocompleteTemplate;
+        if (AutocompleteTemplate != null)
+        {
+            PopupLayout.ContentTemplate = AutocompleteTemplate;
+        }
     }
 }
