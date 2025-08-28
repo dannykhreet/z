@@ -1,0 +1,300 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\frontend (web apps)\\mobile\\maui\\ezgo.maui.core\\services\\assessments\\assessmentsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|solutionrelative:ezgo.maui.core\\services\\assessments\\assessmentsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\frontend (web apps)\\mobile\\maui\\ezgo.maui.core\\models\\assessments\\basicassessmentinstructionitemmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|solutionrelative:ezgo.maui.core\\models\\assessments\\basicassessmentinstructionitemmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\frontend (web apps)\\mobile\\maui\\ezgo.maui.core\\services\\api\\apiclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|solutionrelative:ezgo.maui.core\\services\\api\\apiclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3F246E21-5B0A-481C-B72B-34B09785224F}|EZGO.Maui\\EZGO.Maui.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\frontend (web apps)\\mobile\\maui\\ezgo.maui\\platforms\\android\\androidmanifest.xml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{3F246E21-5B0A-481C-B72B-34B09785224F}|EZGO.Maui\\EZGO.Maui.csproj|solutionrelative:ezgo.maui\\platforms\\android\\androidmanifest.xml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\frontend (web apps)\\mobile\\maui\\ezgo.maui.core\\services\\apirequesthandler\\apirequesthandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|solutionrelative:ezgo.maui.core\\services\\apirequesthandler\\apirequesthandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\frontend (web apps)\\mobile\\maui\\ezgo.maui.core\\viewmodels\\assessments\\assessmentinstructionitemsviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|solutionrelative:ezgo.maui.core\\viewmodels\\assessments\\assessmentinstructionitemsviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3F246E21-5B0A-481C-B72B-34B09785224F}|EZGO.Maui\\EZGO.Maui.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\frontend (web apps)\\mobile\\maui\\ezgo.maui\\views\\assessments\\assessmentsinstructionitemspage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3F246E21-5B0A-481C-B72B-34B09785224F}|EZGO.Maui\\EZGO.Maui.csproj|solutionrelative:ezgo.maui\\views\\assessments\\assessmentsinstructionitemspage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\frontend (web apps)\\mobile\\maui\\ezgo.maui.core\\models\\assessments\\assessmentskillinstructionmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|solutionrelative:ezgo.maui.core\\models\\assessments\\assessmentskillinstructionmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\frontend (web apps)\\mobile\\maui\\ezgo.maui.core\\interfaces\\assessments\\iassessmentsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|solutionrelative:ezgo.maui.core\\interfaces\\assessments\\iassessmentsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3F246E21-5B0A-481C-B72B-34B09785224F}|EZGO.Maui\\EZGO.Maui.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\frontend (web apps)\\mobile\\maui\\ezgo.maui\\views\\assessments\\assessmentsinstructionitemspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{3F246E21-5B0A-481C-B72B-34B09785224F}|EZGO.Maui\\EZGO.Maui.csproj|solutionrelative:ezgo.maui\\views\\assessments\\assessmentsinstructionitemspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\frontend (web apps)\\mobile\\maui\\ezgo.maui.core\\viewmodels\\assessments\\assessmentsviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|solutionrelative:ezgo.maui.core\\viewmodels\\assessments\\assessmentsviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\frontend (web apps)\\mobile\\maui\\ezgo.maui.core\\utils\\asyncawaiter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|solutionrelative:ezgo.maui.core\\utils\\asyncawaiter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\frontend (web apps)\\mobile\\maui\\ezgo.maui.core\\classes\\savetocachedelegatinghandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|solutionrelative:ezgo.maui.core\\classes\\savetocachedelegatinghandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\frontend (web apps)\\mobile\\maui\\ezgo.maui.core\\models\\instructions\\instructionitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|solutionrelative:ezgo.maui.core\\models\\instructions\\instructionitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\frontend (web apps)\\mobile\\maui\\ezgo.maui.core\\assets\\languageresources-en.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|solutionrelative:ezgo.maui.core\\assets\\languageresources-en.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\frontend (web apps)\\mobile\\maui\\ezgo.maui.core\\defaultlanguage.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|solutionrelative:ezgo.maui.core\\defaultlanguage.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\frontend (web apps)\\mobile\\maui\\ezgo.maui.core\\utils\\environments\\developenvironment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0D5AB813-B3C8-412A-814C-380DB696056F}|EZGO.Maui.Core\\EZGO.Maui.Core.csproj|solutionrelative:ezgo.maui.core\\utils\\environments\\developenvironment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AndroidManifest.xml",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui\\Platforms\\Android\\AndroidManifest.xml",
+              "RelativeDocumentMoniker": "EZGO.Maui\\Platforms\\Android\\AndroidManifest.xml",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui\\Platforms\\Android\\AndroidManifest.xml",
+              "RelativeToolTip": "EZGO.Maui\\Platforms\\Android\\AndroidManifest.xml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003576|",
+              "WhenOpened": "2025-08-18T14:12:07.341Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "AssessmentsInstructionItemsPage.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui\\Views\\Assessments\\AssessmentsInstructionItemsPage.xaml.cs",
+              "RelativeDocumentMoniker": "EZGO.Maui\\Views\\Assessments\\AssessmentsInstructionItemsPage.xaml.cs",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui\\Views\\Assessments\\AssessmentsInstructionItemsPage.xaml.cs",
+              "RelativeToolTip": "EZGO.Maui\\Views\\Assessments\\AssessmentsInstructionItemsPage.xaml.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAAwCUAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-18T11:41:32.016Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AssessmentsService.cs",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Services\\Assessments\\AssessmentsService.cs",
+              "RelativeDocumentMoniker": "EZGO.Maui.Core\\Services\\Assessments\\AssessmentsService.cs",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Services\\Assessments\\AssessmentsService.cs",
+              "RelativeToolTip": "EZGO.Maui.Core\\Services\\Assessments\\AssessmentsService.cs",
+              "ViewState": "AgIAAEwBAAAAAAAAAAAcwF8BAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T08:31:49.57Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AssessmentInstructionItemsViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\ViewModels\\Assessments\\AssessmentInstructionItemsViewModel.cs",
+              "RelativeDocumentMoniker": "EZGO.Maui.Core\\ViewModels\\Assessments\\AssessmentInstructionItemsViewModel.cs",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\ViewModels\\Assessments\\AssessmentInstructionItemsViewModel.cs",
+              "RelativeToolTip": "EZGO.Maui.Core\\ViewModels\\Assessments\\AssessmentInstructionItemsViewModel.cs",
+              "ViewState": "AgIAANgAAAAAAAAAAAAQwPIAAAAQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T08:29:05.369Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ApiRequestHandler.cs",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Services\\ApiRequestHandler\\ApiRequestHandler.cs",
+              "RelativeDocumentMoniker": "EZGO.Maui.Core\\Services\\ApiRequestHandler\\ApiRequestHandler.cs",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Services\\ApiRequestHandler\\ApiRequestHandler.cs",
+              "RelativeToolTip": "EZGO.Maui.Core\\Services\\ApiRequestHandler\\ApiRequestHandler.cs",
+              "ViewState": "AgIAAF0AAAAAAAAAAAAgwHIAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T12:33:31.18Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "InstructionItem.cs",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Models\\Instructions\\InstructionItem.cs",
+              "RelativeDocumentMoniker": "EZGO.Maui.Core\\Models\\Instructions\\InstructionItem.cs",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Models\\Instructions\\InstructionItem.cs",
+              "RelativeToolTip": "EZGO.Maui.Core\\Models\\Instructions\\InstructionItem.cs",
+              "ViewState": "AgIAABoAAAAAAAAAAAAswDQAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T12:19:21.797Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "AssessmentsInstructionItemsPage.xaml",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui\\Views\\Assessments\\AssessmentsInstructionItemsPage.xaml",
+              "RelativeDocumentMoniker": "EZGO.Maui\\Views\\Assessments\\AssessmentsInstructionItemsPage.xaml",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui\\Views\\Assessments\\AssessmentsInstructionItemsPage.xaml",
+              "RelativeToolTip": "EZGO.Maui\\Views\\Assessments\\AssessmentsInstructionItemsPage.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAABAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-08-12T09:43:04.769Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ApiClient.cs",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Services\\Api\\ApiClient.cs",
+              "RelativeDocumentMoniker": "EZGO.Maui.Core\\Services\\Api\\ApiClient.cs",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Services\\Api\\ApiClient.cs",
+              "RelativeToolTip": "EZGO.Maui.Core\\Services\\Api\\ApiClient.cs",
+              "ViewState": "AgIAABIAAAAAAAAAAAAtwDQAAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T12:33:36.977Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "AssessmentSkillInstructionModel.cs",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Models\\Assessments\\AssessmentSkillInstructionModel.cs",
+              "RelativeDocumentMoniker": "EZGO.Maui.Core\\Models\\Assessments\\AssessmentSkillInstructionModel.cs",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Models\\Assessments\\AssessmentSkillInstructionModel.cs",
+              "RelativeToolTip": "EZGO.Maui.Core\\Models\\Assessments\\AssessmentSkillInstructionModel.cs",
+              "ViewState": "AgIAACUAAAAAAAAAAAAwwAkAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T12:16:04.879Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "BasicAssessmentInstructionItemModel.cs",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Models\\Assessments\\BasicAssessmentInstructionItemModel.cs",
+              "RelativeDocumentMoniker": "EZGO.Maui.Core\\Models\\Assessments\\BasicAssessmentInstructionItemModel.cs",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Models\\Assessments\\BasicAssessmentInstructionItemModel.cs",
+              "RelativeToolTip": "EZGO.Maui.Core\\Models\\Assessments\\BasicAssessmentInstructionItemModel.cs",
+              "ViewState": "AgIAAEkAAAAAAAAAAADwvw0AAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T12:18:11.452Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "IAssessmentsService.cs",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Interfaces\\Assessments\\IAssessmentsService.cs",
+              "RelativeDocumentMoniker": "EZGO.Maui.Core\\Interfaces\\Assessments\\IAssessmentsService.cs",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Interfaces\\Assessments\\IAssessmentsService.cs",
+              "RelativeToolTip": "EZGO.Maui.Core\\Interfaces\\Assessments\\IAssessmentsService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwA8AAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T10:54:11.719Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "LanguageResources-EN.json",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Assets\\LanguageResources-EN.json",
+              "RelativeDocumentMoniker": "EZGO.Maui.Core\\Assets\\LanguageResources-EN.json",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Assets\\LanguageResources-EN.json",
+              "RelativeToolTip": "EZGO.Maui.Core\\Assets\\LanguageResources-EN.json",
+              "ViewState": "AgIAAO0HAAAAAAAAAAAAwAYIAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-08-14T11:17:41.785Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "SaveToCacheDelegatingHandler.cs",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Classes\\SaveToCacheDelegatingHandler.cs",
+              "RelativeDocumentMoniker": "EZGO.Maui.Core\\Classes\\SaveToCacheDelegatingHandler.cs",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Classes\\SaveToCacheDelegatingHandler.cs",
+              "RelativeToolTip": "EZGO.Maui.Core\\Classes\\SaveToCacheDelegatingHandler.cs",
+              "ViewState": "AgIAABIAAAAAAAAAAAAtwDwAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T12:33:41.369Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "AssessmentsViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\ViewModels\\Assessments\\AssessmentsViewModel.cs",
+              "RelativeDocumentMoniker": "EZGO.Maui.Core\\ViewModels\\Assessments\\AssessmentsViewModel.cs",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\ViewModels\\Assessments\\AssessmentsViewModel.cs",
+              "RelativeToolTip": "EZGO.Maui.Core\\ViewModels\\Assessments\\AssessmentsViewModel.cs",
+              "ViewState": "AgIAAKkBAAAAAAAAAAAqwMUBAABoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T12:37:23.036Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "AsyncAwaiter.cs",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Utils\\AsyncAwaiter.cs",
+              "RelativeDocumentMoniker": "EZGO.Maui.Core\\Utils\\AsyncAwaiter.cs",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Utils\\AsyncAwaiter.cs",
+              "RelativeToolTip": "EZGO.Maui.Core\\Utils\\AsyncAwaiter.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAtwEwAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T12:33:35.088Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "DefaultLanguage.json",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\DefaultLanguage.json",
+              "RelativeDocumentMoniker": "EZGO.Maui.Core\\DefaultLanguage.json",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\DefaultLanguage.json",
+              "RelativeToolTip": "EZGO.Maui.Core\\DefaultLanguage.json",
+              "ViewState": "AgIAALEHAAAAAAAAAAAAwMoHAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-08-14T11:17:36.097Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "DevelopEnvironment.cs",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Utils\\Environments\\DevelopEnvironment.cs",
+              "RelativeDocumentMoniker": "EZGO.Maui.Core\\Utils\\Environments\\DevelopEnvironment.cs",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\Frontend (Web Apps)\\Mobile\\Maui\\EZGO.Maui.Core\\Utils\\Environments\\DevelopEnvironment.cs",
+              "RelativeToolTip": "EZGO.Maui.Core\\Utils\\Environments\\DevelopEnvironment.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAxwBQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T07:40:23.329Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
