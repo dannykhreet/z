@@ -8,7 +8,6 @@
              xmlns:listview="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
              xmlns:tags="clr-namespace:EZGO.Maui.Core.Models.Tags;assembly=EZGO.Maui.Core"
              x:Class="EZGO.Maui.Controls.Filters.TagsFilterSection">
-
     <Grid BackgroundColor="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="50" />
@@ -29,19 +28,18 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="320"/>
             </Grid.RowDefinitions>
-                
-                <!--  Search tag list  -->
-                <listview:SfListView
+            <!--  Search tag list  -->
+            <listview:SfListView
                     Grid.Row="0"
                     x:Name="SearchTag"
                     AutoFitMode="DynamicHeight"
                     Orientation="Vertical"
                     ItemsSource="{Binding SearchedTags, Source={x:Reference TagsFilter}}"
-                    IsVisible="{Binding SearchTags, Converter={StaticResource ListCountToBooleanConverter}}"
+                    IsVisible="{Binding Source={x:Reference TagsFilter}, Path=SearchedTags, Converter={StaticResource ListCountToBooleanConverter}}"
                     ScrollBarVisibility="Never">
-                    <listview:SfListView.ItemTemplate>
-                        <DataTemplate x:DataType="tags:TagModel">
-                            <filters:FilterButton
+                <listview:SfListView.ItemTemplate>
+                    <DataTemplate x:DataType="tags:TagModel">
+                        <filters:FilterButton
                                 Name="{Binding Name, FallbackValue='Unnamed', TargetNullValue='Unnamed'}"
                                 Margin="0,0,0,8"
                                 ButtonColor="{Binding ColorCode}"
@@ -50,34 +48,32 @@
                                 IconName="{Binding IconName}"
                                 IconStyle="{Binding IconStyle}"
                                 IsActive="{Binding IsActive}" />
-                        </DataTemplate>
-                    </listview:SfListView.ItemTemplate>
-                </listview:SfListView>
-
-                <!--  Tag table  -->
-                <listview:SfListView
+                    </DataTemplate>
+                </listview:SfListView.ItemTemplate>
+            </listview:SfListView>
+            <!--  Tag table  -->
+            <listview:SfListView
                     Grid.Row="0"
                     x:Name="TagTable"
                     Margin="0,0,0,0"
                     AutoFitMode="DynamicHeight"
                     ScrollBarVisibility="Never"
                     ItemsSource="{Binding Filter.Tags, Source={x:Reference TagsFilter}}"
-                    IsVisible="{Binding SearchTags, Converter={StaticResource ListCountToBooleanConverter}, ConverterParameter=False}"
+                    IsVisible="{Binding Source={x:Reference TagsFilter}, Path=SearchedTags, Converter={StaticResource ListCountToBooleanConverter}, ConverterParameter=False}"
                     CachingStrategy="CreateNewTemplate"
                     SelectionMode="None">
-                    <listview:SfListView.ItemTemplate>
-                        <DataTemplate x:DataType="tags:TagModel">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="44" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
-
-                                <StackLayout
+                <listview:SfListView.ItemTemplate>
+                    <DataTemplate x:DataType="tags:TagModel">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="44" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <StackLayout
                                     Grid.Row="0"
                                     HorizontalOptions="CenterAndExpand"
                                     Orientation="Horizontal">
-                                    <filters:FilterButton
+                                <filters:FilterButton
                                         Name="{Binding Name, FallbackValue='Unnamed', TargetNullValue='Unnamed'}"
                                         ButtonColor="{Binding ColorCode}"
                                         Margin="0,0,0,4"
@@ -87,10 +83,9 @@
                                         IconStyle="{Binding IconStyle}"
                                         IsActive="{Binding IsActive}"
                                         IsIconVisible="True" />
-                                </StackLayout>
-
-                                <!--  Subtags list  -->
-                                <FlexLayout
+                            </StackLayout>
+                            <!--  Subtags list  -->
+                            <FlexLayout
                                     Grid.Row="1"
                                     Margin="0,8,0,20"
                                     AlignItems="Center"
@@ -99,9 +94,9 @@
                                     IsVisible="True"
                                     JustifyContent="Center"
                                     Wrap="Wrap">
-                                    <BindableLayout.ItemTemplate>
-                                        <DataTemplate x:DataType="tags:TagModel">
-                                            <filters:FilterButton
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="tags:TagModel">
+                                        <filters:FilterButton
                                                 Name="{Binding Name, FallbackValue='Unnamed', TargetNullValue='Unnamed'}"
                                                 Margin="0,0,0,4"
                                                 ButtonColor="{Binding ColorCode}"
@@ -110,15 +105,13 @@
                                                 IconName="{Binding IconName}"
                                                 IconStyle="{Binding IconStyle}"
                                                 IsActive="{Binding IsActive}" />
-                                        </DataTemplate>
-                                    </BindableLayout.ItemTemplate>
-                                </FlexLayout>
-                            </Grid>
-                        </DataTemplate>
-                    </listview:SfListView.ItemTemplate>
-                </listview:SfListView>
-
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </FlexLayout>
+                        </Grid>
+                    </DataTemplate>
+                </listview:SfListView.ItemTemplate>
+            </listview:SfListView>
         </Grid>
     </Grid>
-
 </Border>

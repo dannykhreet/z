@@ -153,7 +153,9 @@ namespace EZGO.Maui.Core.ViewModels
             {
                 if (action.FilterStatus != status)
                 {
-                    Page page = NavigationService.GetCurrentPage();
+                    var page = NavigationService?.GetCurrentPage();
+                    if (page == null)
+                        return;
 
                     string confirm = TranslateExtension.GetValueFromDictionary(LanguageConstants.alertConfirmAction);
                     string yes = TranslateExtension.GetValueFromDictionary(LanguageConstants.alertYesButtonTitle);
@@ -165,7 +167,7 @@ namespace EZGO.Maui.Core.ViewModels
                     {
                         action.FilterStatus = status;
                     }
-                    _statusBarService.HideStatusBar();
+                    _statusBarService?.HideStatusBar();
                 }
             }
         }

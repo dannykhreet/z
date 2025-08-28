@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Amazon.S3;
-using Autofac;
+﻿using Amazon.S3;
 using EZGO.Maui.Core.Classes;
 using EZGO.Maui.Core.Interfaces.Data;
 
@@ -19,8 +15,9 @@ namespace EZGO.Maui.Core.Utils.AWS
             using (var scope = App.Container.CreateScope())
             {
                 var settingsService = scope.ServiceProvider.GetService<ISettingsService>();
-
+                bool lockTaken = false;
                 await HandleCredentialsSemaphore.WaitAsync();
+                lockTaken = true;
                 try
                 {
                     var credentialsRefreshed = await settingsService.HandleAWSCredentials();
@@ -32,7 +29,10 @@ namespace EZGO.Maui.Core.Utils.AWS
                 }
                 finally
                 {
-                    HandleCredentialsSemaphore.Release();
+                    if (lockTaken)
+                    {
+                        HandleCredentialsSemaphore.Release();
+                    }
                 }
             }
         }

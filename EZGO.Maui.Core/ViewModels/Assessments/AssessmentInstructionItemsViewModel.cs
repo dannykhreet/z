@@ -134,12 +134,19 @@ namespace EZGO.Maui.Core.ViewModels.Assessments
             if (id == null)
                 return;
 
-            UserSkillInstructions = SelectedUserAssessment.SkillInstructions ?? new List<AssessmentSkillInstructionModel>();
-            CurrentAssessmentSkillInstruction = UserSkillInstructions.FirstOrDefault(s => s.Id == AssessmentSkillInstructionId) ?? new AssessmentSkillInstructionModel();
+            UserSkillInstructions = SelectedUserAssessment?.SkillInstructions ?? new List<AssessmentSkillInstructionModel>();
+            CurrentAssessmentSkillInstruction = UserSkillInstructions
+                .FirstOrDefault(s => s.Id == AssessmentSkillInstructionId) 
+                ?? new AssessmentSkillInstructionModel();
 
-            InstructionItems = CurrentAssessmentSkillInstruction.InstructionItems.OrderBy(x => x.Id).ToList();
+            var items = CurrentAssessmentSkillInstruction.InstructionItems 
+                        ?? new List<BasicAssessmentInstructionItemModel>();
+
+            InstructionItems = items.OrderBy(x => x.Id).ToList();
+
             InstructionsFilter.SetUnfilteredItems(InstructionItems);
             InstructionsFilter.RefreshStatusFilter();
+
             _SelectedItemIndex = UserSkillInstructions.FindIndex(i => i.Id == CurrentAssessmentSkillInstruction.Id);
         }
 
@@ -155,15 +162,16 @@ namespace EZGO.Maui.Core.ViewModels.Assessments
 
         private void GoToIndex(int index)
         {
-            if (index >= 0 && index < UserSkillInstructions.Count)
-            {
-                var item = UserSkillInstructions[index];
-                CurrentAssessmentSkillInstruction = item;
-                _SelectedItemIndex = index;
-                AssessmentSkillInstructionId = CurrentAssessmentSkillInstruction.Id;
-                InstructionItems = item.InstructionItems;
-                InstructionsFilter.SetUnfilteredItems(InstructionItems);
-            }
+            if (UserSkillInstructions == null || index < 0 || index >= UserSkillInstructions.Count)
+                return;
+
+            var item = UserSkillInstructions[index];
+            CurrentAssessmentSkillInstruction = item;
+            _SelectedItemIndex = index;
+            AssessmentSkillInstructionId = CurrentAssessmentSkillInstruction.Id;
+
+            InstructionItems = item?.InstructionItems ?? new List<BasicAssessmentInstructionItemModel>();
+            InstructionsFilter.SetUnfilteredItems(InstructionItems);
         }
 
 

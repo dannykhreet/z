@@ -382,7 +382,23 @@ namespace EZGO.Maui.Core.ViewModels.Audits
 
         public override async void OnDisappearing(object sender, EventArgs e)
         {
-            if (!IsBusy && _auditService != null) await OpenFields?.AdaptChanges(_auditService);
+            try
+            {
+                if (IsBusy || _auditService == null)
+                    return;
+
+                var fields = OpenFields;
+                if (fields != null)
+                    await fields.AdaptChanges(_auditService).ConfigureAwait(false);
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+            }
+
             base.OnDisappearing(sender, e);
         }
 

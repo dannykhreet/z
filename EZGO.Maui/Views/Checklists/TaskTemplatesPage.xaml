@@ -95,12 +95,10 @@
         </ResourceDictionary>
     </ContentPage.Resources>
     <ContentPage.Content>
-
         <AbsoluteLayout
             AbsoluteLayout.LayoutBounds="0,0,1,1"
             AbsoluteLayout.LayoutFlags="WidthProportional,HeightProportional"
             CompressedLayout.IsHeadless="True">
-
             <!--  Action/Comment popup  -->
             <popups:TaskCommentActionPopup
                 AbsoluteLayout.LayoutBounds="0,0,1,1"
@@ -113,7 +111,6 @@
                 ShowFooter="False"
                 ShowHeader="False"
                 WidthRequest="400" />
-
             <!--  Change photo proof status status popup  -->
             <popups:PictureProofChangeStatusPopup
                 CancelButtonCommand="{Binding BindingContext.CloseChangeStatusPopupCommand, Source={x:Reference Page}}"
@@ -124,7 +121,6 @@
                 MinimumHeightRequest="200"
                 RemoveButtonCommand="{Binding BindingContext.RemoveButtonChangeStatusPopupCommand, Source={x:Reference Page}}"
                 WidthRequest="500" />
-
             <!--  Skip task popup  -->
             <popups:SkipTaskPopup
                 CancelButtonCommand="{Binding BindingContext.CloseSkipTaskPopupCommand, Source={x:Reference Page}}"
@@ -135,7 +131,6 @@
                 ShowFooter="True"
                 SubmitButtonCommand="{Binding BindingContext.SubmitSkipTaskPopupCommand, Source={x:Reference Page}}"
                 WidthRequest="500" />
-
             <popups:DiscardChangesPopupView
                 CancelButtonCommand="{Binding CancelDiscardChangesPopupCommand}"
                 IsOpen="{Binding IsDiscardChangesPopupOpen}"
@@ -144,7 +139,6 @@
                     <behaviors:EventToCommandBehavior Command="{Binding CloseDiscardChangesPopupCommand}" EventName="Closed" />
                 </popups:DiscardChangesPopupView.Behaviors>
             </popups:DiscardChangesPopupView>
-
             <!--  Content  -->
             <Grid
                 AbsoluteLayout.LayoutBounds="0,0,1,1"
@@ -156,20 +150,17 @@
                     <RowDefinition Height="0.127*" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-
                 <!--  Top bar  -->
                 <Grid
                     Grid.Row="0"
                     ColumnSpacing="0"
                     RowSpacing="0"
                     StyleClass="header, bg-white, m-0, pr-15">
-
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="120" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="500" />
                     </Grid.ColumnDefinitions>
-
                     <!--  Current Dropdown  -->
                     <controls:CustomDropdown
                         Grid.Column="1"
@@ -177,7 +168,6 @@
                         IsExpandIconVisible="{Binding IsChecklistSelectorActive}"
                         IsVisible="{Binding IsSearchBarVisible, Converter={StaticResource ReverseBooleanConverter}}"
                         Text="{Binding TaskFilter.SelectedFilter.Name}" />
-
                     <!--  Statuses && List Switcher Controls  -->
                     <StackLayout
                         Grid.Column="2"
@@ -185,7 +175,6 @@
                         HorizontalOptions="FillAndExpand"
                         Orientation="Horizontal"
                         StyleClass="column2">
-
                         <StackLayout
                             x:Name="FilterLayout"
                             Margin="0,0,0,0"
@@ -195,10 +184,8 @@
                             StyleClass="statusses"
                             VerticalOptions="End"
                             WidthRequest="550">
-
                             <!--  Filter Bar Info  -->
                             <controls:FilterBarInfoControl Margin="0,0,0,5" ItemsCount="{Binding TaskFilter.FilteredItemsCount}" />
-
                             <!--  Filter Bar Statuses  -->
                             <appbar:FilterBarControl
                                 x:TypeArguments="enumerations:TaskStatusEnum"
@@ -209,7 +196,6 @@
                                 VerticalOptions="EndAndExpand"
                                 WidthRequest="400" />
                         </StackLayout>
-
                         <!--  Layout Switch Buttons  -->
                         <controls:LayoutSwitcher
                             Margin="10,10"
@@ -217,7 +203,6 @@
                             TapCommand="{Binding ListViewLayoutCommand}" />
                     </StackLayout>
                 </Grid>
-
                 <Grid
                     x:Name="BottomRowGrid"
                     Grid.Row="1"
@@ -227,13 +212,11 @@
                         <ColumnDefinition x:Name="NavigationControlRow" Width="{Binding BindingContext.IsMenuVisible, Mode=OneWay, Source={x:Reference Page}, Converter={StaticResource IsVisibleToWidthConverter}, ConverterParameter='0.098'}" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-
                     <!--  Side menu  -->
                     <partial:MenuNewControl
                         Grid.Row="0"
@@ -241,7 +224,6 @@
                         Grid.Column="0"
                         IsVisible="{Binding BindingContext.IsMenuVisible, Mode=OneWay, Source={x:Reference Page}}"
                         StyleClass="bg-darkblue, fc-white" />
-
                     <!--  Selected tags list  -->
                     <filters:SelectedTagsList
                         Grid.Row="0"
@@ -249,7 +231,6 @@
                         BackgroundColor="{StaticResource WhiteColor}"
                         DeleteTagCommand="{Binding DeleteTagCommand}"
                         Filter="{Binding TaskFilter}" />
-
                     <StackLayout Grid.Row="1" Grid.Column="1">
                         <!--  Tag list  -->
                         <ScrollView IsVisible="{Binding ContainsTags}" Orientation="Horizontal">
@@ -258,18 +239,15 @@
                                 BindableLayout.ItemsSource="{Binding SelectedChecklist.Tags}"
                                 Wrap="NoWrap" />
                         </ScrollView>
-
                         <!--  Save progress  -->
                         <controls:ItemsSyncBar
-                            AnyRemoteChanges="{Binding AnyRemoteChanges, Mode=TwoWay}"
-                            FirstTimeSaving="{Binding FirstTimeSaving, Mode=TwoWay}"
+                            AnyRemoteChanges="{Binding AnyRemoteChanges, Mode=OneWay}"
+                            FirstTimeSaving="{Binding FirstTimeSaving, Mode=OneWay}"
                             HeightRequest="45"
-                            AnyLocalChanges="{Binding OpenFields.AnyLocalChanges, Mode=TwoWay}"
+                            AnyLocalChanges="{Binding OpenFields.AnyLocalChanges, Mode=OneWay}"
                             IsSyncing="{Binding OpenFields.IsSyncing}"
                             SyncButtonCommand="{Binding SaveCommand}" />
-
                     </StackLayout>
-
                     <!--  Detail page  -->
                     <pulltoRefresh:SfPullToRefresh
                         Grid.Row="2"
@@ -318,7 +296,6 @@
                                         SelectionMode="None"
                                         TapCommand="{Binding DetailCommand}" />
                                 </Grid>
-
                                 <!--  Stages lists  -->
                                 <Grid Grid.Row="0" IsVisible="{Binding Stages.HasStages}">
                                     <listview:SfListView
@@ -375,9 +352,7 @@
                                                 </ViewCell>
                                             </DataTemplate>
                                         </listview:SfListView.ItemTemplate>
-
                                     </listview:SfListView>
-
                                     <listview:SfListView
                                         x:Name="listStagesListView"
                                         AutoFitMode="DynamicHeight"
@@ -435,18 +410,13 @@
                                     </listview:SfListView>
                                 </Grid>
                                 <controls:EmptyView IsVisible="{Binding HasItems, Converter={StaticResource ReverseBooleanConverter}}" />
-
                             </Grid>
                         </pulltoRefresh:SfPullToRefresh.PullableContent>
                     </pulltoRefresh:SfPullToRefresh>
-
                     <!--  Message Center  -->
                     <controls:MessageCenter Grid.Column="1" />
-
                 </Grid>
-
             </Grid>
-
             <!--  Popup Open Overlay  -->
             <Grid
                 AbsoluteLayout.LayoutBounds="0,0,1,1"
@@ -456,7 +426,6 @@
                     <TapGestureRecognizer Command="{Binding BindingContext.CloseDropdownCommand, Source={x:Reference Page}}" />
                 </Grid.GestureRecognizers>
             </Grid>
-
             <!--  Drop down  -->
             <Border
                 Padding="0,10,0,0"
@@ -468,7 +437,6 @@
                 Stroke="Transparent"
                 StrokeThickness="0"
                 VerticalOptions="Center">
-
                 <treeview:SfTreeView
                     BackgroundColor="White"
                     ChildPropertyName="TaskTemplates"
@@ -513,7 +481,6 @@
                     </treeview:SfTreeView.ItemTemplate>
                 </treeview:SfTreeView>
             </Border>
-
             <!--  Search Bar  -->
             <controls:ExtSearchBar
                 x:Name="ActionSearch"
@@ -525,8 +492,6 @@
                 Text="{Binding TaskFilter.SearchText}"
                 TextChangedCommand="{Binding SearchTextChangedCommand}"
                 TextChangedDelay="550" />
-
         </AbsoluteLayout>
-
     </ContentPage.Content>
 </ContentPage>

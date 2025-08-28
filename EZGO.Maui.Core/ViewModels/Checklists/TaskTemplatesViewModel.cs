@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using EZGO.Api.Models;
 using EZGO.Api.Models.Enumerations;
 using EZGO.Api.Models.PropertyValue;
 using EZGO.Maui.Core.Classes;
@@ -31,6 +30,7 @@ using EZGO.Maui.Core.Utils;
 using EZGO.Maui.Core.ViewModels.Shared;
 using EZGO.Maui.Core.ViewModels.Tasks;
 using MvvmHelpers.Interfaces;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 using ItemTappedEventArgs = Syncfusion.Maui.ListView.ItemTappedEventArgs;
 
@@ -78,6 +78,7 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
 
         public FilterControl<BasicTaskTemplateModel, TaskStatusEnum> TaskFilter { get; set; } = new FilterControl<BasicTaskTemplateModel, TaskStatusEnum>(null);
 
+        public ObservableCollection<TagModel> SearchTags => TaskFilter.SearchedTags;
         public StagesControl Stages { get; set; } = new StagesControl(null, null, null);
 
         public Rect Rect { get; set; } = new Rect(113, .2, .4, .6);
@@ -224,6 +225,8 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
             _propertySerice = propertyService;
             _updateService = updateService;
             _commentService = commentService;
+
+            TaskFilter.SearchedTags.CollectionChanged += (s, e) => OnPropertyChanged(nameof(SearchTags));
 
             ActionCommand = new Command<BasicTaskTemplateModel>(task => ExecuteLoadingAction(async () => await OpenPopupOrNavigateToActionsAsync(task)), CanExecuteCommands);
 
@@ -461,9 +464,11 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
 
                     MessagingCenter.Subscribe<Application>(Application.Current, Constants.QuickTimer, async (sender) =>
                     {
+                        var lockAcquired = false;
                         try
                         {
-                            if (await FifteenSecondLock.WaitAsync(0))
+                            lockAcquired = await FifteenSecondLock.WaitAsync(0);
+                            if (lockAcquired)
                             {
                                 await Task.Run(async () =>
                                 {
@@ -472,21 +477,22 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
                                     {
                                         AnyRemoteChanges = true;
                                         LoadStages();
-                                        MainThread.BeginInvokeOnMainThread(() => { MessagingCenter.Send(this, Constants.RemoteChanges, AnyRemoteChanges); });
+                                        MainThread.BeginInvokeOnMainThread(() =>
+                                        {
+                                            MessagingCenter.Send(this, Constants.RemoteChanges, AnyRemoteChanges);
+                                        });
                                     }
                                 }).ConfigureAwait(false);
                             }
                         }
                         catch (Exception e)
                         {
-                            //Debugger.Break();
                         }
                         finally
                         {
-                            if (FifteenSecondLock.CurrentCount == 0)
+                            if (lockAcquired)
                                 FifteenSecondLock.Release();
                         }
-
                     });
 
                     MessagingCenter.Subscribe<ChecklistSlideViewModel, bool>(this, Constants.RemoteChanges, (sender, anyRemoteChanges) =>
@@ -524,7 +530,7 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
 
         private void LoadStages()
         {
-            bool hasStages = IncompleteChecklist != null ? IncompleteChecklist.HasStages : selectedChecklist?.StageTemplates?.Count > 0;
+            bool hasStages = selectedChecklist?.StageTemplates != null && (IncompleteChecklist != null ? IncompleteChecklist.HasStages : selectedChecklist.StageTemplates.Count > 0);
             if (!hasStages)
                 return;
 
@@ -533,8 +539,7 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
                 IncompleteChecklist.LocalGuid = selectedChecklist.LocalGuid;
                 selectedChecklist.SelectedChecklistId = IncompleteChecklist.Id;
             }
-
-            if (IncompleteChecklist != null && IncompleteChecklist.Stages != null)
+            if (IncompleteChecklist != null && IncompleteChecklist.Stages != null && selectedChecklist?.StageTemplates != null)
             {
                 foreach (var item in selectedChecklist.StageTemplates)
                 {
@@ -556,7 +561,7 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
                     }
                 }
             }
-            if (TaskFilter != null)
+            if (TaskFilter != null && selectedChecklist?.StageTemplates != null)
             {
                 Stages = new StagesControl(selectedChecklist.StageTemplates, TaskFilter.UnfilteredItems, TaskFilter.FilteredList);
                 Stages.SetStages(TaskFilter.FilteredList);
@@ -747,6 +752,8 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
 
             if (IncompleteChecklist != null)
             {
+                if (selectedChecklist == null)
+                    selectedChecklist = new ChecklistTemplateModel();
                 selectedChecklist.Name = IncompleteChecklist.Name;
                 selectedChecklist.Version = IncompleteChecklist.Version;
                 selectedChecklist.Tags = IncompleteChecklist.Tags;
@@ -1285,6 +1292,11 @@ namespace EZGO.Maui.Core.ViewModels.Checklists
 
         private async Task SaveChecklistAsync()
         {
+            if (OpenFields == null)
+            {
+                _messageService?.SendClosableInfo("No checklist opened. Save skipped.");
+                return;
+            }
             if (OpenFields.IsSyncing)
                 return;
 
