@@ -199,7 +199,8 @@ namespace EZGO.Maui.Core.ViewModels
 
         protected override void Dispose(bool disposing)
         {
-            _auditService.Dispose();
+            // Dispose the audit service instance if we own it
+            _auditService?.Dispose();
             AuditTemplates = null;
             auditTemplates = null;
             TaskFilter?.Dispose();
