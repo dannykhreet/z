@@ -1,4 +1,5 @@
 ﻿using EZGO.Maui.Core.ViewModels;
+using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls.Internals;
 using Syncfusion.Maui.DataSource.Extensions;
 using System.Diagnostics;
@@ -58,7 +59,7 @@ namespace EZGO.Maui.Core.Models.Navigation
                 page.Disappearing -= viewmodel.DisappearingHandler;
                 page.BindingContext = null;
                 if (page is IDisposable disposablePage) disposablePage.Dispose();
-                Task.Run(viewmodel.Dispose);
+                MainThread.BeginInvokeOnMainThread(viewmodel.Dispose);
             }
             page.Parent = null;
 
