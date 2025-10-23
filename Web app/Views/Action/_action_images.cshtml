@@ -1,0 +1,258 @@
+﻿@model WebApp.Models.Action.ActionModel
+@using WebApp.Models.FactoryFeed
+@using System.Security.Claims
+@using WebApp.Models.User
+@using System.Globalization
+
+@if (Model.Images != null && Model.Images.Any() && Model.Images.FirstOrDefault() != null)
+{
+    Model.Images = Model.Images.Where(m => m != null).ToList();
+
+    <div id="actionMediaContainer-@Model.Id">
+        @if (Model.Images.Count == 0)
+        {
+            <img src="/assets/img/normal_unavailable_image.png" loading="lazy" style="position: absolute; top: 0; left: 0; bottom: 0; right: 0; object-fit: cover; height: 100%; width: 100%;" />
+        }
+        else if (Model.Images.Count == 1)
+        {
+            var attachment = Model.Images.First();
+
+            if (attachment.ToLower().EndsWith(".mp4") || attachment.ToLower().EndsWith(".mov"))
+            {
+                var videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, attachment);
+                //fix for double slashes as some images have a leading slash in db
+                int index = videoUrl.IndexOf("//") + 1; //skip the first double slash as it starts with 'https://'
+                videoUrl = videoUrl.Substring(0, index) + videoUrl.Substring(index).Replace("//", "/"); //replace double slashes with single slashes
+
+                <div id="actionVideoContainer-@Model.Id">
+                    <video controls style="max-width: 100%" src="/images/media-loading.mp4" data-src="@videoUrl">
+                        Your browser doesn't support HTML5 video tag.
+                    </video>
+                </div>
+            }
+            else
+            {
+                var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, attachment);
+                //fix for double slashes as some images have a leading slash in db
+                int index = imageUrl.IndexOf("//") + 1; //skip the first double slash as it starts with 'https://'
+                imageUrl = imageUrl.Substring(0, index) + imageUrl.Substring(index).Replace("//", "/"); //replace double slashes with single slashes
+
+                <div id="actionImageContainer-@Model.Id">
+                    <img loading="lazy" class="card-img w-100 d-block rounded-0" src="/images/media-loading.gif" data-src="@imageUrl" />
+                </div>
+            }
+        }
+        else if (Model.Images.Count == 2)
+        {
+            <div class="row">
+                @for (int i = 0; i < Model.Images.Count; i++)
+                {
+                    @if (Model.Images[i].ToLower().EndsWith(".mp4") || Model.Images[i].ToLower().EndsWith(".mov"))
+                    {
+                        var videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Images[i]);
+                        //fix for double slashes as some images have a leading slash in db
+                        int index = videoUrl.IndexOf("//") + 1; //skip the first double slash as it starts with 'https://'
+                        videoUrl = videoUrl.Substring(0, index) + videoUrl.Substring(index).Replace("//", "/"); //replace double slashes with single slashes
+
+                        <div class="col-6" style="height: 91px; padding-left: 2px; padding-right: 2px">
+                            <div id="actionVideoContainer-@Model.Id-@i">
+                                <video style="max-width: 100%; width: 100%; object-fit: cover; height: 91px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                    Your browser doesn't support HTML5 video tag.
+                                </video>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Images[i]);
+                        //fix for double slashes as some images have a leading slash in db
+                        int index = imageUrl.IndexOf("//") + 1; //skip the first double slash as it starts with 'https://'
+                        imageUrl = imageUrl.Substring(0, index) + imageUrl.Substring(index).Replace("//", "/"); //replace double slashes with single slashes
+                        <div class="col-6" style="height: 91px; padding-left: 2px; padding-right: 2px">
+                            <div id="actionImageContainer-@Model.Id-@i">
+                                <img loading="lazy" class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 91px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        }
+        else if (Model.Images.Count == 3)
+        {
+            <div class="row">
+                @if (Model.Images[0].ToLower().EndsWith(".mp4") || Model.Images[0].ToLower().EndsWith(".mov"))
+                {
+                    var videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Images[0]);
+                    //fix for double slashes as some images have a leading slash in db
+                    int index = videoUrl.IndexOf("//") + 1; //skip the first double slash as it starts with 'https://'
+                    videoUrl = videoUrl.Substring(0, index) + videoUrl.Substring(index).Replace("//", "/"); //replace double slashes with single slashes
+
+                    <div class="col-6" style="height: 92px; padding-right: 2px">
+                        <div id="actionVideoContainer-@Model.Id-0">
+                            <video style="max-width: 100%; width: 100%; object-fit: cover; height: 92px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                Your browser doesn't support HTML5 video tag.
+                            </video>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Images[0]);
+                    //fix for double slashes as some images have a leading slash in db
+                    int index = imageUrl.IndexOf("//") + 1; //skip the first double slash as it starts with 'https://'
+                    imageUrl = imageUrl.Substring(0, index) + imageUrl.Substring(index).Replace("//", "/"); //replace double slashes with single slashes
+
+                    <div class="col-6" style="height: 92px; padding-right: 2px">
+                        <div id="actionImageContainer-@Model.Id-0">
+                            <img loading="lazy" class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 92px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                        </div>
+                    </div>
+                }
+                <div class="col-6" style="height: 92px; padding-left: 2px;">
+                    @if (Model.Images[1].ToLower().EndsWith(".mp4") || Model.Images[1].ToLower().EndsWith(".mov"))
+                    {
+                        var videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Images[1]);
+                        //fix for double slashes as some images have a leading slash in db
+                        int index = videoUrl.IndexOf("//") + 1; //skip the first double slash as it starts with 'https://'
+                        videoUrl = videoUrl.Substring(0, index) + videoUrl.Substring(index).Replace("//", "/"); //replace double slashes with single slashes
+
+                        <div id="actionVideoContainer-@Model.Id-1" class="mb-1">
+                            <video style="max-width: 100%; width: 100%; object-fit: cover; height: 44px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                Your browser doesn't support HTML5 video tag.
+                            </video>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Images[1]);
+                        //fix for double slashes as some images have a leading slash in db
+                        int index = imageUrl.IndexOf("//") + 1; //skip the first double slash as it starts with 'https://'
+                        imageUrl = imageUrl.Substring(0, index) + imageUrl.Substring(index).Replace("//", "/"); //replace double slashes with single slashes
+
+                        <div id="actionImageContainer-@Model.Id-1" class="mb-1">
+                            <img loading="lazy" class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 44px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                        </div>
+                    }
+
+                    @if (Model.Images[2].ToLower().EndsWith(".mp4") || Model.Images[2].ToLower().EndsWith(".mov"))
+                    {
+                        var videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Images[2]);
+                        //fix for double slashes as some images have a leading slash in db
+                        int index = videoUrl.IndexOf("//") + 1; //skip the first double slash as it starts with 'https://'
+                        videoUrl = videoUrl.Substring(0, index) + videoUrl.Substring(index).Replace("//", "/"); //replace double slashes with single slashes
+
+                        <div id="actionVideoContainer-@Model.Id-2">
+                            <video style="max-width: 100%; width: 100%; object-fit: cover; height: 44px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                Your browser doesn't support HTML5 video tag.
+                            </video>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Images[2]);
+                        //fix for double slashes as some images have a leading slash in db
+                        int index = imageUrl.IndexOf("//") + 1; //skip the first double slash as it starts with 'https://'
+                        imageUrl = imageUrl.Substring(0, index) + imageUrl.Substring(index).Replace("//", "/"); //replace double slashes with single slashes
+
+                        <div id="actionImageContainer-@Model.Id-2">
+                            <img loading="lazy" class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 44px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else if (Model.Images.Count > 3)
+        {
+            <div class="row">
+                @if (Model.Images[0].ToLower().EndsWith(".mp4") || Model.Images[0].ToLower().EndsWith(".mov"))
+                {
+                    var videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Images[0]);
+                    //fix for double slashes as some images have a leading slash in db
+                    int index = videoUrl.IndexOf("//") + 1; //skip the first double slash as it starts with 'https://'
+                    videoUrl = videoUrl.Substring(0, index) + videoUrl.Substring(index).Replace("//", "/"); //replace double slashes with single slashes
+
+                    <div class="col-6" style="height: 92px; padding-right: 2px">
+                        <div id="actionVideoContainer-@Model.Id-0">
+                            <video style="max-width: 100%; width: 100%; object-fit: cover; height: 92px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                Your browser doesn't support HTML5 video tag.
+                            </video>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Images[0]);
+                    //fix for double slashes as some images have a leading slash in db
+                    int index = imageUrl.IndexOf("//") + 1; //skip the first double slash as it starts with 'https://'
+                    imageUrl = imageUrl.Substring(0, index) + imageUrl.Substring(index).Replace("//", "/"); //replace double slashes with single slashes
+
+                    <div class="col-6" style="height: 92px; padding-right: 2px">
+                        <div id="actionImageContainer-@Model.Id-0">
+                            <img loading="lazy" class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 92px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                        </div>
+                    </div>
+                }
+                <div class="col-6" style="height: 92px; padding-left: 2px">
+                    @if (Model.Images[1].ToLower().EndsWith(".mp4") || Model.Images[1].ToLower().EndsWith(".mov"))
+                    {
+                        var videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Images[1]);
+                        //fix for double slashes as some images have a leading slash in db
+                        int index = videoUrl.IndexOf("//") + 1; //skip the first double slash as it starts with 'https://'
+                        videoUrl = videoUrl.Substring(0, index) + videoUrl.Substring(index).Replace("//", "/"); //replace double slashes with single slashes
+
+                        <div id="actionVideoContainer-@Model.Id-1" class="mb-3">
+                            <video style="max-width: 100%; width: 100%; object-fit: cover; height: 44px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                Your browser doesn't support HTML5 video tag.
+                            </video>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Images[1]);
+                        //fix for double slashes as some images have a leading slash in db
+                        int index = imageUrl.IndexOf("//") + 1; //skip the first double slash as it starts with 'https://'
+                        imageUrl = imageUrl.Substring(0, index) + imageUrl.Substring(index).Replace("//", "/"); //replace double slashes with single slashes
+
+                        <div id="actionImageContainer-@Model.Id-1" class="mb-1">
+                            <img loading="lazy" class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 44px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                        </div>
+                    }
+                    @if (Model.Images[2].ToLower().EndsWith(".mp4") || Model.Images[2].ToLower().EndsWith(".mov"))
+                    {
+                        var videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Images[2]);
+                        //fix for double slashes as some images have a leading slash in db
+                        int index = videoUrl.IndexOf("//") + 1; //skip the first double slash as it starts with 'https://'
+                        videoUrl = videoUrl.Substring(0, index) + videoUrl.Substring(index).Replace("//", "/"); //replace double slashes with single slashes
+
+                        <div id="actionVideoContainer-@Model.Id-2" style="position: relative">
+                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; color: white; font-size: 30px; font-weight: 800; z-index: 2; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,.5)">
+                                +@(Model.Images.Count-3)
+                            </div>
+                            <video style="max-width: 100%; width: 100%; object-fit: cover; height: 44px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                Your browser doesn't support HTML5 video tag.
+                            </video>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Images[2]);
+                        //fix for double slashes as some images have a leading slash in db
+                        int index = imageUrl.IndexOf("//") + 1; //skip the first double slash as it starts with 'https://'
+                        imageUrl = imageUrl.Substring(0, index) + imageUrl.Substring(index).Replace("//", "/"); //replace double slashes with single slashes
+
+                        <div id="actionImageContainer-@Model.Id-2" style="position: relative">
+                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; color: white; font-size: 30px; font-weight: 800; z-index: 2; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,.5)">
+                                +@(Model.Images.Count-3)
+                            </div>
+                            <img loading="lazy" class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 44px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <img src="/assets/img/normal_unavailable_image.png" loading="lazy" style="position: absolute; top: 0; left: 0; bottom: 0; right: 0; object-fit: cover; height: 100%; width: 100%;" />
+}

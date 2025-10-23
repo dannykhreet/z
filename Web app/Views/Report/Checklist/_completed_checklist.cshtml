@@ -1,0 +1,84 @@
+﻿@model WebApp.ViewModels.CompletedChecklistSingleViewModel
+@{
+    var areaPathIds = (Model != null && Model.AreaPathIds != null) ? Model.AreaPathIds.Replace(" -> ", ",") : "";
+}
+
+@if(Model!=null) {
+    if(Model.Timezone == null) { Model.Timezone = TimeZoneInfo.Utc; } //default to UTC, for some reason its empty? should not occur.
+
+    <div class="results" data-pathids="@areaPathIds" data-containertype="resultitem">
+        <a id="completedChecklist-@Model.Id" href="#" class="list-group-item list-group-item-action no-border" data-checklistid="@Model.Id" onclick="loadTasks(event, @Model.Id)">
+            <div class="w-100 justify-content-between">
+                <div class="row">
+                    @if (Model != null && Model.Stages != null && Model.Stages.Where(s => s.UseShiftNotes && !string.IsNullOrEmpty(s.ShiftNotes)).Count() > 0)
+                    {
+                        <div class="col-9">
+                            <h5 class="mb-2">@Model.Name</h5>
+                        </div>
+                        <div class="col-3">
+                            <div class="mb-2 pt-1 pr-2" style="text-align: right"><i style="font-size: 20px" class="fa-solid fa-calendar-lines-pen"></i></div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-12">
+                            <h5 class="mb-2">@Model.Name</h5>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @if (Model != null && Model.Signatures != null && Model.Signatures.Any() && Model.Signatures.Count > 0 && Model.Signatures[0] != null && Model.IsCompleted)
+            {
+               
+                DateTime SignedDate = TimeZoneInfo.ConvertTime(Model.Signatures[0].SignedAt, Model.Timezone);
+
+                <div class="row">
+                    <div class="col">
+                        <p class="mb-0">@Model.CompletedTextValue @SignedDate.ToLocaleFullDateShortTimeString(Model.Locale)</p>
+                        @{
+                            var signedByString = "";
+                            var signedByStrings = new List<string>();
+                            foreach (var signature in Model.Signatures)
+                            {
+                                signedByStrings.Add(signature.SignedBy);
+                            }
+                            signedByString = string.Join(',', signedByStrings);
+                        }
+                        <p class="mb-1">@Model.ByTextValue @Model.Signatures[0].SignedBy</p>
+                    </div>
+                    <div id="completedChecklistImages-@Model.Id" class="col-auto">
+                        <partial name="_completed_checklist_edited_by_users.cshtml" model="@Model" />
+                    </div>
+                </div>
+            }
+            else if (Model != null && Model.IsCompleted)
+            {
+                DateTime CreatedDate = TimeZoneInfo.ConvertTime(Model.CreatedAt, Model.Timezone);
+
+                <div class="row">
+                    <div class="col">
+                        <p class="mb-0">@Model.CompletedTextValue @CreatedDate.ToLocaleFullDateShortTimeString(Model.Locale)</p>
+                        <p class="mb-1">@Model.ByTextValue @CreatedDate</p>
+                    </div>
+                    <div id="completedChecklistImages-@Model.Id" class="col-auto">
+                        <partial name="_completed_checklist_edited_by_users.cshtml" model="@Model" />
+                    </div>
+                </div>
+            }
+            else
+            {
+                DateTime ModifiedAtDate = TimeZoneInfo.ConvertTime(Model.ModifiedAt, Model.Timezone);
+                <div class="row">
+                    <div class="col">
+                        <p class="mb-1">@Model.ModifiedTextValue @ModifiedAtDate.ToLocaleFullDateShortTimeString(Model.Locale)</p>
+                        <p class="mb-1">@Model.ByTextValue @Model.ModifiedBy</p>
+                    </div>
+                    <div id="completedChecklistImages-@Model.Id" class="col-auto">
+                        <partial name="_completed_checklist_edited_by_users.cshtml" model="@Model" />
+                    </div>
+                </div>
+            }
+        </a>
+    </div>
+}

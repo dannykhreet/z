@@ -1,0 +1,409 @@
+﻿@model WebApp.ViewModels.CompanyStatisticViewModel
+@{
+    Layout = "_Layout_template";
+}
+
+<style>
+    .graph_data_table th { width: 200px; }
+    i { cursor: pointer; }
+</style>
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <a asp-controller="Company" asp-action="Index"><i class="fa fa-arrow-left"></i>@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BackToCompaniesTitle, "Back to companies") ?? "Back to companies")</a>
+                <h1>@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanyStatisticsTitle, "Company Statistics") ?? "Company Statistics")</h1>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+
+    <div class="container-fluid">
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-tools">
+                    <div class="input-group input-group-sm">
+                        <select class="form-control" id="statistic_company" name="statistic_company">
+                            @if (0 == Model.CompanyId)
+                            {
+                                <option value="0" selected>- ALL -</option>
+                            }
+                            else
+                            {
+                                <option value="0">- ALL -</option>
+                            }
+
+                            <optgroup label="Companies">
+                                @foreach (var company in Model.Companies)
+                                {
+                                    @if (company.Id == Model.CompanyId)
+                                    {
+                                        <option value="C_@company.Id" selected>@company.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="C_@company.Id">@company.Name</option>
+                                    }
+
+                                }
+                            </optgroup>
+                            <optgroup label="Holdings">
+                                @foreach (var holding in Model.Holdings)
+                                {
+                                    @if (holding.Id == Model.HoldingId)
+                                    {
+                                        <option value="H_@holding.Id" selected>@holding.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="H_@holding.Id">@holding.Name</option>
+                                    }
+
+                                }
+                            </optgroup>
+
+                          
+                        </select>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-default" id="btn_get_data"><i class="fas fa-arrow-alt-circle-down"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="report-content" style="height: calc(100vh - 245px);overflow:auto;">
+            <div id="statistic_container_message" style="text-align:center;">
+                Select company or holding to retrieve statistics.
+            </div>
+            <div id="statistic_container" style="margin:5px;">
+              
+                <div id="main_graph_container" style="position: relative; height:300px;">
+                    
+                </div>
+                <div id="main_graph_datatable_container">
+
+                </div>
+                <hr />
+                <div><i class="fa-solid fa-table" onclick="document.getElementById('actions_created_datatable').style.display = document.getElementById('actions_created_datatable').style.display == 'none' ? 'block' : 'none';" title="Show/Hide data table"></i></div>
+                <div id="actions_created_container" style="position: relative; ">
+
+                </div>
+                <div id="actions_created_datatable_container" style="position: relative; ">
+
+                </div>
+                <hr />
+                <div><i class="fa-solid fa-table" onclick="document.getElementById('actions_dueat_datatable').style.display = document.getElementById('actions_dueat_datatable').style.display == 'none' ? 'block' : 'none';" title="Show/Hide data table"></i></div>
+                <div id="actions_dueat_container" style="position: relative; ">
+
+                </div>
+                <div id="actions_dueat_datatable_container" style="position: relative; ">
+
+                </div>
+                <hr />
+                <div><i class="fa-solid fa-table" onclick="document.getElementById('comments_created_datatable').style.display = document.getElementById('comments_created_datatable').style.display == 'none' ? 'block' : 'none';" title="Show/Hide data table"></i></div>
+                <div id="comments_created_container" style="position: relative; ">
+                </div>
+                <div id="comments_created_datatable_container" style="position: relative; ">
+                </div>
+                <hr />
+                <div><i class="fa-solid fa-table" onclick="document.getElementById('assessments_datatable').style.display = document.getElementById('assessments_datatable').style.display == 'none' ? 'block' : 'none';" title="Show/Hide data table"></i></div>
+                <div id="assessments_container" style="position: relative; ">
+
+                </div>
+                <div id="assessments_datatable_container" style="position: relative; ">
+                </div>
+                <hr />
+                <div><i class="fa-solid fa-table" onclick="document.getElementById('audits_datatable').style.display = document.getElementById('audits_datatable').style.display == 'none' ? 'block' : 'none';" title="Show/Hide data table"></i></div>
+                <div id="audits_container" style="position: relative; ">
+
+                </div>
+                <div id="audits_datatable_container" style="position: relative; ">
+                </div>
+                <hr />
+                <div><i class="fa-solid fa-table" onclick="document.getElementById('checklists_datatable').style.display = document.getElementById('checklists_datatable').style.display == 'none' ? 'block' : 'none';" title="Show/Hide data table"></i></div>
+                <div id="checklists_container" style="position: relative; ">
+
+                </div>
+                <div id="checklists_datatable_container" style="position: relative; ">
+                </div>
+                <hr />
+                <div><i class="fa-solid fa-table" onclick="document.getElementById('tasks_datatable').style.display = document.getElementById('tasks_datatable').style.display == 'none' ? 'block' : 'none';" title="Show/Hide data table"></i></div>
+                <div id="tasks_container" style="position: relative; ">
+
+                </div>
+                <div id="tasks_datatable_container" style="position: relative; ">
+                </div>
+                <hr />
+                <div><i class="fa-solid fa-table" onclick="document.getElementById('tasks_ok_datatable').style.display = document.getElementById('tasks_ok_datatable').style.display == 'none' ? 'block' : 'none';" title="Show/Hide data table"></i></div>
+                <div id="tasks_ok_container" style="position: relative; ">
+                </div>
+                <div id="tasks_ok_datatable_container" style="position: relative; ">
+                </div>
+                <hr />
+                <div><i class="fa-solid fa-table" onclick="document.getElementById('tasks_notok_datatable').style.display = document.getElementById('tasks_notok_datatable').style.display == 'none' ? 'block' : 'none';" title="Show/Hide data table"></i></div>
+                <div id="tasks_notok_container" style="position: relative; ">
+
+                </div>
+                <div id="tasks_notok_datatable_container" style="position: relative; ">
+                </div>
+                <hr />
+                <div><i class="fa-solid fa-table" onclick="document.getElementById('tasks_skipped_datatable').style.display = document.getElementById('tasks_skipped_datatable').style.display == 'none' ? 'block' : 'none';" title="Show/Hide data table"></i></div>
+                <div id="tasks_skipped_container" style="position: relative; ">
+
+                </div>
+                <div id="tasks_skipped_datatable_container" style="position: relative; ">
+                </div>
+                <hr />
+                <div><i class="fa-solid fa-table" onclick="document.getElementById('assessmenttemplates_datatable').style.display = document.getElementById('assessmenttemplates_datatable').style.display == 'none' ? 'block' : 'none';" title="Show/Hide data table"></i></div>
+                <div id="assessmenttemplates_container" style="position: relative; ">
+
+                </div>
+                <div id="assessmenttemplates_datatable_container" style="position: relative; ">
+                </div>
+                <hr />
+                <div><i class="fa-solid fa-table" onclick="document.getElementById('audittemplates_datatable').style.display = document.getElementById('audittemplates_datatable').style.display == 'none' ? 'block' : 'none';" title="Show/Hide data table"></i></div>
+                <div id="audittemplates_container" style="position: relative; ">
+
+                </div>
+                <div id="audittemplates_datatable_container" style="position: relative; ">
+                </div>
+                <hr />
+                <div><i class="fa-solid fa-table" onclick="document.getElementById('checklisttemplates_datatable').style.display = document.getElementById('checklisttemplates_datatable').style.display == 'none' ? 'block' : 'none';" title="Show/Hide data table"></i></div>
+                <div id="checklisttemplates_container" style="position: relative; ">
+
+                </div>
+                <div id="checklisttemplates_datatable_container" style="position: relative; ">
+                </div>
+                <hr />
+                <div><i class="fa-solid fa-table" onclick="document.getElementById('tasktemplates_datatable').style.display = document.getElementById('tasktemplates_datatable').style.display == 'none' ? 'block' : 'none';" title="Show/Hide data table"></i></div>
+                <div id="tasktemplates_container" style="position: relative; ">
+
+                </div>
+                <div id="tasktemplates_datatable_container" style="position: relative; ">
+                </div>
+                <hr />
+                <div><i class="fa-solid fa-table" onclick="document.getElementById('workinstructiontemplates_datatable').style.display = document.getElementById('workinstructiontemplates_datatable').style.display == 'none' ? 'block' : 'none';" title="Show/Hide data table"></i></div>
+
+                <div id="workinstructiontemplates_container" style="position: relative; ">
+
+                </div>
+                <div id="workinstructiontemplates_datatable_container" style="position: relative; ">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts{
+
+    <script src="/js/chartjs.4.4.2.min.js"></script>
+    <script src="/js/chartjs-plugin-datalabels.min.js"></script>
+    <script>
+        var companyStatistic = {
+            init: function () {
+                document.getElementById('statistic_container').style.display = 'none';
+                document.getElementById('statistic_container_message').style.display = 'block';
+                companyStatistic.initHandlers();
+                // setTimeout(() => {
+                //     companyStatistic.retrieve();
+                // }, 1000);
+            },
+            initHandlers: function () {
+                $('#btn_get_data').on('click', function () {
+                    companyStatistic.retrieve();
+                });
+            },
+            numberConvert: function (num) {
+                return num.toString().length > 1 ? num : '0' + num;
+            },
+            retrieve: async function () {
+                toastr.remove();
+                $('body').toggleClass('loaded');
+
+                let possibleId = $('#statistic_company').val();
+                let statisticType = 'company';
+                let uri = '';
+                //set defaults:
+                possibleId = possibleId.replace('C_', '');
+                statisticType = 'company';
+                uri = '/company/statistics/' + possibleId + '/retrieve';
+                //company only
+                if (possibleId.includes('C')) {
+                    possibleId = possibleId.replace('C_', '');
+                    statisticType = 'company';
+                    uri = '/company/statistics/' + possibleId + '/retrieve';
+                }
+                //holding only
+                if (possibleId.includes('H')) {
+                    possibleId = possibleId.replace('H_', '');
+                    statisticType = 'holding';
+                    uri = '/holding/statistics/' + possibleId + '/retrieve';
+                }
+
+
+                ///company/statistics/{companyid}
+                $.ajax({
+                    type: "POST",
+                    url: uri,
+                    success: function (data) {
+
+                        document.getElementById('statistic_container').style.display = 'block';
+                        document.getElementById('statistic_container_message').style.display = 'none';
+
+                        companyStatistic.render(JSON.parse(data));
+                        $('body').toggleClass('loaded');
+                        toastr.success('@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.ReportRetrieved, "Statistics retrieved") ?? "Statistics retrieved")');
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('body').toggleClass('loaded');
+                        toastr.error(JSON.parse(jqXHR.responseText) + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            render: function (data) {
+                //prep main data;
+                if (data.CompanyBasicStatistics != null && data.CompanyBasicStatistics.length > 0) {
+                    let labels = [];
+                    let values = [];
+                    data.CompanyBasicStatistics.forEach(function (item) {
+                        labels.push(item.Type);
+                        values.push(item.CountNr);
+                    });
+
+                    document.getElementById('main_graph_container').innerHTML = '';
+                    document.getElementById('main_graph_container').innerHTML = '<canvas id="main_graph"></canvas>';
+                    companyStatistic.renderGraph('main', '# of items', labels, values);
+                }
+
+                console.log(data);
+
+                //data specific charts
+                companyStatistic.renderStatistic('actions_created', '# of actions created per month.', data.ActionCreatedStatistics);
+                companyStatistic.renderStatistic('actions_dueat', '# of actions due at per month.', data.ActionDueAtStatistics);
+                companyStatistic.renderStatistic('comments_created', '# of comments created per month.', data.CommentCreatedStatistics);
+                companyStatistic.renderStatistic('assessments', '# of assessments per month.', data.AssessmentsStatistics);
+                companyStatistic.renderStatistic('audits', '# of audits per month.', data.AuditsStatistics);
+                companyStatistic.renderStatistic('checklists', '# of checklists per month.', data.ChecklistStatistics);
+                companyStatistic.renderStatistic('tasks', '# of tasks per month.', data.TasksStatistics);
+                companyStatistic.renderStatistic('tasks_ok', '# of ok tasks per month.', data.TasksOkStatistics);
+                companyStatistic.renderStatistic('tasks_notok', '# of not ok tasks per month.', data.TasksNotOkStatistics);
+                companyStatistic.renderStatistic('tasks_skipped', '# of skipped tasks per month.', data.TasksSkippedStatistics);
+
+                companyStatistic.renderStatistic('tasktemplates', '# of tasktemplates created per month.', data.TaskTemplateStatistics);
+                companyStatistic.renderStatistic('checklisttemplates', '# of checklisttemplates created per month.', data.ChecklistTemplateStatistics);
+                companyStatistic.renderStatistic('audittemplates', '# of audittemplates created per month.', data.AuditTemplateStatistics);
+                companyStatistic.renderStatistic('assessmenttemplates', '# of assessmenttemplates created per month.', data.AssessmentTemplateStatistics);
+                companyStatistic.renderStatistic('workinstructiontemplates', '# of workinstructiontemplates per month.', data.WorkInstructionTemplateStatistics);
+
+            },
+            renderStatistic: function (graphId, mainTitle, dataCollection) {
+                if (dataCollection != null && dataCollection.length > 0) {
+                    document.getElementById(graphId + '_container').innerHTML = '';
+                    let renderGraphsHtml = '';
+                    let labels = [];
+                    let values = [];
+                    dataCollection.forEach(function (item) {
+                        labels.push(item.Year + '-' + item.Month);
+                        values.push(item.CountNr);
+                    });
+
+                    companyStatistic.renderDataTable(graphId, mainTitle, dataCollection);
+
+                    renderGraphsHtml += '<canvas id="' + graphId + '_graph"></canvas>';
+                    document.getElementById(graphId + '_container').innerHTML = renderGraphsHtml;
+                    companyStatistic.renderGraph(graphId, mainTitle, labels, values);
+                } else {
+                    document.getElementById(graphId + '_container').innerHTML = 'No information available for ' + mainTitle;
+                }
+
+            },
+            renderDataTable: function (graphId, mainTitle, dataCollection) {
+                if (document.getElementById(graphId + '_datatable_container') != null) {
+                    let dataTableHtml = '<table id="' + graphId + '_datatable" style="display:none;" class="graph_data_table"><thead><tr><th colspan="3">' + mainTitle  + '</th></tr><tr><th>Year</th><th>Month</th><th>CountNr</th></tr><thead><tbody>';
+                    dataCollection.forEach(function (item) {
+                        dataTableHtml += '<tr><td>' + item.Year + '</td><td>' + companyStatistic.numberConvert(item.Month) + '</td><td>' + item.CountNr + '</td></tr>';
+                    });
+                    dataTableHtml += '</tbody></table>';
+                    document.getElementById(graphId + '_datatable_container').innerHTML = dataTableHtml;
+                }
+            },
+            renderGraph: function (graphId, mainTitle, labels, dataPoints) {
+                //console.log(graphId);
+                let ctx = document.getElementById(graphId + '_graph').getContext('2d');
+
+                let mainChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: mainTitle,
+                            data: dataPoints,
+                            //backgroundColor: [
+                            //    'rgba(255, 99, 132, 0.2)',
+                            //    'rgba(54, 162, 235, 0.2)',
+                            //    'rgba(255, 206, 86, 0.2)',
+                            //    'rgba(75, 192, 192, 0.2)',
+                            //    'rgba(153, 102, 255, 0.2)',
+                            //    'rgba(255, 159, 64, 0.2)'
+                            //],
+                            //borderColor: [
+                            //    'rgba(255, 99, 132, 1)',
+                            //    'rgba(54, 162, 235, 1)',
+                            //    'rgba(255, 206, 86, 1)',
+                            //    'rgba(75, 192, 192, 1)',
+                            //    'rgba(153, 102, 255, 1)',
+                            //    'rgba(255, 159, 64, 1)'
+                            //],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                //type: 'logarithmic',
+                                beginAtZero: true,
+                                grace: '10%'
+                            }
+                        },
+                        plugins: {
+                            // Change options for ALL labels of THIS CHART
+                            datalabels: {
+                                //color: '#000000',
+                                anchor: 'center',
+                                align: 'top',
+                                offset: 25,
+                                rotation: 85
+                            }, 
+                            legend: {
+                                display: true,
+                                align: 'start',
+                                position: 'bottom'
+                            }
+                        }, 
+                        layout: {
+                            padding: {
+                                top: 55
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels],
+                });
+            }
+        }
+
+        companyStatistic.init();
+        ezgomediafetcher.preloadImagesAndVideos();
+    </script>
+    <script>
+       
+    </script>
+
+}

@@ -1,0 +1,56 @@
+﻿@model WebApp.Models.Shared.ExtractionModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+
+}
+@if(Model.TemplateId > 0)
+{
+    <button class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto" onclick="load_json_extraction_display()"><i class="fa-solid fa-hashtag"></i></button>
+
+    <!-- no UI yet / add button toggle for displaying information below. -->
+    <div class="row" style="display: none;margin-top:10px;margin-bottom:10px;" data-type="version_listing">
+        <div class="card-group">
+            <div class="card btn-outline-ezgo" style="margin-left:12px;margin-right:26px;">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-sm-11">
+                            <div><b>Current template</b></div>
+                            <div><i id="extract_template_@Model.TemplateId" data-action="extract_template_json" class="btn btn-ezgo btn-sm fa-solid fa-download" onclick="display_json(@Model.TemplateId)"></i></div>
+                        </div>
+                        <div class="col-sm-1" style="text-align:right;"><i class="btn fa-solid fa-xmark" onclick="unload_json_extraction_display()"></i></div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model != null && Model.Versions != null && Model.Versions.Any())
+                    {
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <div class="card-subtitle">Available versions:</div>
+                            </div>
+                        
+                        </div>
+                        <div class="row">
+                       
+                                @foreach (var item in Model.Versions.OrderBy(x => x.CreatedOn))
+                                {
+                                    <div class="col-sm-1">
+                                        <div><b>@item.Version</b><br />(@item.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss"))</div>
+                                        <div><i id="extract_version_@item.Version" data-action="extract_template_version_json" class="btn btn-ezgo btn-sm fa-solid fa-download" onclick="display_json_version(@Model.TemplateId, '@item.Version')"></i></div>
+                                    </div>
+                                }
+                        
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function load_json_extraction_display() { var parent = document.querySelector('section.content');var child = document.querySelector('[data-type="version_listing"]'); parent.insertBefore(child, parent.firstChild); child.style.display = 'block';};
+        function unload_json_extraction_display() { document.querySelector('[data-type="version_listing"]').style.display = 'none';};
+        function display_json(templateid) { var json_window = window.open('/extract/@Model.ExtractionUriPart/' + templateid,'_blank'); json_window.focus();};
+        function display_json_version(templateid, version) { var json_history_window = window.open('/extract/@Model.ExtractionUriPart/' + templateid + '/version/' + version,'_blank'); json_history_window.focus(); };
+    </script>
+}

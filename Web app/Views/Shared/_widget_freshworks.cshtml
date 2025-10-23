@@ -1,0 +1,189 @@
+﻿@{
+    if (Model?.ApplicationSettings?.Features?.EnableSupportChat == true)
+    {
+        if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")))
+        {
+            //TODO add to feature structure.
+            <style>
+                #launcher-frame {
+                    min-width: 30px !important;
+                    max-width: 50px !important;
+                }
+            </style>
+
+            <script>
+                var isRtl = false;
+                var regex = /language=['"]*ar[a-zA-Z-azA-Z]*['"]*/i; //arabic language regex
+                const found = document.cookie.match(regex); //execute regex
+                if (found != null) {
+                    isRtl = true;
+                }
+                function fixFreshworksPosition() {
+                    var offset = '77px';
+
+                    if (!$('#launcher-frame').length) {
+                        return false;
+                    }
+
+                    if($('body').hasClass('sidebar-closed') && $('body').hasClass('sidebar-collapse'))
+                    {
+                        offset = '7px';
+                    }
+                    else if($('body').hasClass('sidebar-open'))
+                    {
+                        offset = '254px';
+                    }
+                    else if (parseInt($('#mainSidebar').width()) > 100) {
+                        offset = '254px';
+                    }
+                    else {
+                        offset = '77px';
+                    }
+
+                    $('#launcher-frame').css('transition', '0.3s ease-in-out');
+                    $('#launcher-frame').css(isRtl ? 'right' : 'left', offset);
+
+                    return true;
+                }
+
+                //wait for freshwork widget to appear, check every 250ms, stop checking after it has been inserted
+                var interval = setInterval(() => {
+                    if (fixFreshworksPosition()) {
+                        clearInterval(interval);
+                    }
+                }, 250);
+
+                $('#pushmenu').on('click', function () {
+                    setTimeout(() => {
+                        fixFreshworksPosition();
+                    }, 400);
+                });
+
+                $('body').on('click', function () {
+                    setTimeout(() => {
+                        fixFreshworksPosition();
+                    }, 400);
+                });
+
+                $(window).on('resize', function () {
+                    setTimeout(() => {
+                        fixFreshworksPosition();
+                    }, 400);
+                });
+            </script>
+
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Staging" || Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Test" || Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "LocalDevelopment" || Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                <!-- freshwork widget-->
+                <script>
+                    window.fwSettings = {
+                        'widget_id': 80000008016,
+                        'locale': '@EZGO.CMS.LIB.Utils.LocaleLanguageMapper.GetWidgetLocaleFromLanguage(Model.Locale)'
+                    };
+
+                    !function () { 
+                        if ("function" != typeof window.FreshworksWidget) { 
+                            var n = function () { 
+                                n.q.push(arguments) 
+                            }; 
+                            n.q = [], window.FreshworksWidget = n 
+                        } 
+                    }();
+                </script>
+
+                <script type='text/javascript' src='https://euc-widget.freshworks.com/widgetBase/bootstrap.js' async defer></script>
+            }
+
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+            {
+                <!-- freshwork widget-->
+                <script>
+                    window.fwSettings = {
+                        'widget_id': 80000001772,
+                        'locale': '@EZGO.CMS.LIB.Utils.LocaleLanguageMapper.GetWidgetLocaleFromLanguage(Model.Locale)'
+                    };
+
+                    !function () { 
+                        if ("function" != typeof window.FreshworksWidget) { 
+                            var n = function () { 
+                                n.q.push(arguments) 
+                            }; 
+                            n.q = [], window.FreshworksWidget = n 
+                        } 
+                    }();
+                </script>
+
+                <script type='text/javascript' src='https://euc-widget.freshworks.com/widgetBase/bootstrap.js' async defer></script>
+            }
+
+            <script>
+                FreshworksWidget("setLabels", {
+                    'fr': {
+                        banner: "Contactez notre équipe de support",
+                        launcher: "", //Soutien
+                        contact_form: {
+                            title: "Contactez nous",
+                            submit: "Envoyez"
+                        }
+                    },
+                    'es': {
+                        banner: "Contacta a nuestro equipo de soporte",
+                        launcher: "", //Apoyo
+                        contact_form: {
+                            title: "Contáctenos",
+                            submit: "Enviar"
+                        }
+                    },
+                    'nl': {
+                        banner: "Hoe kunnen wij u helpen?",
+                        launcher: "", //Hulp nodig
+                        contact_form: {
+                            title: "Neem contact op",
+                            submit: "Versturen"
+                        }
+                    },
+                    'de': {
+                        banner: "Wie können wir Ihnen helfen?",
+                        launcher: "", //Hilfe
+                        contact_form: {
+                            title: "Kontaktiere uns",
+                            submit: "Senden"
+                        }
+                    },
+                    'pt': {
+                        banner: "Como podemos te ajudar?",
+                        launcher: "", //Ajuda
+                        contact_form: {
+                            title: "Contate-Nos",
+                            submit: "Mandar"
+                        }
+                    },
+                    'en': {
+                        banner: "How can we help you?",
+                        launcher: "", //Need help
+                        contact_form: {
+                            title: "Contact us",
+                            submit: "Send"
+                        }
+                    },
+                    'th': {
+                        banner: "เราจะช่วยคุณได้อย่างไร?",
+                        launcher: "", //พนักงาน
+                        contact_form: {
+                            title: "ติดต่อเรา",
+                            submit: "ส่ง"
+                        }
+                    },
+                    'ro': {
+                        banner: "Cum vă putem ajuta?",
+                        launcher: "", //Ajutor
+                        contact_form: {
+                            title: "Contactează-ne",
+                            submit: "Trimite "
+                        }
+                    }
+                });
+            </script>
+        }
+    }
+}

@@ -1,0 +1,401 @@
+﻿@using EZGO.CMS.LIB.Extensions;
+@model WebApp.ViewModels.ConfigViewModel
+@{
+    Layout = "_Layout_template";
+    Dictionary<string, string> CmsLanguage = Model?.CmsLanguage;
+}
+
+@section CSS{
+
+    <style>
+
+        .app article {
+            margin: 10px;
+        }
+
+        #apps .card:hover {
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+        }
+    </style>
+
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-6">
+                <br />
+                <h1>@(CmsLanguage?.GetValue(LanguageKeys.Config.IntegrationTitle, "EZ Marketplace") ?? "EZ Marketplace")</h1>
+            </div>
+            <div class="col-sm-6 d-flex  flex-row-reverse">
+
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row d-none">
+            <div class="col-md-12 pb-3">
+                <div class="card h-100">
+                    <div class="card-body m-2" style="border:dashed 2px silver;border-radius: 5px;">
+
+                        @if (Model.MarketPlace != null && Model.MarketPlace.Where(x => !string.IsNullOrEmpty(x.Configuration)).Any())
+                        {
+                            //all items that have a configuration with the company.
+                            foreach (EZGO.Api.Models.Marketplace.MarketPlaceItem item in Model.MarketPlace.Where(x => !string.IsNullOrEmpty(x.Configuration)))
+                            {
+                                EZGO.Api.Models.Base.BaseConfig config = item.Configuration.ToObjectFromJson<EZGO.Api.Models.Base.BaseConfig>();
+                                if (config != null && config.IsEnabled)
+                                {
+                                    //has config but item not enabled (do something with display?)
+                                    <span>@item.Name</span>
+                                }
+                                else
+                                {
+                                    //has config and is enabled (do something else with display)
+                                    <span>@item.Name (disabled)</span>
+
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <h5 class="text-muted">@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.NoIntegrationsAddedText, "No integrations added yet...") ?? "No integrations added yet...")</h5>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="apps" class="row" style="height:calc(100vh - 167px);overflow:auto;">
+            <div class="col-md-12" style="height:calc(100vh - 183px);overflow:auto;">
+
+                <div class="row">
+
+                    @if (Model.MarketPlace != null)
+                    {
+                        foreach (EZGO.Api.Models.Marketplace.MarketPlaceItem item in Model.MarketPlace)
+                        {
+                            //TODO add check for enabled market place items (different setting, for now all available items will be displayed)
+
+                            <div class="col-lg-4 col-md-4 app pb-3" data-marketitem-id="@item.Id" data-containertype="integration">
+                                <div class="card h-100">
+                                    <div class="row no-gutters">
+                                        <div class="col-md-4 align-self-center p-2">
+                                            <img src="@item.Picture" class="card-img" alt="@item.Name" id="logo_@item.Id" data-marketitem-id="@item.Id" data-containertype="picture"  />
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <h5 class="card-title">@item.Name</h5>
+                                                <p class="card-text">
+                                                    @item.Description
+                                                </p>
+                                                <p class="card-text d-none"><small class="text-muted">&nbsp;</small></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12 pr-3">
+                                            <a href="#" class="btn btn-primary btn-sm float-right" id="model_btn_@item.Id" data-actiontype="edit" data-toggle="modal" data-target="#integrationModal" data-marketitem-id="@item.Id">@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.AddIntegration, "Add integration") ?? "Add integration")</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="config_@item.Id" data-containertype="config" data-marketitem-id="@item.Id" value="@item.Configuration" />
+                            <input type="hidden" id="configtemplate_@item.Id" data-containertype="config_template" data-marketitem-id="@item.Id" value="@item.ConfigurationTemplate" />
+
+                        }
+                    }
+
+                    <!--
+                    <div class="col-lg-6 col-md-6 app pb-3">
+                        <div class="card h-100">
+                            <div class="row no-gutters">
+                                <div class="col-md-4 align-self-center p-2">
+                                    <img src="/assets/img/apps/solvace.jpeg" class="card-img" alt="...">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Solvace</h5>
+                                        <p class="card-text">
+                                            Solvace manages improvement opportunities
+                                            around Visual Management and Problem Solving, Solvace Digitizes your Performance Management Process.
+                                        </p>
+                                        <p class="card-text d-none"><small class="text-muted">Last updated 3 mins ago</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 pr-3">
+                                    <a href="#" class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#integrationModal">Add integration</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 pb-3">
+                        <div class="card h-100">
+                            <div class="row no-gutters">
+                                <div class="col-md-4 align-self-center p-2">
+                                    <img src="/assets/img/apps/ultimo.png" class="card-img" alt="...">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Ultimo</h5>
+                                        <p class="card-text">Ultimo offers many rich functionalities as standard. For planning, monitoring, optimization and execution. For tracking all the required maintenance activities.</p>
+                                        <p class="card-text d-none"><small class="text-muted">Last updated 3 mins ago</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 pr-3">
+                                    <a href="#" class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#integrationModal">Add integration</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 pb-3">
+                        <div class="card h-100">
+                            <div class="row no-gutters">
+                                <div class="col-md-4 align-self-center p-2">
+                                    <img src="/assets/img/apps/SAP-PM-logo.jpg" class="card-img" alt="...">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">SAP Plant Maintenance</h5>
+                                        <p class="card-text">Plant Maintenance module consists of key activities to include inspection, notifications, corrective and preventive maintenance, repairs, and other measures to maintain an ideal technical system.</p>
+                                        <p class="card-text d-none"><small class="text-muted">Last updated 3 mins ago</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 pr-3">
+                                    <a href="#" class="btn btn-primary btn-sm float-right">Add integration</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 pb-3">
+                        <div class="card h-100">
+                            <div class="row no-gutters">
+                                <div class="col-md-4 align-self-center p-2">
+                                    <img src="/assets/img/apps/teams-logo.png" class="card-img" alt="...">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Microsoft Teams</h5>
+                                        <p class="card-text">
+                                            Instantly go from group chat to video call with the touch of a button. Securely connect, access, share, and coauthor files in real time. Stay organized by keeping notes, documents, and your calendar together.
+                                        </p>
+                                        <p class="card-text d-none"><small class="text-muted">Last updated 3 mins ago</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 pr-3">
+                                    <a href="#" class="btn btn-primary btn-sm float-right">Add integration</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 pb-3">
+                        <div class="card h-100">
+                            <div class="row no-gutters">
+                                <div class="col-md-4 align-self-center p-2">
+                                    <img src="/assets/img/apps/realwear-logo.png" class="card-img" alt="...">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Realwear</h5>
+                                        <p class="card-text">Seamless Business Continuity with Remote Hands-Free Collaboration. Accelerate the roll-out of connected work programs, from evaluation through pilot to production use with out-of-the-box functionality.</p>
+                                        <p class="card-text d-none"><small class="text-muted">Last updated 3 mins ago</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 pr-3">
+                                    <a href="#" class="btn btn-primary btn-sm float-right">Add integration</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     -->
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- Modal -->
+<div class="modal fade" id="integrationModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="integrationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="integrationModalLabel">@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.HeaderIntegrateWithSolvace, "Integrate with Solvace") ?? "Integrate with Solvace")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <form id="integrationModalForm">
+                </form>
+                <input type="hidden" id="marketplaceitem_id" value=""  />
+            </div>
+            <div class="modal-footer">
+                <img src="/assets/img/apps/solvace.jpeg" class="mr-auto" style="width: 150px;" date-containertype="modal_picture"/>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonCancel, "Cancel") ?? "Cancel")</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" data-actiontype="save">@(Model.CmsLanguage.GetValue(LanguageKeys.Config.DialogButtonSaveAndAdd, "Save & add") ?? "Save & add")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+
+        $(document).ready(function () {
+
+            integration.init();
+
+        });
+
+        var integration = {
+            _input_template: '<div class="form-group"><label for="input_{0}">{1}</label><input type="{4}" class="form-control" id="input_{0}" aria-describedby="input_{0}_help" placeholder="{2}" data-output="{5}"><small id="input_{0}_help" class="form-text text-muted">{3}</small></div>',
+            _select_template: '<div class="form-group"><label for="select_{0}">{1}</label><select class="custom-select" id="select_{0}" aria-describedby="select_{0}_help" data-output="{4}">{3}</select><small id="select_{0}_help" class="form-text text-muted">{2}</small></div>',
+            _select_options_bool: '<option value="true">@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.OptionYes, "Yes") ?? "Yes")</option><option value="false">@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.OptionNo, "No") ?? "No")</option>',
+            _select_options: '<option {0} value="{2}">{1}</option>',
+            clear: function () {
+
+            },
+            create: function () {
+                var output = {};
+                let currentid = $('#marketplaceitem_id').val();
+                if (currentid !== null && currentid !== '') {
+                    let template = JSON.parse($('[data-containertype="config_template"][data-marketitem-id="' + currentid + '"]').val());
+                    //console.log(template);
+                    output["Version"] = template.Version;
+                    output["SystemKey"] = template.SystemKey;
+                    for (var i = 0; i < template.Fields.length; i++) {
+                        let field = template.Fields[i];
+                        if (field != null) {
+                            output[field.OutputField] = $('[data-output="' + field.OutputField + '"]').val();
+                        }
+                    }
+
+                }
+                return output;
+            },
+            deselect: function () {
+
+            },
+            handleAddChangeCompany: function () {
+
+            },
+            init: function () {
+                integration.setHandlers();
+                integration.clear();
+            },
+            initEditModal: function (id) {
+                if (id != null) {
+                    $('#marketplaceitem_id').val(id); //set the id of the chosen marketplace item.
+
+                    let template = JSON.parse($('[data-containertype="config_template"][data-marketitem-id="' + id + '"]').val());
+                    let imageLogoLocation = $('[data-marketitem-id="' + id + '"][data-containertype="picture"]').attr('src');
+
+                    $('[date-containertype="modal_picture"]').attr('src', imageLogoLocation);
+
+                    let modelform = '';
+                    for (var i = 0; i < template.Fields.length; i++) {
+                        let field = template.Fields[i];
+                        switch (field.Type) {
+                            case 'text':
+                                modelform = modelform + integration._input_template.format(i.toString(), field.Title, field.PlaceHolder, field.Description, field.Type, field.OutputField);
+                                break;
+
+                            case 'password':
+                                modelform = modelform + integration._input_template.format(i.toString(), field.Title, field.PlaceHolder, field.Description, field.Type, field.OutputField);
+                                break;
+
+                            case 'date':
+                                modelform = modelform + integration._input_template.format(i.toString(), field.Title, '', field.Description, field.Type, field.OutputField);
+                                break;
+
+                            case 'bool':
+                                modelform = modelform + integration._select_template.format(i.toString(), field.Title, field.Description, integration._select_options_bool, field.OutputField);
+                                break;
+                        }
+                    }
+                    $('#integrationModalForm').html(modelform);
+                }
+            },
+            remove: function () {
+
+            },
+            save: function () {
+                $('body').toggleClass('loaded');
+                $('#modalSettings').modal('hide');
+
+                var integrationConfig = integration.create();
+                //console.log(integrationConfig);
+
+                //return;
+                $.ajax({
+                    type: "POST",
+                    url: '/config/integrations/save',
+                    data: JSON.stringify(integrationConfig),
+                    success: function (data) {
+                        $('body').toggleClass('loaded');
+
+                        toastr.success('@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.IntegrationSaved, "Integration saved..reloading") ?? "Integration saved..reloading")');
+
+                        setTimeout(() => {
+                            location.href = '/config/integrations';
+                        }, 1000);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('body').toggleClass('loaded');
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+
+            },
+            search: function (searchText) {
+
+            },
+            setValues: function (id) {
+
+            },
+            setHandlers: function () {
+                $('[data-actiontype="edit"]').on('click', function () {
+                    //console.log(this);
+                    //data-containertype="config" data-marketitem-id=""
+                    integration.initEditModal($(this).attr('data-marketitem-id'));
+                });
+                $('[data-actiontype="save"]').on('click', function () {
+                    integration.save();
+                });
+            },
+            updateValues: function () {
+
+            }
+        };
+
+        if (!String.prototype.format) {
+            String.prototype.format = function () {
+                var formatted = this;
+                for (var i = 0; i < arguments.length; i++) {
+                    var regexp = new RegExp('\\{' + i + '\\}', 'gi');
+                    formatted = formatted.replace(regexp, arguments[i] !== undefined ? arguments[i] : '');
+                }
+                return formatted;
+            };
+        }
+    </script>
+
+}

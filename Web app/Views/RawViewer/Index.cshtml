@@ -1,0 +1,311 @@
+﻿@model WebApp.ViewModels.RawViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout_template";
+}
+
+<style>
+    .report-content {
+        width: 100%;
+        background-color: white;
+        border-bottom: 1px solid rgba(0,0,0,.125);
+        padding: 0 1.25rem .75rem 1.25rem;
+        position: relative;
+        border-top-left-radius: .25rem;
+        border-top-right-radius: .25rem;
+        box-shadow: 0 0 1px rgb(0 0 0 / 13%), 0 1px 3px rgb(0 0 0 / 20%);
+        margin-bottom: 1rem;
+    }
+
+    .report-table {
+        width: 100%;
+    }
+
+        .report-table thead th {
+            padding: 5px;
+        }
+
+        .report-table thead tr {
+            height: 60px;
+            box-shadow: inset 0 -2px 0 #808080;
+            background: white;
+            position: sticky;
+            top: 0;
+        }
+
+    .report-table-size-content {
+        width: 6%
+    }
+
+    .report-table tbody td {
+        padding: 5px;
+        max-width: 300px;
+        word-break: break-all;
+    }
+
+        .report-table tbody td span {
+            cursor: pointer;
+        }
+
+
+    .report-table tbody tr {
+        height: 60px;
+        border-bottom: 1px solid #4444443d;
+    }
+
+    .report-table-vertical-title {
+        font-weight: bolder;
+        width: 400px !important;
+    }
+
+    .report-table-vertical-id {
+        font-style: italic;
+        width: 50px !important;
+    }
+
+    .report-vertical {
+        -ms-writing-mode: tb-rl;
+        -webkit-writing-mode: vertical-rl;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        white-space: nowrap;
+    }
+
+    .report-bottom {
+        vertical-align: bottom;
+    }
+
+    .report-center {
+        text-align: center;
+    }
+</style>
+
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                &nbsp;
+                <h1 class="m-0 text-dark">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.HeaderRawViewer, "Raw viewer") ?? "Raw viewer")</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6 d-flex flex-row-reverse">
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+<section class="content">
+
+    <div class="container-fluid">
+
+        <div class="card">
+            <div class="card-header">
+                <h3 id="cardHeader" class="card-title d-none d-sm-inline-block">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.HeaderRawViewer, "Raw viewer") ?? "Raw viewer")<span id="counter">&nbsp;</span></h3>
+                <div class="card-tools">
+                    <div class="input-group input-group-sm">
+                        <select class="form-control" id="raw_viewer_company" name="raw_viewer_company">
+                            <option value="0" title="ONLY FOR USE WITH SPECIFIC RAW VIEWER!!">_ALL/IGNORE_</option>
+                            @foreach (var company in Model.Companies)
+                            {
+                                @if (Model.ChoosenCompanyId == company.Id)
+                                {
+                                    <option value="@company.Id" selected>@company.Name (@company.Id)</option>
+                                }
+                                else
+                                {
+                                    <option value="@company.Id">@company.Name (@company.Id)</option>
+                                }
+
+                            }
+                        </select>
+                        <select class="form-control" id="raw_viewer_type" name="raw_viewer_type">
+                            <optgroup label="Company Modules">
+                                <option value="tasks">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.OptionTasks, "Tasks") ?? "Tasks")</option>
+                                <option value="audits">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.OptionAudits, "Audits") ?? "Audits")</option>
+                                <option value="checklists">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.OptionChecklists, "Checklists") ?? "Checklists")</option>
+                                <option value="assessments">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.OptionAssessments, "Assessments") ?? "Assessments")</option>
+                                <option value="actions">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.OptionActions, "Actions") ?? "Actions")</option>
+                                <option value="comments">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.OptionComments, "Comments") ?? "Comments")</option>
+                            </optgroup>
+                            <optgroup label="Company Relations">
+                                <option value="tasks_deeplink_linked_audit" title="Only for use with company filter.">Retrieve tasks, with deeplinked audits</option>
+                                <option value="tasks_deeplink_linked_checklist" title="Only for use with company filter.">Retrieve tasks, with deeplinked checklist</option>
+                                <option value="audits_deeplink_linked_task" title="Only for use with company filter.">Retrieve audits, with deeplinked tasks</option>
+                                <option value="checklists_deeplink_linked_task" title="Only for use with company filter.">Retrieve checklists, with deeplinked tasks</option>
+                                <option value="external_relations" title="Company choice will be ignored.">External relations</option>
+                            </optgroup>
+                            <optgroup label="Company structures">
+                                <option value="shifts">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.OptionShifts, "Shifts") ?? "Shifts")</option>
+                                <option value="areas" title="Start and end dates will be ignored.">Areas</option>
+                            </optgroup>
+                            <optgroup label="Logging">
+                                <option value="log_auditing">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.OptionLogAuditing, "Log auditing") ?? "Log auditing")</option>
+                                <option value="log_logging" title="Company choice will be ignored.">Log</option>
+                                <option value="log_security" title="Company choice will be ignored.">Log Login</option>
+                                <option value="log_generation" title="Company choice will be ignored.">Log TaskGeneration</option>
+                                <option value="log_app" title="Set to all, to ignore company filter.">Logging app registrations per date</option>
+                                <option value="logging_external_requestresponse" title="Logging external request/response">Logging external request response</option>
+                                <option value="log_export" title="Company choice will be ignored.">Logging export</option>
+                                <option value="log_provisioner" title="Company choice will be ignored.">Logging provisioner</option>
+                                <option value="log_flattener" title="Company choice will be ignored.">Logging flattener</option>
+                                <option value="log_processor" title="Company choice will be ignored.">Logging processor</option>
+                                <option value="log_sap_pm" title="Company choice will be ignored.">Logging SAP PM</option>
+                            </optgroup>
+                            <optgroup label="Logging datawarehouse">
+                                <option value="log_data_warehouse" title="Company choice will be ignored.">Logging data warehouse</option>
+                                <option value="log_data_warehouse_security" title="Company choice will be ignored.">Logging data warehouse security</option>
+                                <option value="synchronisation_data_warehouse" title="Company choice will be ignored, dates will be ignored.">Synchonisation statusses</option>
+                            </optgroup>
+                            <optgroup label="Application Statistics">
+                                <option value="log_grouped_app" title="Set to all, to ignore company filter.">Retrieve app grouped by app version</option>
+                                <option value="log_usage_app" title="Set to all, to ignore company filter.">Retrieve app usage by app and os</option>
+                            </optgroup>
+                            <optgroup label="User Overviews">
+                                <option value="systemusers_overview" title="Set to all, to ignore company filter.">Retrieve list of active system users for automated processes.</option>
+                                <option value="serviceusers_overview" title="Set to all, to ignore company filter.">Retrieve list of active service users.</option>
+                            </optgroup>
+                            <optgroup label="Statistics">
+                                <option value="actions_max_resolved_totals_per_month" title="Set to all for best results.">Retrieve max number of actions resolved per month </option>
+                                <option value="actions_resolved_totals_per_month" title="All / Company filters will be used.">Retrieve number of actions resolved per month per company</option>
+                            </optgroup>
+                            <optgroup label="Versions">
+                                <option value="tasktemplate_versions" title="Company filters will be used.">Retrieve list for task template versions</option>
+                                <option value="checklisttemplate_versions" title="Company filters will be used.">Retrieve list for checklist template versions</option>
+                                <option value="audittemplate_versions" title="Company filters will be used.">Retrieve list for audit template versions</option>
+                                <option value="assessmenttemplate_versions" title="Company filters will be used.">Retrieve list for assessment template versions</option>
+                                <option value="workinstructiontemplate_versions" title="Company filters will be used.">Retrieve list for workinstruction template versions</option>
+                            </optgroup>
+                        </select>
+                        <input type="datetime-local" id="raw_viewer_start" name="raw_viewer_start" class="form-control float-right" style="width:270px;" value="@Model.ChoosenStartDateTime.ToString("yyyy-MM-ddTHH:mm")">
+                        <input type="datetime-local" id="raw_viewer_end" name="raw_viewer_end" class="form-control float-right" style="width:270px;" value="@Model.ChoosenEndDateTime.ToString("yyyy-MM-ddTHH:mm")">
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-default" id="btn_get_data"><i class="fas fa-arrow-alt-circle-down"></i></button>
+                        </div>
+                        &nbsp;
+                        <input type="text" id="rawviewerSearchBox" name="rawviewerSearchBox" class="form-control float-right" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.SearchPlaceholder, "Search") ?? "Search")" data-boxtype="search">
+
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="report-content" style="height: calc(100vh - 245px);overflow:auto;">
+            <div id="report_container" style="margin:0 5px 5px 5px;">
+
+                <partial name="~/Views/RawViewer/_report_table.cshtml" model="@Model" />
+
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+@section Scripts {
+
+    <script>
+
+        var rawviewer = {
+            init: function () {
+                rawviewer.initHandlers();
+                //setTimeout(() => {
+                //    rawviewer.retrieve();
+                //}, 1000);
+            },
+            initHandlers: function () {
+                $('#btn_get_data').on('click', function () {
+                    rawviewer.retrieve();
+                });
+                $('#rawviewerSearchBox').on('keydown, keyup', function () {
+                    rawviewer.search($(this).val());
+                });
+            },
+            retrieve: async function () {
+                toastr.remove();
+                $('body').toggleClass('loaded');
+
+                let company = $('#raw_viewer_company').val();
+                let viewertype = $('#raw_viewer_type').val();
+                let start = $('#raw_viewer_start').val();
+                let end = $('#raw_viewer_end').val();
+
+                console.log(company, viewertype, start, end);
+
+                $.ajax({
+                    type: "POST",
+                    url: '/raw/viewer/' + company + '/' + viewertype + '/?start=' + start + '&end=' + end,
+                    success: function (data) {
+                        rawviewer.render(data);
+                        $('body').toggleClass('loaded');
+                        toastr.success('@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.ReportRetrieved, "Report retrieved") ?? "Report retrieved")');
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('body').toggleClass('loaded');
+                        toastr.error(JSON.parse(jqXHR.responseText) + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            render: function (data) {
+
+                $('#report_container').html('');
+                $('#report_container').html(data);
+
+                if ($('#rawviewerSearchBox').val() !== '') {
+                    rawviewer.search($('#rawviewerSearchBox').val());
+                }
+            },
+            resetSearchUI: function (includeInput) {
+                if (includeInput != undefined && includeInput !== null) {
+                    if (includeInput === true) {
+                        $('#rawviewerSearchBox').val('');
+                    }
+                }
+                $('#report_container table tr').show(); //enable all
+            },
+            search: function (searchValue) {
+                let currentValue = searchValue;
+
+                rawviewer.resetSearchUI();
+
+                if (currentValue != null && currentValue !== '') {
+                    $('[data-type="datatable"] tbody tr').hide(); //hide everything when searching
+                    $('[data-type="datatable"] tbody tr').each(function () {
+                        let searchSuccess = false;
+                        if ($($(this).find('[data-searchcolumn="tasktemplate_id"]')[0]).text().toLowerCase().includes(currentValue.toLowerCase())) {
+                            searchSuccess = true;
+                        };
+                        if ($($(this).find('[data-searchcolumn="name"]')[0]).text().toLowerCase().includes(currentValue.toLowerCase())) {
+                            searchSuccess = true;
+                        };
+                        if ($($(this).find('[data-searchcolumn="recurrency_type"]')[0]).text().toLowerCase().includes(currentValue.toLowerCase())) {
+                            searchSuccess = true;
+                        };
+                        if ($($(this).find('[data-searchcolumn="status"]')[0]).text().toLowerCase().includes(currentValue.toLowerCase())) {
+                            searchSuccess = true;
+                        };
+                        if ($($(this).find('[data-searchcolumn="description"]')[0]).text().toLowerCase().includes(currentValue.toLowerCase())) {
+                            searchSuccess = true;
+                        };
+                        if ($($(this).find('[data-searchcolumn="comment"]')[0]).text().toLowerCase().includes(currentValue.toLowerCase())) {
+                            searchSuccess = true;
+                        };
+
+                        if (searchSuccess) { $(this).show(); }
+                    });
+                }
+            },
+        }
+
+        rawviewer.init();
+        ezgomediafetcher.preloadImagesAndVideos();
+    </script>
+
+}

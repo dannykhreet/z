@@ -1,0 +1,21 @@
+﻿@model List<WebApp.Models.Task.TaskTemplateModel>
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<div>
+    <ul class="list-group h-100">
+        @foreach (var task in Model)
+        {
+            <li class="list-group-item">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input task" data-type="task" id="task-@task.Id" name="Tasks" onchange="taskManagement.toggleSelection(this)" value="@task.Id">
+                    <label class="custom-control-label font-weight-normal" for="task-@task.Id">@(@task.Name)</label>
+                </div>
+                @*<small id="task-@task.Id-disabled-text"></small>*@
+            </li>
+        }
+    </ul>
+</div>

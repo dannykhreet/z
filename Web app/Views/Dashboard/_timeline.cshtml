@@ -1,0 +1,208 @@
+﻿@model List<WebApp.Models.Statistics.LogAuditingModel>
+@using WebApp.Models.Statistics
+@using Newtonsoft.Json.Linq
+@{
+    Layout = null;
+    int cntr = 0;
+
+    string GetIconForLogItem(string description)
+    {
+        switch (description.ToUpper())
+        {
+            case "CHANGED TASK STATUS.":
+                return "fas fa-hand-point-up fa-lg";
+            case "SIGNED CHECKLIST.":
+                return "fas fa-signature fa-lg";
+            case "ADDED CHECKLIST.":
+                return "fas fa-file-contract fa-lg";
+            case "ADDED ACTION.":
+                return "fas fa-bolt-lightning fa-lg";
+            default:
+                break;
+        }
+
+        return "far fa-clock";
+    }
+
+    string GetBadgeColorForLogItem(string description)
+    {
+        switch (description.ToUpper())
+        {
+            case "CHANGED TASK STATUS.":
+                return "success";
+            case "SIGNED CHECKLIST.":
+                return "warning";
+            case "ADDED CHECKLIST.":
+                return "";
+            case "ADDED ACTION.":
+                return "danger";
+            default:
+                break;
+        }
+
+        return "";
+    }
+}
+
+<div class="container">
+    <ul class="timeline">
+        @foreach (LogAuditingModel item in Model)
+        {
+            if (cntr % 2 == 0)
+            {
+                <li>
+                    <div class="timeline-badge @GetBadgeColorForLogItem(item.Description)"><i class="@GetIconForLogItem(item.Description)"></i></div>
+                    <div class="timeline-panel">
+                        <div class="timeline-heading">
+                            <h4 class="timeline-title">@item.Description</h4>
+                            <p class="mb-0"><small class="text-muted"><i class="fas fa-clock"></i> @item.CreatedOnUTC.ToLongDateString() @item.CreatedOnUTC.ToShortTimeString() </small></p>
+                        </div>
+                        <div class="timeline-body">
+
+                            @if (item.MutatedObject != null && item.ObjectType == "actions_action")
+                            {
+                                JObject results = JObject.Parse(item.MutatedObject.ToString());
+                                string img = ""; // WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, results["image_0"].ToString());
+                                @*<p>@results</p>*@
+                                <p>A new action is added: <strong>@results["comment"]</strong>and the action should be:<strong>@results["description"]</strong></p>
+                                @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.NewActionIsAdded, "A new action is added: ") ?? "A new action is added: ")*@
+                                @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.TheActionShouldBe, "and the action should be: ") ?? "and the action should be: ")*@
+                                            <img class="card-img-bottom pt-3" src="@img"  />
+                                        }
+                                        else
+                                        {
+
+                                        }
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                        else
+                        {
+
+                            <li class="timeline-inverted">
+                                <div class="timeline-badge @GetBadgeColorForLogItem(item.Description)"><i class="@GetIconForLogItem(item.Description)"></i></div>
+                                <div class="timeline-panel">
+                                    <div class="timeline-heading">
+                                        <h4 class="timeline-title">@item.Description</h4>
+                                        <p class="mb-0"><small class="text-muted"><i class="fas fa-clock"></i> @item.CreatedOnUTC.ToLongDateString() @item.CreatedOnUTC.ToShortTimeString()</small></p>
+                                    </div>
+                                    <div class="timeline-body">
+                                        <p></p>
+                                    </div>
+                                </div>
+                            </li>
+
+                        }
+
+
+                    cntr += 1;
+                    }
+                 </ul>
+            </div>
+
+            <div class="container d-none">
+                <div class="page-header d-none">
+                    <h1 id="timeline">Timeline</h1>
+                </div>
+                <ul class="timeline">
+                    <li>
+                        <div class="timeline-badge"><i class="fas fa-hand-point-up fa-lg"></i></div>
+                        <div class="timeline-panel">
+                            <div class="timeline-heading">
+                                <h4 class="timeline-title">Task tappings</h4>
+                                @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.TaskTappingsTitle, "Task tappings") ?? "Task tappings")*@
+                                <p><small class="text-muted"><i class="fas fa-clock"></i> @DateTime.Today.ToLongDateString()</small></p>
+                            </div>
+                            <div class="timeline-body">
+                                <p>Till now there 8 task tappings performed by multiple users.</p>
+                                @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.TillNowThere8TaskTappings, "Till now there 8 task tappings performed by multiple users.") ?? "Till now there 8 task tappings performed by multiple users.")*@
+                            </div>
+                        </div>
+                    </li>
+                    <li class="timeline-inverted">
+                        <div class="timeline-badge warning"><i class="fas fa-signature"></i></div>
+                        <div class="timeline-panel">
+                            <div class="timeline-heading">
+                                <h4 class="timeline-title">Completed and signed checklists</h4>
+                                @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.CompletedAndSignedChecklistTitle, "Completed and signed checklists") ?? "Completed and signed checklists")*@
+                                <p><small class="text-muted"><i class="fas fa-clock"></i> @DateTime.Today.ToLongDateString()</small></p>
+                            </div>
+                            <div class="timeline-body">
+                                <p>Today there are X checklists completed within your company.</p>
+                                @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.TodayThereAreChecklistsTitle, "Today there are X checklists completed within your company.") ?? "Today there are X checklists completed within your company.")*@
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="timeline-badge danger"><i class="glyphicon glyphicon-credit-card"></i></div>
+                        <div class="timeline-panel">
+                            <div class="timeline-heading">
+                                <h4 class="timeline-title">Mussum ipsum cacilds</h4>
+                            </div>
+                            <div class="timeline-body">
+                                <p>Mussum ipsum cacilds, vidis litro abertis. Consetis adipiscings elitis. Pra lá , depois divoltis porris, paradis. Paisis, filhis, espiritis santis. Mé faiz elementum girarzis, nisi eros vermeio, in elementis mé pra quem é amistosis quis leo. Manduma pindureta quium dia nois paga. Sapien in monti palavris qui num significa nadis i pareci latim. Interessantiss quisso pudia ce receita de bolis, mais bolis eu num gostis.</p>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="timeline-inverted">
+                        <div class="timeline-panel">
+                            <div class="timeline-heading">
+                                <h4 class="timeline-title">Mussum ipsum cacilds</h4>
+                            </div>
+                            <div class="timeline-body">
+                                <p>Mussum ipsum cacilds, vidis litro abertis. Consetis adipiscings elitis. Pra lá , depois divoltis porris, paradis. Paisis, filhis, espiritis santis. Mé faiz elementum girarzis, nisi eros vermeio, in elementis mé pra quem é amistosis quis leo. Manduma pindureta quium dia nois paga. Sapien in monti palavris qui num significa nadis i pareci latim. Interessantiss quisso pudia ce receita de bolis, mais bolis eu num gostis.</p>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="timeline-badge info"><i class="glyphicon glyphicon-floppy-disk"></i></div>
+                        <div class="timeline-panel">
+                            <div class="timeline-heading">
+                                <h4 class="timeline-title">Mussum ipsum cacilds</h4>
+                            </div>
+                            <div class="timeline-body">
+                                <p>Mussum ipsum cacilds, vidis litro abertis. Consetis adipiscings elitis. Pra lá , depois divoltis porris, paradis. Paisis, filhis, espiritis santis. Mé faiz elementum girarzis, nisi eros vermeio, in elementis mé pra quem é amistosis quis leo. Manduma pindureta quium dia nois paga. Sapien in monti palavris qui num significa nadis i pareci latim. Interessantiss quisso pudia ce receita de bolis, mais bolis eu num gostis.</p>
+                                <hr>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
+                                        <i class="glyphicon glyphicon-cog"></i> <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="#">Action</a></li>
+                                        @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.ActionText, "Action") ?? "Action")*@
+                                        <li><a href="#">Another action</a></li>
+                                        @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.AnotherActionText, "Another action") ?? "Another action")*@
+                                        <li><a href="#">Something else here</a></li>
+                                        @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.SomethingElseHereText, "Something else here") ?? "Something else here")*@
+                                        <li class="divider"></li>
+                                        <li><a href="#">Separated link</a></li>
+                                        @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.SeparatedLinkText, "Separated link") ?? "Separated link")*@
+                                    </ul>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="timeline-panel">
+                        <div class="timeline-heading">
+                            <h4 class="timeline-title">Mussum ipsum cacilds</h4>
+                        </div>
+                        <div class="timeline-body">
+                            <p>Mussum ipsum cacilds, vidis litro abertis. Consetis adipiscings elitis. Pra lá , depois divoltis porris, paradis. Paisis, filhis, espiritis santis. Mé faiz elementum girarzis, nisi eros vermeio, in elementis mé pra quem é amistosis quis leo. Manduma pindureta quium dia nois paga. Sapien in monti palavris qui num significa nadis i pareci latim. Interessantiss quisso pudia ce receita de bolis, mais bolis eu num gostis.</p>
+                        </div>
+                    </div>
+                </li>
+                <li class="timeline-inverted">
+                    <div class="timeline-badge success"><i class="glyphicon glyphicon-thumbs-up"></i></div>
+                    <div class="timeline-panel">
+                        <div class="timeline-heading">
+                            <h4 class="timeline-title">Mussum ipsum cacilds</h4>
+                        </div>
+                        <div class="timeline-body">
+                            <p>Mussum ipsum cacilds, vidis litro abertis. Consetis adipiscings elitis. Pra lá , depois divoltis porris, paradis. Paisis, filhis, espiritis santis. Mé faiz elementum girarzis, nisi eros vermeio, in elementis mé pra quem é amistosis quis leo. Manduma pindureta quium dia nois paga. Sapien in monti palavris qui num significa nadis i pareci latim. Interessantiss quisso pudia ce receita de bolis, mais bolis eu num gostis.</p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>

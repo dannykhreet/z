@@ -1,0 +1,3381 @@
+﻿@model FactoryFeedViewModel
+@using WebApp.Models.FactoryFeed
+@using EZGO.CMS.LIB.Extensions
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = @Model?.CmsLanguage?.GetValue(LanguageKeys.FactoryFeed.FactoryFeedTitle, "Factory feed") ?? "Factory feed";
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+}
+
+@section CSS{
+
+    <style>
+        .card {
+            border-radius: 0.75em;
+            box-shadow: none;
+            border: solid 1px #dbdbdb;
+        }
+
+        textarea {
+            border-radius: 0.75em;
+            border: solid 1px #dbdbdb;
+        }
+
+        .profile-card-4 {
+            background-color: #FFF;
+            border-radius: 0.75em;
+            border: solid 1px #dbdbdb;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+            .profile-card-4 img {
+                transition: all 0.25s linear;
+                width: 100%;
+            }
+
+            .profile-card-4 .profile-content {
+                position: relative;
+                padding: 15px;
+                background-color: #FFF;
+            }
+
+            .profile-card-4 .profile-name {
+                font-weight: bold;
+                position: absolute;
+                left: 0px;
+                right: 0px;
+                top: -70px;
+                color: #FFF;
+                font-size: 17px;
+            }
+
+                .profile-card-4 .profile-name p {
+                    font-weight: 600;
+                    font-size: 13px;
+                    letter-spacing: 1.5px;
+                }
+
+            .profile-card-4 .profile-description {
+                color: #777;
+                font-size: 12px;
+                padding: 10px;
+            }
+
+            .profile-card-4 .profile-overview {
+                padding: 10px 0px;
+            }
+
+                .profile-card-4 .profile-overview p {
+                    font-size: 10px;
+                    font-weight: 600;
+                    color: #777;
+                }
+
+                .profile-card-4 .profile-overview h4 {
+                    color: #273751;
+                    font-weight: bold;
+                }
+
+            .profile-card-4 .profile-content::before {
+                content: "";
+                position: absolute;
+                height: 20px;
+                top: -7px;
+                left: 0px;
+                right: 0px;
+                background-color: #FFF;
+                z-index: 0;
+                transform: skewY(3deg);
+            }
+
+            .profile-card-4:hover img {
+                transform: rotate(5deg) scale(1.1, 1.1);
+                filter: brightness(110%);
+            }
+
+        [id^=factoryUpdateMessage-]:hover {
+            background-color: #dfdfdf;
+        }
+
+
+        .controls {
+            position: absolute;
+            bottom: 0px;
+            margin: 15px;
+        }
+
+
+        .main-image-pencil {
+            background: #93c54b;
+            width: 35px;
+            height: 35px;
+            margin: 10px;
+            opacity: 0.8;
+            z-index: 1;
+            color: #fff;
+            border: solid 1px #333333 !important;
+            cursor: pointer;
+        }
+
+            .main-image-pencil i {
+                width: 35px;
+                height: 33px;
+                position: relative;
+                display: flex;
+            }
+
+            .main-image-pencil:hover {
+                border: solid 1px #fff !important;
+            }
+
+        .factoryFeedToolTip {
+            box-sizing: border-box;
+            position: relative;
+            background-color: silver;
+            width: 200px;
+            height: 50px;
+            border-radius: 0.25em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .factoryFeedTriangle {
+            display: block;
+            height: 0px;
+            width: 0px;
+            border: 10px solid transparent;
+            border-top-color: silver;
+            position: absolute;
+            bottom: -20px;
+            left: calc(50% - 10px);
+        }
+
+        .custom-checkbox .custom-control-input:checked ~ .custom-control-label::before,
+        .custom-checkbox .custom-control-input:indeterminate ~ .custom-control-label::before {
+            background-color: #93C54B;
+            border-color: #93c54b1f;
+        }
+
+        .custom-control-input:checked ~ .custom-control-label::before {
+            color: #fff;
+            border-color: #93c54b1f;
+            background-color: #93C54B;
+            box-shadow: none;
+        }
+
+        .postMenuOption:hover {
+            background-color: #dfdfdf;
+        }
+
+        .sticky-div {
+            font-size: 1rem;
+            position: sticky;
+            top: 0;
+            background-color: #93C54B;
+            z-index: 1;
+            margin-bottom: 0.5em;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            opacity: 0.85;
+        }
+
+        .factoryUpdatesMainFeedToggle {
+            font-size: 1rem;
+            position: sticky;
+            top: 0;
+            background-color: #93C54B;
+            z-index: 1;
+            margin-bottom: 0.5em;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            opacity: 0.85;
+            margin-right: 0;
+            margin-left: 0;
+            text-align: center;
+            vertical-align: middle;
+            align-items: center;
+            align-content: center;
+        }
+
+        .factoryUpdateToggle {
+            border-left: 1px solid white;
+        }
+
+        .pdfTriangle {
+            clip-path: polygon(0% 0%, 0% 100%, 100% 100%);
+            background: #cccccc;
+            width: 100%;
+            height: 80px;
+        }
+
+        .factoryFeedPdfBG {
+            background-color: #E6E6E6;
+        }
+
+        .factoryFeedPdfLogo {
+            width: 25%;
+            margin-top: -33px;
+            margin-bottom: 45px;
+        }
+
+        .factoryFeedPdfBottomSection {
+            background-color: #99BC65;
+            color: white;
+            font-size: 50px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+
+        .pdfTriangleMedium {
+            clip-path: polygon(0% 0%, 0% 100%, 100% 100%);
+            background: #cccccc;
+            width: 100%;
+            height: 60px;
+        }
+
+        .factoryFeedPdfBGMedium {
+            background-color: #E6E6E6;
+        }
+
+        .factoryFeedPdfLogoMedium {
+            width: 25%;
+            margin-top: -43px;
+            margin-bottom: 15px;
+        }
+
+        .factoryFeedPdfBottomSectionMedium {
+            background-color: #99BC65;
+            color: white;
+            font-size: 35px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+
+        .pdfTriangleSmall {
+            clip-path: polygon(0% 0%, 0% 100%, 100% 100%);
+            background: #cccccc;
+            width: 100%;
+            height: 40px;
+        }
+
+        .factoryFeedPdfBGSmall {
+            background-color: #E6E6E6;
+        }
+
+        .factoryFeedPdfLogoSmall {
+            width: 25%;
+            margin-top: -21px;
+            margin-bottom: 17px;
+        }
+
+        .factoryFeedPdfBottomSectionSmall {
+            background-color: #99BC65;
+            color: white;
+            font-size: 30px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+
+        .pdfTriangleFactoryUpdate {
+            clip-path: polygon(0% 0%, 0% 100%, 100% 100%);
+            background: #cccccc;
+            width: 100%;
+            height: 60px;
+        }
+
+        .factoryFeedPdfBGFactoryUpdate {
+            background-color: #E6E6E6;
+        }
+
+        .factoryFeedPdfLogoFactoryUpdate {
+            width: 25%;
+            margin-top: -33px;
+            margin-bottom: 30px;
+        }
+
+        .factoryFeedPdfBottomSectionFactoryUpdate {
+            background-color: #99BC65;
+            color: white;
+            font-size: 50px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        
+
+        .paperclip {
+            height: 160px;
+            background-color: #8ea968;
+            text-align: center;
+            color: #fff;
+        }
+
+    </style>
+
+}
+
+<section id="factoryFeedMain" class="content" style="height: calc(100vh - 98px); overflow: auto; padding-top: 25px; ">
+
+    <div class="container" style="width: 100%">
+
+        <div class="row" style="height:calc(100vh - 145px)">
+            <!-- Left filter column-->
+            <div id="factoryFeedProfileCard" class="col-md-3 col-sm-12">
+                <partial name="_profilecard" model="@Model" />
+            </div>
+            <div id="factoryUpdatesMainFeedToggleContainer" class="col-sm-12 mt-3 d-block d-md-none d-lg-none d-xl-none">
+                <div class="row factoryUpdatesMainFeedToggle">
+                    <div class="col-6 p-2 mainFeedToggle" style="font-weight: 800" onclick="ezgofactoryfeed.showMainFeedPosts()">Show main feed</div>
+                    <div class="col-6 p-2 factoryUpdateToggle" onclick="ezgofactoryfeed.showFactoryUpdates()">Show factory updates</div>
+                </div>
+            </div>
+            <!-- Middle content column (regular) -->
+            <div class="col-sm-12 col-md-6 mt-3">
+                <section id="factoryFeedMiddleColumnRegular">
+
+                    <partial name="_contentform" model="@Model" />
+                    <hr />
+
+                    @*@for (int i = 0; i < 9; i++)
+                        {
+                            <partial name="_contentcard" model="@Model" />
+                        }*@
+                    
+                    <div id="newMessagesInfoBox" class="sticky-div py-2" style="display: none" onclick="ezgofactoryfeed.reloadMainFeedMessages()"><a><i class="fas fa-angle-double-up ml-3 mr-5"></i></a>New messages</div>
+                    <div id="factoryFeedMessages">
+                        @{
+                            var feed = Model.Feed.Where(f => f.FeedType == EZGO.Api.Models.Enumerations.FeedTypeEnum.MainFeed).FirstOrDefault();
+                        }
+                        @if (feed != null)
+                        {
+                            @foreach (FactoryFeedItemModel item in feed.Items)
+                            {
+                                <partial name="_contentcard" model="@item" />
+                            }
+                        }
+                        else
+                        {
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="px-2" style="display: flex;">
+                                        <div class="px-2">Save the company to enable EZ Feed.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: center"><img id="ezfeedLoader" style="width: 100px; height: 100px; display: none" src="/images/feed-loading.gif" /></div>
+
+
+                </section>
+                <!-- Middle content column (factory updates) -->
+                <section id="factoryFeedMiddleColumnFactoryUpdates" style="display: none;">
+
+                    <div class="card mb-3 shadow-0">
+                        <div class="card-header" style="display: flex;">
+                            <div class="pull-left border-dark"><img id="factoryUpdateDetailProfileImage" class="rounded-circle border" src="" style="width: 50px; height: 50px"  /></div>
+                            <div class="pull-left info" style="margin-left: 10px;">
+                                <p id="factoryUpdateDetailUsername" style="height: 7px;"></p>
+                                <div id="factoryUpdateDetailDate1" class="text-sm" style="font-size:10px;"></div>
+                            </div>
+                            <div id="factoryUpdateGoBack" style="margin-left: auto">
+                                <a id="returnToHomeScreen" href="#"
+                                   title="@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.ReturnToHomeScreen, "Return to home screen") ?? "Return to home screen")"
+                                   onclick="ezgofactoryfeed.hideFactoryUpdatesDetail()"
+                                   style="display: inline-block; float: right; text-align: center; width: 22px; height: 22px; border: 2px solid #93C54B; border-radius: 100%; font-size: 10px; line-height: 18px; color: #909090">
+                                    <i class="fa fa-arrow-left" style="font-size: 10px; line-height: 18px; color: #93C54B"></i>
+                                </a>
+                            </div>
+
+                            @if (Model.CurrentUser.Role.ToLower().Equals("manager"))
+                            {
+                                <div class="pull-right" style="margin-left: 10px">
+                                    <a onclick="ezgofactoryfeed.showFactoryUpdateMenu();"><i class="fas fa-ellipsis-h"></i></a>
+                                </div>
+                            }
+                            <div style="position: absolute; right: 1rem; display: none !important; " class="card postMenu" id="factoryUpdateMenu">
+                                <a class="postMenuOption p-1" style="border-radius: 10px 10px 0px 0px" onclick="ezgofactoryfeed.editFactoryUpdate()"><img class="ml-2" src="~/images/factory-feed-edit.png" style="width: 12px; height: 12px" /><div class="pl-2 py-1" style="display: inline-block">@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.EditTitle, "Edit") ?? "Edit")</div></a>
+                                <a class="postMenuOption p-1" style="border-radius: 0px 0px 10px 10px" id="factoryUpdateDelete" data-id="" onclick="ezgofactoryfeed.deleteFactoryUpdate(this)">
+                                    <img class="ml-2" src="~/images/factory-feed-delete.png" style="width: 12px; height: 12px" /><div class="pl-2 py-1" style="display: inline-block">@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.DeleteTitle, "Delete") ?? "Delete")</div>
+                                </a>
+                            </div>
+
+                        </div>
+                        <!-- Factory update content -->
+                        <div id="factoryUpdateContent" class="card-body">
+                            <a id="factoryUpdateFancybox" href="/images/media-loading.gif" data-fancybox="factoryUpdateFancybox">
+                                <img style="width: 100%; display: none" id="factoryUpdateDetailImage"  />
+                                <video controls style="width: 100%; display: none" id="factoryUpdateDetailVideo" ></video>
+
+                                <div id="factoryUpdateDetailPdf" class="pb-2 pl-3 pr-2">
+                                    <div class="row">
+                                        <div class="col-10 p-0 factoryFeedPdfBGFactoryUpdate" style="background-color: #E6E6E6"></div>
+                                        <div class="col-2 p-0">
+                                            <div class="pdfTriangleFactoryUpdate"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12 p-0 factoryFeedPdfBGFactoryUpdate" style="text-align: center">
+                                            <img class="factoryFeedPdfLogoFactoryUpdate" src="/images/logo-green.png" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12 factoryFeedPdfBottomSectionFactoryUpdate">
+                                            PDF
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+
+                            <video src="/images/media-loading.mp4" data-src="" controls id="factoryUpdateDetailVideoPreview" style="display:none;">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                            </video>
+
+                            <h4 class="mt-2" id="factoryUpdateDetailTitle"></h4>
+
+                            <p id="factoryUpdateDetailDescription"></p>
+                        </div>
+                        <!-- Factory update edit -->
+                        <div id="factoryUpdateEditForm" class="card-body" style="display: none">
+                            <div class="editFactoryUpdateImageContainer mt-3 mb-2" style="display: none; position: relative">
+                                <img id="editFactoryUpdateImage" src="" style="width: 100%;"  />
+
+                                <div class="controls d-print-none" style="position:absolute;bottom:0px;">
+                                    <a href="#" data-selector="deletemedia" data-type="template" class="editFactoryUpdateImageOverlay">
+                                        <div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">
+                                            <i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div id="factoryUpdateInfo" style="display: none"></div>
+                            <input class="form-control w-100 mb-2" id="factoryUpdateEditTitle" type="text" value="" maxlength="250" />
+                            <textarea class="form-control w-100 mb-2" id="factoryUpdateEditDescription"></textarea>
+                            <a class="btn btn-light" href="javascript:void(0);" onclick="ezgofactoryfeed.editSelectFactoryUpdateImage()">
+                                <i class="far fa-image mr-2"></i>
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.PictureTitle, "Picture") ?? "Picture")
+                            </a>
+                            <input type="file" style="display:none" accept=".jpg, .jpeg, .png" id="factoryUpdateEditImage" />
+                            <input type="file" style="display:none" accept=".mp4, .mov" id="factoryUpdateEditVideo" />
+                            <input type="file" style="display:none" accept=".pdf" id="factoryUpdateEditPdf" />
+                            <a class="btn btn-light ml-2" href="javascript:void(0);" onclick="ezgofactoryfeed.editSelectFactoryUpdateVideo()">
+                                <i class="fas fa-video mr-2"></i>
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.VideoTitle, "Video") ?? "Video")
+                            </a>
+                            <a class="btn btn-light ml-2" href="javascript:void(0);" onclick="ezgofactoryfeed.editSelectFactoryUpdatePdf()">
+                                <i class="fas fa-file mr-2"></i>
+                                Pdf
+                            </a>
+                            <div class="custom-control custom-checkbox mt-2" style="margin-left: 8px; display: inline-block">
+                                <input type="checkbox" class="custom-control-input" id="factoryUpdateEditIsSticky" />
+                                <label style="font-weight: 400" class="custom-control-label justify-content-start" for="factoryUpdateEditIsSticky">@(Model?.CmsLanguage?.GetValue(LanguageKeys.FactoryFeed.PinToTop, "Pin to top") ?? "Pin to top")</label>
+                            </div>
+                            <button id="editFactoryUpdate"
+                                    class="btn btn-ezgo ml-2 float-right"
+                                    onclick="ezgofactoryfeed.editFactoryUpdateMessage();"
+                                    style="color: #fff !important;">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.SaveButton, "Save") ?? "Save")
+                            </button>
+                            <button type="button" id="cancelEditFactoryUpdate" class="btn btn-danger float-right" onclick="ezgofactoryfeed.cancelEditFactoryUpdate()">
+                                <i class="fas fa-ban mr-2"></i>
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.CancelButton, "Cancel") ?? "Cancel")
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <!-- Right company news column-->
+            <div id="factoryFeedFactoryUpdates" class="col-md-3 col-sm-12 d-none d-md-block">
+                <partial name="_companynewscard" model="@Model" />
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+@{
+    var username = User.Identity.Name;
+    var profileImg = Model.CurrentUser.Picture;
+    var profileImgUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, profileImg);
+    var defaultProfileImg = "/assets/img/user-placeholder.jpg";
+    if (profileImg == null || string.IsNullOrEmpty(profileImg) || profileImg == "emptyprofile")
+    {
+        profileImgUrl = defaultProfileImg;
+    }
+}
+
+<!-- Modal -->
+<div class="modal fade" id="FactoryUpdatesModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="FactoryUpdatesModalTitle">Factory update</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="FactoryUpdatesModalBody">
+
+                <div class="card">
+                    <!-- Modal input/textarea -->
+                    <div class="card-body d-flex pb-0 mb-0">
+                        <div class="pull-left border-dark"><img class="rounded-circle border" src="/images/media-loading.gif" data-src="@profileImgUrl" style="width: 50px; height: 50px"  /></div>
+                        <div class="w-100 ml-3 pb-0 mb-0">
+                            <form class=" pb-0 mb-0">
+                                <div class="form-group pb-0 mb-0">
+                                    <input class="form-control w-100 mb-2" id="factoryUpdatesPostTitle" placeholder="Title" maxlength="250" />
+                                    <textarea class="form-control w-100" id="factoryUpdatesPostDescription" placeholder="Description"></textarea>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                    <!-- Modal buttons -->
+                    <div class="card-footer text-left" style="background-color:transparent !important;">
+                        <a class="btn btn-light" href="javascript:void(0);" onclick="ezgofactoryfeed.selectFactoryUpdateImage(this)">
+                            <i class="far fa-image mr-2"></i>
+                            @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.PictureTitle, "Picture") ?? "Picture")
+                        </a>
+                        <input type="file" style="display:none" accept=".jpg, .jpeg, .png" id="factoryUpdateImageInput" />
+                        <input type="file" style="display:none" accept=".mp4, .mov" id="factoryUpdateVideoInput" />
+                        <input type="file" style="display:none" accept=".pdf" id="factoryUpdatePdfInput" />
+                        <a class="btn btn-light ml-2" href="javascript:void(0);" onclick="ezgofactoryfeed.selectFactoryUpdateVideo(this)">
+                            <i class="fas fa-video mr-2"></i>
+                            @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.VideoTitle, "Video") ?? "Video")
+                        </a>
+                        <a class="btn btn-light ml-2" href="javascript:void(0);" onclick="ezgofactoryfeed.selectFactoryUpdatePdf(this)">
+                            <i class="fas fa-file mr-2"></i>
+                            Pdf
+                        </a>
+                        <div class="custom-control custom-checkbox mt-2" style="margin-left: 8px; display: inline-block">
+                            <input type="checkbox" class="custom-control-input" id="factoryUpdateIsSticky" />
+                            <label style="font-weight: 400" class="custom-control-label justify-content-start" for="factoryUpdateIsSticky">@(Model?.CmsLanguage?.GetValue(LanguageKeys.FactoryFeed.PinToTop, "Pin to top") ?? "Pin to top")</label>
+                        </div>
+                        <button id="postFactoryUpdateMessage" class="btn btn-ezgo ml-2 float-right" onclick="ezgofactoryfeed.sendFactoryUpdate();" style="color: #fff !important;" disabled="disabled">
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            @(Model.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.PostTitle, "Post") ?? "Post")
+                        </button>
+                        @*<div class="postImageContainer" data-content="Click to remove image" style="display: none"><img id="postImage" src="" style="width: 50px; height: 50px; display: none" /></div>*@
+                        <div class="factoryUpdateImageContainer mt-3" style="display: none">
+                            <img id="factoryUpdateImage" src="" style="width: 100%"  />
+                            <div class="controls d-print-none" style="position:absolute;bottom:0px;">
+                                <a href="#" data-selector="deletemedia" data-type="template" class="factoryUpdateImageOverlay">
+                                    <div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">
+                                        <i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script src="/js/ezgoUtils.js"></script>
+
+    <script>
+        var ezgofactoryfeed = {
+        mainFeedId: @(Model?.Feed?.Where(f => f.FeedType == EZGO.Api.Models.Enumerations.FeedTypeEnum.MainFeed).FirstOrDefault()?.Id ?? 1),
+        factoryUpdatesFeedId: @(Model?.Feed?.Where(f => f.FeedType == EZGO.Api.Models.Enumerations.FeedTypeEnum.FactoryUpdates).FirstOrDefault()?.Id ?? 2),
+        attachment: null, //for factory update
+        videoThumbnail: null, //for factory update
+        attachments: [],
+        videoThumbnails: [],
+        commentAttachment: null,
+        commentVideoThumbnail: null,
+        limit: 10,
+        offset: 10,
+        factoryUpdatesLimit: 5,
+        factoryUpdatesOffset: 5,
+        updateCheckDate: new Date(),
+        editNewAttachments: [],
+        editNewObjectURLs: [],
+        editNewVideoThumbnails: [],
+        editFactoryUpdateNewObjectURL: null,
+        editFactoryUpdateNewAttachment: null,
+        editFactoryUpdateVideoThumbnail: null,
+        editNewCommentAttachment: null,
+        editNewCommentObjectURL: null,
+        editNewCommentVideoThumbnail: null,
+        users: @(Html.Raw(Json.Serialize(Model.Users))),
+        editExistingAttachments: [],
+        editExistingCommentAttachment: '',
+        loadingMore: false,
+        loadingMoreFactoryUpdates: false,
+        mainFeedMessagesLoaded: false,
+        factoryUpdatesLoaded: false,
+        imagePrefix: '@(Model.ApplicationSettings?.MediaLocations?.ImageMediaBaseUri)',
+        videoPrefix: '@(Model.ApplicationSettings?.MediaLocations?.VideoMediaBaseUri)',
+        addMainFeed: function () {
+            $('body').toggleClass('loaded');
+            $.ajax({
+                type: "POST",
+                url: `/factoryfeed/addmainfeed`,
+                data: {},
+                success: function (data) {
+                    document.location.reload();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('body').toggleClass('loaded');
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    document.location.reload();
+                }
+            });
+        },
+        addFactoryUpdatesFeed: function () {
+            $('body').toggleClass('loaded');
+            $.ajax({
+                type: "POST",
+                url: `/factoryfeed/addfactoryupdatesfeed`,
+                data: {},
+                success: function (data) {
+                    document.location.reload();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('body').toggleClass('loaded');
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    document.location.reload();
+                }
+            });
+        },
+        init: async function () {
+            $('#factoryFeedMain').on('scroll', function () {
+                if ($('#factoryFeedMain').scrollTop() + $('#factoryFeedMain')[0].offsetHeight + 50 >= $('#factoryFeedMain')[0].scrollHeight && !ezgofactoryfeed.loadingMore && !ezgofactoryfeed.mainFeedMessagesLoaded) {
+                    ezgofactoryfeed.loadingMore = true;
+
+                    $('#ezfeedLoader').show();
+
+                    ezgofactoryfeed.loadMoreMessages(ezgofactoryfeed.mainFeedId);
+                }
+            })
+
+            $('#loadMoreFactoryUpdates').on('click', function () {
+                if (!ezgofactoryfeed.loadingMoreFactoryUpdates && !ezgofactoryfeed.factoryUpdatesLoaded) {
+                    ezgofactoryfeed.loadingMoreFactoryUpdates = true;
+
+                    $('#loadMoreFactoryUpdates').hide();
+                    $('#factoryUpdatesLoader').show();
+                    ezgofactoryfeed.loadMoreFactoryUpdates(ezgofactoryfeed.factoryUpdatesFeedId);
+                }
+            })
+
+            $('#factoryfeedImage').on('input', async function (e) {
+                if(e.target.files.length == 0) {
+                    return;
+                }
+                if (!(ezgofactoryfeed.attachments.length < 5)) {
+                    toastr.error('You can only add up to five attachments');
+                    return;
+                }
+
+                var file = e.target.files[0];
+
+                if (file.type.match('image')) {
+                    const options = {
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                        maxIteration: 1
+                    };
+
+                    //First only resize file
+                    var compressedFile = await imageCompression(file, options);
+                    //console.log(`Successfully compressed file to ${compressedFile.size / 1024} KB.`);
+
+                    //Then compress image if necessary
+                    while (compressedFile.size / 1024 / 1024 > 0.5) {
+                        options.maxSizeMB = 0.5;
+                        compressedFile = await imageCompression(compressedFile, options);
+                        //console.log(`Successfully compressed file to ${compressedFile.size / 1024} KB.`);
+                    }
+
+                    ezgofactoryfeed.attachments.push(compressedFile);
+                }
+                else {
+                    ezgofactoryfeed.attachments.push(e.target.files[0]);
+                }
+
+                const objectURL = URL.createObjectURL(ezgofactoryfeed.attachments[ezgofactoryfeed.attachments.length - 1]);
+                var newImage = postImageTemplate
+                    .replaceAll('{{url}}', objectURL)
+                    .replaceAll('{{number}}', ezgofactoryfeed.attachments.length - 1)
+                    .replaceAll('{{itemid}}', 1)
+                    .replaceAll('{{filename}}', e.target.files[0].name)
+                    .replaceAll('{{fancy}}', "factoryFeedPostAttachment-" + ezgofactoryfeed.attachments.length - 1);
+
+                $('.postImageContainer').append(newImage);
+                $('.postImageContainer').show();
+
+                e.target.value = '';
+            });
+
+            $('#factoryfeedVideo').on('input', async function (e) {
+                if(e.target.files.length == 0) {
+                        return;
+                    }
+                if (!(ezgofactoryfeed.attachments.length < 5)) {
+                    toastr.error('You can only add up to five attachments');
+                    return;
+                }
+
+                var file = e.target.files[0];
+
+                ezgofactoryfeed.attachments.push(e.target.files[0]);
+
+                ezgofactoryfeed.generateVideoThumbnail(file, "post");
+
+                const objectURL = URL.createObjectURL(ezgofactoryfeed.attachments[ezgofactoryfeed.attachments.length - 1]);
+                var newImage = postVideoTemplate
+                    .replaceAll('{{url}}', objectURL)
+                    .replaceAll('{{number}}', ezgofactoryfeed.attachments.length - 1)
+                    .replaceAll('{{itemid}}', 1)
+                    .replaceAll('{{filename}}', e.target.files[0].name)
+                    .replaceAll('{{fancy}}', "factoryFeedPostAttachment-" + ezgofactoryfeed.attachments.length - 1);
+
+                $('.postImageContainer').append(newImage);
+                $('.postImageContainer').show();
+
+                e.target.value = '';
+            });
+
+            $('#factoryfeedPdf').on('input', async function (e) {
+                if(e.target.files.length == 0) {
+                        return;
+                }
+                if (!(ezgofactoryfeed.attachments.length < 5)) {
+                    toastr.error('You can only add up to five attachments');
+                    return;
+                }
+
+                var file = e.target.files[0];
+
+                ezgofactoryfeed.attachments.push(e.target.files[0]);
+
+                const objectURL = URL.createObjectURL(ezgofactoryfeed.attachments[ezgofactoryfeed.attachments.length - 1]);
+                    var newImage = postPdfTemplate
+                    .replaceAll('{{url}}', objectURL)
+                    .replaceAll('{{number}}', ezgofactoryfeed.attachments.length - 1)
+                    .replaceAll('{{itemid}}', 1)
+                    .replaceAll('{{filename}}', e.target.files[0].name)
+                    .replaceAll('{{fancy}}', "factoryFeedPostPdf-" + ezgofactoryfeed.attachments.length - 1);
+
+                $('.postImageContainer').append(newImage);
+                $('.postImageContainer').show();
+                
+                e.target.value = '';
+            });
+
+            $('#factoryUpdateImageInput').on('input', async function (e) {
+                if(e.target.files.length == 0) {
+                    return;
+                }
+                //TODO change to make use of ezgofactoryfeed.factoryUpdateAttachment (add new property) instead of ezgofactoryfeed.attachment
+                if (ezgofactoryfeed.attachment != null)
+                {
+                    toastr.error("You can only add one attachment to a factory update!");
+                    return;
+                }
+
+                var file = e.target.files[0];
+
+                if (file.type.match('image')) {
+                    const options = {
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                        maxIteration: 1
+                    };
+
+                    //First only resize file
+                    var compressedFile = await imageCompression(file, options);
+                    //console.log(`Successfully compressed file to ${compressedFile.size / 1024} KB.`);
+
+                    //Then compress image if necessary
+                    while (compressedFile.size / 1024 / 1024 > 0.5) {
+                        options.maxSizeMB = 0.5;
+                        compressedFile = await imageCompression(compressedFile, options);
+                        //console.log(`Successfully compressed file to ${compressedFile.size / 1024} KB.`);
+                    }
+
+                    ezgofactoryfeed.attachment = compressedFile
+                }
+                else {
+                    ezgofactoryfeed.attachment = e.target.files[0];
+                }
+
+                const objectURL = URL.createObjectURL(ezgofactoryfeed.attachment)
+
+                var newImage = factoryUpdateImageTemplate
+                                    .replaceAll('{{url}}', objectURL)
+                                    .replaceAll('{{number}}', 0);
+
+                $(`.factoryUpdateImageContainer`).html(newImage);
+
+                $(`.factoryUpdateImageContainer`).show();
+
+                $(`.factoryUpdateImageOverlay`).show();
+
+                $(`.factoryUpdateImageOverlay`).off('click').on('click', function () {
+                    $(`#factoryUpdateImage`).attr('src', '');
+                    $(`.factoryUpdateImageContainer`).hide();
+
+                    $(`.factoryUpdateImageOverlay`).hide();
+                    //clear input
+                    $(`#factoryUpdateImage`).val(null);
+                    ezgofactoryfeed.attachment = null;
+                    ezgofactoryfeed.videoThumbnail = null;
+                });
+                
+                e.target.value = '';
+            });
+
+            $('#factoryUpdateVideoInput').on('input', async function (e) {
+                
+                if(e.target.files.length == 0) {
+                    return;
+                }
+                //TODO change to make use of ezgofactoryfeed.factoryUpdateAttachment (add new property) instead of ezgofactoryfeed.attachment
+                if (ezgofactoryfeed.attachment != null)
+                {
+                    toastr.error("You can only add one attachment to a factory update!");
+                    return;
+                }
+                var file = e.target.files[0];
+
+                ezgofactoryfeed.attachment = e.target.files[0];
+
+                ezgofactoryfeed.generateVideoThumbnail(file, "factoryupdate");
+
+                const objectURL = URL.createObjectURL(ezgofactoryfeed.attachment);
+                var newImage = factoryUpdateVideoTemplate
+                    .replaceAll('{{url}}', objectURL)
+                    .replaceAll('{{number}}', 0);
+
+                $(`.factoryUpdateImageContainer`).html(newImage);
+
+                $(`.factoryUpdateImageContainer`).show();
+
+                $(`.factoryUpdateImageOverlay`).show();
+
+                $(`.factoryUpdateImageOverlay`).off('click').on('click', function () {
+                    $(`#factoryUpdateImage`).attr('src', '');
+                    $(`.factoryUpdateImageContainer`).hide();
+
+                    $(`.factoryUpdateImageOverlay`).hide();
+                    //clear input
+                    $(`#factoryUpdateImage`).val(null);
+                    ezgofactoryfeed.attachment = null;
+                    ezgofactoryfeed.videoThumbnail = null;
+                });
+                
+                e.target.value = '';
+            });
+
+            $('#factoryUpdatePdfInput').on('input', async function (e) {
+                if(e.target.files.length == 0) {
+                    return;
+                }
+                //TODO change to make use of ezgofactoryfeed.factoryUpdateAttachment (add new property) instead of ezgofactoryfeed.attachment
+                if (ezgofactoryfeed.attachment != null)
+                {
+                    toastr.error("You can only add one attachment to a factory update!");
+                    return;
+                }
+                var file = e.target.files[0];
+
+                ezgofactoryfeed.attachment = e.target.files[0];
+
+
+                const objectURL = URL.createObjectURL(ezgofactoryfeed.attachment);
+                var newImage = factoryUpdatePdfTemplate
+                    .replaceAll('{{url}}', objectURL)
+                    .replaceAll('{{number}}', 0)
+                    .replaceAll('{{filename}}', e.target.files[0].name)
+                    .replaceAll('{{fancy}}', "factoryFeedFactoryUpdatePdf-" + ezgofactoryfeed.attachments.length - 1);
+
+                $(`.factoryUpdateImageContainer`).html(newImage);
+
+                $(`.factoryUpdateImageContainer`).show();
+
+                $(`.factoryUpdateImageOverlay`).show();
+
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+
+                $(`.factoryUpdateImageOverlay`).off('click').on('click', function () {
+                    $(`#factoryUpdateImage`).attr('src', '');
+                    $(`.factoryUpdateImageContainer`).hide();
+
+                    $(`.factoryUpdateImageOverlay`).hide();
+                    //clear input
+                    $(`#factoryUpdateImage`).val(null);
+                    ezgofactoryfeed.attachment = null;
+                    ezgofactoryfeed.videoThumbnail = null;
+                });
+                
+                e.target.value = '';
+            });
+
+            $('#postDescription').keyup(function () {
+                if ($('#postDescription').val() != "") {
+                    $('#postFeedMessage').attr('disabled', false);
+                }
+                else {
+                    $('#postFeedMessage').attr('disabled', true);
+                }
+            });
+
+            $('#factoryUpdatesPostDescription').keyup(function () {
+                if ($('#factoryUpdatesPostTitle').val() != "" && $('#factoryUpdatesPostDescription').val() != "") {
+                    $('#postFactoryUpdateMessage').attr('disabled', false);
+                }
+                else {
+                    $('#postFactoryUpdateMessage').attr('disabled', true);
+                }
+            });
+
+            $('#factoryUpdatesPostTitle').keyup(function () {
+                if ($('#factoryUpdatesPostTitle').val() != "" && $('#factoryUpdatesPostDescription').val() != "") {
+                    $('#postFactoryUpdateMessage').attr('disabled', false);
+                }
+                else {
+                    $('#postFactoryUpdateMessage').attr('disabled', true);
+                }
+            });
+
+            $('#factoryFeedMain').on('click', '.postImageOverlay', ezgofactoryfeed.removeAttachment);
+
+            $('#factoryFeedMain').on('click', '[class^="editPostImageOverlay-"]', ezgofactoryfeed.removeEditAttachment);
+
+            $('#factoryFeedMain').on('mouseleave', '.postMenu', ezgofactoryfeed.hidePostMenus);
+            
+            setInterval(ezgofactoryfeed.loadUpdates, 60000);
+            setInterval(ezgofactoryfeed.loadStatistics, 60000);
+        },
+        removeAttachment: function () {
+            //hide current image and clear attachment
+            var index = $(this).data('index');
+            ezgofactoryfeed.attachments.splice(index, 1);
+            ezgofactoryfeed.videoThumbnails.splice(index, 1);
+            $(this).parent().parent().remove();
+
+            //reindex all images (set indexes)
+            //for example say we have 1, 2, 3, 4 and we remove 3, then we are left with 1,2,4 while the array has indexes 1,2,3.
+            //for this reason reindexing of data attributes is needed
+            $('.postImageOverlay').each(function (index, elem) {
+                $(elem).data('index', index);
+            });
+        },
+        removeEditAttachment: async function () {
+            //hide current image and clear attachment
+            var index = $(this).data('index');
+
+            var src = $(this).data('src');
+            if (src.startsWith('blob')) {
+                //remove editNewAttachments member
+                var toRemoveIndex = ezgofactoryfeed.editNewObjectURLs.findIndex(u => u == src);
+                ezgofactoryfeed.editNewAttachments.splice(toRemoveIndex, 1);
+                ezgofactoryfeed.editNewObjectURLs.splice(toRemoveIndex, 1);
+            }
+            else if (src.startsWith('http')) {
+                //remove editExistingAttachments member
+                var toRemoveIndex = ezgofactoryfeed.editExistingAttachments.findIndex(u => u.Uri == src);
+                
+                ezgofactoryfeed.editExistingAttachments.splice(toRemoveIndex, 1);
+            }
+
+            $(this).parent().parent().remove();
+
+            //reindex all images (set indexes)
+            //for example say we have 1, 2, 3, 4 and we remove 3, then we are left with 1,2,4 while the array has indexes 1,2,3.
+            //for this reason reindexing of data attributes is needed
+            $('.editPostImageOverlay').each(function (index, elem) {
+                $(elem).data('index', index);
+            });
+        },
+        addComment: async function (e, id, companyId, feedId) {
+            var attachment = null;
+            $(`#postComment-${id}`).attr('disabled', true);
+
+            if (ezgofactoryfeed.commentAttachment != null && ezgofactoryfeed.commentAttachment != undefined && ezgofactoryfeed.commentAttachment) {
+                //TODO construct attachment
+                var result = await ezgofactoryfeed.uploadImage(ezgofactoryfeed.commentAttachment);
+
+                var mediaAttachmentType = "";
+                if(ezgofactoryfeed.commentAttachment.type.includes("pdf")) {
+                    mediaAttachmentType = "doc";
+                }
+                else if(ezgofactoryfeed.commentAttachment.type.includes("image")) {
+                    mediaAttachmentType = "image";
+                }
+                else if(ezgofactoryfeed.commentAttachment.type.includes("video")) {
+                    mediaAttachmentType = "video";
+                }
+
+                var videoThumbnailUri = "";
+                if(ezgofactoryfeed.commentVideoThumbnail != null && ezgofactoryfeed.commentVideoThumbnail != undefined) {
+                    videoThumbnailUri = await ezgofactoryfeed.uploadImage(ezgofactoryfeed.commentVideoThumbnail);
+                }
+
+                attachment = {
+                    Uri: result,
+                    FileName: ezgofactoryfeed.commentAttachment.name,
+                    FileType: ezgofactoryfeed.commentAttachment.type,
+                    FileExtension: "." + ezgofactoryfeed.commentAttachment.name.split('.').pop(),//get extension
+                    AttachmentType: mediaAttachmentType,
+                    VideoThumbnailUri: videoThumbnailUri,
+                    Size: ezgofactoryfeed.commentAttachment.size,
+                    LastModified: new Date(ezgofactoryfeed.commentAttachment.lastModified).toISOString()
+                };
+            }
+            var commentboxselector = '#add-comment-textarea-' + id;
+            var dataToPost = {
+                id: id,
+                companyId: companyId,
+                feedId: feedId,
+                comment: $(commentboxselector).val()
+            };
+
+            if(attachment != null) {
+                dataToPost.attachment = attachment;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: `/factoryfeed/addcomment`,
+                data: dataToPost,
+                success: function (commentPartial) {
+                    $(`#commentsContainer-${id}`).prepend(commentPartial);
+                    $(`#add-comments-${id}`).click();
+
+                    $(`#add-comment-textarea-${id}`).val('');
+
+                    var commentCount = Number($(`#comment-counter-${id}`).text());
+                    commentCount++;
+                    $(`#comment-counter-${id}`).text(commentCount);
+
+                    $(`#collapse-comments-${id}`).show();
+
+                    ezgofactoryfeed.commentAttachment = null;
+                    $(`#postCommentImage-${id}`).attr('src', '');
+                    $(`.postCommentImageContainer-${id}`).hide();
+
+                    ezgofactoryfeed.loadStatistics();
+                    
+                    ezgomediafetcher.preloadImagesAndVideos();
+                    ezgomediafetcher.preloadFancyboxAnchors();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                }
+            });
+        },
+        loadComments: function (feedId, feedItemId) {
+            if ($(`#add-comments-${feedItemId}`).is(":visible")) {
+                $(`#collapse-comments-${feedItemId}`).hide();
+                $(`#add-comments-${feedItemId}`).hide();
+                //turn off event handlers for file inputs
+            }
+            else {
+                $(`#add-comments-${feedItemId}`).show();
+
+                $.ajax({
+                    type: "GET",
+                    url: '/factoryfeed/getfeeditemcomments/' + feedId + '/' + feedItemId,
+                    success: function (data) {
+                        if (data.length > 0) {
+                            $(`#collapse-comments-${feedItemId}`).show();
+                            $(`#commentsContainer-${feedItemId}`).html(data);
+                            
+                            ezgomediafetcher.preloadImagesAndVideos();
+                            ezgomediafetcher.preloadFancyboxAnchors();
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    }
+                });
+
+                $(`#add-comment-textarea-${feedItemId}`).keyup(function () {
+                    if ($(`#add-comment-textarea-${feedItemId}`).val() != "") {
+                        $(`#postComment-${feedItemId}`).attr('disabled', false);
+                    }
+                    else if(ezgofactoryfeed.commentAttachment != null) {
+                        $(`#postComment-${feedItemId}`).attr('disabled', false);
+                    }
+                    else {
+                        $(`#postComment-${feedItemId}`).attr('disabled', true);
+                    }
+                });
+
+                $(`#factoryfeedCommentImage-${feedItemId}`).off('input').on('input', async function (e) {
+                    if(e.target.files.length == 0) {
+                        return;
+                    }
+                    if (ezgofactoryfeed.commentAttachment != null)
+                    {
+                        toastr.error("You can only add one attachment to a comment!");
+                        return;
+                    }
+
+                    var file = e.target.files[0];
+
+                    if (file.type.match('image')) {
+                        const options = {
+                            maxWidthOrHeight: 1920,
+                            useWebWorker: true,
+                            maxIteration: 1
+                        };
+
+                        //First only resize file
+                        var compressedFile = await imageCompression(file, options);
+                        //console.log(`Successfully compressed file to ${compressedFile.size / 1024} KB.`);
+
+                        //Then compress image if necessary
+                        while (compressedFile.size / 1024 / 1024 > 0.5) {
+                            options.maxSizeMB = 0.5;
+                            compressedFile = await imageCompression(compressedFile, options);
+                            //console.log(`Successfully compressed file to ${compressedFile.size / 1024} KB.`);
+                        }
+
+                        ezgofactoryfeed.commentAttachment = compressedFile
+                    }
+                    else {
+                        ezgofactoryfeed.commentAttachment = e.target.files[0];
+                    }
+
+                    const objectURL = URL.createObjectURL(ezgofactoryfeed.commentAttachment);
+                    var newImage = commentImageTemplate
+                                    .replaceAll('{{url}}', objectURL)
+                                    .replaceAll('{{parentid}}', feedItemId)
+                                    .replaceAll('{{number}}', 0);
+
+                    $(`.postCommentImageContainer-${feedItemId}`).html(newImage);
+
+                    $(`.postCommentImageContainer-${feedItemId}`).show();
+
+                    $(`.postCommentImageOverlay-${feedItemId}`).show();
+                    
+                    //enable button
+                    $(`#postComment-${feedItemId}`).attr('disabled', false);
+                    
+                    $(`.postCommentImageOverlay-${feedItemId}`).off('click').on('click', function () {
+                        $(`#postCommentImage-${feedItemId}`).attr('src', '');
+                        $(`.postCommentImageContainer-${feedItemId}`).hide();
+
+                        $(`.postCommentImageOverlay-${feedItemId}`).hide();
+                        //clear input
+                        $(`#postCommentImage-${feedItemId}`).val(null);
+                        ezgofactoryfeed.commentAttachment = null;
+                        ezgofactoryfeed.commentVideoThumbnail = null;
+                        
+                        //disable button
+                        if ($(`#add-comment-textarea-${feedItemId}`).val() == "") {
+                            $(`#postComment-${feedItemId}`).attr('disabled', true);
+                        }
+                    });
+                    
+                    e.target.value = '';
+                });
+
+                $(`#factoryfeedCommentVideo-${feedItemId}`).off('input').on('input', async function (e) {
+                    if(e.target.files.length == 0) {
+                        return;
+                    }
+                    if (ezgofactoryfeed.commentAttachment != null)
+                    {
+                        toastr.error("You can only add one attachment to a comment!");
+                        return;
+                    }
+
+                    var file = e.target.files[0];
+
+                    ezgofactoryfeed.commentAttachment = e.target.files[0];
+
+                    ezgofactoryfeed.generateVideoThumbnail(file, "comment");
+
+                    const objectURL = URL.createObjectURL(ezgofactoryfeed.commentAttachment);
+
+                    var newImage = commentVideoTemplate
+                        .replaceAll('{{url}}', objectURL)
+                        .replaceAll('{{parentid}}', feedItemId)
+                        .replaceAll('{{number}}', ezgofactoryfeed.attachments.length - 1);
+
+                    $(`.postCommentImageContainer-${feedItemId}`).html(newImage);
+
+                    $(`.postCommentImageContainer-${feedItemId}`).show();
+
+                    $(`.postCommentImageOverlay-${feedItemId}`).show();
+                    
+                    //enable button
+                    $(`#postComment-${feedItemId}`).attr('disabled', false);
+
+                    $(`.postCommentImageOverlay-${feedItemId}`).off('click').on('click', function () {
+                        $(`#postCommentImage-${feedItemId}`).attr('src', '');
+                        $(`.postCommentImageContainer-${feedItemId}`).hide();
+
+                        $(`.postCommentImageOverlay-${feedItemId}`).hide();
+                        //clear input
+                        $(`#postCommentImage-${feedItemId}`).val(null);
+                        ezgofactoryfeed.commentAttachment = null;
+                        ezgofactoryfeed.commentVideoThumbnail = null;
+
+                        //disable button if nothing in add comment textarea
+                        if ($(`#add-comment-textarea-${feedItemId}`).val() == "") {
+                            $(`#postComment-${feedItemId}`).attr('disabled', true);
+                        }
+                    });
+                    e.target.value = '';
+                });
+
+                //todo support pdf
+                $(`#factoryfeedCommentPdf-${feedItemId}`).off('input').on('input', async function (e) {
+                    if(e.target.files.length == 0) {
+                        return;
+                    }
+                    if (ezgofactoryfeed.commentAttachment != null)
+                    {
+                        toastr.error("You can only add one attachment to a comment!");
+                        return;
+                    }
+
+                    var file = e.target.files[0];
+
+                    ezgofactoryfeed.commentAttachment = e.target.files[0];
+
+                    const objectURL = URL.createObjectURL(ezgofactoryfeed.commentAttachment);
+
+                    var newImage = commentPdfTemplate
+                        .replaceAll('{{url}}', objectURL)
+                        .replaceAll('{{parentid}}', feedItemId)
+                        .replaceAll('{{number}}', ezgofactoryfeed.attachments.length - 1)
+                        .replaceAll('{{filename}}', e.target.files[0].name)
+                        .replaceAll('{{fancy}}', "factoryFeedPostEditPdf-" + ezgofactoryfeed.attachments.length - 1);;
+
+                    $(`.postCommentImageContainer-${feedItemId}`).html(newImage);
+
+                    $(`.postCommentImageContainer-${feedItemId}`).show();
+
+                    $(`.postCommentImageOverlay-${feedItemId}`).show();
+                    
+                    //enable button
+                    $(`#postComment-${feedItemId}`).attr('disabled', false);
+
+                    $(`.postCommentImageOverlay-${feedItemId}`).off('click').on('click', function () {
+                        $(`#postCommentImage-${feedItemId}`).attr('src', '');
+                        $(`.postCommentImageContainer-${feedItemId}`).hide();
+
+                        $(`.postCommentImageOverlay-${feedItemId}`).hide();
+                        //clear input
+                        $(`#postCommentImage-${feedItemId}`).val(null);
+                        ezgofactoryfeed.commentAttachment = null;
+                        ezgofactoryfeed.commentVideoThumbnail = null;
+
+                        //disable button if nothing in add comment textarea
+                        if ($(`#add-comment-textarea-${feedItemId}`).val() == "") {
+                            $(`#postComment-${feedItemId}`).attr('disabled', true);
+                        }
+                    });
+                    e.target.value = '';
+                });
+                
+            }
+        },
+        loadMoreMessages: function (feedId) {
+            $.ajax({
+                type: "GET",
+                url: '/factoryfeed/getfeeditems/' + feedId + '?limit=' + ezgofactoryfeed.limit + '&offset=' + ezgofactoryfeed.offset,
+                success: function (data) {
+                    if (data.length == 0) {
+                        ezgofactoryfeed.mainFeedMessagesLoaded = true;
+                    }
+                    $('#ezfeedLoader').hide();
+                    $(`#factoryFeedMessages`).append(data);
+                    ezgofactoryfeed.loadingMore = false;
+                    ezgofactoryfeed.offset += 10;
+                    ezgomediafetcher.preloadImagesAndVideos();
+                    ezgomediafetcher.preloadFancyboxAnchors();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    $('#ezfeedLoader').hide();
+                }
+            });
+        },
+        reloadMessages: function (feedId) {
+            $(`#factoryFeedMessages`).html('');
+            $.ajax({
+                type: "GET",
+                url: '/factoryfeed/getfeeditems/' + feedId + '?limit=' + ezgofactoryfeed.limit + '&offset=' + 0,
+                success: function (data) {
+                    if (data.length == 0) {
+                        ezgofactoryfeed.mainFeedMessagesLoaded = true;
+                    }
+                    $('#ezfeedLoader').hide();
+                    $(`#factoryFeedMessages`).html(data);
+                    ezgofactoryfeed.loadingMore = false;
+
+                    ezgofactoryfeed.offset = 10;
+                    
+                    ezgomediafetcher.preloadImagesAndVideos();
+                    ezgomediafetcher.preloadFancyboxAnchors();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    $('#ezfeedLoader').hide();
+                }
+            });
+        },
+        loadMoreFactoryUpdates: function (feedId) {
+            $.ajax({
+                type: "GET",
+                url: '/factoryfeed/getfactoryupdates/' + feedId + '?limit=' + ezgofactoryfeed.factoryUpdatesLimit + '&offset=' + ezgofactoryfeed.factoryUpdatesOffset,
+                success: function (data) {
+                    $('#factoryUpdatesLoader').hide();
+
+                    if (data.length == 0) {
+                        ezgofactoryfeed.factoryUpdatesLoaded = true;
+                        $('#loadMoreFactoryUpdates').hide();
+                    }
+                    else {
+
+                        $('#loadMoreFactoryUpdates').show();
+                    }
+
+                    $('#factoryUpdateMessages').append(data);
+
+                    ezgofactoryfeed.loadingMoreFactoryUpdates = false;
+                    ezgofactoryfeed.factoryUpdatesOffset += 5;
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    $('#ezfeedLoader').hide();
+                }
+            });
+        },
+        deletePost: function (e, postId, isComment) {
+            $('#postMenu' + postId).hide();
+            $.fn.dialogue({
+                //title: "Alert",
+                content: $("<p />").text("@(Model.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.AlertTitle, "Are you sure you want to delete this post from the factory feed?") ?? "Are you sure you want to delete this post from the factory feed?")"),
+                closeIcon: true,
+                buttons: [
+                    {
+                        text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.OptionYes, "Yes") ?? "Yes")", id: $.utils.createUUID(), click: function ($modal) {
+
+                            $modal.dismiss();
+
+                            $('#postMenu' + postId).hide();
+
+                            $.ajax({
+                                type: "POST",
+                                url: '/factoryfeed/deleteitem/' + postId,
+                                data: {
+                                    id: postId
+                                },
+                                success: function (data) {
+                                    if (isComment) {
+                                        var parentPostId = $(e).data('parentpostid');
+                                        //change comment count
+                                        var commentCount = Number($(`#comment-counter-${parentPostId}`).text());
+                                        commentCount--;
+                                        $(`#comment-counter-${parentPostId}`).text(commentCount);
+
+                                        //remove comment from page
+                                        $(`#ez-feed-comment-${postId}`).remove();
+                                    }
+                                    else {
+                                        $(`#ez-feed-message-${postId}`).remove();
+                                    }
+
+                                    ezgofactoryfeed.loadStatistics();
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                    $('body').toggleClass('loaded');
+                                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                                }
+                            });
+                        }
+                    },
+                    { text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.OptionNo, "No") ?? "No")", id: $.utils.createUUID(), click: function ($modal) { $modal.dismiss(); } }
+                ]
+            });
+
+        },
+        deleteFactoryUpdate: function (e) {
+            $('#factoryUpdateGoBack').css('margin-right', '0');
+            $('#factoryUpdateMenu').hide();
+            $.fn.dialogue({
+                //title: "Alert",
+                content: $("<p />").text("@(Model.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.AlertTitle, "Are you sure you want to delete this post from the factory feed?") ?? "Are you sure you want to delete this post from the factory feed?")"),
+                closeIcon: true,
+                buttons: [
+                    {
+                        text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.OptionYes, "Yes") ?? "Yes")", id: $.utils.createUUID(), click: function ($modal) {
+
+                            $modal.dismiss();
+
+                            $.ajax({
+                                type: "POST",
+                                url: '/factoryfeed/deleteitem/' + $(e).data('id'),
+                                data: {
+                                    id: $(e).data('id')
+                                },
+                                success: function (data) {
+                                    $('#factoryUpdate-' + $(e).data('id')).remove();
+                                    //remove picture just in case if it is the first out of 5 posts
+                                    $('#factoryUpdatePicture-' + $(e).data('id')).hide();
+                                    $('#returnToHomeScreen').click();
+
+                                    //TODO: kinda have to re-render the first 5 factory updates here
+                                        ezgofactoryfeed.loadStatistics();
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                    $('body').toggleClass('loaded');
+                                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                                }
+                            });
+                        }
+                    },
+                    { text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.OptionNo, "No") ?? "No")", id: $.utils.createUUID(), click: function ($modal) { $modal.dismiss(); } }
+                ]
+            });
+        },
+        //sort of an init method for the edit functionality
+        editPost: async function (postId, attachments) {
+            ezgofactoryfeed.editNewAttachments = [];
+            ezgofactoryfeed.editNewObjectURLs = [];
+            ezgofactoryfeed.editNewVideoThumbnails = [];
+
+            $('#postMenu' + postId).hide();
+
+            $(`#ez-feed-message-content-${postId}`).hide();
+            $(`#ez-feed-message-edit-container-${postId}`).show();
+            $(`#ez-feed-message-edit-${postId}`).val($(`#ez-feed-message-content-${postId}`).html().replaceAll("<br>", "\n"));
+
+            //hide image and video
+            $(`#postMediaContainer-${postId}`).hide();
+
+            $(`.editPostImageContainer-${postId}`).html('');
+            
+            $(`#editFeedMessage-${postId}`).attr('disabled', false);
+            //show selected image if present
+            if (attachments != null && attachments != undefined && attachments && attachments.length > 0) {
+
+                for (let i = 0; i < attachments.length; i++) {
+                    if(attachments[i] != null && attachments[i] != undefined && attachments[i].Uri != null && attachments[i].Uri != undefined) {
+                        if (attachments[i].Uri.toLowerCase().endsWith('.mp4') || attachments[i].Uri.toLowerCase().endsWith('.mov')) {
+                            var newImage = editPostVideoTemplate
+                                .replaceAll('{{url}}', attachments[i].Uri)
+                                .replaceAll('{{postId}}', postId)
+                                .replaceAll('{{number}}', i);
+
+                            $(`.editPostImageContainer-${postId}`).append(newImage);
+                        }
+                        else if (attachments[i].Uri.toLowerCase().endsWith('.pdf')) {
+                            var newImage = editPostPdfTemplate
+                                .replaceAll('{{url}}', attachments[i].Uri)
+                                .replaceAll('{{postId}}', postId)
+                                .replaceAll('{{filename}}', attachments[i].Uri.split('/').pop())
+                                .replaceAll('{{number}}', i);
+
+                            $(`.editPostImageContainer-${postId}`).append(newImage);
+                        }
+                        else if (attachments[i].Uri != '') {
+                            var newImage = editPostImageTemplate
+                                .replaceAll('{{url}}', attachments[i].Uri)
+                                .replaceAll('{{postId}}', postId)
+                                .replaceAll('{{number}}', i);
+
+                            $(`.editPostImageContainer-${postId}`).append(newImage);
+                        }
+                    }
+                    ezgomediafetcher.preloadImagesAndVideos();
+                    ezgomediafetcher.preloadFancyboxAnchors();
+                    $(`.editPostImageContainer-${postId}`).show();
+
+                }
+
+                ezgofactoryfeed.editExistingAttachments = attachments;
+            }
+
+            $(`#factoryfeedEditImage-${postId}`).off('input').on('input', async function (e) {
+                if(e.target.files.length == 0) {
+                    return;
+                }
+                if (!((ezgofactoryfeed.editNewAttachments.length + ezgofactoryfeed.editExistingAttachments.length) < 5)) {
+                    toastr.error('You can only add up to five attachments');
+                    return;
+                }
+
+                var file = e.target.files[0];
+
+                if (file.type.match('image')) {
+                    const options = {
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                        maxIteration: 1
+                    };
+
+                    //First only resize file
+                    var compressedFile = await imageCompression(file, options);
+                    //console.log(`Successfully compressed file to ${compressedFile.size / 1024} KB.`);
+
+                    //Then compress image if necessary
+                    while (compressedFile.size / 1024 / 1024 > 0.5) {
+                        options.maxSizeMB = 0.5;
+                        compressedFile = await imageCompression(compressedFile, options);
+                        //console.log(`Successfully compressed file to ${compressedFile.size / 1024} KB.`);
+                    }
+
+                    ezgofactoryfeed.editNewAttachments.push(compressedFile);
+                }
+                else {
+                    ezgofactoryfeed.editNewAttachments.push(e.target.files[0]);
+                }
+
+                const objectURL = URL.createObjectURL(ezgofactoryfeed.editNewAttachments[ezgofactoryfeed.editNewAttachments.length - 1])
+                ezgofactoryfeed.editNewObjectURLs.push(objectURL);
+
+                var newImage = editPostImageTemplate
+                    .replaceAll('{{url}}', objectURL)
+                    .replaceAll('{{number}}', ezgofactoryfeed.editNewAttachments.length - 1);
+
+                $(`.editPostImageContainer-${postId}`).append(newImage);
+                $(`.editPostImageContainer-${postId}`).show();
+                
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+
+                e.target.value = '';
+            });
+
+            $(`#factoryfeedEditVideo-${postId}`).off('input').on('input', async function (e) {
+                if(e.target.files.length == 0) {
+                    return;
+                }
+                if (!((ezgofactoryfeed.editNewAttachments.length + ezgofactoryfeed.editExistingAttachments.length) < 5)) {
+                    toastr.error('You can only add up to five attachments');
+                    return;
+                }
+                var file = e.target.files[0];
+
+                ezgofactoryfeed.editNewAttachments.push(e.target.files[0]);
+
+                const objectURL = URL.createObjectURL(ezgofactoryfeed.editNewAttachments[ezgofactoryfeed.editNewAttachments.length - 1])
+                ezgofactoryfeed.editNewObjectURLs.push(objectURL);
+
+                var newImage = editPostVideoTemplate
+                    .replaceAll('{{url}}', objectURL)
+                    .replaceAll('{{number}}', ezgofactoryfeed.editNewAttachments.length - 1);
+
+                $(`.editPostImageContainer-${postId}`).append(newImage);
+                $(`.editPostImageContainer-${postId}`).show();
+
+                ezgofactoryfeed.generateVideoThumbnail(file, "editpost");
+                
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+                
+                e.target.value = '';
+            });
+
+            $(`#factoryfeedEditPdf-${postId}`).off('input').on('input', async function (e) {
+                if(e.target.files.length == 0) {
+                    return;
+                }
+                if (!((ezgofactoryfeed.editNewAttachments.length + ezgofactoryfeed.editExistingAttachments.length) < 5)) {
+                    toastr.error('You can only add up to five attachments');
+                    return;
+                }
+                var file = e.target.files[0];
+
+                ezgofactoryfeed.editNewAttachments.push(e.target.files[0]);
+
+                const objectURL = URL.createObjectURL(ezgofactoryfeed.editNewAttachments[ezgofactoryfeed.editNewAttachments.length - 1])
+                ezgofactoryfeed.editNewObjectURLs.push(objectURL);
+
+                var newImage = editPostPdfTemplate
+                .replaceAll('{{url}}', objectURL)
+                .replaceAll('{{number}}', ezgofactoryfeed.editNewAttachments.length - 1)
+                .replaceAll('{{itemid}}', 1)
+                .replaceAll('{{filename}}', e.target.files[0].name)
+                .replaceAll('{{fancy}}', "factoryFeedPostEditPdf-" + ezgofactoryfeed.editNewAttachments.length - 1);
+                
+                $(`.editPostImageContainer-${postId}`).append(newImage);
+                $(`.editPostImageContainer-${postId}`).show();
+                
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+                
+                e.target.value = '';
+            });
+            
+            $(`#ez-feed-message-edit-${postId}`).keyup(function () {
+                if ($(`#ez-feed-message-edit-${postId}`).val() != "") {
+                    $(`#editFeedMessage-${postId}`).attr('disabled', false);
+                }
+                else {
+                    $(`#editFeedMessage-${postId}`).attr('disabled', true);
+                }
+            });
+        },
+        //sort of an init method for the edit factory update functionality
+        editFactoryUpdate: function () {
+            ezgofactoryfeed.editFactoryUpdateNewAttachment = null;
+            $('#factoryUpdateGoBack').css('margin-right', '0');
+            $('#factoryUpdateMenu').hide();
+            $('#factoryUpdateContent').hide();
+            $('#factoryUpdateEditForm').show();
+
+            $('#factoryUpdateEditIsSticky').prop('checked', $('#factoryUpdateInfo').data('issticky'));
+
+            $('#factoryUpdateEditTitle').val($('#factoryUpdateDetailTitle').html());
+
+            $('#factoryUpdateEditDescription').val($('#factoryUpdateDetailDescription').html().replaceAll("<br>", "\n"));
+
+            $('#editFactoryUpdateImage').attr('src', '');
+            $('.editFactoryUpdateImageContainer').hide();
+            
+            $('#editFactoryUpdate').attr('disabled', false);
+
+            var attachment = $('#factoryUpdateInfo').data('attachment');
+
+            if (attachment != null && attachment != undefined && attachment.Uri != null) {
+                var extension = get_url_extension(attachment.Uri);
+                if (extension == 'mp4' || extension == 'mov') {
+                    var newImage = editFactoryUpdateVideoTemplate
+                        .replaceAll('{{url}}', attachment.Uri)
+                        .replaceAll('{{number}}', 0);
+
+                    $(`.editFactoryUpdateImageContainer`).html(newImage);
+                    $(`.editFactoryUpdateImageContainer`).show();
+
+                    $(`.editFactoryUpdateImageOverlay`).show();
+                }
+                else if (extension == "pdf") {
+                        var newImage = editFactoryUpdatePdfTemplate
+                        .replaceAll('{{url}}', attachment.Uri)
+                        .replaceAll('{{filename}}', attachment.Uri.split('/').pop())
+                        .replaceAll('{{number}}', 0);
+
+                    $(`.editFactoryUpdateImageContainer`).html(newImage);
+                    $(`.editFactoryUpdateImageContainer`).show();
+
+                    $(`.editFactoryUpdateImageOverlay`).show();
+                }
+                else if(attachment.Uri != '') {
+                    var newImage = editFactoryUpdateImageTemplate
+                        .replaceAll('{{url}}', attachment.Uri)
+                        .replaceAll('{{number}}', 0);
+
+                    $(`.editFactoryUpdateImageContainer`).html(newImage);
+                    $(`.editFactoryUpdateImageContainer`).show();
+
+                    $(`.editFactoryUpdateImageOverlay`).show();
+                }
+
+                $('#factoryUpdateInfo').data('attachment', attachment);
+
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+
+                $(`.editFactoryUpdateImageOverlay`).off('click').on('click', function () {
+                    $(`#editFactoryUpdateImage`).attr('src', '');
+                    $(`.editFactoryUpdateImageContainer`).hide();
+
+                    $(`.editFactoryUpdateImageOverlay`).hide();
+                    //clear input
+                    $(`#editFactoryUpdateImage`).val(null);
+
+                    $('#factoryUpdateInfo').removeData('attachment');
+
+                    ezgofactoryfeed.editFactoryUpdateNewAttachment = null;
+                });
+            }
+
+            $('#factoryUpdateEditImage').on('input', async function (e) {
+                if(e.target.files.length == 0) {
+                    return;
+                }
+                var file = e.target.files[0];
+
+                if (file.type.match('image')) {
+                    const options = {
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                        maxIteration: 1
+                    };
+
+                    //First only resize file
+                    var compressedFile = await imageCompression(file, options);
+                    //console.log(`Successfully compressed file to ${compressedFile.size / 1024} KB.`);
+
+                    //Then compress image if necessary
+                    while (compressedFile.size / 1024 / 1024 > 0.5) {
+                        options.maxSizeMB = 0.5;
+                        compressedFile = await imageCompression(compressedFile, options);
+                        //console.log(`Successfully compressed file to ${compressedFile.size / 1024} KB.`);
+                    }
+
+                    ezgofactoryfeed.editFactoryUpdateNewAttachment = compressedFile
+                }
+                else {
+                    ezgofactoryfeed.editFactoryUpdateNewAttachment = e.target.files[0];
+                }
+
+                const objectURL = URL.createObjectURL(ezgofactoryfeed.editFactoryUpdateNewAttachment)
+
+                
+                var newImage = editFactoryUpdateImageTemplate
+                                    .replaceAll('{{url}}', objectURL)
+                                    .replaceAll('{{number}}', 0);
+
+                $(`.editFactoryUpdateImageContainer`).html(newImage);
+                
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+
+                $(`.editFactoryUpdateImageContainer`).show();
+
+                $(`.editFactoryUpdateImageOverlay`).show();
+
+                $(`.editFactoryUpdateImageOverlay`).off('click').on('click', function () {
+                    $(`#editFactoryUpdateImage`).attr('src', '');
+                    $(`.editFactoryUpdateImageContainer`).hide();
+
+                    $(`.editFactoryUpdateImageOverlay`).hide();
+                    //clear input
+                    $(`#editFactoryUpdateImage`).val(null);
+
+                    $('#factoryUpdateInfo').removeData('attachment');
+                    ezgofactoryfeed.editFactoryUpdateNewAttachment = null;
+                });
+                
+                e.target.value = '';
+            });
+
+            $(`#factoryUpdateEditVideo`).on('input', async function (e) {
+                if(e.target.files.length == 0) {
+                    return;
+                }
+                var file = e.target.files[0];
+
+                ezgofactoryfeed.editFactoryUpdateNewAttachment = e.target.files[0];
+
+                const objectURL = URL.createObjectURL(ezgofactoryfeed.editFactoryUpdateNewAttachment);
+
+                var newImage = editFactoryUpdateVideoTemplate
+                    .replaceAll('{{url}}', objectURL)
+                    .replaceAll('{{number}}', 0);
+
+                $(`.editFactoryUpdateImageContainer`).html(newImage);
+
+                $(`.editFactoryUpdateImageContainer`).show();
+
+                $(`.editFactoryUpdateImageOverlay`).show();
+
+                ezgofactoryfeed.generateVideoThumbnail(file, "editfactoryupdate");
+                
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+
+                $(`.editFactoryUpdateImageOverlay`).off('click').on('click', function () {
+                    $(`#editFactoryUpdateImage`).attr('src', '');
+                    $(`.editFactoryUpdateImageContainer`).hide();
+
+                    $(`.editFactoryUpdateImageOverlay`).hide();
+                    //clear input
+                    $(`#editFactoryUpdateImage`).val(null);
+
+                    $('#factoryUpdateInfo').removeData('attachment');
+
+                    ezgofactoryfeed.editFactoryUpdateNewAttachment = null;
+                });
+                
+                e.target.value = '';
+            });
+
+            //todo add edit pdf event handler
+            $(`#factoryUpdateEditPdf`).on('input', async function (e) {
+                if(e.target.files.length == 0) {
+                    return;
+                }
+                var file = e.target.files[0];
+
+                ezgofactoryfeed.editFactoryUpdateNewAttachment = e.target.files[0];
+
+                const objectURL = URL.createObjectURL(ezgofactoryfeed.editFactoryUpdateNewAttachment);
+
+                var newImage = editFactoryUpdatePdfTemplate
+                    .replaceAll('{{url}}', objectURL)
+                        .replaceAll('{{filename}}', e.target.files[0].name.split('/').pop())
+                    .replaceAll('{{number}}', 0);
+
+                $(`.editFactoryUpdateImageContainer`).html(newImage);
+
+                $(`.editFactoryUpdateImageContainer`).show();
+
+                $(`.editFactoryUpdateImageOverlay`).show();
+                
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+
+                $(`.editFactoryUpdateImageOverlay`).off('click').on('click', function () {
+                    $(`#editFactoryUpdateImage`).attr('src', '');
+                    $(`.editFactoryUpdateImageContainer`).hide();
+
+                    $(`.editFactoryUpdateImageOverlay`).hide();
+                    //clear input
+                    $(`#editFactoryUpdateImage`).val(null);
+
+                    $('#factoryUpdateInfo').removeData('attachment');
+
+                    ezgofactoryfeed.editFactoryUpdateNewAttachment = null;
+                });
+                
+                e.target.value = '';
+            });
+
+            $('#factoryUpdateEditDescription').keyup(function () {
+                if ($('#factoryUpdateEditTitle').val() != "" && $('#factoryUpdateEditDescription').val() != "") {
+                    $('#editFactoryUpdate').attr('disabled', false);
+                }
+                else {
+                    $('#editFactoryUpdate').attr('disabled', true);
+                }
+            });
+
+            $('#factoryUpdateEditTitle').keyup(function () {
+                if ($('#factoryUpdateEditTitle').val() != "" && $('#factoryUpdateEditDescription').val() != "") {
+                    $('#editFactoryUpdate').attr('disabled', false);
+                }
+                else {
+                    $('#editFactoryUpdate').attr('disabled', true);
+                }
+            });
+        },
+        //sort of an init method for the edit comment functionality
+        editComment: async function (e, postId, attachment) {
+            ezgofactoryfeed.editExistingCommentAttachment = null;
+
+            $(`#ez-feed-comment-content-${postId}`).hide();
+            $(`#postCommentImageContainer-${postId}`).hide();
+            $(`#postCommentVideoContainer-${postId}`).hide();
+            $(`#postCommentPdfContainer-${postId}`).hide();
+            $(`#postMenu${postId}`).hide();
+            $(`#ez-feed-comment-edit-${postId}`).val($(`#ez-feed-comment-content-${postId}`).html());
+            
+            $(`#editFeedComment-${postId}`).attr('disabled', false);
+
+            //show image or video preview
+
+            if(attachment != null && attachment != undefined && attachment.Uri != null && attachment.Uri != undefined) {
+                ezgofactoryfeed.editExistingCommentAttachment = attachment;
+                var extension = get_url_extension(attachment.Uri);
+
+                if (extension == 'mp4' || extension == 'mov') {
+                    var newImage = editCommentVideoTemplate
+                        .replaceAll('{{url}}', attachment.Uri)
+                        .replaceAll('{{postId}}', postId)
+                        .replaceAll('{{number}}', 0);
+
+                    $(`.editCommentImageContainer-${postId}`).html(newImage);
+                    $(`.editCommentImageContainer-${postId}`).show();
+
+                    $(`.editCommentImageOverlay-${postId}`).show();
+                }
+                else if (extension == 'pdf') {
+                    var newImage = editCommentPdfTemplate
+                        .replaceAll('{{url}}', attachment.Uri)
+                        .replaceAll('{{postId}}', postId)
+                        .replaceAll('{{filename}}', attachment.Uri.split('/').pop())
+                        .replaceAll('{{fancy}}', "factoryFeedCommentEditPdf-" + postId + "-" + 1)
+                        .replaceAll('{{number}}', 0);
+
+                    $(`.editCommentImageContainer-${postId}`).html(newImage);
+                    $(`.editCommentImageContainer-${postId}`).show();
+
+                    $(`.editCommentImageOverlay-${postId}`).show();
+                }
+                //else if attachment type image
+                else if(attachment != '') {
+                    var newImage = editCommentImageTemplate
+                        .replaceAll('{{url}}', attachment.Uri)
+                        .replaceAll('{{postId}}', postId)
+                        .replaceAll('{{number}}', 0);
+
+                    $(`.editCommentImageContainer-${postId}`).html(newImage);
+                    $(`.editCommentImageContainer-${postId}`).show();
+
+                    $(`.editCommentImageOverlay-${postId}`).show();
+                }
+                
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+
+                $(`.editCommentImageOverlay-${postId}`).off('click').on('click', function () {
+                    $(`#editCommentImage-${postId}`).attr('src', '');
+                    $(`.editCommentImageContainer-${postId}`).hide();
+
+                    $(`.editCommentImageOverlay-${postId}`).hide();
+                    //clear input
+                    $(`#editCommentImage-${postId}`).val(null);
+                    
+                    ezgofactoryfeed.editExistingCommentAttachment = null;
+                    ezgofactoryfeed.editNewCommentAttachment = null;
+                    ezgofactoryfeed.editNewCommentObjectURL = null;
+                    ezgofactoryfeed.editNewCommentVideoThumbnail = null;
+                    
+                    if($(`#ez-feed-comment-edit-${postId}`).val() == "")
+                    {
+                        $(`#editFeedComment-${postId}`).attr('disabled', true);
+                    }
+                    else {
+                        $(`#editFeedComment-${postId}`).attr('disabled', false);
+                    }
+                });
+            }
+
+            $(`#factoryfeedEditCommentImage-${postId}`).off('input').on('input', async function (e) {
+                if(e.target.files.length == 0) {
+                    return;
+                }
+                if (ezgofactoryfeed.editNewCommentAttachment != null || ezgofactoryfeed.editExistingCommentAttachment != null)
+                {
+                    toastr.error("You can only add one attachment to a comment!");
+                    return;
+                }
+
+                var file = e.target.files[0];
+
+                if (file.type.match('image')) {
+                    const options = {
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                        maxIteration: 1
+                    };
+
+                    //First only resize file
+                    var compressedFile = await imageCompression(file, options);
+                    //console.log(`Successfully compressed file to ${compressedFile.size / 1024} KB.`);
+
+                    //Then compress image if necessary
+                    while (compressedFile.size / 1024 / 1024 > 0.5) {
+                        options.maxSizeMB = 0.5;
+                        compressedFile = await imageCompression(compressedFile, options);
+                        //console.log(`Successfully compressed file to ${compressedFile.size / 1024} KB.`);
+                    }
+
+                    ezgofactoryfeed.editNewCommentAttachment = compressedFile
+                }
+                else {
+                    ezgofactoryfeed.editNewCommentAttachment = e.target.files[0];
+                }
+
+                const objectURL = URL.createObjectURL(ezgofactoryfeed.editNewCommentAttachment);
+
+                var newImage = editCommentImageTemplate
+                                    .replaceAll('{{url}}', objectURL)
+                                    .replaceAll('{{postId}}', postId)
+                                    .replaceAll('{{number}}', 0);
+
+                ezgofactoryfeed.editNewCommentObjectURL = objectURL;
+
+                $(`.editCommentImageContainer-${postId}`).html(newImage);
+
+                $(`.editCommentImageContainer-${postId}`).show();
+
+                $(`.editCommentImageOverlay-${postId}`).show();
+                
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+
+                $(`#editFeedComment-${postId}`).attr('disabled', false);
+                
+                $(`.editCommentImageOverlay-${postId}`).off('click').on('click', function () {
+                    $(`#editCommentImage-${postId}`).attr('src', '');
+                    $(`.editCommentImageContainer-${postId}`).hide();
+
+                    $(`.editCommentImageOverlay-${postId}`).hide();
+                    //clear input
+                    $(`#editCommentImage-${postId}`).val(null);
+
+                    ezgofactoryfeed.editExistingCommentAttachment = null;
+                    ezgofactoryfeed.editNewCommentAttachment = null;
+                    ezgofactoryfeed.editNewCommentObjectURL = null;
+                    ezgofactoryfeed.editNewCommentVideoThumbnail = null;
+                    
+                    if($(`#ez-feed-comment-edit-${postId}`).val() == "")
+                    {
+                        $(`#editFeedComment-${postId}`).attr('disabled', true);
+                    }
+                    else {
+                        $(`#editFeedComment-${postId}`).attr('disabled', false);
+                    }
+                });
+                
+                e.target.value = '';
+            });
+
+            $(`#factoryfeedEditCommentVideo-${postId}`).off('input').on('input', async function (e) {
+                if(e.target.files.length == 0) {
+                    return;
+                }
+                if (ezgofactoryfeed.editNewCommentAttachment != null || ezgofactoryfeed.editExistingCommentAttachment != null)
+                {
+                    toastr.error("You can only add one attachment to a comment!");
+                    return;
+                }
+                var file = e.target.files[0];
+
+                ezgofactoryfeed.editNewCommentAttachment = e.target.files[0];
+
+                const objectURL = URL.createObjectURL(ezgofactoryfeed.editNewCommentAttachment);
+                
+                ezgofactoryfeed.editNewCommentObjectURL = objectURL;
+
+                var newImage = editCommentVideoTemplate
+                    .replaceAll('{{url}}', objectURL)
+                    .replaceAll('{{postId}}', postId)
+                    .replaceAll('{{number}}', 0);
+
+                $(`.editCommentImageContainer-${postId}`).html(newImage);
+
+                $(`.editCommentImageContainer-${postId}`).show();
+
+                $(`.editCommentImageOverlay-${postId}`).show();
+
+                ezgofactoryfeed.generateVideoThumbnail(file, "editcomment");
+                
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+
+                $(`#editFeedComment-${postId}`).attr('disabled', false);
+
+                $(`.editCommentImageOverlay-${postId}`).off('click').on('click', function () {
+                    $(`#editCommentImage-${postId}`).attr('src', '');
+                    $(`.editCommentImageContainer-${postId}`).hide();
+
+                    $(`.editCommentImageOverlay-${postId}`).hide();
+                    //clear input
+                    $(`#editCommentImage-${postId}`).val(null);
+
+                    ezgofactoryfeed.editExistingCommentAttachment = null;
+                    ezgofactoryfeed.editNewCommentAttachment = null;
+                    ezgofactoryfeed.editNewCommentObjectURL = null;
+                    ezgofactoryfeed.editNewCommentVideoThumbnail = null;
+                    
+                    if($(`#ez-feed-comment-edit-${postId}`).val() == "")
+                    {
+                        $(`#editFeedComment-${postId}`).attr('disabled', true);
+                    }
+                    else {
+                        $(`#editFeedComment-${postId}`).attr('disabled', false);
+                    }
+                });
+
+                e.target.value = '';
+            });
+
+            //add pdf event handler
+
+            $(`#factoryfeedEditCommentPdf-${postId}`).off('input').on('input', async function (e) {
+                if(e.target.files.length == 0) {
+                    return;
+                }
+                if (ezgofactoryfeed.editNewCommentAttachment != null || ezgofactoryfeed.editExistingCommentAttachment != null)
+                {
+                    toastr.error("You can only add one attachment to a comment!");
+                    return;
+                }
+                var file = e.target.files[0];
+
+                ezgofactoryfeed.editNewCommentAttachment = e.target.files[0];
+
+                const objectURL = URL.createObjectURL(ezgofactoryfeed.editNewCommentAttachment);
+                
+                ezgofactoryfeed.editNewCommentObjectURL = objectURL;
+
+                var newImage = editCommentPdfTemplate
+                    .replaceAll('{{url}}', objectURL)
+                    .replaceAll('{{postId}}', postId)
+                    .replaceAll('{{filename}}', e.target.files[0].name)
+                    .replaceAll('{{fancy}}', "factoryFeedCommentEditPdf-" + postId + "-" + 1)
+                    .replaceAll('{{number}}', 0);
+
+                $(`.editCommentImageContainer-${postId}`).html(newImage);
+
+                $(`.editCommentImageContainer-${postId}`).show();
+
+                $(`.editCommentImageOverlay-${postId}`).show();
+                
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+
+                $(`#editFeedComment-${postId}`).attr('disabled', false);
+
+                $(`.editCommentImageOverlay-${postId}`).off('click').on('click', function () {
+                    $(`#editCommentImage-${postId}`).attr('src', '');
+                    $(`.editCommentImageContainer-${postId}`).hide();
+
+                    $(`.editCommentImageOverlay-${postId}`).hide();
+                    //clear input
+                    $(`#editCommentImage-${postId}`).val(null);
+
+                    ezgofactoryfeed.editExistingCommentAttachment = null;
+                    ezgofactoryfeed.editNewCommentAttachment = null;
+                    ezgofactoryfeed.editNewCommentObjectURL = null;
+                    ezgofactoryfeed.editNewCommentVideoThumbnail = null;
+                    
+                    if($(`#ez-feed-comment-edit-${postId}`).val() == "")
+                    {
+                        $(`#editFeedComment-${postId}`).attr('disabled', true);
+                    }
+                    else {
+                        $(`#editFeedComment-${postId}`).attr('disabled', false);
+                    }
+                });
+                
+                e.target.value = '';
+            });
+
+
+            $(`#ez-feed-comment-edit-${postId}`).keyup(function () {
+                if ($(`#ez-feed-comment-edit-${postId}`).val() != "") {
+                    $(`#editFeedComment-${postId}`).attr('disabled', false);
+                }
+                else if(ezgofactoryfeed.editNewCommentAttachment != null || ezgofactoryfeed.editExistingCommentAttachment != null) {
+                    $(`#editFeedComment-${postId}`).attr('disabled', false);
+                }
+                else {
+                    $(`#editFeedComment-${postId}`).attr('disabled', true);
+                }
+            });
+
+            $(`#ez-feed-comment-edit-container-${postId}`).show();
+        },
+        editFeedMessage: async function (e, postId, companyId, feedId, userId, originalUserId) {
+            //send ajax call to change factoryfeed message
+            //on success: update ui and change post content
+
+            var attachments = [];
+
+            for (let i = 0; i < ezgofactoryfeed.editExistingAttachments.length; i++) {
+                var pictureUrl = ezgofactoryfeed.editExistingAttachments[i].Uri;
+
+                if (pictureUrl.startsWith(ezgofactoryfeed.imagePrefix)) {
+                    pictureUrl = pictureUrl.replace(ezgofactoryfeed.imagePrefix, '');
+                }
+                else if (pictureUrl.startsWith(ezgofactoryfeed.videoPrefix)) {
+                    pictureUrl = pictureUrl.replace(ezgofactoryfeed.videoPrefix, '');
+                }
+                
+                var videoThumbnailUri = ezgofactoryfeed.editExistingAttachments[i].VideoThumbnailUri;
+
+                if(videoThumbnailUri != null && videoThumbnailUri != undefined && videoThumbnailUri != '')
+                {
+                    if (videoThumbnailUri.startsWith(ezgofactoryfeed.imagePrefix)) {
+                        videoThumbnailUri = videoThumbnailUri.replace(ezgofactoryfeed.imagePrefix, '');
+                    }
+                    else if (videoThumbnailUri.startsWith(ezgofactoryfeed.videoPrefix)) {
+                        videoThumbnailUri = videoThumbnailUri.replace(ezgofactoryfeed.videoPrefix, '');
+                    }
+                }
+
+                var mediaAttachment = {
+                    Uri: pictureUrl,
+                    FileName: ezgofactoryfeed.editExistingAttachments[i].FileName,
+                    FileType: ezgofactoryfeed.editExistingAttachments[i].FileType,
+                    FileExtension: ezgofactoryfeed.editExistingAttachments[i].FileExtension,//get extension
+                    AttachmentType: ezgofactoryfeed.editExistingAttachments[i].AttachmentType,
+                    VideoThumbnailUri: videoThumbnailUri,
+                    Size: ezgofactoryfeed.editExistingAttachments[i].Size,
+                    LastModified: ezgofactoryfeed.editExistingAttachments[i].LastModified
+                };
+                
+                attachments.push(mediaAttachment);
+            }
+
+            if (ezgofactoryfeed.editNewAttachments != null && ezgofactoryfeed.editNewAttachments != undefined && ezgofactoryfeed.editNewAttachments && ezgofactoryfeed.editNewAttachments.length > 0) {
+                for (let i = 0; i < ezgofactoryfeed.editNewAttachments.length; i++) {
+                    var result = await ezgofactoryfeed.uploadImage(ezgofactoryfeed.editNewAttachments[i]);
+                    
+                    var mediaAttachmentType = "";
+
+                    if(ezgofactoryfeed.editNewAttachments[i].type.includes("pdf")) {
+                        mediaAttachmentType = "doc";
+                    }
+                    else if(ezgofactoryfeed.editNewAttachments[i].type.includes("image")) {
+                        mediaAttachmentType = "image";
+                    }
+                    else if(ezgofactoryfeed.editNewAttachments[i].type.includes("video")) {
+                        mediaAttachmentType = "video";
+                    }
+                    
+                    var videoThumbnailUri = "";
+                    if(ezgofactoryfeed.editNewVideoThumbnails[i] != null && ezgofactoryfeed.editNewVideoThumbnails[i] != undefined) {
+                        videoThumbnailUri = await ezgofactoryfeed.uploadImage(ezgofactoryfeed.editNewVideoThumbnails[i]);
+                    }
+
+                    var mediaAttachment = {
+                        Uri: result,
+                        FileName: ezgofactoryfeed.editNewAttachments[i].name,
+                        FileType: ezgofactoryfeed.editNewAttachments[i].type,
+                        FileExtension: "." + ezgofactoryfeed.editNewAttachments[i].name.split('.').pop(),//get extension
+                        AttachmentType: mediaAttachmentType,
+                        VideoThumbnailUri: videoThumbnailUri,
+                        Size: ezgofactoryfeed.editNewAttachments[i].size,
+                        LastModified: new Date(ezgofactoryfeed.editNewAttachments[i].lastModified).toISOString()
+                    };
+
+                    attachments.push(mediaAttachment);
+                }
+            }
+
+            $.ajax({
+                type: "POST",
+                url: `/factoryfeed/changefeedmessage`,
+                data: {
+                    id: postId,
+                    companyId: companyId,
+                    feedId: feedId,
+                    message: $(`#ez-feed-message-edit-${postId}`).val(),
+                    attachments: attachments,
+                    originalUserId: originalUserId
+                },
+                success: function (data) {
+                    $(`#ez-feed-message-${postId}`).replaceWith(data);
+                    
+                    ezgofactoryfeed.editExistingAttachments = [];
+                    ezgofactoryfeed.editNewAttachments = [];
+                    
+                    ezgomediafetcher.preloadImagesAndVideos();
+                    ezgomediafetcher.preloadFancyboxAnchors();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                }
+            });
+        },
+        editFeedComment: async function (e, commentId, parentId, companyId, feedId, originalUserId) {
+            var attachment = null;
+            
+            if(ezgofactoryfeed.editExistingCommentAttachment != null && ezgofactoryfeed.editExistingCommentAttachment.Uri != null) {
+                var pictureUrl = ezgofactoryfeed.editExistingCommentAttachment.Uri;
+
+                if (pictureUrl.startsWith(ezgofactoryfeed.imagePrefix)) {
+                    pictureUrl = pictureUrl.replace(ezgofactoryfeed.imagePrefix, '');
+                }
+                else if (pictureUrl.startsWith(ezgofactoryfeed.videoPrefix)) {
+                    pictureUrl = pictureUrl.replace(ezgofactoryfeed.videoPrefix, '');
+                }
+                
+                var videoThumbnailUri = ezgofactoryfeed.editExistingCommentAttachment.VideoThumbnailUri;
+
+                if(videoThumbnailUri != null && videoThumbnailUri != undefined && videoThumbnailUri != '')
+                {
+                    if (videoThumbnailUri.startsWith(ezgofactoryfeed.imagePrefix)) {
+                        videoThumbnailUri = videoThumbnailUri.replace(ezgofactoryfeed.imagePrefix, '');
+                    }
+                    else if (videoThumbnailUri.startsWith(ezgofactoryfeed.videoPrefix)) {
+                        videoThumbnailUri = videoThumbnailUri.replace(ezgofactoryfeed.videoPrefix, '');
+                    }
+                }
+
+                var mediaAttachment = {
+                    Uri: pictureUrl,
+                    FileName: ezgofactoryfeed.editExistingCommentAttachment.FileName,
+                    FileType: ezgofactoryfeed.editExistingCommentAttachment.FileType,
+                    FileExtension: ezgofactoryfeed.editExistingCommentAttachment.FileExtension,//get extension
+                    AttachmentType: ezgofactoryfeed.editExistingCommentAttachment.AttachmentType,
+                    VideoThumbnailUri: videoThumbnailUri,
+                    Size: ezgofactoryfeed.editExistingCommentAttachment.Size,
+                    LastModified: ezgofactoryfeed.editExistingCommentAttachment.LastModified
+                };
+                
+                attachment = mediaAttachment;
+            }
+            else if(ezgofactoryfeed.editNewCommentAttachment != null && ezgofactoryfeed.editNewCommentAttachment != undefined) {
+                var result = await ezgofactoryfeed.uploadImage(ezgofactoryfeed.editNewCommentAttachment);
+                    
+                var mediaAttachmentType = "";
+
+                if(ezgofactoryfeed.editNewCommentAttachment.type.includes("pdf")) {
+                    mediaAttachmentType = "doc";
+                }
+                else if(ezgofactoryfeed.editNewCommentAttachment.type.includes("image")) {
+                    mediaAttachmentType = "image";
+                }
+                else if(ezgofactoryfeed.editNewCommentAttachment.type.includes("video")) {
+                    mediaAttachmentType = "video";
+                }
+                    
+                var videoThumbnailUri = "";
+                if(ezgofactoryfeed.editNewCommentVideoThumbnail != null && ezgofactoryfeed.editNewCommentVideoThumbnail != undefined) {
+                    videoThumbnailUri = await ezgofactoryfeed.uploadImage(ezgofactoryfeed.editNewCommentVideoThumbnail);
+                }
+
+                var mediaAttachment = {
+                    Uri: result,
+                    FileName: ezgofactoryfeed.editNewCommentAttachment.name,
+                    FileType: ezgofactoryfeed.editNewCommentAttachment.type,
+                    FileExtension: "." + ezgofactoryfeed.editNewCommentAttachment.name.split('.').pop(),//get extension
+                    AttachmentType: mediaAttachmentType,
+                    VideoThumbnailUri: videoThumbnailUri,
+                    Size: ezgofactoryfeed.editNewCommentAttachment.size,
+                    LastModified: new Date(ezgofactoryfeed.editNewCommentAttachment.lastModified).toISOString()
+                };
+
+                attachment = mediaAttachment;
+            }
+
+            //ChangeFeedComment(int id, int companyId, string pictureUrl, int feedId, string message, int parentId)
+            $.ajax({
+                type: "POST",
+                url: `/factoryfeed/changefeedcomment`,
+                data: {
+                    id: commentId,
+                    companyId: companyId,
+                    feedId: feedId,
+                    message: $(`#ez-feed-comment-edit-${commentId}`).val(),
+                    attachment: attachment,
+                    parentId: parentId,
+                    originalUserId: originalUserId
+                },
+                success: function (data) {
+                    //change description of factoryfeed comment
+                    //return rendered partial
+                    $(`#ez-feed-comment-${commentId}`).remove();
+                    $(`#commentsContainer-${parentId}`).prepend(data);
+                    ezgomediafetcher.preloadImagesAndVideos();
+                    ezgomediafetcher.preloadFancyboxAnchors();
+                    $(`#ez-feed-comment-edit-container-${commentId}`).hide();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                }
+            });
+        },
+        editFactoryUpdateMessage: async function () {
+            var attachment = $('#factoryUpdateInfo').data('attachment');
+            if(attachment != null && attachment != null && attachment != '') {
+                var pictureUrl = attachment.Uri;
+
+                if (pictureUrl.startsWith(ezgofactoryfeed.imagePrefix)) {
+                    pictureUrl = pictureUrl.replace(ezgofactoryfeed.imagePrefix, '');
+                }
+                else if (pictureUrl.startsWith(ezgofactoryfeed.videoPrefix)) {
+                    pictureUrl = pictureUrl.replace(ezgofactoryfeed.videoPrefix, '');
+                }
+                
+                var videoThumbnailUri = attachment.VideoThumbnailUri;
+
+                if(videoThumbnailUri != null && videoThumbnailUri != undefined && videoThumbnailUri != '')
+                {
+                    if (videoThumbnailUri.startsWith(ezgofactoryfeed.imagePrefix)) {
+                        videoThumbnailUri = videoThumbnailUri.replace(ezgofactoryfeed.imagePrefix, '');
+                    }
+                    else if (videoThumbnailUri.startsWith(ezgofactoryfeed.videoPrefix)) {
+                        videoThumbnailUri = videoThumbnailUri.replace(ezgofactoryfeed.videoPrefix, '');
+                    }
+                }
+
+                var mediaAttachment = {
+                    Uri: pictureUrl,
+                    FileName: attachment.FileName,
+                    FileType: attachment.FileType,
+                    FileExtension: attachment.FileExtension,//get extension
+                    AttachmentType: attachment.AttachmentType,
+                    VideoThumbnailUri: videoThumbnailUri,
+                    Size: attachment.Size,
+                    LastModified: attachment.LastModified
+                };
+                
+                attachment = mediaAttachment;
+            }
+            else if(ezgofactoryfeed.editFactoryUpdateNewAttachment != null && ezgofactoryfeed.editFactoryUpdateNewAttachment != undefined) {
+                var result = await ezgofactoryfeed.uploadImage(ezgofactoryfeed.editFactoryUpdateNewAttachment);
+                    
+                var mediaAttachmentType = "";
+
+                if(ezgofactoryfeed.editFactoryUpdateNewAttachment.type.includes("pdf")) {
+                    mediaAttachmentType = "doc";
+                }
+                else if(ezgofactoryfeed.editFactoryUpdateNewAttachment.type.includes("image")) {
+                    mediaAttachmentType = "image";
+                }
+                else if(ezgofactoryfeed.editFactoryUpdateNewAttachment.type.includes("video")) {
+                    mediaAttachmentType = "video";
+                }
+                    
+                var videoThumbnailUri = "";
+                if(ezgofactoryfeed.editFactoryUpdateVideoThumbnail != null && ezgofactoryfeed.editFactoryUpdateVideoThumbnail != undefined) {
+                    videoThumbnailUri = await ezgofactoryfeed.uploadImage(ezgofactoryfeed.editFactoryUpdateVideoThumbnail);
+                }
+
+                var mediaAttachment = {
+                    Uri: result,
+                    FileName: ezgofactoryfeed.editFactoryUpdateNewAttachment.name,
+                    FileType: ezgofactoryfeed.editFactoryUpdateNewAttachment.type,
+                    FileExtension: "." + ezgofactoryfeed.editFactoryUpdateNewAttachment.name.split('.').pop(),//get extension
+                    AttachmentType: mediaAttachmentType,
+                    VideoThumbnailUri: videoThumbnailUri,
+                    Size: ezgofactoryfeed.editFactoryUpdateNewAttachment.size,
+                    LastModified: new Date(ezgofactoryfeed.editFactoryUpdateNewAttachment.lastModified).toISOString()
+                };
+
+                attachment = mediaAttachment;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: `/factoryfeed/changefactoryupdatemessage`,
+                data: {
+                    id: $('#factoryUpdateInfo').data('postid'),
+                    companyId: $('#factoryUpdateInfo').data('companyid'),
+                    feedId: ezgofactoryfeed.factoryUpdatesFeedId,
+                    message: $('#factoryUpdateEditTitle').val(),
+                    description: $('#factoryUpdateEditDescription').val(),
+                    attachment: attachment,
+                    isSticky: $('#factoryUpdateEditIsSticky').is(":checked")
+                },
+                success: function (data) {
+                    document.location.reload();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                }
+            });
+        },
+        cancelEditPost: function (postId) {
+            $(`#ez-feed-message-content-${postId}`).show();
+
+            $(`#ez-feed-message-edit-container-${postId}`).hide();
+
+            $(`#postMediaContainer-${postId}`).show();
+        },
+        cancelEditComment: function (postId) {
+            $(`#ez-feed-comment-content-${postId}`).show();
+
+            $(`#postCommentImageContainer-${postId}`).show();
+            $(`#postCommentVideoContainer-${postId}`).show();
+            $(`#postCommentPdfContainer-${postId}`).show();
+
+            $(`#ez-feed-comment-edit-container-${postId}`).hide();
+        },
+        cancelEditFactoryUpdate: function () {
+            $('#factoryUpdateContent').show();
+            $('#factoryUpdateEditForm').hide();
+            $('#factoryUpdateEditTitle').val('');
+            $('#factoryUpdateEditDescription').html('');
+        },
+        selectImage: function (e) {
+            $('#factoryfeedImage').click();
+        },
+        selectVideo: function (e) {
+            $('#factoryfeedVideo').click();
+        },
+        selectPdf: function (e) {
+            $('#factoryfeedPdf').click();
+        },
+        selectCommentImage: function (e, id) {
+            $(`#factoryfeedCommentImage-${id}`).click();
+        },
+        selectCommentVideo: function (e, id) {
+            $(`#factoryfeedCommentVideo-${id}`).click();
+        },
+        selectCommentPdf: function (e, id) {
+            $(`#factoryfeedCommentPdf-${id}`).click();
+        },
+        editSelectImage: function (e, id) {
+            $(`#factoryfeedEditImage-${id}`).click();
+        },
+        editSelectVideo: function (e, id) {
+            $(`#factoryfeedEditVideo-${id}`).click();
+        },
+        editSelectPdf: function (e, id) {
+            $(`#factoryfeedEditPdf-${id}`).click();
+        },
+        selectFactoryUpdateImage: function (e, id) {
+            $(`#factoryUpdateImageInput`).click();
+        },
+        selectFactoryUpdateVideo: function (e, id) {
+            $(`#factoryUpdateVideoInput`).click();
+        },
+        selectFactoryUpdatePdf: function (e, id) {
+            $(`#factoryUpdatePdfInput`).click();
+        },
+        editSelectFactoryUpdateImage: function (e, id) {
+            $(`#factoryUpdateEditImage`).click();
+        },
+        editSelectFactoryUpdateVideo: function (e, id) {
+            $(`#factoryUpdateEditVideo`).click();
+        },
+        editSelectFactoryUpdatePdf: function (e, id) {
+            $(`#factoryUpdateEditPdf`).click();
+        },
+        editCommentSelectImage: function (e, id) {
+            $(`#factoryfeedEditCommentImage-${id}`).click();
+        },
+        editCommentSelectVideo: function(e, id) {
+            $(`#factoryfeedEditCommentVideo-${id}`).click();
+        },
+        editCommentSelectPdf: function(e, id) {
+            $(`#factoryfeedEditCommentPdf-${id}`).click();
+        },
+        sendPost: async function () {
+            $('#postFeedMessage').attr('disabled', true);
+            var attachments = [];
+
+            if (ezgofactoryfeed.attachments != null && ezgofactoryfeed.attachments != undefined && ezgofactoryfeed.attachments && ezgofactoryfeed.attachments.length > 0) {
+                for (let i = 0; i < ezgofactoryfeed.attachments.length; i++)
+                {
+                    //TODO construct attachments
+                    var result = await ezgofactoryfeed.uploadImage(ezgofactoryfeed.attachments[i]);
+
+                    var mediaAttachmentType = "";
+                    if(ezgofactoryfeed.attachments[i].type.includes("pdf")) {
+                        mediaAttachmentType = "doc";
+                    }
+                    else if(ezgofactoryfeed.attachments[i].type.includes("image")) {
+                        mediaAttachmentType = "image";
+                    }
+                    else if(ezgofactoryfeed.attachments[i].type.includes("video")) {
+                        mediaAttachmentType = "video";
+                    }
+
+                    var videoThumbnailUri = "";
+                    if(ezgofactoryfeed.videoThumbnails[i] != null && ezgofactoryfeed.videoThumbnails[i] != undefined) {
+                        videoThumbnailUri = await ezgofactoryfeed.uploadImage(ezgofactoryfeed.videoThumbnails[i]);
+                    }
+
+                    var mediaAttachment = {
+                        Uri: result,
+                        FileName: ezgofactoryfeed.attachments[i].name,
+                        FileType: ezgofactoryfeed.attachments[i].type,
+                        FileExtension: "." + ezgofactoryfeed.attachments[i].name.split('.').pop(),//get extension
+                        AttachmentType: mediaAttachmentType,
+                        VideoThumbnailUri: videoThumbnailUri,
+                        Size: ezgofactoryfeed.attachments[i].size,
+                        LastModified: new Date(ezgofactoryfeed.attachments[i].lastModified).toISOString()
+                    };
+                    attachments.push(mediaAttachment);
+                }
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '/factoryfeed/addfeedmessage',
+                data: {
+                    title: $('#postDescription').val(),
+                    description: $('#postDescription').val(),
+                    attachments: attachments,
+                    feedId: ezgofactoryfeed.mainFeedId
+                },
+                success: function (contentCardPartial) {
+                    if (contentCardPartial) {
+                        //add the newly posted message to the page, then reset the form
+                        $('#factoryFeedMessages').prepend(contentCardPartial);
+                        ezgofactoryfeed.resetContentForm();
+
+                        ezgofactoryfeed.loadStatistics();
+
+                        ezgomediafetcher.preloadImagesAndVideos();
+                        ezgomediafetcher.preloadFancyboxAnchors();
+                    } else {
+                        //if the post was successful but the partial was not returned by the controller, reload the page
+                        location.reload();
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                }
+            });
+        },
+        sendFactoryUpdate: async function () {
+            var attachment = null;
+
+            if (ezgofactoryfeed.attachment != null && ezgofactoryfeed.attachment != undefined && ezgofactoryfeed.attachment) {
+                //TODO construct attachment
+                var result = await ezgofactoryfeed.uploadImage(ezgofactoryfeed.attachment);
+
+                var mediaAttachmentType = "";
+                if(ezgofactoryfeed.attachment.type.includes("pdf")) {
+                    mediaAttachmentType = "doc";
+                }
+                else if(ezgofactoryfeed.attachment.type.includes("image")) {
+                    mediaAttachmentType = "image";
+                }
+                else if(ezgofactoryfeed.attachment.type.includes("video")) {
+                    mediaAttachmentType = "video";
+                }
+
+                var videoThumbnailUri = "";
+                if(ezgofactoryfeed.videoThumbnail != null && ezgofactoryfeed.videoThumbnail != undefined) {
+                    videoThumbnailUri = await ezgofactoryfeed.uploadImage(ezgofactoryfeed.videoThumbnail);
+                }
+
+                attachment = {
+                    Uri: result,
+                    FileName: ezgofactoryfeed.attachment.name,
+                    FileType: ezgofactoryfeed.attachment.type,
+                    FileExtension: "." + ezgofactoryfeed.attachment.name.split('.').pop(),//get extension
+                    AttachmentType: mediaAttachmentType,
+                    VideoThumbnailUri: videoThumbnailUri,
+                    Size: ezgofactoryfeed.attachment.size,
+                    LastModified: new Date(ezgofactoryfeed.attachment.lastModified).toISOString()
+                };
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '/factoryfeed/addfactoryupdatemessage',
+                data: {
+                    title: $('#factoryUpdatesPostTitle').val(),
+                    description: $('#factoryUpdatesPostDescription').val(),
+                    attachment: attachment,
+                    feedId: ezgofactoryfeed.factoryUpdatesFeedId,
+                    isSticky: $('#factoryUpdateIsSticky').is(":checked")
+                },
+                success: function () {
+                    location.reload();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                }
+            });
+        },
+        showFactoryUpdateDetail: function (e, id, title, description, itemDate, attachment, postUserName, profileImgUrl, postId, companyId, isSticky) {
+
+            $('#factoryUpdateFancybox').attr('href', '/images/media-loading.gif');
+            $('#factoryUpdateDetailImage').attr('src', '/images/media-loading.gif');
+            $('#factoryUpdateDetailVideo').attr('src', '/images/media-loading.mp4');
+
+            $("div[id^='factoryUpdateMessage-']").css('background-color', '');
+            $(e).css('background-color', 'rgba(151, 193, 49, 0.82)');
+            $('#factoryUpdateDetailImage').hide();
+            $('#factoryUpdateDetailVideo').hide();
+            $('#factoryUpdateDetailPdf').hide();
+
+            $('#factoryUpdateDelete').attr('data-id', `${id}`);
+            
+            if (attachment != null && attachment != undefined && attachment.Uri != null) {
+                if (attachment.Uri.toLowerCase().endsWith('.mp4') || attachment.Uri.toLowerCase().endsWith('.mov')) {
+                    $('#factoryUpdateDetailVideo').data('src', attachment.Uri);
+                    $('#factoryUpdateDetailVideoPreview').data('src', attachment.Uri);
+                
+                    $('#factoryUpdateFancybox').attr('href', '#factoryUpdateDetailVideoPreview');
+                    $('#factoryUpdateFancybox').data('href', '');
+                    $('#factoryUpdateFancybox').data('type', "");
+                    $('#factoryUpdateFancybox').data('options', '');
+
+                    $('#factoryUpdateDetailVideo').show();
+                }
+                else if(attachment.Uri.toLowerCase().endsWith('.pdf')) {
+                    $('#factoryUpdateFancybox').attr('href', '/images/media-loading.gif');
+                    $('#factoryUpdateFancybox').data('href', attachment.Uri);
+                    $('#factoryUpdateFancybox').data('type', "iframe");
+                    $('#factoryUpdateFancybox').data('options', '{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } ');
+
+                    $('#factoryUpdateDetailFilename').html(attachment.Uri.split('/').pop());
+                
+                    $('#factoryUpdateDetailPdf').show();
+                }
+                else if (attachment.Uri != '') {
+                    $('#factoryUpdateDetailImage').data('src', attachment.Uri);
+
+                    $('#factoryUpdateFancybox').attr('href', '/images/media-loading.gif');
+                    $('#factoryUpdateFancybox').data('href', attachment.Uri);
+                    $('#factoryUpdateFancybox').data('type', "");
+                    $('#factoryUpdateFancybox').data('options', '');
+
+                    $('#factoryUpdateDetailImage').show();
+                }
+            }
+
+            $('#factoryUpdateDetailTitle').html(title);
+            $('#factoryUpdateDetailDescription').html(description.replaceAll("<br>", "\n"));
+            $('#factoryUpdateDetailDate1').html(itemDate);
+
+            $('#factoryUpdateDetailUsername').html(postUserName);
+
+            $('#factoryUpdateDetailProfileImage').data('src', profileImgUrl);
+
+            $('#factoryFeedMiddleColumnRegular').hide();
+
+            $('#factoryUpdateInfo').data("postid", postId);
+            $('#factoryUpdateInfo').data("companyid", companyId);
+            $('#factoryUpdateInfo').data("issticky", isSticky);
+            $('#factoryUpdateInfo').data("attachment", attachment);
+
+
+
+            $('#factoryUpdateMenu').hide();
+            $('#factoryUpdateEditForm').hide(); 
+            $('#factoryUpdateGoBack').css('margin-right', '0');
+            $('#factoryUpdateContent').show();
+            $('#factoryFeedMiddleColumnFactoryUpdates').show();
+
+            ezgomediafetcher.preloadImagesAndVideos();
+            ezgomediafetcher.preloadFancyboxAnchors();
+        },
+        hideFactoryUpdatesDetail: function () {
+            $("div[id^='factoryUpdateMessage-']").css('background-color', '');
+            $('#factoryFeedMiddleColumnFactoryUpdates').hide();
+            $('#factoryFeedMiddleColumnRegular').show();
+        },
+        setItemLiked: function (e) {
+            var FeedItemId = $(e).data("id");
+            var likeButton = $(`button[data-id="${FeedItemId}"]`);
+            likeButton.prop('disabled', true);
+            var isLiking = likeButton.data('toLike');
+            var currentUserLikeImage = $('#likeImage-' + FeedItemId + '-' + @Model.CurrentUser.Id);
+            var currentUserLikeUserName = $('#likeUsername-' + FeedItemId + '-' + @Model.CurrentUser.Id);
+            var currentUserLike = $(`#like-${FeedItemId}-${@Model.CurrentUser.Id}`);
+
+            $.ajax({
+                type: "POST",
+                url: `/factoryfeed/likefeeditem/${FeedItemId}`,
+                data: {
+                    isLiked: isLiking,
+                },
+                success: function (data) {
+                    var likesAmount = Number($('#likesAmount-' + FeedItemId).text());
+                    if (isLiking) {
+                        likesAmount++;
+                        likeButton.css('background', 'rgba(151, 193, 49, 0.82)');
+                        likeButton.css('color', '#fff');
+                        currentUserLikeImage.show();
+                        currentUserLikeUserName.show();
+                        currentUserLike.show();
+                    } else {
+                        likesAmount--;
+                        likeButton.css('background', '');
+                        likeButton.css('color', '#1f2d3d');
+                        currentUserLikeImage.hide();
+                        currentUserLikeUserName.hide();
+                        currentUserLike.hide();
+                    }
+                    $('#likesAmount-' + FeedItemId).text(likesAmount.toString());
+
+                    //this only edits internal jQuery
+                    likeButton.data("toLike", !isLiking);
+                    //changes DOM
+                    likeButton.attr('data-to-like', !isLiking);
+                    likeButton.prop('disabled', false);
+
+                    ezgofactoryfeed.loadStatistics();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('body').toggleClass('loaded');
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    likeButton.prop('disabled', false);
+                }
+            });
+        },
+        showFactoryUpdatesModal: function () {
+            $('#FactoryUpdatesModal').modal('show');
+            $('#factoryUpdatesPostTitle').val('');
+            $('#factoryUpdatesPostDescription').val('');
+            $('.factoryUpdateImageContainer').html('');
+            ezgofactoryfeed.attachment = null;
+        },
+        showLikes: function (postId) {
+            $(`#LikesUsersModal-${postId}`).modal('show');
+        },
+        showPostMenu: function (postId) {
+            $('.postMenu').hide();
+            if ($('#postMenu' + postId).is(':visible')) {
+                $('#postMenu' + postId).hide();
+            }
+            else {
+                $('#postMenu' + postId).show();
+            }
+        },
+        showFactoryUpdateMenu: function () {
+            $('.postMenu').hide();
+            $('#factoryUpdateMenu').show();
+            $('#factoryUpdateGoBack').css('margin-right', $('#factoryUpdateMenu').css('width'));
+        },
+        showMainFeedPosts: function () {
+            $('.mainFeedToggle').css('font-weight', '800');
+            $('.factoryUpdateToggle').css('font-weight', '400');
+            $('#factoryFeedMiddleColumnRegular').removeClass('d-none');
+            $('#factoryFeedMiddleColumnRegular').removeClass('d-md-block');
+            $('#factoryFeedFactoryUpdates').addClass('d-none');
+            $('#factoryFeedFactoryUpdates').addClass('d-md-block');
+            $('#returnToHomeScreen').click();
+        },
+        showFactoryUpdates: function () {
+            $('.mainFeedToggle').css('font-weight', '400');
+            $('.factoryUpdateToggle').css('font-weight', '800');
+            $('#factoryFeedFactoryUpdates').removeClass('d-none');
+            $('#factoryFeedFactoryUpdates').removeClass('d-md-block');
+            $('#factoryFeedMiddleColumnRegular').addClass('d-none');
+            $('#factoryFeedMiddleColumnRegular').addClass('d-md-block');
+        },
+        uploadImage: async function(attachment) {
+            const formData = new FormData();
+
+            formData.append('file', attachment);
+            formData.append('filename', attachment.name);
+            formData.append("itemtype", attachment.type);
+            const rawResponse = await fetch(`/factoryfeed/upload`, {
+                method: 'POST',
+                body: formData
+            });
+            const response = await rawResponse.json();
+            return response
+        },
+        generateVideoThumbnail: async function(attachment, connectedTo)
+        {
+            var fileReader = new FileReader();
+
+            fileReader.onload = function () {
+                var url = URL.createObjectURL(attachment);
+                var video = document.createElement('video');
+                var timeupdate = function () {
+                    if (snapImage()) {
+                        video.removeEventListener('timeupdate', timeupdate);
+                        video.pause();
+                    }
+                };
+                video.addEventListener('loadeddata', function () {
+                    if (snapImage()) {
+                        video.removeEventListener('timeupdate', timeupdate);
+                    }
+                });
+                var snapImage = function () {
+                    var canvas = document.createElement('canvas');
+                    var videoName = attachment.name.substring(0, attachment.name.lastIndexOf('.')) || attachment.name;
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                    var image = canvas.toDataURL();
+                    var success = image.length > 1000;
+                    var imageBlob = $.utils.dataURItoBlob(image);
+                    var imageFile = new File([imageBlob], videoName + ".png");
+                    if (success) {
+                        if(connectedTo == "post") {
+                            ezgofactoryfeed.videoThumbnails[ezgofactoryfeed.attachments.indexOf(attachment)] = imageFile;
+                        }
+                        else if(connectedTo == "comment") {
+                            ezgofactoryfeed.commentVideoThumbnail = imageFile;
+                        }
+                        else if(connectedTo == "factoryupdate") {
+                            ezgofactoryfeed.videoThumbnail = imageFile;
+                        }
+                        else if(connectedTo == "editpost") {
+                            ezgofactoryfeed.editNewVideoThumbnails[ezgofactoryfeed.editNewAttachments.indexOf(attachment)] = imageFile;
+                        }
+                        else if(connectedTo == "editcomment") {
+                            ezgofactoryfeed.editNewCommentVideoThumbnail = imageFile;
+                        }
+                        else if(connectedTo == "editfactoryupdate") {
+                            ezgofactoryfeed.editFactoryUpdateVideoThumbnail = imageFile;
+                        }
+                    }
+                    return success;
+                };
+
+                video.addEventListener('timeupdate', timeupdate);
+                video.preload = 'metadata';
+                video.src = url;
+                //Load video in Safari / IE11
+                video.muted = true;
+                video.playsInline = true;
+                video.play();
+            };
+
+            fileReader.readAsArrayBuffer(attachment);
+
+        },
+        hidePostMenus: function () {
+            $('.postMenu').hide();
+            $('#factoryUpdateGoBack').css('margin-right', '0');
+        },
+        hideLikeName: function (postId, userId) {
+            $('#likeUsername-' + postId + "-" + userId).hide();
+            $('#likeImage-' + postId + "-" + userId).css('border', '0')
+        },
+        showLikeName: function (postId, userId) {
+            $('#likeUsername-' + postId + "-" + userId).show();
+            $('#likeImage-' + postId + "-" + userId).css('border', '3px solid rgba(151, 193, 49, 0.82)')
+        },
+        resetContentForm: function (postId, userId) {
+            //clear textarea
+            $('#postDescription').val('');
+            //clear multi media upload
+            $('.postImageContainer').html('');
+            //remove attachment and clear input values
+            ezgofactoryfeed.attachments = [];
+            //TODO clear other attachments?
+            $('#factoryfeedImage').val('');
+            $('#factoryfeedVideo').val('');
+            //disable post button
+            $('#postFeedMessage').attr('disabled', true);
+        },
+        loadUpdates: function () {
+            $.ajax({
+                type: "GET",
+                url: '/factoryfeed/updatecheck/' + ezgofactoryfeed.updateCheckDate.toISOString(),
+                success: function (data) {
+                    ezgofactoryfeed.updateCheckDate = new Date();
+                    if (data) {
+                        //there are changes
+
+                        $('#newMessagesInfoBox').show();
+                    }
+                    else {
+                        //there are no changes
+                        //nothing needs to be done
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    $('#ezfeedLoader').hide();
+                }
+            });
+        },
+        loadStatistics: async function() {
+            $.ajax({
+                type: "GET",
+                url: '/factoryfeed/statistics',
+                success: function (statisticsData) {
+                    $('#factoryFeedProfileCard').html(statisticsData);
+                    ezgomediafetcher.preloadImagesAndVideos();
+                    ezgomediafetcher.preloadFancyboxAnchors();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    $('#ezfeedLoader').hide();
+                }
+                });
+        },
+        reloadMainFeedMessages: async function () {
+            var pendingChangesFound = false;
+            let items = document.querySelectorAll('textarea');
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].value != '') {
+                    pendingChangesFound = true;
+                }
+            }
+            if (pendingChangesFound) {
+                $.fn.dialogue({
+                //title: "Alert",
+                content: $("<p />").text("You have pending edits, are you sure you want to reload the main feed?"),
+                closeIcon: true,
+                buttons: [
+                    {
+                        text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.Action.OptionYes, "Yes") ?? "Yes")", id: $.utils.createUUID(), click: async function ($modal) {
+                            $modal.dismiss();
+                            ezgofactoryfeed.loadingMore = true;
+                            $('#newMessagesInfoBox').hide();
+                            $('#factoryFeedMain').stop().animate({ scrollTop: 0 }, 500, 'swing', function () { });
+
+                            $('#ezfeedLoader').show();
+                            await ezgofactoryfeed.reloadMessages(ezgofactoryfeed.mainFeedId);
+                        }
+                    },
+                    { text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.Action.OptionNo, "No") ?? "No")", id: $.utils.createUUID(), click: async function ($modal) { $modal.dismiss(); } }
+                ]
+            });
+            }
+            else {
+                ezgofactoryfeed.loadingMore = true;
+                $('#newMessagesInfoBox').hide();
+                $('#factoryFeedMain').stop().animate({ scrollTop: 0 }, 500, 'swing', function () { });
+
+                $('#ezfeedLoader').show();
+                await ezgofactoryfeed.reloadMessages(ezgofactoryfeed.mainFeedId);
+                
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+            }
+            //loadMoreMessages sets loadingMore boolean to false after it's done
+        }
+    };
+    </script>
+    <script>
+        ezgofactoryfeed.init();
+    </script>
+    <script>
+        var videoTemplate =
+            '<br />' +
+            '<div id="postVideoContainer-{{postId}}">' +
+                '<video controls src="{{url}}" >' +
+                    '@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")' +
+                '</video>' +
+            '</div>';
+
+        var imageTemplate =
+            '<br />' +
+            '<div id="postImageContainer-{{postId}}">' +
+                '<img class="card-img w-100 d-block rounded-0" src="{{url}}"  />' +
+            '</div>';
+
+
+        var postImageTemplate =
+            '<div class="col-6 my-1">' +
+                '<a href="{{url}}" data-fancybox="{{fancy}}">' +
+                    '<img id="postImage-{{number}}" src="{{url}}" style="width: 100%"  />' +
+                '</a>' +
+                '<div class="controls d-print-none" style="position:absolute;top:0px;right:0px">' +
+                    '<a data-index={{number}} href="#" data-selector="deletemedia" data-type="template" class="postImageOverlay">' +
+                        '<div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">' +
+                            '<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>' +
+                        '</div>' +
+                    '</a>' +
+                '</div>' +
+            '</div>';
+
+        var postVideoTemplate =
+            '<div class="col-6 my-1">' +
+                '<a href="#postVideo-{{number}}" data-fancybox="{{fancy}}">' +
+                    '<video style="max-width: 100%" src="{{url}}" >' +
+                        '@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")' +
+                    '</video>' +
+                '</a>' +
+                '<video src="{{url}}" controls id="postVideo-{{number}}" style="display:none;">' +
+                        '@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")' +
+                '</video>' +
+                '<div class="controls d-print-none" style="position:absolute;top:0px;right:0px">' +
+                    '<a data-index={{number}} href="#" data-selector="deletemedia" data-type="template" class="postImageOverlay">' +
+                        '<div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">' +
+                            '<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>' +
+                        '</div>' +
+                    '</a>' +
+                '</div>' +
+            '</div>';
+
+        var postPdfTemplate =
+            `<div class="col-6 my-1 p-1 shadow-sm" style="border-radius: 10px">` +
+                `<a href="{{url}}" data-fancybox="{{fancy}}" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>` +
+                    `<div style="position: relative">` +
+                        `<div class="paperclip" style="text-align: center; padding-top: 25px; height: 160px">` +
+                            `<i class="fa fa-paperclip fa-3x"></i>` +
+                            `<div style="text-overflow: ellipsis">{{filename}}</div>` +
+                        `</div>` +
+                    `</div>` +
+                    `<div>` +
+                        `<p id="view" class="view p-2 text-center text-muted">PDF</p>` +
+                    `</div>` +
+                `</a>` +
+                `<div class="controls d-print-none" style="position:absolute;left: 50%;transform: translateX(-50%);margin: 0px 0px 57px 0px">` +
+                    `<a data-index={{number}} href="#" data-selector="deletemedia" data-type="template" class="postImageOverlay">` +
+                        `<div class="border rounded-circle d-lg-flex justify-content-lg-center shadow main-image-pencil">` +
+                            `<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>` +
+                        `</div>` +
+                    `</a>` +
+                `</div>` +
+            `</div>`;
+
+
+        var editPostImageTemplate =
+            '<div class="col-6 my-1">' +
+                '<a href="/images/media-loading.gif" data-href="{{url}}" data-fancybox="{{fancy}}">' +
+                    '<img id="editPostMedia-{{number}}" src="/images/media-loading.gif" data-src="{{url}}" style="width: 100%"  />' +
+                '</a>' +
+                '<div class="controls d-print-none" style="position:absolute;top:0px;right:0px">' +
+                    '<a data-index={{number}} data-src="{{url}}" href="#" data-selector="deletemedia" data-type="template" class="editPostImageOverlay-{{number}}">' +
+                        '<div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">' +
+                            '<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>' +
+                        '</div>' +
+                    '</a>' +
+                '</div>' +
+            '</div>';
+
+        var editPostVideoTemplate =
+            '<div class="col-6 my-1">' +
+                '<a href="#editPostVideo-{{number}}" data-fancybox="{{fancy}}">' +
+                    '<video id="editPostMedia-{{number}}" style="max-width: 100%" src="/images/media-loading.mp4" data-src="{{url}}" >' +
+                        '@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")' +
+                    '</video>' +
+                '</a>' +
+                '<video src="/images/media-loading.mp4" data-src="{{url}}" controls id="editPostVideo-{{number}}" style="display:none;">' +
+                    '@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")' +
+                '</video>' +
+                '<div class="controls d-print-none" style="position:absolute;top:0px;right:0px">' +
+                    '<a data-index={{number}} data-src="{{url}}" href="#" data-selector="deletemedia" data-type="template" class="editPostImageOverlay-{{number}}">' +
+                        '<div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">' +
+                            '<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>' +
+                        '</div>' +
+                    '</a>' +
+                '</div>' +
+            '</div>';
+
+        var editPostPdfTemplate =
+            `<div class="col-6 my-1 p-1 shadow-sm" style="border-radius: 10px">` +
+                `<a href='/images/media-loading.gif' data-href="{{url}}" data-fancybox="{{fancy}}" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>` +
+                    `<div style="position: relative">` +
+                        `<div class="paperclip" style="text-align: center; padding-top: 25px; height: 160px">` +
+                            `<i class="fa fa-paperclip fa-3x"></i>` +
+                            `<div style="text-overflow: ellipsis">{{filename}}</div>` +
+                        `</div>` +
+                    `</div>` +
+                    `<div>` +
+                        `<p id="view" class="view p-2 text-center text-muted">PDF</p>` +
+                    `</div>` +
+                `</a>` +
+                `<div class="controls d-print-none" style="position:absolute;left: 50%;transform: translateX(-50%);margin: 0px 0px 57px 0px">` +
+                    `<a data-index={{number}} href="#" data-src="{{url}}" data-selector="deletemedia" data-type="template" class="editPostImageOverlay-{{number}}">` +
+                        `<div class="border rounded-circle d-lg-flex justify-content-lg-center shadow main-image-pencil">` +
+                            `<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>` +
+                        `</div>` +
+                    `</a>` +
+                `</div>` +
+            `</div>`;
+
+        
+        var commentImageTemplate =
+            '<div class="col-6 my-1">' +
+                '<a href="{{url}}" data-fancybox="{{fancy}}">' +
+                    '<img id="postCommentImage" src="{{url}}" style="width: 100%"  />' +
+                '</a>' +
+                '<div class="controls d-print-none" style="position:absolute;top:0px;right:0px">' +
+                    '<a data-index={{number}} href="#" data-selector="deletemedia" data-type="template" class="postCommentImageOverlay-{{parentid}}">' +
+                        '<div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">' +
+                            '<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>' +
+                        '</div>' +
+                    '</a>' +
+                '</div>' +
+            '</div>';
+
+        var commentVideoTemplate =
+            '<div class="col-6 my-1">' +
+            
+                '<a href="#postCommentVideo-{{number}}" data-fancybox="{{fancy}}">' +
+                    '<video style="max-width: 100%" src="{{url}}" >' +
+                        '@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")' +
+                    '</video>' +
+                '</a>' +
+                '<video src="{{url}}" controls id="postCommentVideo-{{number}}" style="display:none;">' +
+                    '@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")' +
+                '</video>' +
+
+                '<div class="controls d-print-none" style="position:absolute;top:0px;right:0px">' +
+                    '<a data-index={{number}} href="#" data-selector="deletemedia" data-type="template" class="postCommentImageOverlay-{{parentid}}">' +
+                        '<div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">' +
+                            '<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>' +
+                        '</div>' +
+                    '</a>' +
+                '</div>' +
+            '</div>';
+
+        var commentPdfTemplate =
+            `<div class="col-12 my-1 p-1 shadow-sm" style="border-radius: 10px">` +
+                `<a href="{{url}}" data-fancybox="{{fancy}}" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>` +
+                    `<div style="position: relative">` +
+                        `<div class="paperclip" style="text-align: center; padding-top: 25px; height: 160px">` +
+                            `<i class="fa fa-paperclip fa-3x"></i>` +
+                            `<div style="text-overflow: ellipsis">{{filename}}</div>` +
+                        `</div>` +
+                    `</div>` +
+                    `<div>` +
+                        `<p id="view" class="view p-2 text-center text-muted">PDF</p>` +
+                    `</div>` +
+                `</a>` +
+                `<div class="controls d-print-none" style="position:absolute;left: 50%;transform: translateX(-50%);margin: 0px 0px 57px 0px">` +
+                    `<a data-index={{number}} href="#" data-selector="deletemedia" data-type="template" class="postCommentImageOverlay-{{parentid}}">` +
+                        `<div class="border rounded-circle d-lg-flex justify-content-lg-center shadow main-image-pencil">` +
+                            `<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>` +
+                        `</div>` +
+                    `</a>` +
+                `</div>` +
+            `</div>`;
+        
+
+        var editCommentImageTemplate =
+            '<div class="col-6 my-1">' +
+                '<a href="/images/media-loading.gif" data-href="{{url}}" data-fancybox="{{fancy}}">' +
+                    '<img id="editCommentImage-{{postId}}" src="/images/media-loading.gif" data-src="{{url}}" style="width: 100%"  />' +
+                '</a>' +
+                '<div class="controls d-print-none" style="position:absolute;top:0px;right:0px">' +
+                    '<a data-index={{number}} href="#" data-selector="deletemedia" data-type="template" class="editCommentImageOverlay-{{postId}}">' +
+                        '<div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">' +
+                            '<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>' +
+                        '</div>' +
+                    '</a>' +
+                '</div>' +
+            '</div>';
+
+        var editCommentVideoTemplate =
+            '<div class="col-6 my-1">' +
+                '<a href="#editPostCommentVideo-{{number}}" data-fancybox="{{fancy}}">' +
+                    '<video style="max-width: 100%" src="/images/media-loading.mp4" data-src="{{url}}" >' +
+                        '@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")' +
+                    '</video>' +
+                '</a>' +
+                '<video src="/images/media-loading.mp4" data-src="{{url}}" controls id="editPostCommentVideo-{{number}}" style="display:none;">' +
+                    '@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")' +
+                '</video>' +
+                '<div class="controls d-print-none" style="position:absolute;top:0px;right:0px">' +
+                    '<a data-index={{number}} href="#" data-selector="deletemedia" data-type="template" class="editCommentImageOverlay-{{postId}}">' +
+                        '<div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">' +
+                            '<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>' +
+                        '</div>' +
+                    '</a>' +
+                '</div>' +
+            '</div>';
+
+        var editCommentPdfTemplate =
+            `<div class="my-1 p-1 shadow-sm" style="border-radius: 10px; width: 100%">` +
+                `<a href='/images/media-loading.gif' data-href="{{url}}" data-fancybox="{{fancy}}" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>` +
+                    `<div style="position: relative">` +
+                        `<div class="paperclip" style="text-align: center; padding-top: 25px; height: 160px; min-width: 150px">` +
+                            `<i class="fa fa-paperclip fa-3x"></i>` +
+                            `<div style="text-overflow: ellipsis">{{filename}}</div>` +
+                        `</div>` +
+                    `</div>` +
+                    `<div>` +
+                        `<p id="view" class="view p-2 text-center text-muted">PDF</p>` +
+                    `</div>` +
+                `</a>` +
+                `<div class="controls d-print-none" style="position:absolute;left: 50%;transform: translateX(-50%);margin: 0px 0px 57px 0px">` +
+                    `<a data-index={{number}} href="#" data-src="{{url}}" data-selector="deletemedia" data-type="template" class="editCommentImageOverlay-{{postId}}">` +
+                        `<div class="border rounded-circle d-lg-flex justify-content-lg-center shadow main-image-pencil">` +
+                            `<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>` +
+                        `</div>` +
+                    `</a>` +
+                `</div>` +
+            `</div>`;
+        
+
+        var factoryUpdateImageTemplate =
+            '<div class="col-6 my-1">' +
+                '<a href="{{url}}" data-fancybox="{{fancy}}">' +
+                    '<img id="factoryUpdateImage" src="{{url}}" style="width: 100%"  />' +
+                '</a>' +
+                '<div class="controls d-print-none" style="position:absolute;top:0px;right:0px">' +
+                    '<a data-index={{number}} href="#" data-selector="deletemedia" data-type="template" class="factoryUpdateImageOverlay">' +
+                        '<div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">' +
+                            '<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>' +
+                        '</div>' +
+                    '</a>' +
+                '</div>' +
+            '</div>';
+
+        var factoryUpdateVideoTemplate =
+            '<div class="col-6 my-1">' +
+                '<a href="#factoryUpdateVideo-{{number}}" data-fancybox="{{fancy}}">' +
+                    '<video style="max-width: 100%" src="{{url}}" >' +
+                        '@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")' +
+                    '</video>' +
+                '</a>' +
+                '<video src="{{url}}" controls id="factoryUpdateVideo-{{number}}" style="display:none;">' +
+                        '@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")' +
+                '</video>' +
+                '<div class="controls d-print-none" style="position:absolute;top:0px;right:0px">' +
+                    '<a data-index={{number}} href="#" data-selector="deletemedia" data-type="template" class="factoryUpdateImageOverlay">' +
+                        '<div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">' +
+                            '<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>' +
+                        '</div>' +
+                    '</a>' +
+                '</div>' +
+            '</div>';
+
+        var factoryUpdatePdfTemplate =
+            `<div class="col-6 my-1 p-1 shadow-sm" style="border-radius: 10px">` +
+                `<a href="{{url}}" data-fancybox="{{fancy}}" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>` +
+                    `<div style="position: relative">` +
+                        `<div class="paperclip" style="text-align: center; padding-top: 25px; height: 160px">` +
+                            `<i class="fa fa-paperclip fa-3x"></i>` +
+                            `<div style="text-overflow: ellipsis">{{filename}}</div>` +
+                        `</div>` +
+                    `</div>` +
+                    `<div>` +
+                        `<p id="view" class="view p-2 text-center text-muted">PDF</p>` +
+                    `</div>` +
+                `</a>` +
+                `<div class="controls d-print-none" style="position:absolute;left: 50%;transform: translateX(-50%);margin: 0px 0px 57px 0px">` +
+                    `<a data-index={{number}} href="#" data-selector="deletemedia" data-type="template" class="factoryUpdateImageOverlay">` +
+                        `<div class="border rounded-circle d-lg-flex justify-content-lg-center shadow main-image-pencil">` +
+                            `<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>` +
+                        `</div>` +
+                    `</a>` +
+                `</div>` +
+            `</div>`;
+            
+
+        var editFactoryUpdateImageTemplate =
+            '<div class="col-12 my-1">' +
+                '<a href="/images/media-loading.gif" data-href="{{url}}" data-fancybox="{{fancy}}">' +
+                    '<img id="editFactoryUpdateImage" src="/images/media-loading.gif" data-src="{{url}}" style="width: 100%"  />' +
+                '</a>' +
+                '<div class="controls d-print-none" style="position:absolute;top:0px;right:0px">' +
+                    '<a data-index={{number}} href="#" data-selector="deletemedia" data-type="template" class="editFactoryUpdateImageOverlay">' +
+                        '<div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">' +
+                            '<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>' +
+                        '</div>' +
+                    '</a>' +
+                '</div>' +
+            '</div>';
+
+        var editFactoryUpdateVideoTemplate =
+            '<div class="col-12 my-1">' +
+                '<a href="#editFactoryUpdateVideo-{{number}}" data-fancybox="{{fancy}}">' +
+                    '<video style="width: 100%" src="/images/media-loading.mp4" data-src="{{url}}" >' +
+                        '@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")' +
+                    '</video>' +
+                '</a>' +
+                '<video src="/images/media-loading.mp4" data-src="{{url}}" controls id="editFactoryUpdateVideo-{{number}}" style="display:none;">' +
+                    '@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")' +
+                '</video>' +
+                '<div class="controls d-print-none" style="position:absolute;top:0px;right:0px">' +
+                    '<a data-index={{number}} href="#" data-selector="deletemedia" data-type="template" class="editFactoryUpdateImageOverlay">' +
+                        '<div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">' +
+                            '<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>' +
+                        '</div>' +
+                    '</a>' +
+                '</div>' +
+            '</div>';
+
+        var editFactoryUpdatePdfTemplate =
+            `<div class="col-6 my-1 p-1 shadow-sm" style="border-radius: 10px">` +
+                `<a href="/images/media-loading.gif" data-href="{{url}}" data-fancybox="{{fancy}}" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>` +
+                    `<div style="position: relative">` +
+                        `<div class="paperclip" style="text-align: center; padding-top: 25px; height: 160px">` +
+                            `<i class="fa fa-paperclip fa-3x"></i>` +
+                            `<div style="text-overflow: ellipsis">{{filename}}</div>` +
+                        `</div>` +
+                    `</div>` +
+                    `<div>` +
+                        `<p id="view" class="view p-2 text-center text-muted">PDF</p>` +
+                    `</div>` +
+                `</a>` +
+                `<div class="controls d-print-none" style="position:absolute;left: 50%;transform: translateX(-50%);margin: 0px 0px 57px 0px">` +
+                    `<a data-index={{number}} href="#" data-selector="deletemedia" data-type="template" class="editFactoryUpdateImageOverlay">` +
+                        `<div class="border rounded-circle d-lg-flex justify-content-lg-center shadow main-image-pencil">` +
+                            `<i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>` +
+                        `</div>` +
+                    `</a>` +
+                `</div>` +
+            `</div>`;
+
+        function get_url_extension(url) {
+            return url.split(/[#?]/)[0].split('.').pop().trim();
+        }
+    </script>
+    <script>
+        ezgomediafetcher.preloadImagesAndVideos();
+        ezgomediafetcher.preloadFancyboxAnchors();
+    </script>
+}

@@ -1,0 +1,49 @@
+﻿@model WebApp.ViewModels.ConfigViewModel
+@using WebApp.Models.Company
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    string Locale = Model.Locale ?? "en-US";
+    string[] DaysOfWeek = new string[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+}
+
+<ul class="w-100 p-0 m-0" style="display:inline-block;list-style:none;">
+
+    @for (var i = 0; i < 7; i++)
+    {
+        int day = i + 1;
+        if (day > 6) { day = 0; }
+
+        <li class="float-left" style="width:14%;">
+            <div class="text-bold text-capitalize">
+                <!--@DaysOfWeek[i]-->
+                @(((DayOfWeek)day).GetTextTranslation(Locale))
+            </div>
+            <ul class="p-0 m-0" style="list-style:none;" data-containertype="shiftdaydata" data-weekdaynumber="@i" data-autosort="true">
+                @if (Model.Company != null)
+                {
+                    @foreach (WebApp.Models.Company.CompanyShiftModel item in Model.Company.Shifts.Where(m => m.Weekday.Equals(i)).ToList())
+                    {
+                        <li 
+                            title="@(item.AreaId.HasValue ? string.Format("Area [{0}] shift ", Model.Areas.Where(x => x.Id == item.AreaId.Value)?.FirstOrDefault()?.Name) : "Shift ")
+                            @(string.Concat(item.Start.Split(':')[0], ":", item.Start.Split(':')[1], "-", item.End.Split(':')[0], ":", @item.End.Split(':')[1]))" 
+                            data-containertype="shiftdata" 
+                            style="@(item.AreaId.HasValue ? "font-style: italic" : "")" 
+                            data-id="@item.Id" 
+                            data-areaid="@item.AreaId" 
+                            data-weekdaynumber="@i" 
+                            data-starttime="@item.Start.Substring(0, 5).ToString()" 
+                            data-endtime="@item.End.Substring(0, 5).ToString()">
+                                @item.Start.Split(':')[0]:@item.Start.Split(':')[1]-@item.End.Split(':')[0]:@item.End.Split(':')[1]
+                        </li>
+                    }
+                }
+            </ul>
+    </li>
+}
+</ul>
+@if(Model.Company.Shifts.Where(x=> x.AreaId.HasValue).Any()) 
+{
+    <div style="font-size:10px;"><i>*@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.AreaShift, "Area shift") ?? "Area shift")</i></div>
+}

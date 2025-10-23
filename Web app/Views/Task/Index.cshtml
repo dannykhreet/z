@@ -1,0 +1,843 @@
+﻿@model WebApp.ViewModels.TaskViewModel
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TasksTitle, "Tasks") ?? "Tasks";
+
+}
+
+@section CSS{
+
+    <style>
+        #contentBody .results {
+            border: solid 1px transparent;
+            transition: transform .2s; /* Animation */
+        }
+
+            #contentBody .results:hover {
+                border: solid 1px #93c54b;
+                box-shadow: 0 .425rem .75rem rgba(0,0,0,.075) !important;
+                color: #93c54b !important;
+                transform: scale(1.010);
+                margin-left: 5px;
+                left: 5px;
+            }
+
+            #contentBody .results a:hover {
+                color: #93c54b !important;
+            }
+
+        #contentBody img.img-fluid {
+            border-radius: 5px;
+            border: solid 1px #bfbfbf;
+        }
+
+        .list-group-area-filter-inline {
+            padding-right: 0px;
+            height: 230px;
+            padding-left: 0px;
+            overflow: auto;
+        }
+
+        #inlineAreaTree .list-group-area-filter-inline {
+            border: none;
+            height: unset;
+        }
+
+        #inlineAreaTree a {
+            color: slategrey;
+            cursor: pointer;
+        }
+
+            #inlineAreaTree a:hover {
+                text-decoration: none;
+            }
+    </style>
+
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-3">
+                &nbsp;
+                <h1>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OverviewTitle, "Task overview") ?? "Task overview")</h1>
+            </div>
+            <div class="col-sm-3 align-self-end">
+                <span style="margin-left:10px;">
+                    <a href="/report/task/completed" target="_top" data-tracking="enabled" data-tracking-name="completed tasks" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsTaskCompletedTitle, "Completed tasks") ?? "Completed tasks")">
+                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsTaskCompletedTitle, "Completed tasks") ?? "Completed tasks")
+                    </a>
+                </span>
+            </div>
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                <a asp-controller="task" asp-action="details" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OverviewListTitle, "Add new task") ?? "Add new task")</a>
+
+                @if (Model.ApplicationSettings?.Features?.OrderTasks == true)
+                {
+                    <a asp-controller="task" asp-action="indices" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.ChangeOrder, "Change order") ?? "Change order")</a>
+                }
+
+                @if (Model?.ApplicationSettings?.Features != null)
+                {
+                    @if (Model.ApplicationSettings.Features.ExportAdvancedEnabled.HasValue || Model.ApplicationSettings.Features.ExportEnabled.HasValue)
+                    {
+                        @if (Model.ApplicationSettings.Features.ExportTaskProperties != null && Model.ApplicationSettings.Features.ExportTaskProperties.Value && Model.ApplicationSettings.Features.TasksPropertyValueRegistrationEnabled != null && Model.ApplicationSettings.Features.TasksPropertyValueRegistrationEnabled.Value && Model.ApplicationSettings.Features.TasksEnabled != null && Model.ApplicationSettings.Features.TasksEnabled.Value)
+                        {
+                            <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="taskproperties" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.DownloadValueRegistration, "Download value registration data") ?? "Download value registration data")"><i class="far fa-object-group"></i></button>
+                        }
+                        @if (Model.ApplicationSettings.Features.ExportEnabled != null && Model.ApplicationSettings.Features.ExportEnabled.Value && Model.ApplicationSettings.Features.TasksEnabled != null && Model.ApplicationSettings.Features.TasksEnabled.Value)
+                        {
+                            <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="tasks" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.DownloadTasks, "Download tasks") ?? "Download tasks")"><i class="fas fa-download"></i></button>
+                        }
+                        @if (Model.ApplicationSettings.Features.ExportAdvancedEnabled != null && Model.ApplicationSettings.Features.ExportAdvancedEnabled.Value && Model.ApplicationSettings.Features.TasksEnabled != null && Model.ApplicationSettings.Features.TasksEnabled.Value)
+                        {
+                            <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="tasktemplates" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.ExportTemplates, "Export task templates") ?? "Export task templates")"><i class="fa fa-file-excel"></i></button>
+                        }
+
+                    }
+                }
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row pt-1" style="height:calc(100vh - 165px);">
+            <div class="col-xl-3 d-none d-xl-inline-block" style="padding-right: 15px">
+                <div class="card card-filter h-100">
+                    <div class="card-header pb-0 d-flex" style="border-bottom: none;width:100%">
+                        <h3 class="card-title d-flex" style="width:100%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.CardTitle, "Filters") ?? "Filters")</h3>
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn" onclick="areaFilter_v2.reset('block'); ezgoTaskTemplatesOverview.resetFilters();" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body card-filter pt-0">
+                        <partial name="_filters_block" model="Model.Filter" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12 col-xl-9" style="padding-left: 7.5px">
+                <div class="card template-searchbar" style="margin-left: 0px">
+                    <div class="card-header d-flex" style="margin-left:-11px; height: 55px">
+                        <div style="display: flex; height: 100%; width: 100%; align-items: center">
+                            <h3 id="cardHeader" class="card-title d-sm-inline-block" style="min-width: 200px">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsTaskTitle, "Task templates") ?? "Task templates") (<span id="totalCounter">total</span>)
+                            </h3>
+                        </div>
+                        <div class="d-xl-none" style="width: 100%;text-align: right; padding-right: 10px">
+                            <div class="collapseFilter collapse">
+                                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" style="width: 80px" onclick="ezgoTaskTemplatesOverview.showInlineTagFilterModal()">Filter tags</button>
+                                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" style="width: 80px" onclick="ezgoTaskTemplatesOverview.showInlineAreaFilterModal()">Filter area</button>
+                            </div>
+                        </div>
+                        <div style="width: auto; text-align: right">
+                            <div class="card-tools" style="width: 236px; display: inline-block">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" id="templatesSearchBox" name="templatesSearchBox" class="form-control float-right" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.Search, "Search") ?? "Search")" data-boxtype="search">
+
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                        <button type="button" class="btn btn-default d-block d-xl-none" data-toggle="collapse" data-target=".collapseFilter"><i class="fas fa-filter"></i></button>
+                                        <button type="button" class="btn btn-default d-xl-none" onclick="areaFilter_v2.reset('block'); ezgoTaskTemplatesOverview.resetFilters()" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-xl-none" style="padding-left: 5px; padding-right: 5px">
+                        <div class="card-header collapse collapseFilter px-0">
+                            <partial name="_filters_inline" model="Model.Filter" />
+                        </div>
+                    </div>
+                </div>
+                <div id="contentBody" class="pr-3" style="height: calc(100vh - 252px);overflow:auto; padding-left: 0px">
+                    <partial name="_overview" model="@Model" />
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="panel-wrap" id="MyPopup">
+    <div id="userflyout" class="card shadow" style="height: 100vh;">
+        <div id="taskProfileContainer" class="card-body">
+            <partial name="_taskprofile" model="Model.CurrentTaskTemplate" />
+        </div>
+
+        <div class="card-footer text-right">
+            <button type="button" class="btn btn-secondary" id="btn-close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.DialogClose, "Close") ?? "Close")</button>
+            <button class="btn btn-success" id="btn-save" type="button">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.BtnSave, "Save") ?? "Save")</button>
+        </div>
+    </div>
+</div>
+
+<a id="back-to-top" href="#" class="btn btn-ezgo btn-lg back-to-top shadow" role="button"><i class="fas fa-chevron-up"></i></a>
+
+
+
+<!-- Modal tags filter -->
+<div class="modal fade" id="modalTagsFilter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLongTitle">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagsFiltering, "Tags filtering") ?? "Tags filtering")</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" style="display: flex; justify-content: center">
+                <div id="tagsModalBody" style="overflow-x: scroll">
+                    <div class="col-12 p-0 pb-3" data-item="steps-view">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsMainTitle, "Tags") ?? "Tags")</h3>
+                            </div>
+                            <div class="card-body px-3 pb-3 pt-0">
+                                <partial name="_tags_filtering_block" model="Model.Filter" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal inline area filter -->
+<div class="modal fade" id="modalInlineAreaFilter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content" style="overflow-y: scroll">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLongTitle">Filter area</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" style="display: flex; justify-content: center">
+                <div style="width: 80%">
+                    <div class="col-12 p-0 pb-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 style="font-weight: 700" class="card-title">@(Model.CmsLanguage?.GetValue(LanguageKeys.Filters.AreaTitle, "Area") ?? "Area")</h3>
+                            </div>
+                            <div class="card-body pb-3 pt-0">
+                                <div id="inlineAreaTree" style="overflow-y: hidden"></div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="/js/areafilter_v2.js"></script>
+    @if (Model.ApplicationSettings?.Features?.ExportAdvancedEnabled == true || Model.ApplicationSettings?.Features?.ExportEnabled == true)
+    {
+        <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+        <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+    }
+
+    @if (Model.ApplicationSettings?.Features?.AnalyticsEnabled == true)
+    {
+        <script src="~/js/analytics.js"></script>
+        <script>ezgoAnalytics.init('task');</script>
+    }
+
+    <script>
+        var areaid = 0;
+        var analyticsEnabled = @(Json.Serialize(Model.ApplicationSettings.Features.ExportAdvancedEnabled.Value || Model.ApplicationSettings.Features.ExportEnabled.Value));
+        areaFilter_v2.init('/config/getareatree', 'task');
+
+        var ezgoTaskTemplatesOverview = {
+            filters: {
+                listtype: 'task',
+                limit: 20,
+                offset: 0,
+                filterText: "",
+                areaid: null,
+                tagids: [],
+                roles: [],
+                instructionsAttached: null,
+                photosAttached: null,
+                videosAttached: null,
+                recurrency:''
+            },
+            loadingMore: false,
+            taskTemplatesLoaded: false,
+            mostRecentRequest: null,
+            mostRecentCountsRequest: null,
+            @if(Model.ApplicationSettings.Features.TagsEnabled.HasValue && Model.ApplicationSettings.Features.TagsEnabled.Value)
+            {
+            <text>
+            showInlineTagFilterModal: function() {
+                $('#modalTagsFilter').modal('show');
+            },
+            </text>
+            }
+            saveFilters: function() {
+                localStorage.setItem('task_filters', JSON.stringify(ezgoTaskTemplatesOverview.filters));
+            },
+            showInlineAreaFilterModal: function() {
+                $('#modalInlineAreaFilter').modal('show');
+            },
+            resetFilters: function () {
+                ezgoTaskTemplatesOverview.filters = {
+                    limit: 20,
+                    offset: 0,
+                    filterText: "",
+                    areaid: null,
+                    tagids: [],
+                    roles: [],
+                    instructionsAttached: null,
+                    photosAttached: null,
+                    videosAttached: null,
+                    recurrency:''
+                };
+
+                $('#templatesSearchBox').val('');
+
+                ezgoTaskTemplatesOverview.taskTemplatesLoaded = false;
+                //clear results
+                ezgoTaskTemplatesOverview.filters.offset = 0;
+                $('#contentCol').html('');
+                //retrieve
+                ezgoTaskTemplatesOverview.retrieve();
+                ezgoTaskTemplatesOverview.retrieveCounts();
+                ezgoTaskTemplatesOverview.saveFilters();
+            },
+            getRetrieveUriParams(url) {
+                let urlParams = [];
+                let loadTaskTemplateRequestURL = "";
+
+                if (ezgoTaskTemplatesOverview.filters.areaid != "" && ezgoTaskTemplatesOverview.filters.areaid != null) {
+                    urlParams.push("areaid=" + ezgoTaskTemplatesOverview.filters.areaid);
+                }
+
+                if (ezgoTaskTemplatesOverview.filters.filterText.length > 0) {
+                    urlParams.push("filterText=" + encodeURIComponent(ezgoTaskTemplatesOverview.filters.filterText));
+                }
+
+                if (ezgoTaskTemplatesOverview.filters.instructionsAttached != null) {
+                    urlParams.push("instructionsadded=" + ezgoTaskTemplatesOverview.filters.instructionsAttached);
+                }
+
+                if (ezgoTaskTemplatesOverview.filters.photosAttached != null) {
+                    urlParams.push("photosadded=" + ezgoTaskTemplatesOverview.filters.photosAttached);
+                }
+
+                if (ezgoTaskTemplatesOverview.filters.videosAttached != null) {
+                    urlParams.push("videosadded=" + ezgoTaskTemplatesOverview.filters.videosAttached);
+                }
+
+                if (ezgoTaskTemplatesOverview.filters.roles != null && ezgoTaskTemplatesOverview.filters.roles.length > 0) {
+                    urlParams.push("roles=" + ezgoTaskTemplatesOverview.filters.roles.join(","));
+                }
+
+                if (ezgoTaskTemplatesOverview.filters.recurrency != null && ezgoTaskTemplatesOverview.filters.recurrency.length > 0) {
+                    urlParams.push("recurrency=" + ezgoTaskTemplatesOverview.filters.recurrency.join(","));
+                }
+
+
+                if (ezgoTaskTemplatesOverview.filters.tagids != null && ezgoTaskTemplatesOverview.filters.tagids.length > 0) {
+                    urlParams.push("tagids=" + ezgoTaskTemplatesOverview.filters.tagids.join(","));
+                }
+
+                if (ezgoTaskTemplatesOverview.filters.limit > 0) {
+                    urlParams.push("limit=" + ezgoTaskTemplatesOverview.filters.limit);
+                }
+
+                if (ezgoTaskTemplatesOverview.filters.offset > 0) {
+                    urlParams.push("offset=" + ezgoTaskTemplatesOverview.filters.offset);
+                }
+
+                if (urlParams.length > 0) {
+                    loadTaskTemplateRequestURL = url + '?' + urlParams.join('&');
+                }
+                else {
+                    loadTaskTemplateRequestURL = url;
+                }
+
+                return loadTaskTemplateRequestURL;
+            },
+            retrieveCounts: function () {
+                let loadTaskTemplateCountsRequestURL = "";
+                let baseUrl = '/gettaskscounts';
+
+                loadTaskTemplateCountsRequestURL = ezgoTaskTemplatesOverview.getRetrieveUriParams(baseUrl);
+
+                if (ezgoTaskTemplatesOverview.mostRecentCountsRequest != null) {
+                    ezgoTaskTemplatesOverview.mostRecentCountsRequest.abort();
+                }
+                $('#totalCounter').html('Loading...');
+                ezgoTaskTemplatesOverview.mostRecentCountsRequest = $.ajax({
+                    type: "GET",
+                    url: loadTaskTemplateCountsRequestURL,
+                    success: function (data) {
+                        //set total 
+                        $('#totalCounter').html(data);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.statusText == "abort") {
+                            return;
+                        }
+                        else { 
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        }
+                        $('#actionOverviewLoader').hide();
+                    }
+                });
+            },
+            retrieve: function () {
+                let loadTaskTemplatesRequestURL = "";
+                let baseUrl = '/gettasks';
+                if (ezgoTaskTemplatesOverview.taskTemplatesLoaded) {
+                    return;
+                }
+                //show loader
+                $('#taskTemplatesOverviewLoader').show();
+
+                loadTaskTemplatesRequestURL = ezgoTaskTemplatesOverview.getRetrieveUriParams(baseUrl);
+
+                if (ezgoTaskTemplatesOverview.mostRecentRequest != null) {
+                    ezgoTaskTemplatesOverview.mostRecentRequest.abort();
+                }
+
+                ezgoTaskTemplatesOverview.mostRecentRequest = $.ajax({
+                    type: "GET",
+                    url: loadTaskTemplatesRequestURL,
+                    success: function (data) {
+                        $('#taskTemplatesOverviewLoader').hide();
+                        $('#contentCol').append(data);
+
+                        var amountOfTaskTemplates = $('#taskTemplatesCounter').val();
+                        if (amountOfTaskTemplates == 0 && ezgoTaskTemplatesOverview.filters.offset == 0) {
+                            $('#noTaskTemplatesFound').show();
+                            ezgoTaskTemplatesOverview.taskTemplatesLoaded = true;
+                        }
+                        else if (amountOfTaskTemplates < 20) {
+                            ezgoTaskTemplatesOverview.taskTemplatesLoaded = true;
+                        }
+                        $('#taskTemplatesCounter').remove();
+                        
+                        ezgoTaskTemplatesOverview.loadingMore = false;
+
+                        ezgoTaskTemplatesOverview.filters.offset += 20;
+
+                        ezgomediafetcher.preloadVisibleImagesAndVideos();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.statusText == "abort") {
+                            return;
+                        }
+                        else { 
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        }
+                        $('#actionOverviewLoader').hide();
+                    }
+                });
+            },
+            initHandlers: function () {
+                //event handlers for filters
+                $('#areatree').on('click', 'a', function () {
+                    var areaDeselected = +$(this).data('id') != areaid;
+
+                    if (areaDeselected) {
+                        ezgoTaskTemplatesOverview.filters.areaid = null;
+                    }
+                    else {
+                        ezgoTaskTemplatesOverview.filters.areaid = $(this).data('id');
+                    }
+                    ezgoTaskTemplatesOverview.taskTemplatesLoaded = false;
+                    //clear results
+                    ezgoTaskTemplatesOverview.filters.offset = 0;
+                    $('#contentCol').html('');
+                    //retrieve
+                    ezgoTaskTemplatesOverview.retrieve();
+                    ezgoTaskTemplatesOverview.retrieveCounts();
+                    ezgoTaskTemplatesOverview.saveFilters();
+                });
+                
+                $('#inlineAreaTree').on('click', 'a', function () {
+                    var areaDeselected = +$(this).data('id') != areaid;
+
+                    if (areaDeselected) {
+                        ezgoTaskTemplatesOverview.filters.areaid = null;
+                    }
+                    else {
+                        ezgoTaskTemplatesOverview.filters.areaid = $(this).data('id');
+                    }
+                    ezgoTaskTemplatesOverview.taskTemplatesLoaded = false;
+                    //clear results
+                    ezgoTaskTemplatesOverview.filters.offset = 0;
+                    $('#contentCol').html('');
+                    //retrieve
+                    ezgoTaskTemplatesOverview.retrieve();
+                    ezgoTaskTemplatesOverview.retrieveCounts();
+                    ezgoTaskTemplatesOverview.saveFilters();
+                });
+
+                $('#contentBody').scroll(function () {
+                    //if at bottom, load more actions
+                    if ($('#contentBody').scrollTop() + $('#contentBody')[0].offsetHeight + 50 >= $('#contentBody')[0].scrollHeight && !ezgoTaskTemplatesOverview.loadingMore && !ezgoTaskTemplatesOverview.taskTemplatesLoaded) {
+                        ezgoTaskTemplatesOverview.loadingMore = true;
+
+                        ezgoTaskTemplatesOverview.retrieve();
+                    }
+                    else { 
+                        ezgomediafetcher.preloadVisibleImagesAndVideos();
+                    }
+                });
+
+                $('#back-to-top').click(function () {
+                    $('#contentBody').animate({
+                        scrollTop: 0
+                    }, 400);
+                    return false;
+                });
+
+                $("#templatesSearchBox").on("keyup", function () {
+                    var value = $(this).val().toLowerCase().trim();
+                    ezgoTaskTemplatesOverview.filters.filterText = value;
+
+                    ezgoTaskTemplatesOverview.taskTemplatesLoaded = false;
+                    //clear results
+                    ezgoTaskTemplatesOverview.filters.offset = 0;
+                    $('#contentCol').html('');
+                    //retrieve
+                    ezgoTaskTemplatesOverview.retrieve();
+                    ezgoTaskTemplatesOverview.retrieveCounts();
+                    ezgoTaskTemplatesOverview.saveFilters();
+                });
+
+                @if(Model.ApplicationSettings.Features.TagsEnabled.HasValue && Model.ApplicationSettings.Features.TagsEnabled.Value)
+                {
+                    <text>
+                        $('.btn-tagsfilter').on('click', function() {
+                            $('#modalTagsFilter').modal('show');
+                        });
+
+                        $('.modal-filter-tag').on('click', function(e) {
+                            var tagId = $(this).data('id');
+                            if($($(this).children()[0]).hasClass('selected-tag'))
+                            {
+                                $(`#filter-tag-${tagId}`).css('display', 'flex');
+                            }
+                            else {
+                                $(`#filter-tag-${tagId}`).css('display', 'none');
+                            }
+                        
+                            ezgoTaskTemplatesOverview.filters.tagids = [];
+                            $('[id^="filter-tag-"]').each(function (index, elem) {
+                                var tagSelected = $(this).css('display') == 'flex';
+                                var tagSelectedId = $(this).data('tag');
+                                if (tagSelected) {
+                                    ezgoTaskTemplatesOverview.filters.tagids.push(+tagSelectedId)
+                                }
+                            });
+
+                            ezgoTaskTemplatesOverview.taskTemplatesLoaded = false;
+                            //clear results
+                            ezgoTaskTemplatesOverview.filters.offset = 0;
+                            $('#contentCol').html('');
+                            //retrieve
+                            ezgoTaskTemplatesOverview.retrieve();
+                            ezgoTaskTemplatesOverview.retrieveCounts();
+                            ezgoTaskTemplatesOverview.saveFilters();
+                        });
+
+                    </text>
+    
+                }
+
+                $('#roleFilter').on('change', function () {
+                    var roleFilterValue = $(this).val();
+                    ezgoTaskTemplatesOverview.filters.roles = roleFilterValue;
+
+                    ezgoTaskTemplatesOverview.taskTemplatesLoaded = false;
+                    //clear results
+                    ezgoTaskTemplatesOverview.filters.offset = 0;
+                    $('#contentCol').html('');
+                    //retrieve
+                    ezgoTaskTemplatesOverview.retrieve();
+                    ezgoTaskTemplatesOverview.retrieveCounts();
+                    ezgoTaskTemplatesOverview.saveFilters();
+                });
+
+                $('#roleFilterInline').on('change', function (e) {
+                    $('#roleFilter').selectpicker('val', $('#roleFilterInline').val());
+                    $('#roleFilter').selectpicker('refresh');
+                    $('#roleFilter').trigger('change');
+                });
+
+
+                $('#recurrenceFilter').on('change', function () {
+                    var recurrenceFilterValue = $(this).val();
+                    ezgoTaskTemplatesOverview.filters.recurrency = recurrenceFilterValue;
+
+                    ezgoTaskTemplatesOverview.taskTemplatesLoaded = false;
+                    //clear results
+                    ezgoTaskTemplatesOverview.filters.offset = 0;
+                    $('#contentCol').html('');
+                    //retrieve
+                    ezgoTaskTemplatesOverview.retrieve();
+                    ezgoTaskTemplatesOverview.retrieveCounts();
+                    ezgoTaskTemplatesOverview.saveFilters();
+                });
+
+                $('#recurrenceFilterInline').on('change', function (e) {
+                    $('#recurrenceFilter').selectpicker('val', $('#recurrenceFilterInline').val());
+                    $('#recurrenceFilter').selectpicker('refresh');
+                    $('#recurrenceFilter').trigger('change');
+                });
+
+                $('#instructionFilter').on('change', function () {
+                    var instructionFilterValue = $(this).val();
+                    if (instructionFilterValue == '') {
+                        ezgoTaskTemplatesOverview.filters.instructionsAttached = null;
+                    }
+                    else if(instructionFilterValue == 'true') {
+                        ezgoTaskTemplatesOverview.filters.instructionsAttached = true;
+                    }
+                    else if(instructionFilterValue == 'false') {
+                        ezgoTaskTemplatesOverview.filters.instructionsAttached = false;
+                    }
+
+                    ezgoTaskTemplatesOverview.taskTemplatesLoaded = false;
+                    //clear results
+                    ezgoTaskTemplatesOverview.filters.offset = 0;
+                    $('#contentCol').html('');
+                    //retrieve
+                    ezgoTaskTemplatesOverview.retrieve();
+                    ezgoTaskTemplatesOverview.retrieveCounts();
+                    ezgoTaskTemplatesOverview.saveFilters();
+                });
+
+                $('#instructionFilterInline').on('change', function (e) {
+                    $('#instructionFilter').selectpicker('val', $('#instructionFilterInline').val());
+                    $('#instructionFilter').selectpicker('refresh');
+                    $('#instructionFilter').trigger('change');
+                });
+
+                $('#imageFilter').on('change', function () {
+                    var imageFilterValue = $(this).val();
+                    if (imageFilterValue == '') {
+                        ezgoTaskTemplatesOverview.filters.photosAttached = null;
+                    }
+                    else if(imageFilterValue == 'true') {
+                        ezgoTaskTemplatesOverview.filters.photosAttached = true;
+                    }
+                    else if(imageFilterValue == 'false') {
+                        ezgoTaskTemplatesOverview.filters.photosAttached = false;
+                    }
+
+                    ezgoTaskTemplatesOverview.taskTemplatesLoaded = false;
+                    //clear results
+                    ezgoTaskTemplatesOverview.filters.offset = 0;
+                    $('#contentCol').html('');
+                    //retrieve
+                    ezgoTaskTemplatesOverview.retrieve();
+                    ezgoTaskTemplatesOverview.retrieveCounts();
+                    ezgoTaskTemplatesOverview.saveFilters();
+                });
+
+                $('#imageFilterInline').on('change', function (e) {
+                    $('#imageFilter').selectpicker('val', $('#imageFilterInline').val());
+                    $('#imageFilter').selectpicker('refresh');
+                    $('#imageFilter').trigger('change');
+                });
+
+                $('#videoFilter').on('change', function () {
+                    var videoFilterValue = $(this).val();
+                    if (videoFilterValue == '') {
+                        ezgoTaskTemplatesOverview.filters.videosAttached = null;
+                    }
+                    else if (videoFilterValue == 'true') {
+                        ezgoTaskTemplatesOverview.filters.videosAttached = true;
+                    }
+                    else if (videoFilterValue == 'false') {
+                        ezgoTaskTemplatesOverview.filters.videosAttached = false;
+                    }
+
+                    ezgoTaskTemplatesOverview.taskTemplatesLoaded = false;
+                    //clear results
+                    ezgoTaskTemplatesOverview.filters.offset = 0;
+                    $('#contentCol').html('');
+                    //retrieve
+                    ezgoTaskTemplatesOverview.retrieve();
+                    ezgoTaskTemplatesOverview.retrieveCounts();
+                    ezgoTaskTemplatesOverview.saveFilters();
+                });
+
+                $('#videoFilterInline').on('change', function (e) {
+                    $('#videoFilter').selectpicker('val', $('#videoFilterInline').val());
+                    $('#videoFilter').selectpicker('refresh');
+                    $('#videoFilter').trigger('change');
+                });
+            }
+
+        };
+
+
+        $(document).ready(function () {
+
+            //clear no templates found message
+            $('#contentCol').html('');
+
+            $('#back-to-top').fadeOut();
+
+            ezgoTaskTemplatesOverview.initHandlers();
+
+            var filters = localStorage.getItem('task_filters');
+
+            if (filters !== null) {
+                var filtersJson = JSON.parse(filters);
+                var filterObj = filtersJson;
+
+                if (filtersJson.hasOwnProperty('areaid') &&
+                    filtersJson.hasOwnProperty('filterText') &&
+                    filtersJson.hasOwnProperty('instructionsAttached') &&
+                    filtersJson.hasOwnProperty('limit') &&
+                    filtersJson.hasOwnProperty('offset') &&
+                    filtersJson.hasOwnProperty('photosAttached') &&
+                    filtersJson.hasOwnProperty('videosAttached') &&
+                    filtersJson.hasOwnProperty('roles') &&
+                    filtersJson.hasOwnProperty('tagids')) {
+
+                    ezgoTaskTemplatesOverview.filters = filtersJson;
+                    ezgoTaskTemplatesOverview.filters.offset = 0;
+                    ezgoTaskTemplatesOverview.filters.limit = 20;
+
+                    areaid = ezgoTaskTemplatesOverview.filters.areaid;
+
+                    //filterText init
+                    $('#templatesSearchBox').val(ezgoTaskTemplatesOverview.filters.filterText);
+
+                    //areafilter init
+                    if (areaid != undefined && areaid !== 0) {
+                        //open area tree sections
+                        var level = $('#areatree li a[data-id="' + filterObj.areaid + '"]').parent('li').data('level') === undefined ? 0 : $('#areatree li a[data-id="' + filterObj.areaid + '"]').parent('li').data('level');
+                        var pid = $('#areatree a[data-id="' + filterObj.areaid + '"]');
+                        areaFilter_v2.selectAreaNode(pid[0]);
+                        for (i = 0; i < level; i++) {
+                            pid = areaFilter_v2.nextSibling(pid);
+                        }
+                        //make areatree parent li's child anchors bold
+                        var areaElem = $('#areatree a[data-id="' + filterObj.areaid + '"]');
+                        var areaElemParentLi = areaElem.closest('ul').closest('li');
+                        while (areaElemParentLi.length) {
+                            $(areaElemParentLi.children('a')[0]).css("font-weight", "700");
+                            areaElemParentLi = areaElemParentLi.closest('ul').closest('li');
+                        }
+
+                        //open inline area tree sections
+                        var inlineLevel = $('#inlineAreaTree li a[data-id="' + filterObj.areaid + '"]').parent('li').data('level') === undefined ? 0 : $('#inlineAreaTree li a[data-id="' + filterObj.areaid + '"]').parent('li').data('level');
+                        var inlinePid = $('#inlineAreaTree a[data-id="' + filterObj.areaid + '"]');
+
+                        areaFilter_v2.selectAreaNode(inlinePid[0]);
+                        for (i = 0; i < inlineLevel; i++) {
+                            inlinePid = areaFilter_v2.nextSibling(inlinePid);
+                        }
+
+                        //make inline area tree parent li's child anchors bold
+                        var inlineAreaElem = $('#inlineAreaTree a[data-id="' + filterObj.areaid + '"]');
+                        var inlineAreaElemParentLi = inlineAreaElem.closest('ul').closest('li');
+                        while (inlineAreaElemParentLi.length) {
+                            $(inlineAreaElemParentLi.children('a')[0]).css("font-weight", "700");
+                            inlineAreaElemParentLi = inlineAreaElemParentLi.closest('ul').closest('li');
+                        }
+                    }
+
+                    //tagsfilter init
+                    if ($("#tagsfilter")[0] != null && ezgoTaskTemplatesOverview.filters.tagids != null && ezgoTaskTemplatesOverview.filters.tagids.length) {
+                        $('[id^="filter-tag-"]').each(function (index, elem) {
+                            if (ezgoTaskTemplatesOverview.filters.tagids.includes(+$(elem).data('tag'))) {
+                                $(elem).show();
+                                toggleStyle(+$(elem).data('tag'));
+                            }
+                        });
+                    }
+
+                    //rolesfilter init
+                    if ($('#roleFilter')[0] != null) {
+                        if (ezgoTaskTemplatesOverview.filters.roles != null && Object.prototype.toString.call(ezgoTaskTemplatesOverview.filters.roles) === "[object String]") {
+                            $('#roleFilter').selectpicker('val', ezgoTaskTemplatesOverview.filters.roles.split(','));
+                            $('#roleFilterInline').selectpicker('val', ezgoTaskTemplatesOverview.filters.roles.split(','));
+                        }
+                        else if (ezgoTaskTemplatesOverview.filters.roles != null && Array.isArray(ezgoTaskTemplatesOverview.filters.roles)) {
+                            $('#roleFilter').selectpicker('val', ezgoTaskTemplatesOverview.filters.roles);
+                            $('#roleFilterInline').selectpicker('val', ezgoTaskTemplatesOverview.filters.roles);
+                        }
+                    }
+
+                    //instructions attached init
+                    if ($("#instructionFilter")[0] != null && ezgoTaskTemplatesOverview.filters.instructionsAttached != null) {
+                        $("#instructionFilter").val(ezgoTaskTemplatesOverview.filters.instructionsAttached.toString()).selectpicker("refresh");
+                        $("#instructionFilterInline").val(ezgoTaskTemplatesOverview.filters.instructionsAttached.toString()).selectpicker("refresh");
+                    }
+
+                    //photo attached
+                    if ($("#imageFilter")[0] != null && ezgoTaskTemplatesOverview.filters.photosAttached != null) {
+                        $("#imageFilter").val(ezgoTaskTemplatesOverview.filters.photosAttached.toString()).selectpicker("refresh");
+                        $("#imageFilterInline").val(ezgoTaskTemplatesOverview.filters.photosAttached.toString()).selectpicker("refresh");
+                    }
+
+
+                    //video attached
+                    if ($("#videoFilter")[0] != null && ezgoTaskTemplatesOverview.filters.videosAttached != null) {
+                        $("#videoFilter").val(ezgoTaskTemplatesOverview.filters.videosAttached.toString()).selectpicker("refresh");
+                        $("#videoFilterInline").val(ezgoTaskTemplatesOverview.filters.videosAttached.toString()).selectpicker("refresh");
+                    }
+                }
+            }
+            else {
+                localStorage.removeItem('task_filters');
+                ezgoTaskTemplatesOverview.filters.offset = 0;
+                ezgoTaskTemplatesOverview.filters.limit = 20;
+            }
+
+            ezgomediafetcher.preloadVisibleImagesAndVideos();
+            ezgoTaskTemplatesOverview.retrieve();
+            ezgoTaskTemplatesOverview.retrieveCounts();
+            ezgoTaskTemplatesOverview.saveFilters();
+        });
+
+        
+        @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+        {
+            <text>
+                    $("#templatesSearchBox").on("focusout", function () {
+                        var value = $(this).val().toLowerCase();
+
+                        if (value.length > 0) {
+                            ezgoAnalytics.customLog("Search", "Search used", "task", "search value:" + value);
+                        }
+                    });
+            </text>
+        }
+
+    </script>   
+}
+
+

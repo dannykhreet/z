@@ -1,0 +1,1511 @@
+﻿@model ActionViewModel
+@{
+    Dictionary<string, string> CmsLanguage = Model?.CmsLanguage;
+    Layout = "_Layout_template";
+    ViewData["Title"] = CmsLanguage?.GetValue(LanguageKeys.Action.DetailsTitle, "Action details") ?? "Action details";
+    int? taskId = Model.TaskId > 0 ? Model.TaskId : new Nullable<int>();
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+}
+
+<style>
+    form.inline-form {
+    margin-top: auto;
+    display: inline-block;
+    }
+
+    div.card.detail.isresolved {
+    border-bottom: solid 2px #93c54b;
+    }
+
+    div.card.detail.isoverdue {
+    border-bottom: solid 2px #dc3545;
+    }
+
+    .tag-card {
+    display: flex;
+    width: 9em;
+    color: white;
+    align-content: center;
+    align-items: center;
+    }
+
+    .tag-wrapper {
+    width: 100%;
+    width: -moz-available;
+    width: -webkit-fill-available;
+    display: flex;
+    height: 2.6em;
+    line-height: 1.1;
+    }
+
+    .tag-span {
+    text-align: center;
+    align-self: center;
+    display: inline-block;
+    width: 100%;
+    width: -moz-available;
+    width: -webkit-fill-available;
+    }
+
+    .nav-icon {
+    float: left;
+    display: inline-block;
+    }
+
+    .itemlist.user .card {
+    width: 8rem;
+    }
+
+    .itemlist .card {
+    width: 10rem;
+    }
+
+    .itemlist .card {
+    margin-bottom: 0px !important;
+    }
+
+    .itemlist .card-link img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    }
+
+    .input-invalid {
+    border-bottom: solid 2px #dc3545;
+    }
+
+    .img-container {
+    border-radius: 0.25em;
+    overflow: hidden;
+    width: 100%;
+    position: relative; /* If you want text inside of it */
+    }
+
+    .img-container > a {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    }
+
+    .img-container > a > img {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+    }
+
+    #userDataForSelectedTemplateContainer {
+        border-radius: 5px;
+        border: 2px solid grey;
+        padding: 5px;
+    }
+
+    #userDataItemsForSelectedTemplateContainer {
+        border-radius: 5px;
+        border: 2px solid grey;
+        padding: 5px;
+    }
+
+    .linkableChecklistItem:hover {
+        background-color: #93c54b;
+    }
+
+    .linkableAuditItem:hover {
+        background-color: #93c54b;
+    }
+
+    .linkableTask:hover {
+        background-color: #93c54b;
+    }
+
+    [id^="completedChecklist-"]:hover {
+        background-color: #93c54b;
+    }
+
+    [id^="completedAudit-"]:hover {
+        background-color: #93c54b;
+    }
+
+    [id^="completedTask-"]:hover {
+        background-color: #93c54b;
+    }
+
+    [id^="completedChecklist-"].selectedTemplateToLink {
+        background-color: #BEFF61;
+        border: 2px solid black;
+        border-radius: 5px;
+    }
+
+    [id^="completedAudit-"].selectedTemplateToLink {
+        background-color: #BEFF61;
+        border: 2px solid black;
+        border-radius: 5px;
+    }
+
+    .linkableChecklistItem.selectedToLink {
+        background-color: #BEFF61;
+        border: 2px solid black;
+        border-radius: 5px;
+    }
+
+    .linkableAuditItem.selectedToLink {
+        background-color: #BEFF61;
+        border: 2px solid black;
+        border-radius: 5px;
+    }
+
+    .linkableTask.selectedToLink {
+        background-color: #BEFF61;
+        border: 2px solid black;
+        border-radius: 5px;
+    }
+
+    #userDataForSelectedTemplate {
+        max-height: 50vh;
+        overflow-y: scroll;
+    }
+</style>
+
+<!-- Completed checklist display-->
+<style>
+    .my-circle {
+        display: inline-block;
+        border-radius: 60px;
+        padding: 0.8em 1.1em;
+        background-color: #3f903f;
+        color: #fff;
+    }
+
+        .my-circle i {
+            font-size: 20px;
+        }
+
+    .status-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff !important;
+        flex-grow: 0;
+        flex-shrink: 0;
+    }
+
+    .status-icon {
+        display: flex;
+        margin: auto;
+        font-size: 1.3em;
+    }
+
+    .infoText {
+        position: fixed;
+        right: 0;
+        top: 0;
+        margin: 10px;
+    }
+
+    .score {
+        color: #fff;
+        width: 40px;
+        height: 40px;
+        padding: 3px 10px 0px 14px;
+        font-size: 23px;
+    }
+
+    .score-large {
+        color: #fff;
+        width: 40px;
+        height: 40px;
+        padding: 3px 0px 0px 8px;
+        font-size: 23px;
+    }
+
+    .checklistOngoing {
+        background-color: #93C54B;
+        border-radius: 20px;
+        color: white;
+        width: 80px;
+        padding: 0.2rem 0.5rem 0.2rem 0.5rem;
+        text-align: center;
+        float: right;
+    }
+
+    .ongoingSelected {
+        background-color: white;
+        color: #93C54B;
+    }
+
+    .editedByUserPicture {
+        min-width: 40px;
+        width: 40px;
+        height: 40px;
+        top: 0px;
+        background-size: cover;
+        border-radius: 50%;
+        position: absolute;
+    }
+
+    .editedByUserOverlay {
+        min-width: 40px;
+        width: 40px;
+        height: 40px;
+        background-size: cover;
+        border-radius: 50%;
+        position: absolute;
+        top: 0px;
+        right: 5px;
+        color: white;
+        font-size: 20px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(147,197,75,.7)
+    }
+
+    .no-border {
+        border: 0px;
+    }
+
+    .stageContainer {
+        border: 0px solid white;
+        border-radius: 10px;
+    }
+
+    .stageHeader {
+        border-radius: 10px 10px 0px 0px;
+        color: white;
+        font-size: 16px;
+        letter-spacing: 1px;
+    }
+
+    .stageBody {
+        border-radius: 0px 0px 10px 10px;
+    }
+
+    .checklistItem {
+        border-radius: 10px;
+        background-color: white;
+    }
+
+    .stageBody li:first-child {
+        margin-top: 0px !important;
+    }
+
+    .stageBody li:last-child {
+        margin-bottom: 0px !important;
+    }
+
+    .separateChecklistItem {
+        border-radius: 10px;
+        background-color: white;
+        box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.07), 1px 2px 2px 1px rgba(0, 0, 0, 0.07), 1px 3px 3px 1px rgba(0, 0, 0, 0.07), 1px 4px 4px 1px rgba(0, 0, 0, 0.07);
+    }
+
+
+
+    .itemEditedByUserPicture {
+        min-width: 40px;
+        width: 40px;
+        height: 40px;
+        background-size: cover;
+        border-radius: 50%;
+        position: absolute;
+    }
+
+    .itemEditedByUserOverlay {
+        min-width: 40px;
+        width: 40px;
+        height: 40px;
+        background-size: cover;
+        border-radius: 50%;
+        position: absolute;
+        top: 0px;
+        right: 5px;
+        color: white;
+        font-size: 20px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(147,197,75,.7)
+    }
+
+    .signedStageInfoOverlay {
+        min-height: 120px;
+        height: 100%;
+        width: 120px;
+        float: left;
+        border-radius: 10px 0px 0px 10px;
+        background-size: cover;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        bottom: 0px;
+        color: #1ED760;
+        font-size: 80px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(20,20,40,.5)
+    }
+
+    .showExtraStageInfo {
+        font-size: 32px;
+    }
+
+    .shiftNotesEntered {
+        font-size: 32px;
+        color: #93C54B;
+    }
+
+    .stageContainer {
+        border: 0px solid white;
+        border-radius: 10px;
+    }
+
+    .stageHeader {
+        border-radius: 10px 10px 0px 0px;
+        color: white;
+        font-size: 16px;
+        letter-spacing: 1px;
+    }
+
+    .stageBody {
+        border-radius: 0px 0px 10px 10px;
+    }
+
+    .checklistItem {
+        border-radius: 10px;
+        background-color: white;
+    }
+
+    .stageBody li:first-child {
+        margin-top: 0px !important;
+    }
+
+    .stageBody li:last-child {
+        margin-bottom: 0px !important;
+    }
+
+    .separateChecklistItem {
+        border-radius: 10px;
+        background-color: white;
+        box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.07), 1px 2px 2px 1px rgba(0, 0, 0, 0.07), 1px 3px 3px 1px rgba(0, 0, 0, 0.07), 1px 4px 4px 1px rgba(0, 0, 0, 0.07);
+    }
+
+    .itemEditedByUserPicture {
+        min-width: 40px;
+        width: 40px;
+        height: 40px;
+        background-size: cover;
+        border-radius: 50%;
+        position: absolute;
+    }
+
+    .itemEditedByUserOverlay {
+        min-width: 40px;
+        width: 40px;
+        height: 40px;
+        background-size: cover;
+        border-radius: 50%;
+        position: absolute;
+        top: 0px;
+        right: 5px;
+        color: white;
+        font-size: 20px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(147,197,75,.7)
+    }
+
+    .signedStageInfoOverlay {
+        min-height: 120px;
+        height: 100%;
+        width: 120px;
+        float: left;
+        border-radius: 10px 0px 0px 10px;
+        background-size: cover;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        bottom: 0px;
+        color: #1ED760;
+        font-size: 60px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(20,20,40,.5)
+    }
+
+    .showExtraStageInfo {
+        font-size: 32px;
+    }
+
+    .shiftNotesEntered {
+        font-size: 32px;
+        color: #93C54B;
+    }
+
+
+    .editedByUserPicture {
+        min-width: 40px;
+        width: 40px;
+        height: 40px;
+        top: 0px;
+        background-size: cover;
+        border-radius: 50%;
+        position: absolute;
+    }
+</style>
+
+<style>
+
+
+    .width-available {
+        width: 100%;
+        width: -moz-available;
+        width: -webkit-fill-available;
+    }
+</style>
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <a id="goBackToActionOverview" href="#" onclick=""><i class="fa fa-arrow-left"></i> @(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsBackToAction, "Back to action overview") ?? "Back to action overview")</a>
+                <h1>@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsTitle, "Action details") ?? "Action details")</h1>
+            </div>
+
+            <div class="col-sm-6 d-flex  flex-row-reverse">
+                @if ((!Model.CurrentAction?.IsResolved ?? false) && (User.IsInRole("manager") || (User.IsInRole("shift_leader") && Model.CurrentAction.CreatedById == Model.CurrentUser.Id)))
+                {
+                    <form asp-controller="action" asp-action="setresolved" asp-route-id="@Model.CurrentAction.Id" class="inline-form">
+                        <button type="submit" onclick="confirmChoice('@(Model?.CmsLanguage?.GetValue(LanguageKeys.Action.SetActionResolvedAlert, "You are about to mark this action as completed, are you sure?") ?? "You are about to mark this action as completed, are you sure?")', event)" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Action.SetActionResolved, "Set action completed") ?? "Set action completed")</button>
+                    </form>
+                    <a asp-controller="action" asp-action="edit" asp-route-id="@Model.CurrentAction?.Id" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto">@(CmsLanguage?.GetValue(LanguageKeys.Action.EditActionButton, "Edit action") ?? "Edit action")</a>
+                    if (Model?.CurrentUser != null && Model.CurrentUser.IsServiceAccount)
+                    {
+                        <button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" id="manageActionConnections">Manage action connections</button>
+                    }
+                }
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col col-md-8" style="height:calc(100vh - 175px);overflow:auto;">
+                <div class="card detail @((Model.CurrentAction?.IsResolved ?? false) ? "isresolved" : (Model.CurrentAction?.IsOverdue ?? false) ? "isoverdue": null)">
+                    <div class="card-header">
+                        <h3 class="card-title d-inline-block">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsTitle, "Details") ?? "Details")</h3>
+                        <h3 class="card-title d-inline-block float-right">
+                            @if (Model.CurrentAction.Parent?.Type == "audit")
+                            {
+                                <span class="badge badge-secondary">Audit: @Model.CurrentAction?.Parent?.AuditTemplateName </span>
+                                <span class="badge badge-secondary">Audit item: @Model.CurrentAction?.Parent?.TaskName</span>
+                            }
+                            else if (Model.CurrentAction.Parent?.Type == "checklist")
+                            {
+                                <span class="badge badge-secondary">Checklist: @Model.CurrentAction?.Parent?.ChecklistTemplateName </span>
+                                <span class="badge badge-secondary">Checklist item: @Model.CurrentAction?.Parent?.TaskName</span>
+                            }
+                            else if (Model.CurrentAction.Parent?.Type == "task")
+                            {
+                                <span class="badge badge-secondary">Task: @Model.CurrentAction?.Parent?.TaskName </span>
+                            }
+                        </h3>
+                    </div>
+
+                    <div class="card-body">
+                        <p class="mb-2"><span class="text-muted">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsActionTitle, "Action") ?? "Action"):</span><br />@Model.CurrentAction?.Description</p>
+                        <p class="mb-2"><span class="text-muted">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsCommentTitle, "Comment") ?? "Comment"):</span><br />@Model.CurrentAction?.Comment</p>
+                        <p class="mb-2"><span class="text-muted">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsAuthorTitle, "Author") ?? "Author"):</span><br />@Model.CurrentAction?.CreatedBy</p>
+
+                        <ul id="datelist" class="list-inline card-group mt-3 itemlist">
+                            <li class="list-inline-item pb-3 pr-3">
+                                <span class="text-muted">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsStartedTitle, "Started") ?? "Started"):</span><br />@Model.CurrentAction?.CreatedAt.ToLocaleLongDateString(Model.Locale)
+                            </li>
+
+                            <li class="list-inline-item pb-3 px-3">
+                                <span class="text-muted">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsModifiedTitle, "Modification date") ?? "Modification date"):</span><br />@Model.CurrentAction?.ModifiedAt.ToLocaleLongDateString(Model.Locale)
+                            </li>
+
+                            <li class="list-inline-item pb-3 px-3 @((Model.CurrentAction?.IsOverdue ?? false) ? "text-danger": null)">
+                                <span class="text-muted">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsDuedateTitle, "Due date") ?? "Due date"):</span><br />@Model.CurrentAction?.DueDate.ToLocaleLongDateString(Model.Locale)
+                            </li>
+                        </ul>
+
+                        @if (Model.CurrentAction.Tags?.Count > 0 && Model.ApplicationSettings?.Features?.TagsEnabled == true)
+                        {
+                            <p class="mb-2">
+                                <span class="text-muted">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsMainTitle, "Tags") ?? "Tags"):</span>
+                                <br />
+                                <div class="row">
+                                    @foreach (var tag in Model.CurrentAction.Tags)
+                                    {
+                                        <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode;">
+                                            <div class="tag-wrapper" style="">
+                                                <i class="nav-icon my-auto ml-2 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                <span class="my-auto mr-2 tag-span">@tag.Name</span>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </p>
+                        }
+                        @if ((Model.ApplicationSettings.Features.MarketUltimoEnabled.HasValue && Model.ApplicationSettings.Features.MarketUltimoEnabled.Value) ||
+                             (Model.ApplicationSettings.Features.MarketSapEnabled.HasValue && Model.ApplicationSettings.Features.MarketSapEnabled.Value))
+                        {
+                            <span class="text-muted">External connection status:</span>
+                            @if (Model.ApplicationSettings.Features.MarketUltimoEnabled.HasValue && Model.ApplicationSettings.Features.MarketUltimoEnabled.Value)
+                            {
+                                <p class="">
+                                    @{
+                                    DateTime ultimoDateTime = DateTime.MinValue;
+                                    if (Model.CurrentAction.UltimoStatusDateTime.HasValue && Model.CurrentAction.UltimoStatusDateTime.Value != null)
+                                    {
+                                    Model.CurrentAction.UltimoStatusDateTime = DateTime.SpecifyKind(Model.CurrentAction.UltimoStatusDateTime.Value, DateTimeKind.Utc);
+                                    ultimoDateTime = TimeZoneInfo.ConvertTime(Model.CurrentAction.UltimoStatusDateTime.Value, timezone);
+                                    }
+                                    }
+                                    @if (Model.CurrentAction.UltimoStatus == "NONE")
+                                    {
+                                    <i class="fa-solid fa-x"></i>
+                                    @:Not sent to Ultimo
+                                    }
+                                    else if (Model.CurrentAction.UltimoStatus == "READY_TO_BE_SENT")
+                                    {
+                                    <i class="fa-solid fa-check"></i>
+                                    @:Ready to be sent to Ultimo at @ultimoDateTime.ToLocaleFullDateShortTimeString(Model.Locale)
+                                    }
+                                    else if (Model.CurrentAction.UltimoStatus == "SENT")
+                                    {
+                                    <i class="fa-solid fa-check"></i>
+                                    @:Sent to Ultimo at @ultimoDateTime.ToLocaleFullDateShortTimeString(Model.Locale)
+                                    }
+                                    else if (Model.CurrentAction.UltimoStatus == "ERROR")
+                                    {
+                                    <i class="fa-solid fa-x"></i>
+                                    @:Error sending to Ultimo at @ultimoDateTime.ToLocaleFullDateShortTimeString(Model.Locale)
+                                    }
+                                </p>
+                            }
+
+                            @if (Model.ApplicationSettings.Features.MarketSapEnabled.HasValue && Model.ApplicationSettings.Features.MarketSapEnabled.Value)
+                            {
+                                <p class="">
+                                    @if (Model.CurrentAction.SapPmNotificationConfig != null && Model.CurrentAction.SapPmNotificationConfig.FunctionalLocationId > 0 && Model.SelectedLocation != null)
+                                    {
+                                    <i class="fa-solid fa-check"></i>
+                                    @:Configured to be sent to SAP PM (Functional location: <strong>@Model.SelectedLocation.FunctionalLocation</strong>, @Model.SelectedLocation.FunctionalLocationName)
+                                    }
+                                    else if (Model.CurrentAction.SapPmNotificationConfig == null)
+                                    {
+                                    <i class="fa-solid fa-x"></i>
+                                    @:Not configured to be sent to SAP PM
+                                    }
+                                </p>
+                            }
+                        }
+                    </div>
+                </div>
+
+                @if (Model.CurrentAction != null)
+                {
+                    @if (Model.CurrentAction.AssignedUsers.Any() || Model.CurrentAction.AssignedAreas.Any())
+                    {
+                        <!-- Resources -->
+                        <div class="card mb-0">
+                            <div class="card-header">
+                                <h3 class="card-title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Action.DetailsResourcesTitle, "Resources") ?? "Resources")</h3>
+                            </div>
+
+                            <div class="card-body">
+                                @if (Model.CurrentAction?.AssignedUsers.Any() ?? false)
+                                {
+                                    @if (Model.CurrentAction?.AssignedAreas.Any() ?? false)
+                                    {
+                                        //only add title when there are assigned areas and users
+                                        <div style="border-bottom:1px solid #C0C0C0;margin-bottom:5px;">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Action.DetailsResourcesTitleUsers, "Users") ?? "Users")</div>
+                                    }
+
+                                    <div id="userlist" class="row card-group pt3 user">
+                                        @foreach (UserBasicModel user in Model.CurrentAction.AssignedUsers.OrderBy(o => o.Name))
+                                        {
+                                            var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, user.Picture);
+                                            picture = picture.Replace("/media/media", "/media"); //fix for incorrect data in db
+                                            <div class="col-12 col-md-4 col-lg-3 col-xl-2" data-cid="@user.Id">
+                                                <div class="card h-100">
+                                                    <div class="card-body p-0 text-center">
+                                                        <a class="card-link" href="/images/media-loading.gif" data-href="@picture" data-fancybox="resources" data-caption="@user.Name">
+                                                            <img loading="lazy" class="img-fluid rounded-circle mt-2 mx-2" src="/images/media-loading.gif" data-src="@picture" style="width: 60px;height: 60px;object-fit: cover;object-position: center;">
+                                                        </a>
+
+                                                        <div>
+                                                            <p class="p-2 mb-0 text-muted small">@user.Name</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+
+                                @if (Model.CurrentAction?.AssignedAreas.Any() ?? false)
+                                {
+                                    @if (Model.CurrentAction?.AssignedUsers.Any() ?? false)
+                                    {
+                                        //only add title when there are assigned areas and users
+                                        <div style="border-bottom:1px solid #C0C0C0;margin-bottom:5px;">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Action.DetailsResourcesTitleAreas, "Areas") ?? "Areas")</div>
+                                    }
+                                    <div id="arealist" class="row pt3 area">
+                                        <ul class="list-group h-100" style="width:100%;max-height:240px;">
+                                            @foreach (AreaBasicModel area in Model.CurrentAction.AssignedAreas.OrderBy(o => o.NamePath))
+                                            {
+                                                <li class="list-group-item text-muted small" style="margin-left:5px;margin-right:5px;">
+                                                    @area.NamePath
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+                <br />
+
+                @if ((Model.CurrentAction?.Images.Any() ?? false) || (Model.CurrentAction?.Videos.Any() ?? false))
+                {
+                    <!-- Media -->
+                    <div class="card mb-0">
+                        <div class="card-header">
+                            <h3 class="card-title">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsMediaTitle, "Media") ?? "Media")</h3>
+                        </div>
+
+                        <div class="card-body">
+                            <div id="medialist" class="row card-group pt3">
+                                @foreach (string img in Model.CurrentAction.Images)
+                                {
+                                    var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, img);
+                                    picture = picture.Replace("/media/media", "/media"); //fix for incorrect data in db
+
+                                    //fix for double slashes as some images have a leading slash in db
+                                    int index = picture.IndexOf("//") + 1; //skip the first double slash as it starts with 'https://'
+                                    picture = picture.Substring(0, index) + picture.Substring(index).Replace("//", "/"); //replace double slashes with single slashes
+
+                                    <div class="col-12 col-md-4 col-lg-3 col-xl-2" data-type="image">
+                                        <div class="card h-100">
+                                            <div class="card-body img-container p-0 text-center">
+                                                <a class="card-link" href="/images/media-loading.gif" data-href="@picture" data-fancybox="action" data-caption="@Model.CurrentAction.Comment">
+                                                    <img loading="lazy" src="/images/media-loading.gif" data-src="@picture" />
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (Model.CurrentAction.VideoThumbNails.Count == Model.CurrentAction.Videos.Count)
+                                {
+                                    @foreach (var (thumb, index) in Model.CurrentAction.VideoThumbNails.Select((value, i) => (value, i)))
+                                    {
+                                        var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, thumb);
+                                        picture = picture.Replace("/media/media", "/media"); //fix for incorrect data in db
+                                        var video = Model.CurrentAction.Videos[index];
+                                        var videourl = AppUrlsResolver.Video(video);
+                                        <div class="col-12 col-md-4 col-lg-3 col-xl-2" data-type="image">
+                                            <div class="card h-100">
+                                                <div class="card-body img-container p-0 text-center">
+                                                    <a class="card-link" href="#video_@index" data-fancybox="action" data-caption="@Model.CurrentAction.Comment">
+                                                        <img loading="lazy" src="/images/media-loading.gif" data-src="@picture" />
+                                                    </a>
+
+                                                    <video src="/images/media-loading.mp4" data-src="@videourl" controls id="video_@index" style="display:none;">
+                                                        @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                                    </video>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else if(Model.CurrentAction.Videos.Count > 0 && Model.CurrentAction.VideoThumbNails.Count == 0)
+                                {
+                                    @foreach (var (video, index) in Model.CurrentAction.Videos.Select((value, i) => (value, i)))
+                                    {
+                                        var videourl = video;
+                                        if(!videourl.StartsWith("https"))
+                                        {
+                                            videourl = AppUrlsResolver.Video(video);
+                                        }
+                                        <div class="col-12 col-md-4 col-lg-3 col-xl-2" data-type="image">
+                                            <div class="card h-100">
+                                                <div class="card-body img-container p-0 text-center">
+                                                    <a class="card-link" href="#video_@index" data-fancybox="action" data-caption="@Model.CurrentAction.Comment">
+                                                        <video style="width: 100%" loading="lazy" src="/images/media-loading.gif" data-src="@videourl" />
+                                                    </a>
+
+                                                    <video src="/images/media-loading.mp4" data-src="@videourl" controls id="video_@index" style="display:none;">
+                                                        @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                                    </video>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                }
+            </div>
+
+            <div class="col col-md-4" style="height:calc(100vh - 195px);">
+                <input asp-for="CurrentAction.Id" type="hidden" />
+                <partial name="_chat" model="@Model?._ChatViewModel" />
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (Model?.CurrentUser != null && Model.CurrentUser.IsServiceAccount)
+{
+    <!-- Modal tags filter -->
+    <div class="modal fade" id="manageActionConnectionsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="exampleModalLongTitle">Manage action connections</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body" style="display: flex; justify-content: left">
+                    <div id="manageActionConnectionsModalBody" style="width: 100%">
+                        <div class="col-12 p-0 pb-3" data-item="steps-view">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Action with Id @Model.CurrentAction.Id</h3>
+                                </div>
+                                <div class="card-body pb-3 pt-0">
+                                    <p>
+                                        Task template id: @((Model?.CurrentAction?.Parent?.TaskTemplateId ?? 0) == 0 ? "-" : Model.CurrentAction.Parent.TaskTemplateId.ToString())
+                                    </p>
+                                    <p>
+                                        Task id: @((Model?.CurrentAction?.Parent?.TaskId ?? 0) == 0 ? "-" : Model.CurrentAction.Parent.TaskId.ToString())
+                                    </p>
+                                    <p>
+                                        Currently connected to:
+                                        @if (Model.CurrentAction.Parent?.Type == "audit")
+                                        {
+                                            <span class="badge badge-secondary">Audit: @Model.CurrentAction?.Parent?.AuditTemplateName </span>
+                                            <span class="badge badge-secondary">Audit item: @Model.CurrentAction?.Parent?.TaskName</span>
+                                        }
+                                        else if (Model.CurrentAction.Parent?.Type == "checklist")
+                                        {
+                                            <span class="badge badge-secondary">Checklist: @Model.CurrentAction?.Parent?.ChecklistTemplateName </span>
+                                            <span class="badge badge-secondary">Checklist item: @Model.CurrentAction?.Parent?.TaskName</span>
+                                        }
+                                        else if (Model.CurrentAction.Parent?.Type == "task")
+                                        {
+                                            <span class="badge badge-secondary">Task: @Model.CurrentAction?.Parent?.TaskName </span>
+                                        }
+                                        else 
+                                        {
+                                            @:-
+                                        }
+                                    </p>
+                                    <p>
+                                        <select id="actionConnectionTypeFilter" data-role="actionConnectionTypeFilter" data-type="block" class="form-control selectpicker tdfilter" data-size="10" title="Select type to link">
+                                            <option value="task">Task template/task</option>
+                                            <option value="checklist">Checklist template item/checklist item</option>
+                                            <option value="audit">Audit template item/audit item</option>
+                                        </select>
+                                    </p>
+                                    <p>
+                                        <select id="checklistTemplatesFilter" data-role="checklistTemplatesFilter" data-type="block" class="form-control selectpicker tdfilter" data-live-search="true" data-size="10" title="Checklist templates">
+                                            <option value=""></option>
+                                            @if (Model.ChecklistTemplates != null)
+                                            {
+                                                foreach (var template in Model.ChecklistTemplates)
+                                                {
+                                                    var templateString = $"Id: {template.Id}, Name: {template.Name}";
+                                                    if (templateString.Length > 90)
+                                                    {
+                                                        templateString = templateString.Substring(0, 90) + "...";
+                                                    }
+                                                    <option data-tokens="@($"{template.Id} {template.Name}")" value="@(template.Id)" title="@template.Name" data-bs-select="bs-select-1-@Model.ChecklistTemplates.IndexOf(template)"><strong></strong>@templateString</option>
+                                                }
+                                            }
+                                        </select>
+                                        <select id="auditTemplatesFilter" data-role="auditTemplatesFilter" data-type="block" class="form-control selectpicker tdfilter" data-live-search="true" data-size="10" title="Audit templates">
+                                            <option value=""></option>
+                                            @if (Model.AuditTemplates != null)
+                                            {
+                                                foreach (var template in Model.AuditTemplates)
+                                                {
+                                                    var templateString = $"Id: {template.Id}, Name: {template.Name}";
+                                                    if (templateString.Length > 90)
+                                                    {
+                                                        templateString = templateString.Substring(0, 90) + "...";
+                                                    }
+                                                    <option data-tokens="@($"{template.Id} {template.Name}")" value="@(template.Id)" title="@template.Name" data-bs-select="bs-select-1-@Model.AuditTemplates.IndexOf(template)"><strong></strong>@templateString</option>
+                                                }
+                                            }
+                                        </select>
+                                        <select id="taskTemplatesFilter" data-role="taskTemplatesFilter" data-type="block" class="form-control selectpicker tdfilter" data-live-search="true" data-size="10" title="Task templates">
+                                            <option value=""></option>
+                                            @if (Model.TaskTemplates != null)
+                                            {
+                                                foreach (var template in Model.TaskTemplates)
+                                                {
+                                                    var templateString = $"Id: {template.Id}, Name: {template.Name}";
+                                                    if (templateString.Length > 90)
+                                                    {
+                                                        templateString = templateString.Substring(0, 90) + "...";
+                                                    }
+                                                    <option data-tokens="@($"{template.Id} {template.Name}")" value="@(template.Id)" title="@template.Name" data-bs-select="bs-select-1-@Model.TaskTemplates.IndexOf(template)"><strong></strong>@templateString</option>
+                                                }
+                                            }
+                                        </select>
+                                    </p>
+
+                                    <img id="actionLinkLoader" style="width: 100px; height: 100px; display: none" src="/images/feed-loading.gif" />
+                                    <div id="userDataForSelectedTemplateContainer" style="display: none">
+                                        <div id="userDataForSelectedTemplate"></div>
+                                        <div style="text-align: center; width: 100%">
+                                            <img id="actionUserDataLoader" style="width: 100px; height: 100px; display: none" src="/images/feed-loading.gif" />
+                                            <div id="userDataLoadMoreButton" style="text-align:center;">
+                                                <a class="btn btn-ezgo" style="width:200px;" data-actiontype="load_more"><i class="fas fa-angle-double-down"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="actionLinkBackToUserdataLists" class="btn btn-ezgo mb-1 mt-2 mr-1" style="display: none"><span class="pl-2"></span> <i class="fa-solid fa-chevrons-left"></i> &nbsp; Back</div>
+
+                                    <div id="userDataItemsForSelectedTemplateContainer" style="display: none">
+                                        <div id="userDataItemsForSelectedTemplate"></div>
+                                        <div id="userDataItemsLoadMoreButton" style="text-align:center;display:none">
+                                            <a class="btn btn-ezgo" style="width:200px;" data-actiontype="load_more"><i class="fas fa-angle-double-down"></i></a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="applyActionTaskIdButton" type="button" class="btn btn-ezgo btn-sm" disabled>Set action task id</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<input id="FilterLocalStorage" type="hidden" />
+
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="/js/ezgoUtils.js"></script>
+
+    @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+    {
+        <script src="~/js/analytics.js"></script>
+        <script>ezgoAnalytics.init('action');</script>
+    }
+
+    <script>
+
+
+        // ajax fetch of the comments, conditional rebuild of the comments
+        function getComments() {
+            var actionid = $('#CurrentAction_Id').prop('value');
+            var jqxhr = $.get("/action/comments/" + actionid + "/" + counter, function (data, status) {
+                // how many chat messages do we have?
+                var len = $.grep($.parseHTML(data), function (el, i) {
+                    return $(el).hasClass("direct-chat-msg")
+                }).length;
+
+                if (len > 0) {
+                    if (len > counter) {
+                        $('#chat').html(data);
+                        ezgomediafetcher.preloadImagesAndVideos();
+                    }
+                    else {
+                        noActivityCounter++;
+                    }
+                } else {
+                    // start the abort process if no comments available
+                    noContentCounter++;
+                }
+            })
+                .done(function () {
+                    if (noContentCounter >= 2 || noActivityCounter >= 4) {
+                        abortTimer();
+                    } else {
+                        var numItems2 = $('.direct-chat-msg').length;
+
+                        if (numItems2 > counter) {
+                            var chatElement = $("#chat");
+                            chatElement.animate({ scrollTop: chatElement.prop('scrollHeight') });
+                            counter = numItems2;
+                        }
+                    }
+                })
+                .fail(function () {
+                    abortTimer();
+                })
+                .always(function () {
+                    $('#chat-date').html(moment(new Date()).format('HH:mm:ss'));
+                })
+        }
+
+        function loadTasks() {
+
+        }
+        // set interval
+        var chatRefreshInterval = 15000;
+        var tid = setInterval(getComments, chatRefreshInterval);
+        var counter = $('.direct-chat-msg').length;
+        var noContentCounter = 0;
+        var noActivityCounter = 0;
+
+
+    </script>
+        @if (Model.CurrentUser != null && Model.CurrentUser.IsServiceAccount)
+        {
+            <script>
+                var selectedTemplateIdForLinking = 0;
+                var selectedTemplateTypeForLinking = '';
+                var selectedUserDataIdForLinking = 0;
+                var selectedUserDataItemIdForLinking = 0;
+
+                var userDataLimit = 20;
+                var userDataOffset = 0;
+            </script>
+        }
+    <script>
+        if (history.length == 1) {
+            $('#goBackToPreviousPage').hide();
+        }
+
+        function abortTimer() { // to be called when you want to stop the timer
+            clearInterval(tid);
+            $('#chat_pause').addClass('d-none');
+            $('#chat_play').removeClass('d-none');
+        }
+
+        function startTimer() { // to be called when you want to start the timer
+            tid = setInterval(getComments, chatRefreshInterval);
+            $('#chat_play').addClass('d-none');
+            $('#chat_pause').removeClass('d-none');
+        }
+        
+        function goBack() {
+            history.back();
+        }
+
+        // client side validation and posting of comment
+        function postComment(event) {
+            if (event != null) event.preventDefault();
+
+            var postItem = {};
+            postItem.ActionId = parseInt($('#comment_action_id').val());
+            postItem.UserId = parseInt($('#comment_user_id').val());
+            postItem.Comment = $('#comment_comment').val();
+
+            if (postItem.Comment != '') {
+                postItem.Comment = postItem.Comment.trim();
+            }
+
+            if (postItem.Comment !== '') {
+                $.ajax({
+                    type: "POST",
+                    url: '/action/postcomment',
+                    data: JSON.stringify(postItem),
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (data) {
+                        startTimer();
+                        getComments();
+                        $('#comment_comment').prop('value', '');
+                        @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+                        {
+                            @:ezgoAnalytics.customLog("custom", "chat message", "action", "action: @Model.CurrentAction.Id")
+                        }                                                                            
+                    },
+                    error: function (ex) {
+                        toastr.warning('@(Model?.CmsLanguage.GetValue(LanguageKeys.Action.ErrorComment, "error posting comment") ?? "error posting comment")');
+                    }
+                });
+            } else {
+                $('#comment_comment').addClass('input-invalid');
+                return false;
+            }
+        }
+        </script>
+
+    @if (Model.CurrentUser != null && Model.CurrentUser.IsServiceAccount)
+    {
+        <script>
+            function loadAuditItemDetails(e) {
+                $('#applyActionTaskIdButton').prop('disabled', true);
+                selectedUserDataIdForLinking = +$(e.currentTarget).data('auditid');
+                $('#actionLinkLoader').show();
+                $('[id^="completedAudit-"]').removeClass('selectedTemplateToLink');
+                $(e.currentTarget).addClass('selectedTemplateToLink');
+
+                $.ajax({
+                    type: "GET",
+                    url: '/report/audit/completed/' + selectedUserDataIdForLinking,
+                    success: function (data) {
+                        $('#actionLinkLoader').hide();
+                        //set total
+                        $('#userDataItemsForSelectedTemplate').html(data);
+
+                        ezgomediafetcher.preloadImagesAndVideos();
+                        ezgomediafetcher.preloadFancyboxAnchors();
+
+                        $('#userDataForSelectedTemplateContainer').hide('fast');
+                        $('#userDataItemsForSelectedTemplateContainer').show('fast');
+                        $('#actionLinkBackToUserdataLists').show();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.statusText == "abort") {
+                            return;
+                        }
+                        else {
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        }
+                        $('#actionOverviewLoader').hide();
+                    }
+                });
+
+            }
+
+            function loadChecklistItemDetails(e) {
+                $('#applyActionTaskIdButton').prop('disabled', true);
+                selectedUserDataIdForLinking = +$(e.currentTarget).data('checklistid');
+                $('#actionLinkLoader').show();
+
+                $('[id^="completedChecklist-"]').removeClass('selectedTemplateToLink');
+                $(e.currentTarget).addClass('selectedTemplateToLink');
+
+                $.ajax({
+                    type: "GET",
+                    url: '/report/checklist/completed/' + selectedUserDataIdForLinking,
+                    success: function (data) {
+                        $('#actionLinkLoader').hide();
+                        //set total
+                        $('#userDataItemsForSelectedTemplate').html(data);
+
+                        ezgomediafetcher.preloadImagesAndVideos();
+                        ezgomediafetcher.preloadFancyboxAnchors();
+
+                        $('#userDataForSelectedTemplateContainer').hide('fast');
+                        $('#userDataItemsForSelectedTemplateContainer').show('fast');
+                        $('#actionLinkBackToUserdataLists').show();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.statusText == "abort") {
+                            return;
+                        }
+                        else {
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        }
+                        $('#actionOverviewLoader').hide();
+                    }
+                });
+            }
+
+            function setChecklistItemToLink(e) {
+                selectedUserDataItemIdForLinking = $(e.currentTarget).data('id');
+                $('.linkableChecklistItem').removeClass('selectedToLink');
+                $(e.currentTarget).addClass('selectedToLink');
+                $('#applyActionTaskIdButton').removeAttr('disabled');
+            }
+
+            function setAuditItemToLink(e) {
+                selectedUserDataItemIdForLinking = $(e.currentTarget).data('id');
+                $('.linkableAuditItem').removeClass('selectedToLink');
+                $(e.currentTarget).addClass('selectedToLink');
+                $('#applyActionTaskIdButton').removeAttr('disabled');
+            }
+
+            function setTaskToLink(e) {
+                selectedUserDataItemIdForLinking = $(e.currentTarget).data('id');
+                $('.linkableTaskItem').removeClass('selectedToLink');
+                $(e.currentTarget).addClass('selectedToLink');
+                $('#applyActionTaskIdButton').removeAttr('disabled');
+            }
+
+            function getAndDisplayAudits(templateId, limit, offset, removeCurrentlyVisible) {
+                if(removeCurrentlyVisible) {
+                    $('#userDataForSelectedTemplate').html('');
+                }
+                $.ajax({
+                    type: "GET",
+                    url: '/report/audit/completeddetails?templateId=' + templateId + '&limit=' + limit + '&offset=' + offset,
+                    success: function (data) {
+                        $('#actionLinkLoader').hide();
+                        //set total
+                        $('#userDataForSelectedTemplate').append(data);
+
+                        ezgomediafetcher.preloadImagesAndVideos();
+                        ezgomediafetcher.preloadFancyboxAnchors();
+
+                        $('#userDataItemsForSelectedTemplateContainer').hide('fast');
+                        $('#userDataForSelectedTemplateContainer').show('fast');
+
+                        $('#actionUserDataLoader').hide();
+                        $('#userDataLoadMoreButton').show();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.statusText == "abort") {
+                            return;
+                        }
+                        else {
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        }
+                        $('#actionOverviewLoader').hide();
+                    }
+                });
+            }
+
+            function getAndDisplayChecklists(templateId, limit, offset, removeCurrentlyVisible) {
+                if(removeCurrentlyVisible) {
+                    $('#userDataForSelectedTemplate').html('');
+                }
+                $.ajax({
+                    type: "GET",
+                    url: '/report/checklist/completeddetails?iscompleted=true&templateId=' + templateId + '&limit=' + limit + '&offset=' + offset,
+                    success: function (data) {
+                        $('#actionLinkLoader').hide();
+                        //set total
+                        $('#userDataForSelectedTemplate').append(data);
+
+                        ezgomediafetcher.preloadImagesAndVideos();
+                        ezgomediafetcher.preloadFancyboxAnchors();
+
+                        $('#userDataItemsForSelectedTemplateContainer').hide('fast');
+                        $('#userDataForSelectedTemplateContainer').show('fast');
+
+                        $('#actionUserDataLoader').hide();
+                        $('#userDataLoadMoreButton').show();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('#actionLinkLoader').hide();
+                        if (jqXHR.statusText == "abort") {
+                            return;
+                        }
+                        else {
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        }
+                        $('#actionOverviewLoader').hide();
+                    }
+                });
+            }
+
+            function getAndDisplayTasks(templateId, limit, offset, removeCurrentlyVisible) {
+                if(removeCurrentlyVisible) {
+                    $('#userDataForSelectedTemplate').html('');
+                    $('#userDataItemsForSelectedTemplate').html('');
+                }
+                $.ajax({
+                    type: "GET",
+                    url: '/report/task/latestcompleteddetails?templateId=' + templateId + '&limit=' + limit + '&offset=' + offset,
+                    success: function (data) {
+                        $('#actionLinkLoader').hide();
+                        //set total
+                        $('#userDataItemsForSelectedTemplate').append(data);
+
+                        ezgomediafetcher.preloadImagesAndVideos();
+                        ezgomediafetcher.preloadFancyboxAnchors();
+
+                        $('#userDataForSelectedTemplateContainer').hide('fast');
+                        $('#userDataItemsForSelectedTemplateContainer').show('fast');
+
+                        $('#actionUserDataLoader').hide();
+                        $('#userDataLoadMoreButton').show();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('#actionLinkLoader').hide();
+                        if (jqXHR.statusText == "abort") {
+                            return;
+                        }
+                        else {
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        }
+                        $('#actionOverviewLoader').hide();
+                    }
+                });
+            }
+
+            function setActionTask() {
+                $.ajax({
+                    type: "GET",
+                    url: '/action/settask?actionid=' + @Model.CurrentAction.Id + '&taskid=' + selectedUserDataItemIdForLinking,
+                    success: function (data) {
+                        window.location.reload();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.statusText == "abort") {
+                            return;
+                        }
+                        else {
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        }
+                    }
+                });
+            }
+
+        </script>
+    }
+    <script>
+        // show alert before marking action as resolved
+        function confirmChoice(message, event) {
+            event.preventDefault();
+            var sender = $(event.target);
+            var frm = sender.closest('form');
+
+            $.fn.dialogue({
+                //title: "Alert",
+                content: $("<p />").text(message),
+                closeIcon: true,
+                buttons: [
+                        {
+                            text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.Action.OptionYes, "Yes") ?? "Yes")", id: $.utils.createUUID(), click: function ($modal) {
+                                frm.submit();
+                                $modal.dismiss();
+                                @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+                                {
+                                    @:ezgoAnalytics.customLog("click", "mark resolved", "action", "action open for days: " + @((DateTime.UtcNow.Date - Model.CurrentAction.CreatedAt.Date).Days));
+                                }
+                        }
+                    },
+                    { text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.Action.OptionNo, "No") ?? "No")", id: $.utils.createUUID(), click: function ($modal) { $modal.dismiss(); } }
+                ]
+            });
+        }
+
+        $('document').ready(function () {
+            ezgomediafetcher.preloadImagesAndVideos();
+            ezgomediafetcher.preloadFancyboxAnchors();
+            // chat
+            var chat_outer = $('#chat-container').height();
+            var chat_inner = $('#chat')[0].scrollHeight;
+
+            if (chat_inner > chat_outer && $('div.direct-chat-msg:last').length > 0) {
+                $("#chat").animate({ scrollTop: $('div.direct-chat-msg:last').offset().top });
+            }
+
+            $('#comment_comment').keypress(function (event) {
+                var keycode = (event.keyCode ? event.keyCode : event.which);
+                if (keycode == '13') {
+                    event.preventDefault();
+                    postComment(event);
+                }
+            }).focus(function () {
+                $(this).removeClass("input-invalid")
+            });
+
+            // local storage to input
+            $('#FilterLocalStorage').val(localStorage.getItem('3dfilters'));
+
+            $('#comment_comment').focus();
+
+            $('.bootstrap-select button .filter-option').addClass('d-flex');
+
+            let actionOverviewLocation = window.location.origin;
+            let localStorageItem = localStorage.getItem('last_action_overview_location');
+            if (localStorageItem != null && localStorageItem != undefined) {
+                actionOverviewLocation += localStorageItem;
+            }
+            else {
+                actionOverviewLocation += '/action?filter=action';
+            }
+            $('#goBackToActionOverview').attr('href', actionOverviewLocation);
+
+            $('#taskTemplatesFilter').selectpicker('refresh');
+            $('#checklistTemplatesFilter').selectpicker('refresh');
+            $('#auditTemplatesFilter').selectpicker('refresh');
+
+            $('#taskTemplatesFilter').parent('.bootstrap-select').hide();
+            $('#checklistTemplatesFilter').parent('.bootstrap-select').hide();
+            $('#auditTemplatesFilter').parent('.bootstrap-select').hide();
+
+
+        @if (Model.CurrentUser != null && Model.CurrentUser.IsServiceAccount)
+        {
+            @:$('#userDataForSelectedTemplateContainer').on('click', '[id^="completedChecklist-"]', loadChecklistItemDetails);
+            @:$('#userDataForSelectedTemplateContainer').on('click', '[id^="completedAudit-"]', loadAuditItemDetails);
+
+            @:$('#userDataItemsForSelectedTemplateContainer').on('click', '.linkableChecklistItem', setChecklistItemToLink);
+            @:$('#userDataItemsForSelectedTemplateContainer').on('click', '.linkableAuditItem', setAuditItemToLink);
+            @:$('#userDataItemsForSelectedTemplateContainer').on('click', '.linkableTask', setTaskToLink);
+
+            @:userDataOffset = 0;
+        }
+        })
+    </script>
+
+
+    @if (Model.CurrentUser != null && Model.CurrentUser.IsServiceAccount)
+    {
+        <script>
+            $('#manageActionConnections').on('click', function() {
+                $('#manageActionConnectionsModal').modal('show');
+            });
+
+            $('#actionConnectionTypeFilter').on('change', function(e) {
+                userDataOffset = 0;
+
+                $('#applyActionTaskIdButton').prop('disabled', true);
+                $('#taskTemplatesFilter').parent('.bootstrap-select').hide();
+                $('#checklistTemplatesFilter').parent('.bootstrap-select').hide();
+                $('#auditTemplatesFilter').parent('.bootstrap-select').hide();
+
+                $('#taskTemplatesFilter').selectpicker('val', '');
+                $('#checklistTemplatesFilter').selectpicker('val', '')
+                $('#auditTemplatesFilter').selectpicker('val', '')
+
+                selectedTemplateIdForLinking = 0;
+                selectedTemplateTypeForLinking = '';
+
+                $('#actionLinkBackToUserdataLists').hide();
+
+                $('#userDataForSelectedTemplateContainer').hide();
+                $('#userDataItemsForSelectedTemplateContainer').hide();
+
+                let actionConnectionTypeValue = $('#actionConnectionTypeFilter').val();
+
+                switch(actionConnectionTypeValue) {
+                    case 'task':
+                    $('#taskTemplatesFilter').parent('.bootstrap-select').show();
+                    selectedTemplateTypeForLinking = 'task';
+                    break;
+                    case 'checklist':
+                    $('#checklistTemplatesFilter').parent('.bootstrap-select').show();
+                    selectedTemplateTypeForLinking = 'checklist';
+                    break;
+                    case 'audit':
+                    $('#auditTemplatesFilter').parent('.bootstrap-select').show();
+                    selectedTemplateTypeForLinking = 'audit';
+                    break;
+                }
+            });
+
+            $('#checklistTemplatesFilter').on('change', function(e) {
+                userDataOffset = 0;
+                $('#applyActionTaskIdButton').prop('disabled', true);
+                $('#userDataForSelectedTemplateContainer').hide();
+                $('#userDataItemsForSelectedTemplateContainer').hide();
+                $('#actionLinkBackToUserdataLists').hide();
+
+                $('#actionLinkLoader').show();
+
+                if(parseInt($('#checklistTemplatesFilter').val()))
+                {
+                    selectedTemplateIdForLinking = +$('#checklistTemplatesFilter').val();
+                    $('#userDataItemsLoadMoreButton').hide();
+                    //populate userDataForSelectedTemplate
+                    getAndDisplayChecklists(selectedTemplateIdForLinking, userDataLimit, userDataOffset, true);
+                }
+            });
+
+            $('#auditTemplatesFilter').on('change', function(e) {
+                userDataOffset = 0;
+                $('#applyActionTaskIdButton').prop('disabled', true);
+                $('#userDataForSelectedTemplateContainer').hide();
+                $('#userDataItemsForSelectedTemplateContainer').hide();
+                $('#actionLinkBackToUserdataLists').hide();
+
+                $('#actionLinkLoader').show();
+
+                if(parseInt($('#auditTemplatesFilter').val()))
+                {
+                    selectedTemplateIdForLinking = +$('#auditTemplatesFilter').val();
+                    $('#userDataItemsLoadMoreButton').hide();
+                    //populate userDataForSelectedTemplateContainer
+                    getAndDisplayAudits(selectedTemplateIdForLinking, userDataLimit, userDataOffset, true);
+                }
+            });
+
+            $('#taskTemplatesFilter').on('change', function(e) {
+                userDataOffset = 0;
+                $('#applyActionTaskIdButton').prop('disabled', true);
+                $('#userDataForSelectedTemplateContainer').hide();
+                $('#userDataItemsForSelectedTemplateContainer').hide();
+                
+                $('#actionLinkBackToUserdataLists').hide();
+
+                if(parseInt($('#taskTemplatesFilter').val()))
+                {
+                    userDataOffset = 0;
+                    selectedTemplateIdForLinking = +$('#taskTemplatesFilter').val();
+                    $('#userDataItemsLoadMoreButton').show();
+                    //populate userDataForSelectedTemplateContainer
+                    getAndDisplayTasks(selectedTemplateIdForLinking, userDataLimit, userDataOffset, true);
+                }
+            });
+
+            $('#actionLinkBackToUserdataLists').on('click', function(e) {
+                $('#applyActionTaskIdButton').prop('disabled', true);
+                $('#actionLinkBackToUserdataLists').hide();
+                $('#userDataItemsForSelectedTemplateContainer').hide('fast');
+                $('#userDataForSelectedTemplateContainer').show('fast');
+            });
+
+            $('#userDataLoadMoreButton').on('click', function(e) {
+                $('#actionUserDataLoader').show();
+                $('#userDataLoadMoreButton').hide();
+                userDataOffset += userDataLimit;
+
+                $('#userDataItemsLoadMoreButton').hide();
+                switch(selectedTemplateTypeForLinking) {
+                    case 'task':
+                    break;
+                    case 'checklist':
+                        getAndDisplayChecklists(selectedTemplateIdForLinking, userDataLimit, userDataOffset, false);
+                    break;
+                    case 'audit':
+                        getAndDisplayAudits(selectedTemplateIdForLinking, userDataLimit, userDataOffset, false);
+                    break;
+                }
+            });
+
+            $('#userDataItemsLoadMoreButton').on('click', function(e) {
+                $('#actionUserDataLoader').show();
+                $('#userDataLoadMoreButton').hide();
+                userDataOffset += userDataLimit;
+                if(selectedTemplateTypeForLinking == 'task') {
+                    $('#userDataItemsLoadMoreButton').show();
+                    getAndDisplayTasks(selectedTemplateIdForLinking, userDataLimit, userDataOffset, false);
+                }
+            });
+
+            $('#applyActionTaskIdButton').on('click', function(e) {
+                if(@Model.CurrentAction.Id && selectedUserDataItemIdForLinking)
+                {
+                    setActionTask();
+                }
+            });
+
+        </script>
+    }
+} 

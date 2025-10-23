@@ -1,0 +1,554 @@
+﻿@model WebApp.ViewModels.CompaniesViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout_template";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                &nbsp;
+                <h1 class="m-0 text-dark">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompaniesTitle, "Companies") ?? "Companies")</h1>
+            </div>
+
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                @if (Model.EnableCompanyManagement)
+                {
+                    <a class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" href="/company/create">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnAddNewCompany, "Add new company") ?? "Add new company")</a>
+                }
+
+                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" title="Holding overview" onclick="document.location.href = '/company/holding/overview';"><i class="fa-regular fa-building"></i></button>
+
+                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.ManagementOverviewTitle, "Company Management Overview") ?? "Company Management Overview")" onclick="document.location.href = '/company/reports';"><i class="fas fa-chart-area"></i></button>
+                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.StatisticsOverviewTitle, "Company Statistics Overview") ?? "Company Statistics Overview")" onclick="document.location.href = '/company/statistics';"><i class="fas fa-chart-bar"></i></button>
+                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" title="Feature overview popup." onclick="window.open('/company/features/overview','CompanyFeatureOverview', 'fullscreen=yes,menubar=no,status=yes');"><i class="fa-solid fa-toolbox"></i></button>
+
+                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" title="Login map overview" onclick="document.location.href = '/company/loginoverview';"><i class="fa-solid fa-globe"></i></button>
+
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+<div class="modal fade" id="modalCompanySettings" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_addchange_title">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanySettingsNameTitle, "Company settings") ?? "Company settings") <span id="company_settings_title_name"></span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row form-group">
+                    <div class="col-md-2">
+                        <label for="company_timezone" style="margin-top:5px;">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanyTimezoneTitle, "Timezone") ?? "Timezone")</label>
+                    </div>
+
+                    <div class="col-md-9">
+                        <select id="company_timezone" class="form-control" data-resource-id="1" style="height:32px;" data-itemtype="settingsresource">
+                            <option value="" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.NoCompanyTimezoneTitle, "No company timezone selected, therefor will default to UTC.") ?? "No company timezone selected, therefor will default to UTC.")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.OptionNoCompanyTimezoneSelected, "No company timezone selected") ?? "No company timezone selected")</option>
+                            @foreach (EZGO.Api.Models.Settings.DatabaseTimezoneItem item in Model.Timezones)
+                            {
+                                <option value="@item.Name" title="@item.Name (@item.Abbrivation) - @item.UtcOffset @(item.IsDayLightSavingsTime ? "Daylight Savings Time" : "")">@item.Name (@item.UtcOffset)</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-1">
+                        <button id="save_companysetting_timezone_btn" type="button" class="btn btn-ezgo btn-sm" data-actiontype="save" data-resource-id="1" disabled>@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnSave, "Save") ?? "Save")</button>
+                    </div>
+                </div>
+
+                @if (Model.EnableCompanyManagement)
+                {
+                    <div class="row form-group">
+                        <div class="col-md-2">
+                            <label for="company_language" style="margin-top:5px;">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanyLanguageTitle, "Language/Locale") ?? "Language/Locale")</label>
+                        </div>
+
+                        <div class="col-md-9">
+                            <select id="company_language" class="form-control" data-resource-id="43" style="height:32px;" data-itemtype="settingsresource">
+                                <option value="" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.NoCompanyLanguageSelectedTitle, "No company language selected, therefor will default to English.") ?? "No company language selected, therefor will default to English.")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.OptionNoCompanyLanguageOrLocaleSelected, "No company language/locale selected") ?? "No company language/locale selected")</option>
+                                @if (Statics.AvailableLanguages != null)
+                                {
+                                    @foreach (var item in Statics.AvailableLanguages)
+                                    {
+                                        var cltr = System.Globalization.CultureInfo.GetCultureInfo(item);
+
+                                        <option value="@item" title="@cltr.NativeName">@string.Concat(cltr.NativeName.Substring(0, 1).ToUpper(), cltr.NativeName.Substring(1, cltr.NativeName.Length - 1)) (@cltr.TwoLetterISOLanguageName.ToUpper()) (@cltr.Name) (@cltr.EnglishName)</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-1">
+                            <button id="save_companysetting_languagelocale_btn" type="button" class="btn btn-ezgo btn-sm" data-actiontype="save" data-resource-id="43" disabled>@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnSave, "Save") ?? "Save")</button>
+                        </div>
+                    </div>
+                }
+
+                <div class="row form-group">
+                    <div class="col-md-2">
+                        <label for="company_tag_limit" style="margin-top:5px;">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanyTagLimitTitle, "Tag limit") ?? "Tag limit")</label>
+                    </div>
+
+                    <div class="col-md-9">
+                        <input type="number" id="company_tag_limit" class="form-control" data-resource-id="74" style="height:32px;" data-itemtype="settingsresource">
+                    </div>
+
+                    <div class="col-md-1">
+                        <button id="save_companysetting_tag_limit_btn" type="button" class="btn btn-ezgo btn-sm" data-actiontype="save" data-resource-id="74" disabled>@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnSave, "Save") ?? "Save")</button>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-2">
+                        <label for="company_taggroup_limit" style="margin-top:5px;">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanyTagGroupLimitTitle, "Tag group limit") ?? "Tag group limit")</label>
+                    </div>
+
+                    <div class="col-md-9">
+                        <input type="number" id="company_taggroup_limit" class="form-control" data-resource-id="76" style="height:32px;" data-itemtype="settingsresource">
+                    </div>
+
+                    <div class="col-md-1">
+                        <button id="save_companysetting_taggroup_limit_btn" type="button" class="btn btn-ezgo btn-sm" data-actiontype="save" data-resource-id="76" disabled>@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnSave, "Save") ?? "Save")</button>
+                    </div>
+                </div>
+                <div id="ultimo-settings">
+                    <div class="row form-group">
+                        <div class="col-md-2">
+                            <label for="company_ultimo_api_url" style="margin-top:5px;">Ultimo REST API URL</label>
+                        </div>
+
+                        <div class="col-md-9">
+                            <input type="text" id="company_ultimo_api_url" class="form-control" data-resource-id="82" style="height:32px;" data-itemtype="settingsresource">
+                        </div>
+
+                        <div class="col-md-1">
+                            <button id="company_ultimo_api_url_btn" type="button" class="btn btn-ezgo btn-sm" data-actiontype="save" data-resource-id="82" disabled>@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnSave, "Save") ?? "Save")</button>
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-md-2">
+                            <label for="company_ultimo_api_token" style="margin-top:5px;">Ultimo REST API Token</label>
+                        </div>
+
+                        <div class="col-md-9">
+                            <input type="text" id="company_ultimo_api_token" class="form-control" data-resource-id="83" style="height:32px;" data-itemtype="settingsresource">
+                        </div>
+
+                        <div class="col-md-1">
+                            <button id="company_ultimo_api_token_btn" type="button" class="btn btn-ezgo btn-sm" data-actiontype="save" data-resource-id="83" disabled>@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnSave, "Save") ?? "Save")</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+
+                    <div class="col-md-2">
+                        <label for="company_tennant_json" style="margin-top:5px;">Tennant Json Key</label>
+                    </div>
+
+                    <div class="col-md-9">
+                        <input type="text" id="company_tennant_json" class="form-control" data-resource-id="40" style="height:32px;" data-itemtype="settingsresource">
+                    </div>
+
+                    <div class="col-md-1">
+                        <button id="company_tennant_json_btn" type="button" class="btn btn-ezgo btn-sm" data-actiontype="save" data-resource-id="40" disabled>@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnSave, "Save") ?? "Save")</button>
+                    </div>
+
+                </div>
+
+                
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="cancel_companysetting_btn" class="btn btn-info btn-sm" data-dismiss="modal" data-actiontype="close">
+                    @(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnClose, "Close") ?? "Close")
+                </button>
+            </div>
+
+            <input type="hidden" name="company_id" id="company_id" />
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDeleteCompany" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Company</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">You are about to delete:</div>
+                <div class="row" style="text-align:center"><div class="col-md-12"><h3><span id="span_companyname"> </span> (<span id="span_companyid"></span>)</h3></div></div>
+                <div class="row" style="text-align:center">
+                    <div class="col-md-12"><span style="color:red;font-size:15px;font-weight:bolder;">THIS ACTION CAN NOT BE UNDONE!</span></div>
+                </div>
+                <div class="row" style="text-align:center">
+                    <div class="col-md-12"><span style="font-size:12px">Make sure before deleting, this company is removed from the settings.</span></div>
+                </div>
+                <br /><br />
+                <div class="row form-group">
+                    <div class="col-md-12">If you are sure, please type the following:</div>
+
+                    <div class="col-md-12"> <label for="txt_datevalidator" style="margin-top:5px;">Type the date in the following format ddMMyyyy (e.g. @DateTime.Now.ToString("ddMMyyyy"))</label></div>
+
+                    <div class="input-group col-md-12">
+                        <input type="text" id="txt_datevalidator" class="form-control" />
+                    </div>
+
+                    <div class="col-md-12"><label for="txt_textvalidator" style="margin-top:5px;">Type the following text [DELETE] (without brackets)</label></div>
+
+                    <div class="input-group  col-md-12">
+                        <input type="text" id="txt_textvalidator" class="form-control" />
+                    </div>
+
+                    <div class="col-md-12"><label for="txt_companyvalidator" style="margin-top:5px;">Type the company id number</label></div>
+
+                    <div class="input-group col-md-12">
+                        <input type="text" id="txt_companyvalidator" class="form-control" />
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="btn_delete_company" data-actiontype="confirmdelete" class="btn btn-danger btn-sm">Confirm delete</button>
+                <button type="button" id="closedelete" class="btn btn-info btn-sm" data-dismiss="modal" data-actiontype="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnClose, "Close") ?? "Close")</button>
+            </div>
+
+            <input type="hidden" id="hidden_deletecompanyid" id="hidden_deletecompanyid" />
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header">
+                <h3 id="cardHeader" class="card-title d-none d-sm-inline-block">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.HeaderCompanyOverview, "Company overview") ?? "Company overview") <span id="counter">&nbsp;</span></h3>
+                <div class="card-tools">
+                    <div class="input-group input-group-sm">
+                        <input type="text" id="companySearchBox" name="companySearchBox" class="form-control float-right" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.SearchPlaceholder, "Search") ?? "Search")" data-boxtype="search">
+
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row pt-1" style="height:calc(100vh - 235px);">
+            <div class="col-lg-12 col-xl-12">
+                <div id="contentBody" style="height: calc(100vh - 245px);overflow:auto;">
+                    <div class="row no-gutters" id="contentCol">
+                        @if (Model.Companies != null && Model.Companies.Count != 0)
+                        {
+                            @foreach (var company in Model.Companies)
+                            {
+                                <div class="card w-100 results" data-id="@company.Id" data-containertype="company_container" style="height:150px;">
+                                    @{
+                                        var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, company.Picture);
+                                        if (string.IsNullOrEmpty(company.Picture))
+                                        {
+                                            picture = @"/assets/img/normal_unavailable_image.png";
+                                        }
+                                    }
+                                    <div class="card-body p-0">
+                                        <div class="col-12 p-1">
+                                            <div class="p-1">
+                                                <div class="row" data-id="@company.Id" style="position:relative;">
+                                                    <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                                                        <div style="text-align:center;">
+                                                            <img src="/images/media-loading.gif" data-src="@picture" class="img-fluid" style="max-width:150px;max-height:100px;margin: 5px;" loading="lazy" />
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <h5 class="mt-3 mt-sm-0" data-containertype="setting_company_name" data-filterchar="@company.Name.Substring(0,1).ToUpper()">@company.Name</h5>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row">
+                                                            <div class="col-lg-12 d-flex justify-content-between flex-column">
+                                                                <div class="row">
+                                                                    <div class="col-md-12 col-lg-12 text-muted" style="overflow:auto; max-height:100px;"><small>@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.DescriptionTitle, "Description: ") ?? "Description: ")<br /><strong>@company.Description</strong></small></div>
+                                                                    <div class="col-md-12 col-lg-12 text-muted">
+                                                                        <small></small>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2" style="text-align: right;">
+                                                        <div>
+                                                            <a id="view_statistics_company_btn_@company.Id" href="/company/statistics/@company.Id" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" data-id="@company.Id" data-actiontype="view" date-companyname="@company.Name" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.StatisticsOverviewTitle, "Company Statistics Overview") ?? "Company Statistics Overview")"><i class="fas fa-chart-bar"></i></a>
+                                                            @if (Model.EnableCompanyManagement)
+                                                            {
+                                                                <a id="edit_company_btn_@company.Id" href="/company/details/@company.Id" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" data-id="@company.Id" data-actiontype="edit" date-companyname="@company.Name" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.EditCompanyDetailsTitle, "Edit company details") ?? "Edit company details")"><i class="fas fa-edit"></i></a>
+                                                            }
+
+                                                            @{
+                                                                var ultimoEnabled = Json.Serialize(Model.CompanySettings[company.Id].Contains("MARKET_ULTIMO"));
+                                                                var companyTagLimit = company.Settings?.Where(x => x.ResourceId == 74).FirstOrDefault()?.Value;
+                                                                var defaultTagLimit = Model.Settings?.Where(x => x.SettingsKey.Equals("GENERAL_TAG_LIMIT")).FirstOrDefault()?.Value;
+                                                                companyTagLimit = companyTagLimit.IsNullOrEmpty() ? defaultTagLimit : companyTagLimit;
+
+                                                                var companyTagGroupLimit = company.Settings?.Where(x => x.ResourceId == 76).FirstOrDefault()?.Value;
+                                                                var defaultTagGroupLimit = Model.Settings?.Where(x => x.SettingsKey.Equals("GENERAL_TAGGROUP_LIMIT")).FirstOrDefault()?.Value;
+                                                                companyTagGroupLimit = companyTagGroupLimit.IsNullOrEmpty() ? defaultTagGroupLimit : companyTagGroupLimit;
+
+                                                                var companyUltimoRestApiUrl = company.Settings?.Where(x => x.ResourceId == 82).FirstOrDefault()?.Value;
+
+                                                                var companyUltimoRestApiToken = company.Settings?.Where(x => x.ResourceId == 83).FirstOrDefault()?.Value;
+
+                                                                var tennantJson = company.Settings?.Where(x => x.ResourceId == 40).FirstOrDefault()?.Value;
+                                                            }
+
+                                                            <a  id="edit_setting_btn_@company.Id" 
+                                                                class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" 
+                                                                data-id="@company.Id" 
+                                                                data-actiontype="editsettings" 
+                                                                date-companyname="@company.Name" 
+                                                                data-setting-timezone="@company.Settings?.Where(x => x.ResourceId == 1).FirstOrDefault()?.Value" 
+                                                                data-setting-locale="@company.Settings?.Where(x => x.ResourceId == 43).FirstOrDefault()?.Value" 
+                                                                data-setting-tag-limit="@companyTagLimit" 
+                                                                data-setting-taggroup-limit="@companyTagGroupLimit"
+                                                                data-ultimo-enabled="@ultimoEnabled"
+                                                                data-ultimo-rest-api-url="@companyUltimoRestApiUrl" 
+                                                                data-ultimo-rest-api-token="@companyUltimoRestApiToken"
+                                                                data-tennant-json-key="@tennantJson"
+                                                                data-company-id="@company.Id" 
+                                                                title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.EditCompanySettingsTitle, "Edit company settings") ?? "Edit company settings")">
+                                                                <i class="fas fa-wrench"></i>
+                                                            </a>
+                                                            <a id="remove_company_btn_@company.Id" class="btn btn-danger btn-sm mr-2 shadow-sm mt-auto" style="color:white;" data-id="@company.Id" data-actiontype="delete" data-companyname="@company.Name"><i class="far fa-trash-alt"></i></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style="position:absolute; bottom:2px; left:5px">
+                                        <div><small>Id: <strong>@company.Id</strong></small></div>
+                                    </div>
+
+                                    <div style="position:absolute; bottom:2px; right:5px; text-align:right;">
+                                        @if (string.IsNullOrEmpty(company.Settings?.Where(x => x.ResourceId == 1).FirstOrDefault()?.Value))
+                                        {
+                                            <i class="fas fa-exclamation-triangle" style="color:burlywood" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.NoCompanyTimezoneAvailableTitle, "No Company TimeZone available.") ?? "No Company TimeZone available.")"></i>
+                                        }
+
+                                        @if (Model.CompaniesFeatures.Where(x => x.CompanyId == company.Id).FirstOrDefault() != null)
+                                        {
+                                            var taskGeneratorEnabled = Model.CompaniesFeatures.Where(x => x.CompanyId == company.Id).FirstOrDefault().TaskGenerationEnabled;
+                                            if (!taskGeneratorEnabled)
+                                            {
+                                                <i class="fas fa-exclamation-triangle" style="color:red" title="Task Generation NOT enabled."></i>
+                                            }
+                                        }
+
+                                        @if (Model.CompanySettings.Where(x => x.Key == company.Id) != null)
+                                        {
+                                            var item = Model.CompanySettings.Where(x => x.Key == company.Id).FirstOrDefault();
+                                            if(item.Value != null)
+                                            {
+                                                if (item.Value.Contains("TECH_DATAWAREHOUSE"))
+                                                {
+                                                    <i class="fas fa-database" style="color:green" title="DataWarehouse enabled, if company or holding is configured within the DataWarehouse."></i>
+                                                
+                                                }; 
+                                            }
+
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <partial name="~/Views/Shared/_no_templates_message.cshtml" model="@Model" />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+@section Scripts{
+    <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+    <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+    <script>
+        $(document).ready(function () {
+            ezgomediafetcher.preloadImagesAndVideos();
+            company.init();
+        });
+
+        var company = {
+            clear: function () {
+                $('[data-actiontype="save"]').attr('disabled', true);
+                $('#company_id').val('');
+            },
+            enableSaveButton: function (resourceId) {
+                $('[data-actiontype="save"][data-resource-id="' + resourceId + '"]').removeAttr('disabled');
+            },
+            disableSaveButton: function (resourceId) {
+                $('[data-actiontype="save"][data-resource-id="' + resourceId + '"]').attr('disabled', true);
+            },
+            init: function () {
+                company.setHandlers();
+                company.clear();
+            },
+            save: function (resourceId) {
+                toastr.remove();
+
+                var companySetting = {
+                    Value: $('[data-itemtype="settingsresource"][data-resource-id="' + resourceId + '"]').val(),
+                    ResourceId: parseInt(resourceId),
+                    CompanyId: parseInt($('#company_id').val())
+                };
+
+                //add responses management from api (invalid password etc.)
+                $.ajax({
+                    type: "POST",
+                    url: '/company/savesetting',
+                    data: JSON.stringify(companySetting),
+                    success: function (data) {
+                        toastr.success('@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.SettingSaved, "Setting saved.") ?? "Setting saved.")');
+                        company.disableSaveButton(resourceId);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            search: function (searchText) {
+                if (searchText != null && searchText != '') {
+                    $('[data-containertype="company_container"]').hide();
+                    $($('[data-containertype="setting_company_name"]:icontains(' + searchText + ')')).parents('[data-containertype="company_container"]').show();
+                } else {
+                    $('[data-containertype="company_container"]').show();
+                }
+            },
+            setHandlers: function () {
+                $('#companySearchBox').on('keyup', function () {
+                    company.search($(this).val());
+                });
+                $('[data-actiontype="editsettings"]').on('click', function () {
+                    company.clear();
+                    company.setSettingValues(this);
+                    $('#modalCompanySettings').modal('show');
+                });
+                $('[data-actiontype="save"]').on('click', function () {
+                    company.save($(this).attr('data-resource-id'));
+                });
+                $('[data-itemtype="settingsresource"]').on('change', function () {
+                    company.enableSaveButton($(this).attr('data-resource-id'));
+                });
+                $('[data-actiontype="close"]').on('click', function () {
+                    company.clear();
+                });
+                $('[data-actiontype="delete"]').on('click', function () {
+                    company.showDeleteCompany($(this).attr('data-id'), $(this).attr('data-companyname'));
+                });
+                $('[data-actiontype="confirmdelete"]').on('click', function () {
+                    if ($('#hidden_deletecompanyid').val() == $('#txt_companyvalidator').val()) {
+                        company.saveDeleteCompany($('#hidden_deletecompanyid').val(), $('#txt_datevalidator').val(), $('#txt_textvalidator').val(), $('#txt_companyvalidator').val());
+                    } else {
+                        toastr.error('CompanyId, Date Validator or Text Validator is not correct.');
+                    }
+                   
+                });
+                $('[data-actiontype="closedelete"]').on('click', function () {
+                    company.closeDeleteCompany();
+                });
+            },
+            setSettingValues: function (settingBtn) {
+                $('#company_timezone').val($(settingBtn).attr('data-setting-timezone'));
+                $('#company_language').val($(settingBtn).attr('data-setting-locale'));
+                $('#company_tag_limit').val($(settingBtn).attr('data-setting-tag-limit'));
+                $('#company_taggroup_limit').val($(settingBtn).attr('data-setting-taggroup-limit'));
+                $('#company_id').val($(settingBtn).attr('data-company-id'));
+                $('#company_ultimo_api_url').val($(settingBtn).attr('data-ultimo-rest-api-url'));
+                $('#company_ultimo_api_token').val($(settingBtn).attr('data-ultimo-rest-api-token'));
+                $('#company_tennant_json').val($(settingBtn).attr('data-tennant-json-key'));
+                if ($(settingBtn).attr('data-ultimo-enabled') === 'true') {
+                    $('#ultimo-settings').show();
+                } else {
+                    $('#ultimo-settings').hide();
+                }
+            },
+            closeDeleteCompany: function () {
+                $('#modalDeleteCompany').modal('hide');
+            },
+            showDeleteCompany: function (companyid, companyname) {
+                console.log(companyid, companyname);
+                $('#txt_datevalidator').val('');
+                $('#txt_textvalidator').val('');
+                $('#txt_companyvalidator').val('');
+                $('#span_companyname').text(companyname);
+                $('#span_companyid').text(companyid);
+                $('#hidden_deletecompanyid').val(companyid);
+
+                //show modal
+                $('#modalDeleteCompany').modal('show');
+
+            },
+            saveDeleteCompany: function (companyid, datevalidor, textvalidator, companyvalidator, companyname) {
+                console.log(companyid, datevalidor, textvalidator, companyvalidator);
+                 if ((datevalidor != null) && (textvalidator != null) && (companyid != null) && companyvalidator == companyid.toString() && textvalidator == 'DELETE') {
+                    toastr.remove();
+
+                    let deletedCompany = {
+                        CompanyId: companyid,
+                        Name: $('#span_companyname').text()
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: '/company/remove/' + companyid + '/' + datevalidor + '/' + textvalidator + companyvalidator,
+                        data: JSON.stringify(deletedCompany),
+                        success: function (data) {
+                            toastr.success('Delete company successful');
+                            setTimeout(() => {
+                                location.href = '/company';
+                            }, 1000);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        },
+                        contentType: "application/json; charset=utf-8"
+                    });
+                } else {
+                    toastr.error('CompanyId, Date Validator or Text Validator is not correct.');
+                 }
+
+        },
+        };
+
+        jQuery.expr[":"].icontains = jQuery.expr.createPseudo(function (arg) {
+            return function (elem) {
+                return jQuery(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+            };
+        });
+    </script>
+}

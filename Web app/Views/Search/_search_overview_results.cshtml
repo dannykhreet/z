@@ -1,0 +1,118 @@
+﻿@model WebApp.ViewModels.SearchResultsViewModel
+
+@*TODO: fix naming of items*@
+
+@if (Model.SearchResults != null && Model.SearchResults.Count != 0)
+{
+    @foreach (EZGO.Api.Models.Search.SearchResult searchResult in Model.SearchResults)
+    {
+
+        <div class="card w-100 results m-1" data-id="@searchResult.Id">
+
+            <div class="card-body p-0">
+                @{
+                    var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, searchResult.Picture);
+                    if (string.IsNullOrEmpty(searchResult.Picture))
+                    {
+                        picture = @"/assets/img/normal_unavailable_image.png";
+                    }
+                    //NOTE! handle video image with video image
+                }
+
+                <a class="text-muted fs-0 fs-lg-1" href="@string.Concat(Model.DetailsUrlPart, "/", searchResult.Id)">
+                    <div class="col-12 p-1">
+                        <div class="p-1">
+                            <div class="row" data-containertype="task_container" data-id="@searchResult.Id">
+                                <div class="col-sm-5 col-md-3 col-lg-3 col-xl-2">
+                                    <img src="@picture" loading="lazy" class="img-fluid"  />
+                                </div>
+                                <div class="col-sm-7 col-md-9 col-lg-9 col-xl-10">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <h5 class="mt-3 mt-sm-0">@searchResult.Name</h5>
+                                            <p class="fs--1 mb-2 mb-md-2"><span class="badge badge-secondary">@searchResult.AreaPath</span></p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-12 d-flex justify-content-between flex-column">
+                                            <div class="row checklistRow">
+                                                <div class="col-md-6 col-lg-2 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TemplateId, "Id") ?? "Id"): <strong>@searchResult.Id</strong></small></div>
+                                                @if (searchResult.Counts != null && searchResult.Counts.Count > 0)
+                                                {
+                                                    @if (searchResult.Counts.Where(x => x.Key == "Items").Any())
+                                                    {
+                                                        <div class="col-md-6 col-lg-2 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.ItemsTitle, "Items") ?? "Items"): <strong>@searchResult.Counts.Where(x => x.Key == "Items").FirstOrDefault().Value</strong></small></div>
+                                                    }
+                                                    @if (searchResult.Counts.Where(x => x.Key == "Instructions").Any())
+                                                    {
+                                                        <div class="col-md-6 col-lg-2 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.InstructionDialogTitle, "Instructions") ?? "Instructions"): <strong>@searchResult.Counts.Where(x => x.Key == "Instructions").FirstOrDefault().Value</strong></small></div>
+                                                    }
+
+                                                    @if (searchResult.Counts.Where(x => x.Key == "Assessed").Any())
+                                                    {
+                                                        <div class="col-md-6 col-lg-2 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AssessedTitle, "Assessed") ?? "Assessed"): <strong>@searchResult.Counts.Where(x => x.Key == "Assessed").FirstOrDefault().Value</strong></small></div>
+                                                    }
+
+                                                    @if (searchResult.Counts.Where(x => x.Key == "OpenAssessments").Any())
+                                                    {
+                                                        <div class="col-md-6 col-lg-2 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AssessedTitle, "OpenAssessments") ?? "OpenAssessments"): <strong>@searchResult.Counts.Where(x => x.Key == "OpenAssessments").FirstOrDefault().Value</strong></small></div>
+                                                    }
+
+                                                    @if (searchResult.Counts.Where(x => x.Key == "UserGroups").Any())
+                                                    {
+                                                        <div class="col-md-6 col-lg-2 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserGroups, "User groups") ?? "User groups"): <strong>@searchResult.Counts.Where(x => x.Key == "UserGroups").FirstOrDefault().Value</strong></small></div>
+                                                    }
+
+                                                    @if (searchResult.Counts.Where(x => x.Key == "OperationalSkills").Any())
+                                                    {
+                                                        <div class="col-md-6 col-lg-2 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixOperationalSkills, "Operational skills") ?? "Operational skills"): <strong>@searchResult.Counts.Where(x => x.Key == "OperationalSkills").FirstOrDefault().Value</strong></small></div>
+                                                    }
+
+                                                    @if (searchResult.Counts.Where(x => x.Key == "MandatorySkills").Any())
+                                                    {
+                                                        <div class="col-md-6 col-lg-2 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixMandatorySkills, "Mandatory skills") ?? "Mandatory skills"): <strong>@searchResult.Counts.Where(x => x.Key == "MandatorySkills").FirstOrDefault().Value</strong></small></div>
+                                                    }
+
+                                                }
+
+                                                @if (searchResult.LinkedInformation != null && searchResult.LinkedInformation.Count > 0)
+                                                {
+                                                    @if (searchResult.LinkedInformation.Where(x => x.Key == "Audit").Any())
+                                                    {
+                                                        <div class="col-md-6 col-lg-2 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TemplateLinkTitle, "Link") ?? "Link"): <strong>Audit #@searchResult.Counts.Where(x => x.Key == "Instructions").FirstOrDefault().Value</strong></small></div>
+                                                    }
+                                                    @if (searchResult.LinkedInformation.Where(x => x.Key == "Checklist").Any())
+                                                    {
+                                                        <div class="col-md-6 col-lg-2 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TemplateLinkTitle, "Link") ?? "Link"): <strong>Checklist #@searchResult.Counts.Where(x => x.Key == "Instructions").FirstOrDefault().Value</strong></small></div>
+                                                    }
+                                                    @if (searchResult.LinkedInformation.Where(x => x.Key == "AttachmentFile").Any())
+                                                    {
+                                                        <div class="col-md-6 col-lg-2 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TemplateAttachmentTitle, "Attachment") ?? "Attachment"): <strong>PDF</strong></small></div>
+                                                    }
+                                                }
+
+                                                @if (!string.IsNullOrEmpty(searchResult.Role))
+                                                {
+                                                    <div class="col-md-6 col-lg-3 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TemplateRoleTitle, "Role") ?? "Role"): <strong>@searchResult.Role</strong></small></div>
+                                                }
+                                                @if (!string.IsNullOrEmpty(searchResult.Type))
+                                                {
+                                                    <div class="col-md-6 col-lg-2 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TemplateRecurrenceTitle, "Recurrence") ?? "Recurrence"): <strong>@searchResult.Type</strong></small></div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    }
+}
+else
+{
+    <partial name="~/Views/Shared/_no_templates_message.cshtml" model="@Model" />
+}

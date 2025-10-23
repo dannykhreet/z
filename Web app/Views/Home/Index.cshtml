@@ -1,0 +1,150 @@
+﻿@{
+    ViewData["Title"] = Model?.CmsLanguage.GetValue(LanguageKeys.Home.Title, "Home Page") ?? "Home Page";
+}
+    <div id="dashboard">
+        <div class="row space-rows">
+            <div class="col-md-6 col-lg-4 col-xl-3 mb-5" data-role="tile-button" data-list="checklist">
+                <div class="card cards-shadown shadow cards-hover" data-aos="flip-right" data-aos-duration="500">
+                    <div class="card-header" style="background-image: url(&quot;/assets/img/home/checklist_cell_image.png&quot;);background-repeat: no-repeat;background-size: cover;background-position: 1%;">
+                        <span class="space"><a href="#"><i class="icon ion-android-checkmark-circle" id="download-icon" style="color: rgb(255,255,255);"></i></a></span>
+                        <div class="cardheader-text">
+                            <h4 id="heading-card">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.HeaderChecklists, "Checklists") ?? "Checklists")</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text sub-text-color">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.LastActivityText, "Last activity:") ?? "Last activity:")</p>
+                        <p class="card-text cardbody-sub-text">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.TwoMinutesAgoText, "2 minutes ago") ?? "2 minutes ago")</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 col-xl-3 mb-5" data-role="tile-button" data-list="tasklist">
+                <div class="card cards-shadown shadow cards-hover" data-aos="flip-right" data-aos-duration="950">
+                    <div class="card-header" style="background-image: url(&quot;/assets/img/home/tasks_cell_image.png&quot;);background-size: cover;background-position: 1%;">
+                        <span class="space"><a href="#"><i class="icon ion-android-checkmark-circle" id="download-icon" style="color: rgb(255,255,255);"></i></a></span>
+                        <div class="cardheader-text">
+                            <h4 id="heading-card">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.HeaderTasks, "Tasks") ?? "Tasks")</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text sub-text-color">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.LastActivityText, "Last activity:") ?? "Last activity:")</p>
+                        <p class="card-text cardbody-sub-text">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.TwoMinutesAgoText, "2 minutes ago") ?? "2 minutes ago")</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 col-xl-3 mb-5" data-role="tile-button" data-list="auditlist">
+                <div class="card cards-shadown shadow cards-hover" data-aos="flip-up" data-aos-duration="950">
+                    <div class="card-header cards-header-hover" style="background-image: url(&quot;/assets/img/home/audit_cell_image.png&quot;);background-size: cover;background-position: 1%;">
+                        <span class="space"><a href="#"><i class="icon ion-android-checkmark-circle" id="download-icon" style="color: rgb(255,255,255);"></i></a></span>
+                        <div class="cardheader-text">
+                            <h4 id="heading-card">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.HeaderAudits, "Audits") ?? "Audits")</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text sub-text-color">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.LastActivityText, "Last activity:") ?? "Last activity:")</p>
+                        <p class="card-text cardbody-sub-text">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.TwoMinutesAgoText, "2 minutes ago") ?? "2 minutes ago")</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 col-xl-3 mb-5" data-role="tile-button" data-list="actionlist">
+                <div class="card cards-shadown shadow cards-hover" data-aos="flip-left" data-aos-duration="950">
+                    <div class="card-header cards-header-hover" style="background-image: url(&quot;/assets/img/home/action_tile_image.png&quot;);background-size: cover;background-position: 1%;">
+                        <span class="space"><a href="#"><i class="icon ion-android-checkmark-circle" id="download-icon" style="color: rgb(255,255,255);"></i></a></span>
+                        <div class="cardheader-text">
+                            <h4 id="heading-card">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.HeaderActions, "Actions") ?? "Actions")</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text sub-text-color">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.LastActivityText, "Last activity:") ?? "Last activity:")</p>
+                        <p class="card-text cardbody-sub-text">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.TwoMinutesAgoText, "2 minutes ago") ?? "2 minutes ago")</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 col-xl-3 mb-5" data-role="tile-button" data-list="report">
+                <div class="card cards-shadown shadow cards-hover" data-aos="flip-down" data-aos-duration="950">
+                    <div class="card-header cards-header-hover" style="background-image: url(&quot;/assets/img/home/report_cell_image.png&quot;);background-size: cover;background-position: 1%;">
+                        <span class="space"><a href="#"><i class="icon ion-android-checkmark-circle" id="download-icon" style="color: rgb(255,255,255);"></i></a></span>
+                        <div class="cardheader-text">
+                            <h4 id="heading-card">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.HeaderReports, "Reports") ?? "Reports")</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text sub-text-color">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.LastActivityText, "Last activity:") ?? "Last activity:")</p>
+                        <p class="card-text cardbody-sub-text">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.TwoMinutesAgoText, "2 minutes ago") ?? "2 minutes ago")</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 col-xl-3 mb-5" data-role="tile-button" data-list="config">
+                <div class="card cards-shadown shadow cards-hover" data-aos="flip-down" data-aos-duration="950">
+                    <div class="card-header cards-header-hover" style="background-image: url(&quot;/assets/img/home/report_cell_image.png&quot;);background-size: cover;background-position: 1%;">
+                        <span class="space"><a href="#"><i class="icon ion-android-checkmark-circle" id="download-icon" style="color: rgb(255,255,255);"></i></a></span>
+                        <div class="cardheader-text">
+                            <h4 id="heading-card">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.HeaderConfiguration, "Configuration") ?? "Configuration")</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text sub-text-color">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.LastActivityText, "Last activity:") ?? "Last activity:")</p>
+                        <p class="card-text cardbody-sub-text">@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.TwoMinutesAgoText, "2 minutes ago") ?? "2 minutes ago")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+@section Scripts{
+<script>
+
+    $(document).ready(function () {
+        config.load();
+        if (!config.settings.showActivity) {
+            $("div[data-role='tile-button'] div.card-body").hide();
+        };
+        if (!config.settings.showHeaderImages) {
+            $("div[data-role='tile-button'] div.card-header").css('background-image', '');
+        };
+        $('#chk-activity').prop("checked", config.settings.showActivity);
+        $('#chk-headerimg').prop("checked", config.settings.showHeaderImages);
+        $("div[data-role='tile-button']").on('click', function (event) {
+            var listType = $(event.currentTarget).data('list');
+            //window.console.log(listType);
+            switch (listType) {
+                case 'checklist':
+                    location.href = '/checklist';
+                    break;
+                case 'tasklist':
+                    location.href = '/task';
+                    break;
+                case 'auditlist':
+                    location.href = '/audit';
+                    break;
+                case 'actionlist':
+                    location.href = '/action';
+                    break;
+                case 'report':
+                    location.href = '/report';
+                    break;
+                case 'config':
+                    location.href = '/config';
+                    break;
+                default:
+                    location.href = '/';
+                    break;
+            }
+        });
+
+        $('#chk-activity').on('change', function () {
+            var status = $(this).is(':checked');
+            config.settings.showActivity = status;
+            config.save();
+        });
+        $('#chk-headerimg').on('change', function () {
+            var status = $(this).is(':checked');
+            config.settings.showHeaderImages = status;
+            config.save();
+        });
+
+
+    });
+
+</script>
+}

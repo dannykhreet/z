@@ -1,0 +1,962 @@
+﻿@model WebApp.ViewModels.CompanyViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout_template";
+
+    var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Picture);
+    if (string.IsNullOrEmpty(Model.Picture))
+    {
+        picture = @"/assets/img/normal_unavailable_image.png";
+    }
+}
+
+<style>
+    #generate_service_user:hover { background-color: orange;}
+</style>
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <a asp-controller="Company" asp-action="Index"><i class="fa fa-arrow-left"></i>@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BackToCompaniesTitle, "Back to companies") ?? "Back to companies")</a>
+                <h1>@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.Title, "Company") ?? "Company")</h1>
+            </div>
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                <button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" onclick="company.save()">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnSave, "Save") ?? "Save")</button>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+    <div class="row pt-1" style="height:calc(100vh - 175px);overflow:auto;">
+        <div class="col-lg-12">
+            <div class="col-12 p-0 pb-3">
+                <div class="row card-group">
+                    <div class="col-sm-4 col-md-2">
+                        <div class="card h-100" style="width:100%;height:238px;display:flex;border-radius: 5px;">
+                            <div class="card-body">
+                                <div style="text-align: center;">
+                                    <div style="text-align: center; align-content: center;">
+                                        <div style="display: inline-flex; position:relative; align-self: center; ">
+                                            <img src="/images/media-loading.gif" data-src="@picture" id="company_image" class="" style="width:100%"  />
+                                            <div class="controls d-print-none" style="position:absolute;bottom:0px;">
+                                                <input class="d-none" type="file" id="uploaderTemplate" accept="image/*" name="photo" onchange="company.previewFile(this);" data-preview="#company_image" data-type="image" required="">
+                                                <a href="#" onclick="$('#uploaderTemplate').trigger('click'); return false;">
+                                                    <div class="border rounded-circle float-right d-lg-flex justify-content-lg-center shadow main-image-pencil" style="background-color:#FFFFFF;margin-left:4px; margin-bottom:6px; height:20px; width:20px;">
+                                                        <i class="fa fa-paperclip d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 14px;"></i>
+                                                    </div>
+                                                </a>
+                                                <a href="#" data-selector="deletemedia" data-type="template" onclick="company.removeFile(this);" data-preview="#company_image">
+                                                    <div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil" style="background-color:#FFFFFF;margin-left:28px; margin-bottom:6px; height:20px; width:20px;">
+                                                        <i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 14px;"></i>
+                                                    </div>
+                                                </a>
+                                                <video id="dialogVideo" controls="" style="display:none;">
+                                                </video>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-8 col-md-10">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_name">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanyName, "Name") ?? "Name")</label>
+                                        <input type="text" class="form-control" id="company_name" name="company_name" maxlength="200" value="@Model.Name" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_description">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanyDescription, "Description") ?? "Description")</label>
+                                        <textarea class="form-control" id="company_description" name="company_description">@Model.Description</textarea>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_manager">Manager@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanyManager, "Manager") ?? "Manager")</label>
+                                        <select id="company_manager" class="form-control">
+                                            @if (Model.Users != null)
+                                            {
+                                                @foreach (var item in Model.Users)
+                                                {
+
+                                                    if (item.Id == Model.ManagerId)
+                                                    {
+                                                        <option value="@item.Id" selected title="@item.LastName, @item.FirstName">@item.LastName, @item.FirstName</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@item.Id" title="@item.LastName, @item.FirstName">@item.LastName, @item.FirstName</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 p-0 pb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CardCompanyHoldingTitle, "Company Holding") ?? "Company Holding")</h3>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col pb-2">
+                                <label for="company_holding">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanyHolding, "Holding") ?? "Holding")</label>
+                                <select id="company_holding" class="form-control">
+                                    <option value="" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.NoHoldingSelectedTitle, "No holding selected.") ?? "No holding selected.")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.OptionNoHoldingSelected, "No company holding selected") ?? "No company holding selected")</option>
+                                    @if (Model.Holdings != null)
+                                    {
+                                        @foreach (EZGO.Api.Models.Holding item in Model.Holdings)
+                                        {
+                                            if (item.Id == Model.HoldingId)
+                                            {
+                                                <option value="@item.Id" selected title="@item.Name" data-holdingunits="@item.HoldingUnits.ToJsonFromObject()">@item.Name (@item.SecurityGUID)</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.Id" title="@item.Name" data-holdingunits="@item.HoldingUnits.ToJsonFromObject()">@item.Name (@item.SecurityGUID)</option>
+                                            }
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col pb-2">
+                                <label for="company_holding_security_guid" title="Enter the security GUID as saved with the selected holding.">Security GUID</label>
+                                <input type="text" class="form-control" id="company_holding_security_guid" name="company_holding_security_guid" maxlength="200" value="@Model.HoldingCompanySecurityGUID" title="Enter the security GUID as saved with the selected holding." />
+                            </div>
+                        </div>
+                        <div>
+                            Depending on functionality, the security code has to be the same as the selected holding security code (displayed between brackets). <br />This is a security measure to make
+                            sure that the holding is not accidentally chosen.<br />
+                            This currently impacts the following functionality:<br />
+                            - Datawarehouse<br />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 p-0 pb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanySettingsNameTitle, "Company settings") ?? "Company settings")</h3>
+                    </div>
+
+                    <div class="card-body p-3">
+                        <div class="card-header">
+                            <h3 class="card-title" style="border-bottom:1px solid #C0C0C0">Localization</h3>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_timezone">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanyTimezoneTitle, "Timezone") ?? "Timezone")</label>
+                                        <select id="company_timezone" class="form-control" data-resource-id="1">
+                                            <option value="" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.NoCompanyTimezoneSelectedTitle, "No company timezone selected, therefor will default to UTC.") ?? "No company timezone selected, therefor will default to UTC.")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.OptionNoCompanyTimezoneSelected, "No company timezone selected") ?? "No company timezone selected")</option>
+                                            @if (Model.Timezones != null)
+                                            {
+                                                @foreach (EZGO.Api.Models.Settings.DatabaseTimezoneItem item in Model.Timezones)
+                                                {
+                                                    @if (item.Name == "Europe/Amsterdam")
+                                                    {
+                                                        <option value="@item.Name" selected title="@item.Name (@item.Abbrivation) - @item.UtcOffset @(item.IsDayLightSavingsTime ? "Daylight Savings Time" : "")">@item.Name (@item.UtcOffset)</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@item.Name" title="@item.Name (@item.Abbrivation) - @item.UtcOffset @(item.IsDayLightSavingsTime ? "Daylight Savings Time" : "")">@item.Name (@item.UtcOffset)</option>
+                                                    }
+
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_language">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanyLanguageTitle, "Language/Locale") ?? "Language/Locale")</label>
+                                        <select id="company_language" class="form-control" data-resource-id="99">
+                                            <option value="" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.NoCompanyLanguageSelectedTitle, "No company language selected, therefor will default to English.") ?? "No company language selected, therefor will default to English.")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.OptionNoLanguageOrLocaleSelected, "No language/locale selected") ?? "No language/locale selected")</option>
+                                            @if (Statics.AvailableLanguages != null)
+                                            {
+                                                @foreach (var item in Statics.AvailableLanguages)
+                                                {
+                                                    var cltr = System.Globalization.CultureInfo.GetCultureInfo(item);
+                                                    if (item.ToLower() == "en-us")
+                                                    {
+                                                        <option value="@item" selected title="@cltr.NativeName">@string.Concat(cltr.NativeName.Substring(0, 1).ToUpper(), cltr.NativeName.Substring(1, cltr.NativeName.Length - 1)) (@cltr.TwoLetterISOLanguageName.ToUpper()) (@cltr.Name) (@cltr.EnglishName)</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@item" title="@cltr.NativeName">@string.Concat(cltr.NativeName.Substring(0, 1).ToUpper(), cltr.NativeName.Substring(1, cltr.NativeName.Length - 1)) (@cltr.TwoLetterISOLanguageName.ToUpper()) (@cltr.Name) (@cltr.EnglishName)</option>
+                                                    }
+
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_country">Country</label>
+                                        <select id="company_country" class="form-control" data-resource-id="99">
+                                            <option value="" title="No country selected">No country selected.</option>
+                                            @if (Model.Countries != null)
+                                            {
+                                                @foreach (var item in Model.Countries)
+                                                {
+                                                    if (Model.CompanySettings != null && Model.CompanySettings.Country != null && item.Iso2.ToLower() == Model.CompanySettings.Country.ToLower())
+                                                    {
+                                                        <option value="@item.Iso2" selected title="@item.Name">@item.Name</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@item.Iso2" title="@item.Name">@item.Name</option>
+                                                    }
+
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_coords">Coordinates (latitude,longitude)</label><br />
+                                        <input type="text" class="form-control" id="company_coords" name="company_coords" title="Company coordinates in latitude and longitude. If possible, map, apple maps, google maps and openstraat map url will be generated." value="@Model.CompanySettings.Coords" />
+                                        <div id="company_coords_edit_maps" style="display:none;">
+                                            <br />
+                                            <iframe id="os_map" width="425" height="350" src="" style="border: 1px solid black;"></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_mapuris">Maps</label>&nbsp;&nbsp;
+                                        <i class="fa-brands fa-apple" id="btn_applemaps" data-kind="apple" data-type="map_button" style="cursor: pointer" title="Open Apple maps, if available"></i> |
+                                        <i class="fa-brands fa-google" id="btn_googlemaps" data-kind="google" data-type="map_button" style="cursor: pointer" title="Open Google maps, if available"></i> |
+                                        <i class="fa-solid fa-map-location-dot" id="btn_osmaps" data-kind="os" data-type="map_button" style="cursor: pointer" title="Open OpenStreet maps, if available"></i> |
+                                        <i class="fa-solid fa-pen-to-square" id="btn_edit_maps_uris" style="cursor: pointer"></i>
+                                        <br />
+                                        <div id="company_coords_edit_element" style="display:none;">
+                                            <input type="text" class="form-control" id="company_mapuris" name="company_mapuris" title="Company map uri's." style="display:none;" />
+                                            <input type="text" class="form-control" id="company_mapuri_apple" name="company_mapuri_apple" data-kind="apple" data-type="map_uri" title="Map uri Apple maps." placeholder="Apple maps direct link" />
+                                            <input type="text" class="form-control" id="company_mapuri_google" name="company_mapuri_google" data-kind="google" data-type="map_uri" title="Map uri Google maps" placeholder="Google maps direct link" />
+                                            <input type="text" class="form-control" id="company_mapuri_openstreet" name="company_mapuri_openstreet" data-kind="os" data-type="map_uri" title="Map uri OpenStreet Maps" placeholder="OpenStreet maps direct link" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-header">
+                            <h3 class="card-title" style="border-bottom:1px solid #C0C0C0">Platform features</h3>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_tier">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanyFeatureTierTitle, "Company feature tier") ?? "Company feature tier")</label>
+                                        <select id="company_tier" class="form-control" data-resource-id="1">
+                                            <option value="essential" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.EssentialTierTitle, "Essential tier") ?? "Essential tier")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.OptionEssential, "Essential") ?? "Essential")</option>
+                                            <option value="advanced" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.AdvancedTierTitle, "Advanced tier") ?? "Advanced tier")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.OptionAdvanced, "Advanced") ?? "Advanced")</option>
+                                            <option value="premium" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.PremiumTierTitle, "Premium tier") ?? "Premium tier")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.OptionPremium, "Premium") ?? "Premium")</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_taskgeneration">Task generation enabled</label><br />
+                                        <div style="width:40px;"><input type="checkbox" class="form-control" style="height:30px;width:30px;" id="company_taskgeneration" name="company_taskgeneration" title="Enable task generation. Note! only enable if functionality is used." /></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_datawarehouse">Data warehouse enabled</label><br />
+                                        <div style="width:40px;"><input type="checkbox" class="form-control" style="height:30px;width:30px;" id="company_datawarehouse" name="company_datawarehouse" title="Enable data warehouse module." /></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_wichangednotifications">Work instruction changes notifications enabled</label><br />
+                                        <div style="width:40px;"><input type="checkbox" class="form-control" style="height:30px;width:30px;" id="company_wichangednotifications" name="company_wichangednotifications" title="Enable work instruction changes notifications feature." /></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-header">
+                            <h3 class="card-title" style="border-bottom:1px solid #C0C0C0">Security</h3>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_iprestrictions">IP Restrictions enabled</label><br />
+                                        <div style="width:40px;"><input type="checkbox" class="form-control" style="height:30px;width:30px;" id="company_iprestrictions" name="company_iprestrictions" title="Enable ip restrictions." /></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_iprestrictionlist">Valid ip for ip restrictions</label><br />
+                                        <input type="text" class="form-control" id="company_iprestrictionlist" name="company_iprestrictionlist" title="Company ip's that are valid, this is a comma(,) separated field. NOTE only valid ipv4 ip's" value="@Model.CompanySettings.IpRestrictionList" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-header">
+                            <h3 class="card-title" style="border-bottom:1px solid #C0C0C0">Smart Services</h3>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_virtualteamlead">Virtual Teamlead enabled</label><br />
+                                        <div style="width:40px;"><input type="checkbox" class="form-control" id="company_virtualteamlead" name="company_virtualteamlead" title="Enable virtual team lead feature." style="height:30px;width:30px;" /></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_virtualteamleadmodules">Virtual Team Lead available modules</label><br />
+                                        <input type="text" class="form-control" id="company_virtualteamleadmodules" name="company_virtualteamleadmodules" title="Available modules for virtual team lead." value="@Model.CompanySettings.VirtualTeamLeadModules" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_translations">Translations enabled</label><br />
+                                        <div style="width:40px;"><input type="checkbox" class="form-control" id="company_translations" name="company_translations" title="Enable translation modules feature." style="height:30px;width:30px;" /></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_translationlanguages">Translations available languages</label><br />
+                                        <input type="text" class="form-control" id="company_translationlanguages" name="company_translationlanguages" title="Enabled languages for company that are used in translation modules, comma(,) separated value, containing ISO2 language versions." value="@Model.CompanySettings.TranslationLanguages" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label for="company_translationmodules">Translations available in modules</label><br />
+                                        <input type="text" class="form-control" id="company_translationmodules" name="company_translationmodules" title="Modules where translations are used, comma(,) separated value." value="@Model.CompanySettings.TranslationModules" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-header">
+                            <h3 class="card-title" style="border-bottom:1px solid #C0C0C0">Connectors</h3>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                @{
+                                    bool sapEnabled = Model.CompaniesFeatures.Where(x => x.CompanyId == Model.Id).FirstOrDefault().Features?.MarketSapEnabled == true;
+                                    bool connectorEnabled = sapEnabled; //when moving ultimo, also check ultimo
+                                }
+                                <div @(sapEnabled ? "" : "hidden")>
+                                    <div class="row">
+                                        <div class="col pb-2">
+                                            <label for="company_sappmcompanyid">SAP PM Company id</label><br />
+                                            <input type="text" class="form-control" id="company_sappmcompanyid" name="company_sappmcompanyid" title="SAP PM Company id." />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col pb-2">
+                                            <label for="company_sappmnotificationoptions">SAP PM notification options (JSON)</label><br />
+                                            <input type="text" class="form-control" id="company_sappmnotificationoptions" name="company_sappmnotificationoptions" title="SAP PM notification options (JSON)" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col pb-2">
+                                            <label for="company_sap_pm_authorization_url">SAP PM authorization URL</label><br />
+                                            <input type="text" class="form-control" id="company_sap_pm_authorization_url" name="company_sap_pm_authorization_url" title="SAP PM authorization URL" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col pb-2">
+                                            <label for="company_sap_pm_location_url">SAP PM location URL</label><br />
+                                            <input type="text" class="form-control" id="company_sap_pm_location_url" name="company_sap_pm_location_url" title="SAP PM location URL" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col pb-2">
+                                            <label for="company_sap_pm_notification_url">SAP PM notification URL</label><br />
+                                            <input type="text" class="form-control" id="company_sap_pm_notification_url" name="company_sap_pm_notification_url" title="SAP PM notification URL" />
+                                        </div>
+                                    </div>        
+                                    <div class="row">
+                                        <div class="col pb-2">
+
+                                            <label for="company_sap_pm_timezone">SAP PM @(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanyTimezoneTitle, "Timezone") ?? "Timezone")</label>
+                                            <select id="company_sap_pm_timezone" class="form-control" data-resource-id="1">
+                                                <option value="" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.NoCompanyTimezoneSelectedTitle, "No company timezone selected, therefor will default to UTC.") ?? "No company timezone selected, therefor will default to UTC.")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.OptionNoCompanyTimezoneSelected, "No company timezone selected") ?? "No company timezone selected")</option>
+                                                @if (Model.Timezones != null)
+                                                {
+                                                    @foreach (EZGO.Api.Models.Settings.DatabaseTimezoneItem item in Model.Timezones)
+                                                    {
+                                                        @if (Model.CompanySettings != null && Model.CompanySettings.SapPmTimezone == item.Name)
+                                                        {
+                                                            <option value="@item.Name" selected title="@item.Name (@item.Abbrivation) - @item.UtcOffset @(item.IsDayLightSavingsTime ? "Daylight Savings Time" : "")">@item.Name (@item.UtcOffset)</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.Name" title="@item.Name (@item.Abbrivation) - @item.UtcOffset @(item.IsDayLightSavingsTime ? "Daylight Savings Time" : "")">@item.Name (@item.UtcOffset)</option>
+                                                        }
+
+                                                    }
+                                                }
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <p @(connectorEnabled ? "hidden" : "")>No connector with settings enabled</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 p-0 pb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Tools</h3>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col pb-2">
+                                <label title="">Add an extra service user</label>
+                                <input type="button" class="form-control" id="generate_service_user" name="generate_service_user" title="Generate an extra service user with pre-determined password. If successful user name will appear below." value="Generate Service User"/>
+                            </div>
+                        </div>
+                        <div id="saved_user_name" style="text-align:center">
+                        </div>
+                        <div>
+                            Note! adding a extra service user WILL be visible by the customer in the logging. <br />If this is needed you should only generate a service user in consultation with the customer.<br />
+                            After logging-in please, change password for the service user, this will be forced in a later update.<br />
+                        </div>
+                    </div>
+                    <div class="card-body p-3">
+                        @if (Model.CompaniesFeatures.Where(x => x.CompanyId == Model.Id).FirstOrDefault() != null)
+                        {
+                            var taskGeneratorEnabled = Model.CompaniesFeatures.Where(x => x.CompanyId == Model.Id).FirstOrDefault().TaskGenerationEnabled;
+                            if (!taskGeneratorEnabled)
+                            {
+                                <i class="fas fa-exclamation-triangle" style="color:red; font-size: 40px;" title="Task Generation NOT enabled."></i><label style="padding-left:10px;font-size:20px;">Task Generation NOT enabled.</label>
+                            }
+                            else
+                            {
+                                <div class="row">
+                                    <div class="col pb-2">
+                                        <label title="">Remove old task generation configurations for this company</label>
+                                        <input type="button" class="form-control" id="reduce_task_generation_configs" name="reduce_task_generation_configs" title="Reduce Task generation configurations." value="Reduce Task generation configurations" />
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="company_id" id="company_id" value="@Model.Id" />
+</section>
+
+
+@section Scripts{
+    <script src="/js/ezgoUtils.js"></script>
+    @if (Model.Holdings != null)
+    {
+        <script>
+            var holdingCollection = JSON.parse('@Html.Raw(Model.Holdings.ToJsonFromObject())');
+        </script>
+
+    }
+    else
+    {
+        <script>
+            var holdingCollection = {};
+        </script>
+    }
+    <script>
+        var company = {
+            _mediaarray: [],
+            _mediapath: '@(string.IsNullOrEmpty(Model.ApplicationSettings?.MediaLocations?.ImageMediaBaseUri) ? Constants.General.MediaUrl : Model.ApplicationSettings?.MediaLocations?.ImageMediaBaseUri)',
+            tempImage: null,
+            tempImageType: null,
+            defaultImage: '/assets/img/normal_unavailable_image.png',
+            createCompany: function () {
+                let changedCompany = {
+                    Description: $('#company_description').val(),
+                    Picture: $('#company_image').data('src'),
+                    Name: $('#company_name').val(),
+                    Id: parseInt($('#company_id').val()),
+                    ManagerId: parseInt($('#company_manager').val()),
+                    CompanySettings: {
+                        CompanyId: parseInt($('#company_id').val()),
+                        Locale: $('#company_language').val(),
+                        TimeZone: $('#company_timezone').val(),
+                        Country: $('#company_country').val(),
+                        Coords: $('#company_coords').val(),
+                        MapsJson: $('#company_mapuris').val(),
+                        TierLevel: $('#company_tier').val(),
+                        EnableTaskGeneration: $('#company_taskgeneration').is(':checked'),
+                        EnableDataWarehouse: $('#company_datawarehouse').is(':checked'),
+                        EnableWorkInstructionChangesNotifications: $('#company_wichangednotifications').is(':checked'),
+                        SapPmCompanyId: $('#company_sappmcompanyid').val(),
+                        SapPmNotificationOptions: $('#company_sappmnotificationoptions').val(),
+                        SapPmAuthorizationUrl: $('#company_sap_pm_authorization_url').val(),
+                        SapPmFunctionalLocationUrl: $('#company_sap_pm_location_url').val(),
+                        SapPmNotificationUrl: $('#company_sap_pm_notification_url').val(),
+                        SapPmTimezone: $('#company_sap_pm_timezone').val(),
+
+                        EnableIpRestrictions: $('#company_iprestrictions').is(':checked'),
+                        IpRestrictionList: $('#company_iprestrictionlist').val(),
+                        EnableVirtualTeamLead: $('#company_virtualteamlead').is(':checked'),
+                        VirtualTeamLeadModules: $('#company_virtualteamleadmodules').val(),
+                        EnableTranslations: $('#company_translations').is(':checked'),
+                        TranslationModules: $('#company_translationmodules').val(),
+                        TranslationLanguages: $('#company_translationlanguages').val()
+
+                    }
+                }
+
+                if ($('#company_holding').val() !== '') {
+                    changedCompany.HoldingId = parseInt($('#company_holding').val());
+                    changedCompany.HoldingCompanySecurityGUID = $('#company_holding_security_guid').val();
+                    if ($('#company_holdingunit').val() != null) {
+                        changedCompany.HoldingUnitIds = [];
+                        let ids = $('#company_holdingunit').val();
+                        for (let i = 0; i < ids.length; i++) {
+                            changedCompany.HoldingUnitIds.push(parseInt(ids[i]));
+                        }
+                    } else {
+                        changedCompany.HoldingUnitIds = [];
+                    }
+
+                }
+
+                changedCompany.Picture = company.fixImage(changedCompany.Picture);
+
+                return changedCompany;
+            },
+            fixImage: function (imageUrl) {
+                let imageout = '';
+                if (imageUrl.includes('unavailable') || imageUrl.startsWith('blob:') || imageUrl.startsWith('/assets/img/')) {
+                    return imageout;
+                } else {
+                    imageout = imageUrl.replace(company._mediapath, '');
+                    return imageout;
+                }
+            },
+            init: function () {
+                company.initHandlers();
+                company.initSettingValues();
+            },
+            initHandlers: function () {
+                $('#generate_service_user').on('click', function () {
+                    company.setAndRetrieveNewServiceAccount($('#company_id').val())
+                });
+
+                $('#reduce_task_generation_configs').on('click', function() {
+                    company.reduceTaskGenerationConfigs($('#company_id').val());
+                })
+
+                $('#company_mapuri_apple,#company_mapuri_google,#company_mapuri_openstreet').on('change', function () {
+                    company.setMapEmbed();
+                    company.setMapUriJson();
+                });
+                 $('#company_coords').on('change', function () {
+                    company.setMapEmbed();
+                    company.convertLatLonToMapUrls($(this).val());
+                    company.setMapUriJson();
+                });
+                $('#btn_edit_maps_uris').on('click', function() {
+                    $('#company_coords_edit_element').show();
+                });
+                $('[data-type="map_button"]').on('click', function() {
+                    company.openMaps($(this).attr('data-kind'));
+                });
+            },
+            initSettingValues: function () {
+                $('#company_taskgeneration').prop('checked', @(Model.CompanySettings.EnableTaskGeneration.ToString().ToLower()));
+                $('#company_datawarehouse').prop('checked', @(Model.CompanySettings.EnableDataWarehouse.ToString().ToLower()));
+                $('#company_wichangednotifications').prop('checked', @(Model.CompanySettings.EnableWorkInstructionChangesNotifications.ToString().ToLower()));
+                $("#company_timezone").val('@(Model.CompanySettings.TimeZone)').change();
+                $("#company_language").val('@(Model.CompanySettings.Locale)').change();
+                $("#company_tier").val('@(Model.CompanySettings.TierLevel)').change();
+                $("#company_sappmcompanyid").val('@(Model.CompanySettings.SapPmCompanyId)');
+                $("#company_sappmnotificationoptions").val('@(Html.Raw(Model.CompanySettings.SapPmNotificationOptions))');
+                $("#company_sap_pm_authorization_url").val('@(Html.Raw(Model.CompanySettings.SapPmAuthorizationUrl))');
+                $("#company_sap_pm_location_url").val('@(Html.Raw(Model.CompanySettings.SapPmFunctionalLocationUrl))');
+                $("#company_sap_pm_notification_url").val('@(Html.Raw(Model.CompanySettings.SapPmNotificationUrl))');
+                $("#company_sap_pm_timezone").val('@(Html.Raw(Model.CompanySettings.SapPmTimezone))');
+                $('#company_iprestrictions').prop('checked', @(Model.CompanySettings.EnableIpRestrictions.ToString().ToLower()));
+                $('#company_virtualteamlead').prop('checked', @(Model.CompanySettings.EnableVirtualTeamLead.ToString().ToLower()));
+                $('#company_translations').prop('checked', @(Model.CompanySettings.EnableTranslations.ToString().ToLower()));
+
+                $('#company_mapuris').val('@(Html.Raw(Model.CompanySettings.MapsJson))');
+                company.setMapEmbed();
+                if($('#company_mapuris').val() != null && $('#company_mapuris').val() != '') {
+                    company.setMapUris(); //prefill map uris for ez navigation
+                }
+                if($('#company_coords').val() != null && $('#company_coords').val() != '') {
+                    if($('#company_mapuris').val() == null || $('#company_mapuris').val() == '') {
+                        company.convertLatLonToMapUrls($('#company_coords').val());//if no map uris, try to convert
+                        company.setMapUriJson(); //create json from possibly generated items
+                    }
+                }
+            },
+            previewFile: async function (input) {
+                var maxSizeMB = 0.3;
+
+                const options = {
+                    maxWidthOrHeight: 480,
+                    useWebWorker: true,
+                    maxIteration: 1
+                };
+
+                var previewElement = $(input).data('preview');
+                var compressedFile = event.target.files[0];
+
+                if (compressedFile != undefined && compressedFile !== null) {
+                    //First only resize image
+                    compressedFile = await imageCompression(compressedFile, options);
+                    //console.log(`Successfully compressed file to ${compressedFile.size / 1024} KB.`);
+
+                    //Then compress image if necessary
+                    while (compressedFile.size / 1024 / 1024 > maxSizeMB) {
+                        options.maxSizeMB = maxSizeMB;
+                        compressedFile = await imageCompression(compressedFile, options);
+                        //console.log(`Successfully compressed file to ${compressedFile.size / 1024} KB.`);
+                    }
+
+                    var ext = compressedFile.name.split('.').pop();
+                    var fileReader = new FileReader();
+                    fileReader.onload = function () {
+                        var url = URL.createObjectURL(compressedFile, { oneTimeOnly: true });
+                        company.tempImage = url;
+                        company.tempImageType = ext;
+                        $(previewElement).attr("src", url).parent('a').attr('href', url);
+                    };
+                    fileReader.readAsDataURL(compressedFile);
+                }
+            },
+            removeFile: function (rmbutton) {
+                var previewElement = $(rmbutton).attr('data-preview');
+                company.tempImage = null;//reset image to null
+                company.tempImageType = null; //reset image type to null
+                $(previewElement).attr('src', company.defaultImage); //reset to default image
+                $('#company_image').data('src', company.defaultImage); //reset to default image
+            },
+            save: async function () {
+                toastr.remove();
+                $('body').toggleClass('loaded');
+
+                await company.saveMedia(); //save media if there is media
+
+                let newCompany = company.createCompany();
+
+                $.ajax({
+                    type: "POST",
+                    url: '/company/save',
+                    data: JSON.stringify(newCompany),
+                    success: function (data) {
+                        $('body').toggleClass('loaded');
+                        toastr.success('@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanySaved, "Company Saved") ?? "Company Saved")');
+                        setTimeout(() => {
+                            location.href = '/company';
+                        }, 1000);
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('body').toggleClass('loaded');
+                        toastr.error(JSON.parse(jqXHR.responseText) + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            saveMedia: async function () {
+                let output = null;
+                if (company.tempImage != null) {
+                    if (String(company.tempImage).startsWith('blob:') || String(company.tempImage).startsWith('data:')) {
+                        var url = company.tempImage;
+                        var ext = '.' + company.tempImageType;
+                        company._mediaarray.push({ type: 'company', url: url, ext: ext, delay: 1000, kind: 'pic' });
+                    }
+
+                    //array, but only 1 item will be filled.
+                    if (company._mediaarray != null && company._mediaarray.length > 0) {
+                        //uploading media
+                        const tasks = company._mediaarray.map(company.uploadMedia);
+                        const results = await Promise.all(tasks);
+                        results.forEach(x => output = x);
+                        company._mediaarray = []; //reset media array;
+                    }
+                }
+                return output;
+            },
+            setAndRetrieveNewServiceAccount(companyid) {
+                $('#saved_user_name').text('');
+                toastr.remove();
+                $('body').toggleClass('loaded');
+
+                $.ajax({
+                    type: "POST",
+                    url: '/company/createserviceuser',
+                    data: JSON.stringify(companyid),
+                    success: function (data) {
+                        $('body').toggleClass('loaded');
+                        toastr.success('user created');
+                        $('#saved_user_name').text(data);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('body').toggleClass('loaded');
+                        toastr.error(JSON.parse(jqXHR.responseText) + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            reduceTaskGenerationConfigs: function(companyid) {
+                $('body').toggleClass('loaded');
+                $.ajax({
+                    type: "POST",
+                    url: '/company/reducetaskgenerationconfigs',
+                    data: JSON.stringify(companyid),
+                    success: function (data) {
+                        $('body').toggleClass('loaded');
+                        toastr.success('Old task generation configs removed');
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('body').toggleClass('loaded');
+                        toastr.error(JSON.parse(jqXHR.responseText) + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            setMapUriJson: function() {
+                let uriElements = $('[data-type="map_uri"]');
+                if(uriElements != null) {
+                    let col = [];
+                    $(uriElements).each(function() {
+                        if($(this).val() != '' && $(this).val() != null) {
+                            col.push($(this).val());
+                        }
+                    });
+                    if(col.length>0) {
+                        $('#company_mapuris').val(JSON.stringify(col));
+                    }
+                }
+            },
+            setMapEmbed: function() {
+                let coords = $('#company_coords').val();
+                let mapurl = $('#company_mapuri_openstreet').val();
+                let embedurl = '';
+
+                //if coords available, then use these, else try to parse openstreet map uri if available.
+                if(coords != undefined && coords != '') {
+                    embedurl = company.setCoordMappedChart(coords);
+                } else if (mapurl != undefined && mapurl != '') {
+                    embedurl = company.setOSUrlMappedChart(mapurl);
+                }
+                if(embedurl != '') {
+                    $('#os_map').attr('src',embedurl);
+                    $('#company_coords_edit_maps').show();
+                } else {
+                    $('#company_coords_edit_maps').hide();
+                };
+            },
+            setMapUris: function() {
+                if($('#company_mapuris').val() != undefined && $('#company_mapuris').val() != null && $('#company_mapuris').val() != '') {
+                    try {
+                        let colUris = JSON.parse($('#company_mapuris').val());
+                        if(colUris.length > 0) {
+                            for (let iu = 0; iu < colUris.length; iu++) {
+                                if(colUris[iu].includes('apple')) {
+                                    $('#company_mapuri_apple').val(colUris[iu]);
+                                };
+                                if(colUris[iu].includes('google')) {
+                                    $('#company_mapuri_google').val(colUris[iu]);
+                                };
+                                if(colUris[iu].includes('openstreetmap')) {
+                                    $('#company_mapuri_openstreet').val(colUris[iu]);
+                                };
+                            }
+                        }
+                    } catch (error) { console.log(error);}
+                }
+            },
+            setCoordMappedChart: function(coords) {
+                if(coords != undefined && coords != '') {
+                    let osmUrl = company.convertLatLonToEmbed(coords);
+                    if(osmUrl != null) {
+                        return osmUrl;
+                    } else {
+                        return '';
+                    }
+                }
+            },
+            setOSUrlMappedChart: function(mapurl) {
+                if(mapurl != undefined && mapurl != '') {
+                    let osmUrl = company.convertOsmUrlToEmbed(mapurl);
+                    if(osmUrl != null) {
+                        return osmUrl;
+                    } else {
+                        return '';
+                    }
+                }
+            },
+            uploadMedia: async function (spec) {
+
+                let blob = await fetch(spec.url).then(
+                    r => r.blob()
+                );
+                var file = new File([blob], $.utils.createUUID() + spec.ext);
+                var formData = new FormData();
+                formData.append("file", file);
+                formData.append("filekind", spec.kind);
+                formData.append("itemtype", spec.type);
+
+                return fetch('/company/details/upload', {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then(response => (response.text()))
+                    .then(path => {
+                        var returnedPath = String(path).replaceAll('"', '');
+                        $('#company_image').data('src', company._mediapath + returnedPath);
+                        $('#Picture').val(returnedPath);
+
+                    })
+                    .then(text => `Fetched ${spec.url}, and got back ${text}`);
+            }, 
+            convertOsmUrlToEmbed: function(osmUrl) {
+                try {
+                       const url = new URL(osmUrl);
+                    const hash = url.hash;
+                    const match = hash.match(/#map=(\d+)\/([\d.]+)\/([\d.]+)/);
+
+                    if (!match) {
+                        throw new Error("Invalid OpenStreetMap URL format.");
+                    }
+
+                    const zoom = parseInt(match[1]);
+                    const lat = parseFloat(match[2]);
+                    const lon = parseFloat(match[3]);
+
+                    const delta = 0.01; // Adjust for bounding box size
+                    const bbox = [
+                        lon - delta,
+                        lat - delta,
+                        lon + delta,
+                        lat + delta
+                    ].map(coord => coord.toFixed(4)).join(',');
+
+                    return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lon}`;
+                } catch(error) {
+                    console.log(error);
+                }
+                return '';
+            },
+            convertLatLonToEmbed: function(latLonStr) {
+                try {
+                    const [latStr, lonStr] = latLonStr.split(',');
+                    const lat = parseFloat(latStr.trim());
+                    const lon = parseFloat(lonStr.trim());
+
+                    if (isNaN(lat) || isNaN(lon)) {
+                        throw new Error("Invalid latitude or longitude.");
+                    }
+
+                    const delta = 0.01; // Adjust for bounding box size
+                    const bbox = [
+                        lon - delta,
+                        lat - delta,
+                        lon + delta,
+                        lat + delta
+                    ].map(coord => coord.toFixed(4)).join(',');
+
+                    return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lon}`;
+                } catch (error) {
+                    console.log(error);
+                }
+                return '';
+            },
+            convertLatLonToGoogleMapsUrl : function(latLongStr) {
+                try {
+                    const parts = latLongStr.split(',');
+                    if (parts.length !== 2) {
+                        return 'Invalid input. Please provide a comma-separated latitude and longitude.';
+                    }
+
+                    const latitude = parts[0].trim();
+                    const longitude = parts[1].trim();
+
+                    return `https://www.google.com/maps?q=${latitude},${longitude}`;
+                } catch (error) {
+                    console.log(error);
+                }
+                return '';
+            },
+            convertLatLonToAppleMapsUrl : function(latLongStr) {
+                try {
+                    const parts = latLongStr.split(',');
+                    if (parts.length !== 2) {
+                        return 'Invalid input. Please provide a comma-separated latitude and longitude.';
+                    }
+
+                    const latitude = parts[0].trim();
+                    const longitude = parts[1].trim();
+
+                    return `https://maps.apple.com/?ll=${latitude},${longitude}`;
+                } catch (error) {
+                    console.log(error);
+                }
+                return '';
+            },
+            convertLatLonToOpenStreetMapsUrl : function(latLongStr) {
+                try {
+                    const parts = latLongStr.split(',');
+                    if (parts.length !== 2) {
+                        return 'Invalid input. Please provide a comma-separated latitude and longitude.';
+                    }
+
+                    const latitude = parts[0].trim();
+                    const longitude = parts[1].trim();
+
+                    return `https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=15/${latitude}/${longitude}`;
+                } catch (error) {
+                    console.log(error);
+                }
+                return '';
+            },
+            convertLatLonToMapUrls: function(latLongStr) {
+                if(latLongStr != undefined && latLongStr != null && latLongStr != '') {
+                    if($('#company_mapuri_apple').val() == '') { $('#company_mapuri_apple').val(company.convertLatLonToAppleMapsUrl(latLongStr)) };
+                    if($('#company_mapuri_google').val() == '') { $('#company_mapuri_google').val(company.convertLatLonToGoogleMapsUrl(latLongStr)) };
+                    if($('#company_mapuri_openstreet').val() == '') { $('#company_mapuri_openstreet').val(company.convertLatLonToOpenStreetMapsUrl(latLongStr)); };
+                }
+            },
+            openMaps: function(mapskind) {
+                if(mapskind != null) {
+                    let uri = $('[data-type="map_uri"][data-kind="' + mapskind + '"]').val();
+                    if(uri != undefined && uri != null && uri != '' && uri.includes('https')) {
+                        window.open(uri, "_blank");
+                    } else {
+                         toastr.warning(mapskind + ' maps not available, please make sure maps url are correctly added.');
+                    }
+                }
+            }
+        }
+
+        company.init();
+        ezgomediafetcher.preloadImagesAndVideos();
+    </script>
+
+
+}

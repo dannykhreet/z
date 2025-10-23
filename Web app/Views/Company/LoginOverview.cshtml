@@ -1,0 +1,123 @@
+﻿@model WebApp.ViewModels.CompanyLoginsViewModel
+@{
+    Layout = "_Layout_template";
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <a asp-controller="Company" asp-action="Index"><i class="fa fa-arrow-left"></i>@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BackToCompaniesTitle, "Back to companies") ?? "Back to companies")</a>
+                <h1>Login overview</h1>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+
+    <div class="container-fluid">
+
+        <div class="report-content" style="height: calc(100vh - 180px);overflow:auto;">
+            <div id="worldmap_empty_container" style="width: 1200px; height: 700px; position:absolute;"></div>
+            <div id="worldmap_container" style="width: 1200px; height: 700px;"></div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+
+@*     <script src="/js/chartjs.4.4.2.min.js"></script>
+    <script src="/js/chartjs-plugin-datalabels.min.js"></script> *@
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        $('#worldmap_container').fadeOut('fast');
+
+        google.charts.load('current', {
+            'packages': ['geochart'],
+        });
+        google.charts.setOnLoadCallback(drawRegionMapOnStart);
+
+        function drawRegionMapOnStart() {
+            var data = google.visualization.arrayToDataTable([
+                ['Country', 'Popularity'],
+                @Html.Raw(!string.IsNullOrEmpty(Model.JsDataOutput) ? Model.JsDataOutput.Substring(0, Model.JsDataOutput.Length - 1) : "")
+            ]);
+
+            var data_empty = google.visualization.arrayToDataTable([
+                ['Country', 'Popularity']
+            ]);
+
+            var options = {
+                colorAxis: { colors: ['#A5D6A7', '#2E7D32'] },
+                datalessRegionColor: '#424242',
+                enableRegionInteractivity: false,
+                legend: 'none',
+                backgroundColor: '#000000'
+            };
+
+            var chart_empty = new google.visualization.GeoChart(document.getElementById('worldmap_empty_container'));
+            var chart = new google.visualization.GeoChart(document.getElementById('worldmap_container'));
+
+            chart.draw(data, options);
+            chart_empty.draw(data_empty, options);
+
+            $('#worldmap_container').fadeIn('slow'); 
+        }
+
+        function drawRefresh(arrcont) {
+            $('#worldmap_container').fadeOut('fast');
+
+            var data = google.visualization.arrayToDataTable(
+                arrcont
+            );
+            var options = {
+                colorAxis: { colors: ['#A5D6A7', '#2E7D32'] },
+                datalessRegionColor: '#424242',
+                enableRegionInteractivity: false,
+                legend: 'none',
+                backgroundColor: '#000000'
+            };
+            var chart = new google.visualization.GeoChart(document.getElementById('worldmap_container'));
+            chart.draw(data, options);
+
+            $('#worldmap_container').fadeIn('slow');
+        }
+
+        var loginMap = {
+            init: function () {
+                setInterval(() => {
+                    loginMap.retrieve();
+                }, 55000);
+            },
+            retrieve: function () {
+                $.ajax({
+                    type: "POST",
+                    url: '/company/loginoverview/retrieve',
+                    success: function (data) {
+                        //manual parsing of data, cuz auto parsing .netcore/json parse and js won't handle double arrays nicely, so manually buildup new arrays
+                        let a = data.split('|');
+                        let arrarr = [];
+                        for (let i = 0; i < a.length; i++) {
+                            let arr = a[i].toString().split(",");
+                            arrarr.push(arr);
+                        }
+                        console.log(arrarr);
+                        if (a.length > 1) { drawRefresh(arrarr); }
+                      
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error(JSON.parse(jqXHR.responseText) + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            }
+        }
+
+        loginMap.init();
+        ezgomediafetcher.preloadImagesAndVideos();
+    </script>
+
+
+}

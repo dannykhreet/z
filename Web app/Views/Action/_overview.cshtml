@@ -1,0 +1,135 @@
+﻿@model WebApp.ViewModels.ActionViewModel
+@{
+    Layout = null;
+    int? taskId = Model.TaskId > 0 ? Model.TaskId : new Nullable<int>();
+}
+@section CSS {
+    <style>
+        .tag-card:hover {
+            box-shadow: 0 !important;
+            transform: scale(1) !important;
+        }
+    </style>
+}
+@if (Model != null && Model.ActionList != null)
+{
+    <input type="text" value="@Model.ActionList.Count" id="actionCounter" style="display: none" />
+    @foreach (ActionModel action in Model.ActionList)
+    {
+        var status = (action.ActionType == EZGO.CMS.LIB.Enumerators.ActionTypeEnum.action ? (action.IsResolved) ? "isresolved" : (action.IsOverdue) ? "isoverdue" : "isaction" : "iscomment");
+
+        <div class="card w-100 results mr-1 my-1 @status">
+
+            <div class="card-body p-0">
+                @if (action.ActionType == EZGO.CMS.LIB.Enumerators.ActionTypeEnum.action)
+                {
+                    <a class="text-muted fs-0 fs-lg-1" asp-controller="action" asp-action="details" asp-route-id="@action.Id" asp-route-taskid="@taskId">
+                        <div class="col-12 p-2">
+                            <div class="row" data-containertype="action_container" data-id="@action.Id">
+                                <div class="col-sm-5 col-md-3 col-lg-3 col-xl-2">
+                                    <div class="imgcontainer">
+                                        <partial name="_action_images" model="@action" />
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-7 col-md-9 col-lg-9 col-xl-10">
+                                    <div class="row">
+                                        <div class="col">
+                                            <h5 class="mt-3 mt-sm-0 mb-0">@action.Description</h5>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col col-lg-9">
+                                            <p class="mb-1">@action.Comment</p>
+                                            <p class="mb-0">
+                                                <span class="mr-2 text-right">@(Model.CmsLanguage.GetValue(LanguageKeys.Action.ActionId, "ID")): @(action.Id)</span>
+                                                <span class="mr-2 text-right">@(Model.CmsLanguage.GetValue(LanguageKeys.Action.StartDate, "Started")): @(action.CreatedAt.ToLocaleLongDateString(Model.Locale))</span>
+                                                <span class="mr-2">@(Model.CmsLanguage.GetValue(LanguageKeys.Action.Author, "Due date")): @action.CreatedBy</span>
+                                                <span class="mr-2 text-right @(action.IsOverdue ? "text-danger" : null)">@(Model.CmsLanguage.GetValue(LanguageKeys.Action.DueDate, "Due date")): @(action.DueDate.ToLocaleLongDateString(Model.Locale))</span>
+                                            </p>
+                                        </div>
+
+                                        <div class="col col-lg-3">
+                                            @if (action.HasUnviewedComments)
+                                            {
+                                                <span class="fa-stack mr-2 float-right @(action.UnviewedCommentNr > 0 ? "text-danger" : null)" style="vertical-align: top;">
+                                                    <i class="far fa-circle fa-stack-2x"></i>
+                                                    <i class="fas fa-comments fa-stack-1x"></i>
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    @if (action.Tags?.Count > 0 && Model.ApplicationSettings?.Features?.TagsEnabled == true)
+                                    {
+                                        <div class="row">
+                                            @foreach (var tag in action.Tags)
+                                            {
+                                                <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                                                    <div class="tag-wrapper" style="color:white;">
+                                                        <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                        <span class="my-1 ml-1 mr-3 tag-span" style="font-size:.78rem;">@tag.Name</span>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                }
+                else
+                {
+                    <a class="text-muted fs-0 fs-lg-1" asp-controller="action" asp-action="comment" asp-route-id="@action.Id" asp-route-taskid="@taskId">
+                        <div class="col-12 p-2">
+                            <div class="row" data-containertype="action_container" data-id="@action.Id">
+                                <div class="col-sm-5 col-md-3 col-lg-3 col-xl-2">
+                                    <div class="imgcontainer">
+                                        <partial name="_action_images" model="@action" />
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-7 col-md-9 col-lg-9 col-xl-10">
+                                    <div class="row">
+                                        <div class="col">
+                                            <h5 class="mt-3 mt-sm-0 mb-0">@action.Comment</h5>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col col-lg-9">
+                                            <p class="mb-1">@action.Description</p>
+                                            <p class="mb-0">
+                                                <span class="mr-2 text-right">Comment Id: @(action.Id)</span>
+                                                <span class="mr-2 text-right">@(Model.CmsLanguage.GetValue(LanguageKeys.Action.StartDate, "Started")): @(action.CreatedAt.ToLocaleLongDateString(Model.Locale))</span>
+                                                <span class="mr-2">@(Model.CmsLanguage.GetValue(LanguageKeys.Action.Author, "Author")): @action.CreatedBy</span>
+                                            </p>
+                                        </div>
+                                    </div>
+
+
+                                    @if (action.Tags?.Count > 0 && Model.ApplicationSettings?.Features?.TagsEnabled == true)
+                                    {
+                                        <div class="row">
+                                            @foreach (var tag in action.Tags)
+                                            {
+                                                <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                                                    <div class="tag-wrapper" style="color:white;">
+                                                        <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                        <span class="my-1 ml-1 mr-3 tag-span" style="font-size:.78rem;">@tag.Name</span>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    }
+}

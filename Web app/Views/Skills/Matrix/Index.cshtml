@@ -1,0 +1,537 @@
+﻿@model WebApp.ViewModels.SkillsViewModel
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = @Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatricesOverViewTitle, "Skill Matrices") ?? "Skill Matrices";
+}
+
+@section CSS {
+    <style>
+        #contentBody .card {
+            border: solid 1px transparent;
+            transition: transform .2s; /* Animation */
+        }
+
+            #contentBody .card:hover {
+                border: solid 1px #93c54b;
+                box-shadow: 0 .425rem .75rem rgba(0,0,0,.075) !important;
+                color: #93c54b !important;
+                transform: scale(1.010);
+                margin-left: 5px;
+                left: 5px;
+            }
+
+            #contentBody .card a:hover {
+                color: #93c54b !important;
+            }
+
+        #contentBody img.img-fluid {
+            border-radius: 5px;
+            border: solid 1px #bfbfbf;
+        }
+
+        .list-group-area-filter-inline {
+            padding-right: 0px;
+            height: 230px;
+            padding-left: 0px;
+            overflow: auto;
+        }
+
+        #inlineAreaTree .list-group-area-filter-inline {
+            border: none;
+            height: unset;
+        }
+
+        #inlineAreaTree a {
+            color: slategrey;
+            cursor: pointer;
+        }
+
+            #inlineAreaTree a:hover {
+                text-decoration: none;
+            }
+    </style>
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-3">
+                <a asp-controller="skills" asp-action="index"><i class="fa fa-arrow-left"></i>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixNavBackTitle, "Back to skills assessments") ?? "Back to skills assessments")</a>
+                <h1>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixOverviewTitle, "Skill matrices overview") ?? "Skill matrices overview")</h1>
+            </div>
+            <div class="col-sm-9 d-flex flex-row-reverse">
+                <button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" data-actiontype="add_new_matrix">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnAddNewMatrix, "Add new matrix") ?? "Add new matrix")</button>
+                @if (Model?.ApplicationSettings?.Features != null && Model.ApplicationSettings.Features.ExportMatrixSkillUserEnabled != null && Model.ApplicationSettings.Features.ExportMatrixSkillUserEnabled.Value)
+                {
+                    <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="matrixskillscores" title="Export matrix skill scores"><i class="fa fa-file-excel"></i></button>
+                }
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row pt-1" style="height:calc(100vh - 165px);">
+            <div class="col-xl-3 d-none d-xl-inline-block" style="padding-right: 15px">
+                <div class="card card-filter h-100">
+                    <div class="card-header pb-0 d-flex" style="border-bottom: none;width:100%">
+                        <h3 class="card-title d-flex" style="width:100%">
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.CardTitle, "Filters") ?? "Filters")
+                        </h3>
+
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-append">
+                                    <button type="button"
+                                            class="btn"
+                                            onclick="areaFilter.reset('block')"
+                                            title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")"
+                                            data-action="resetfilters">
+                                        <i class="fas fa-undo"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body card-filter pt-0">
+                        <partial name="_filters_block" model="Model.Filter" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12 col-xl-9" style="padding-left: 7.5px">
+                <div class="card template-searchbar" style="margin-left: 0px">
+                    <div class="card-header d-flex" style="margin-left:-11px; height: 55px">
+                        <div style="display: flex; height: 100%; width: 100%; align-items: center">
+                            <h3 id="cardHeader" class="card-title d-sm-inline-block" style="width:100%">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatricesTitle, "Skill matrices") ?? "Skill matrices")<span id="counter"></span>
+                            </h3>
+                        </div>
+
+                        <div class="d-xl-none" style="width: 100%;text-align: right; padding-right: 10px">
+                            <div class="collapseFilter collapse">
+                                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" style="width: 80px" onclick="showInlineAreaFilterModal()">Filter area</button>
+                            </div>
+                        </div>
+
+                        <div style="width: auto; text-align: right">
+                            <div class="card-tools" style="width: 236px; display: inline-block">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" id="skillmatrixSearchBox" name="skillmatrixSearchBox" class="form-control float-right" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.Search, "Search") ?? "Search")" data-boxtype="search">
+
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                        <button type="button" class="btn btn-default d-block d-xl-none" data-toggle="collapse" data-target=".collapseFilter"><i class="fas fa-filter"></i></button>
+                                        <button type="button" class="btn btn-default d-xl-none" onclick="areaFilter.reset('block')" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="contentBody" class="pr-3" style="height: calc(100vh - 245px);overflow:auto;">
+                    <partial name="~/Views/Skills/Matrix/_overview.cshtml" model="@Model" />
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<a id="back-to-top" href="#" class="btn btn-ezgo btn-lg back-to-top shadow" role="button"><i class="fas fa-chevron-up"></i></a>
+
+<div class="modal fade" id="AddNewMatrixModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AddNewMatrixTitle, "Add new matrix") ?? "Add new matrix")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-actiontype="close_modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label for="">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixName, "Name") ?? "Name")</label>
+                    <input type="text" id="matrix_name" name="matrix_name" class="form-control" />
+                </div>
+
+                <div class="form-group row">
+                    <label for="">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixDescription, "Description") ?? "Description")</label>
+                    <input type="text" id="matrix_description" name="matrix_description" class="form-control" />
+                </div>
+
+                <div class="form-group row">
+                    <label for="">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixArea, "Area") ?? "Area")</label>
+                    <div style="margin-left: auto"><i style="cursor: pointer" id="matrixRemoveAreaAdd" class="fa-solid fa-x"></i></div>
+                    <div class="card-body p-2 d-print-none form-control" style="overflow-x:auto; height:260px" id="areasScrollDiv">
+                        <div id="areascardadd" class="d-flex clearfix" style="height:231px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" id="addMatrixButton" class="btn btn-ezgo btn-sm" data-action="add" disabled>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnAdd, "Add") ?? "Add")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ChangeMatrixModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="matrixTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixTitle, "Change matrix title and description") ?? "Change matrix title and description")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-actiontype="close_modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label for="">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixName, "Name") ?? "Name")</label>
+                    <input type="text" id="matrix_name_change" name="matrix_name_change" class="form-control" />
+                </div>
+
+                <div class="form-group row">
+                    <label for="">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixDescription, "Description") ?? "Description")</label>
+                    <input type="text" id="matrix_description_change" name="matrix_description_change" class="form-control" />
+                </div>
+
+                <div class="form-group row">
+                    <label for="">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixArea, "Area") ?? "Area")</label>
+                    <div style="margin-left: auto"><i style="cursor: pointer" id="matrixRemoveAreaChange" class="fa-solid fa-x"></i></div>
+                    <div class="card-body p-2 d-print-none form-control" style="overflow-x:auto; height:260px" id="areasScrollDiv">
+                        <div id="areascardchange" class="d-flex clearfix" style="height:231px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" id="changeMatrixButton" class="btn btn-ezgo btn-sm" data-action="change">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnChange, "Change") ?? "Change")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal inline area filter -->
+<div class="modal fade" id="modalInlineAreaFilter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content" style="overflow-y: scroll">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLongTitle">Filter area</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" style="display: flex; justify-content: center">
+                <div style="width: 80%">
+                    <div class="col-12 p-0 pb-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 style="font-weight: 700" class="card-title">@(Model.CmsLanguage?.GetValue(LanguageKeys.Filters.AreaTitle, "Area") ?? "Area")</h3>
+                            </div>
+
+                            <div class="card-body pb-3 pt-0">
+                                <div id="inlineAreaTree" style="overflow-y: hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/js/areafilter.js"></script>
+    <script src="/js/ezgoUtils.js"></script>
+    <script src="/js/export.js"></script>
+
+    @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+    {
+        <script src="~/js/analytics.js"></script>
+        <script>ezgoAnalytics.init('skill');</script>
+    }
+
+    <script>
+        areaFilter.init('/config/getareatree', 'matrix');
+        $(document).ready(function () {
+            ezgomediafetcher.preloadImagesAndVideos();
+            var cntr = $('#contentCol .card:visible').length;
+            $('#counter').html('&nbsp;(' + cntr + ')');
+            $('#back-to-top').fadeOut();
+            $('#contentBody').scroll(function () {
+                if ($('#contentBody').scrollTop() > 50) {
+                    $('#back-to-top').fadeIn();
+                } else {
+                    $('#back-to-top').fadeOut();
+                }
+            });
+
+            $('#back-to-top').click(function () {
+                $('#contentBody').animate({
+                    scrollTop: 0
+                }, 400);
+                return false;
+            });
+
+            $('#btn-close').on('click', function (e) {
+                $('.actionRow').css('backgroundColor', '');
+                $('.panel-wrap').css('transform', 'translateX(100%)');
+            });
+
+            $("#skillmatrixSearchBox").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#contentCol div.results").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+                var cntr = $('#contentCol .card:visible').length;
+                $('#counter').html('&nbsp;(' + cntr + ')');
+                $('#back-to-top').click();
+            });
+
+            $("#skillmatrixSearchBox").on('search', function () {
+                var value = '';
+
+                $("#contentCol div.row.results:visible").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+                var cntr = $('#contentCol .card:visible').length;
+                $('#counter').html('&nbsp;(' + cntr + ')');
+                $('#back-to-top').click();
+            });
+
+            $("#contentCol").on('filterDone', function () {
+                var cntr = $('#contentCol .card:visible').length;
+                $('#counter').html('&nbsp;(' + cntr + ')');
+
+            });
+
+            @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+            {
+                <text>
+                        $("#skillmatrixSearchBox").on("focusout", function () {
+                            var value = $(this).val().toLowerCase();
+
+                            if (value.length > 0) {
+                                ezgoAnalytics.customLog("Search", "Skillmatrix search used", "skills", "search value:" + value);
+                            }
+                        });
+                </text>
+            }
+        });
+
+        var matrixOverview = {
+            currentlySelectedArea: 0,
+            init: function () {
+                $('[data-actiontype="add_new_matrix"]').on('click', function () {
+                    $('#matrix_name').val('');
+                    $('#matrix_description').val('');
+                    $('#addMatrixButton').attr('disabled', true);
+                    matrixOverview.currentlySelectedArea = 0;
+                    matrixAreas.renderAdd();
+                    $('#AddNewMatrixModal').modal('show');
+                });
+
+                $('[data-actiontype="change_matrix"]').on('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    var id = $(this).data("matrixid");
+                    var name = $(this).data("matrixname");
+                    var description = $(this).data("matrixdesc");
+                    var areaid = $(this).data("matrixareaid");
+
+                    $('#matrixTitle').attr('data-id', id);
+                    $('#matrix_name_change').val(name);
+                    $('#matrix_description_change').val(description);
+                    matrixOverview.currentlySelectedArea = parseInt(areaid);
+                    matrixAreas.renderChange();
+                    $('#ChangeMatrixModal').modal('show');
+                });
+
+                $('#matrixRemoveAreaAdd').on('click', function (e) {
+                    matrixOverview.currentlySelectedArea = 0;
+                    matrixAreas.renderAdd();
+                });
+
+                $('#matrixRemoveAreaChange').on('click', function (e) {
+                    matrixOverview.currentlySelectedArea = 0;
+                    matrixAreas.renderChange();
+                });
+
+                $('[data-actiontype="delete_matrix"]').on('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var elem = this;
+                    $.fn.dialogue({
+                        content: $("<p />").text("Are you sure you want to delete the skills matrix?"),
+                        closeIcon: true,
+                        buttons: [
+                            {
+                                text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.Action.OptionYes, "Yes") ?? "Yes")", id: $.utils.createUUID(), click: function ($modal) {
+                                    //delete skills matrix
+                                    //add loader
+                                    $('body').toggleClass('loaded');
+                                    $.ajax({
+                                        type: "GET",
+                                        url: '/skillsmatrices/delete/' + $(elem).data("matrixid"),
+                                        success: function (data) {
+                                            window.location.reload();
+                                        },
+                                        error: function (jqXHR, textStatus, errorThrown) {
+                                            $modal.dismiss();
+                                            toastr.error("error deleting skills matrix");
+                                        },
+                                        contentType: "application/json; charset=utf-8"
+                                    });
+                                    //refresh
+                                }
+                            },
+                            {
+                                text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.Action.OptionNo, "No") ?? "No")", id: $.utils.createUUID(), click: function ($modal) {
+                                    //dont delete skills matrix
+                                    $modal.dismiss();
+                                }
+                            }
+                        ]
+                    });
+                });
+
+                $('[data-action="add"]').on('click', function () {
+                    matrixOverview.save();
+                });
+
+                $('[data-action="change"]').on('click', function () {
+                    matrixOverview.change();
+                });
+
+                $('#matrix_name').on('keyup', function () {
+                    matrixOverview.updateMatrixEditScreen('#matrix_name', '#matrix_description', '#addMatrixButton');
+                });
+
+                $('#matrix_description').on('keyup', function () {
+                    matrixOverview.updateMatrixEditScreen('#matrix_name', '#matrix_description', '#addMatrixButton');
+                });
+
+                $('#matrix_name_change').on('keyup', function () {
+                    matrixOverview.updateMatrixEditScreen('#matrix_name_change', '#matrix_description_change', '#changeMatrixButton');
+                });
+
+                $('#matrix_description_change').on('keyup', function () {
+                    matrixOverview.updateMatrixEditScreen('#matrix_name_change', '#matrix_description_change', '#changeMatrixButton');
+                });
+            },
+            updateMatrixEditScreen(matrix_name, matrix_description, matrixButton) {
+                if ($(matrix_name).val().replace(/\s/g, '') != '' && $(matrix_description).val().replace(/\s/g, '') != '') {
+                    $(matrix_name).attr('style', '');
+                    $(matrix_description).attr('style', '');
+                    $(matrixButton).removeAttr('disabled');
+                }
+                else {
+                    if ($(matrix_name).val().replace(/\s/g, '') == '') {
+                        $(matrix_name).css('border', '1px solid red');
+                        $(matrixButton).attr('disabled', true);
+                    }
+                    else {
+                        $(matrix_name).attr('style', '');
+                    }
+
+                    if ($(matrix_description).val().replace(/\s/g, '') == '') {
+                        $(matrix_description).css('border', '1px solid red');
+                        $(matrixButton).attr('disabled', true);
+                    }
+                    else {
+                        $(matrix_description).attr('style', '');
+                    }
+                }
+            },
+            save: function () {
+                var form = document.createElement("form");
+                form.setAttribute("method", 'post');
+                form.setAttribute("action", '/skillsmatrices/add');
+
+                var u = document.createElement("input"); //input element, text
+                u.setAttribute('type', "text");
+                u.setAttribute('name', "Name");
+                u.setAttribute('value', $('#matrix_name').val());
+
+                var t = document.createElement("input"); //input element, text
+                t.setAttribute('type', "text");
+                t.setAttribute('name', "Description");
+                t.setAttribute('value', $('#matrix_description').val());
+
+                var r = document.createElement("input"); //input element, number
+                r.setAttribute('type', "text");
+                r.setAttribute('name', "AreaId");
+                r.setAttribute('value', matrixOverview.currentlySelectedArea);
+
+                form.appendChild(u);
+                form.appendChild(t);
+                form.appendChild(r);
+
+                document.body.appendChild(form);
+                form.submit(); //auto submit
+            },
+            change: function () {
+                var form = document.createElement("form");
+                form.setAttribute("method", 'post');
+                form.setAttribute("action", '/skillsmatrices/change/');
+
+                var y = document.createElement("input"); //input element, number
+                y.setAttribute('type', "text");
+                y.setAttribute('name', "Id");
+                y.setAttribute('value', $('#matrixTitle').data('id'));
+
+                var u = document.createElement("input"); //input element, text
+                u.setAttribute('type', "text");
+                u.setAttribute('name', "Name");
+                u.setAttribute('value', $('#matrix_name_change').val());
+
+                var t = document.createElement("input"); //input element, text
+                t.setAttribute('type', "text");
+                t.setAttribute('name', "Description");
+                t.setAttribute('value', $('#matrix_description_change').val());
+
+                var r = document.createElement("input"); //input element, number
+                r.setAttribute('type', "text");
+                r.setAttribute('name', "AreaId");
+                r.setAttribute('value', matrixOverview.currentlySelectedArea);
+
+                form.appendChild(y);
+                form.appendChild(u);
+                form.appendChild(t);
+                form.appendChild(r);
+
+                document.body.appendChild(form);
+                form.submit(); //auto submit
+            },
+            showChangeModal(id, name, description) {
+                $('#matrixTitle').attr('data-id', id);
+                $('#matrix_name_change').val(name);
+                $('#matrix_description_change').val(description);
+                $('#ChangeMatrixModal').modal('show');
+            }
+        }
+
+        matrixOverview.init();
+
+        function showInlineAreaFilterModal() {
+            $('#modalInlineAreaFilter').modal('show');
+        }
+    </script>
+
+    <script src="/js/areas.js"></script>
+}

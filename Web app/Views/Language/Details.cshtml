@@ -1,0 +1,209 @@
+﻿@model LanguageViewModel
+@{
+    Layout = "_Layout_template";
+}
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<style>
+    .missing {
+        background-color: red;
+    }
+
+    td {
+        padding-right: 5px;
+    }
+
+    .report-content {
+        width: 100%;
+        background-color: white;
+        border-bottom: 1px solid rgba(0,0,0,.125);
+        padding: .75rem 1.25rem;
+        position: relative;
+        border-top-left-radius: .25rem;
+        border-top-right-radius: .25rem;
+        box-shadow: 0 0 1px rgb(0 0 0 / 13%), 0 1px 3px rgb(0 0 0 / 20%);
+        margin-bottom: 1rem;
+    }
+</style>
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                @{
+                    var flagImage = string.Format("/assets/img/flags/{0}.png", Model.Language.LanguageCulture.ToLower());
+                }
+                <h1 class="m-0 text-dark"><img src="@flagImage" class="img-fluid" style="max-width:60px;max-height:20px;margin: 5px;" />Language @Model.Language.LanguageEnglishName (@Model.Language.Language)</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6 d-flex flex-row-reverse">
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+    <div class="row pt-1">
+        <div class="col-lg-6"></div>
+        <div class="col-lg-6" style="text-align:right;">
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="card">
+        <div class="card-header">
+            <a href="/languages/@(Model.Language.LanguageCulture.ToLower())/app">APP keys</a> | <a href="/languages/@(Model.Language.LanguageCulture.ToLower())/cms">CMS keys</a> | <a href="/languages/overview">Back to overview</a><span id="counter">&nbsp;</span>
+
+            <div class="card-tools">
+                <div class="input-group input-group-sm">
+                    <i class="fa-solid fa-question" id="btn_missing_filter" style="cursor:pointer; margin:5px; margin-right:10px; font-size: 16px; color:#808080" title="Filter missing" data-filter-resourcetype="missing"></i>
+                    <input type="text" id="languageSearchBox" name="languageSearchBox" class="form-control float-right" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.SearchPlaceholder, "Search") ?? "Search")" data-boxtype="search">
+
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="text-align: right; margin-bottom:5px;">
+    </div>
+    <div class="row pt-1" style="height:calc(100vh - 220px);">
+        <div class="col-lg-12 col-xl-12">
+            <div id="contentBody" class="report-content" style="height: calc(100vh - 255px);overflow:auto;">
+                @if (Model.Language != null && Model.Language.ResourceItems.Any())
+                {
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="min-width:200px;">
+                                    KEY (@Model.Language.ResourceItems.Count)
+                                </th>
+                                <th style="min-width:500px;">
+                                    VALUE
+                                </th>
+                                @foreach (var languageitem in Model.Languages.Where(x => x.ResourceItems != null && x.ResourceItems.Any()).OrderBy(y => y.LanguageCulture))
+                                {
+                                    <th style="min-width:100px;">@languageitem.LanguageCulture.ToUpper()</th>
+                                }
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Language.ResourceItems.OrderBy(x => x.ResourceKey))
+                            {
+                                <tr>
+                                    <td data-containertype="key" title="@item.Guid" style="vertical-align:top">
+                                        @item.ResourceKey
+                                    </td>
+                                    <td data-containertype="source_value" class="@(string.IsNullOrEmpty(item.ResourceValue) ? string.Concat("missing") : string.Empty)" style="vertical-align:top" data-key="@item.ResourceKey" data-guid="@item.Guid">
+                                        <textarea multiline="true" data-key="@item.ResourceKey" data-guid="@item.Guid" style="min-width:460px;">@item.ResourceValue</textarea>
+                                        <button id="save_@item.Guid" data-buttontype="save" data-key="@item.ResourceKey" data-guid="@item.Guid" style="margin-top:0px;vertical-align:top;" title="Save @item.ResourceKey"><i class="fa-solid fa-floppy-disk"></i></button>
+                                    </td>
+                                    @foreach (var languageitem in Model.Languages.Where(x => x.ResourceItems != null && x.ResourceItems.Any()).OrderBy(y => y.LanguageCulture))
+                                    {
+                                        var possibleValue = languageitem.ResourceItems.Where(x => x.ResourceKey == @item.ResourceKey)?.FirstOrDefault()?.ResourceValue;
+                                        <td data-containertype="check_value" data-culture="@languageitem.LanguageCulture.ToString().ToLower()" style="vertical-align:top">@possibleValue</td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div>Language can not be loaded.</div>
+                }
+
+
+            </div>
+        </div>
+    </div>
+    
+</section>
+
+
+
+@section Scripts {
+
+    <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+    <script>
+        var currentLanguage = '@Model.Language.LanguageCulture.ToString().ToLower()';
+        var resourcelanguage = {
+            _activeFilter: '',
+            init: function () {
+                resourcelanguage.setHandlers();
+            },
+            search: function (searchText) {
+                resourcelanguage._activeFilter = '';
+                $('#btn_missing_filter').css('color', '#808080');
+                if (searchText != null && searchText != '') {
+                    $('[data-containertype="source_value"]').parent('tr').hide();
+                    $('tr:icontains(' + searchText + ')').show();
+                } else {
+                    $('[data-containertype="source_value"]').parent('tr').show();
+                }
+            },
+            filterMissing: function () {
+                $('#languageSearchBox').val('');
+                if (resourcelanguage._activeFilter == 'missing') {
+                    resourcelanguage._activeFilter = '';
+                    $('[data-containertype="source_value"]').parent('tr').show();
+                    $('#btn_missing_filter').css('color', '#808080');
+                } else {
+                    $('[data-containertype="source_value"]').parent('tr').hide();
+                    $('td.missing').parent('tr').show();
+                    $('#btn_missing_filter').css('color', '#93C54B');
+                    resourcelanguage._activeFilter = 'missing';
+                }
+
+            },
+            save: function (key, guid) {
+                let value = $('textarea[data-key="' + key + '"][data-guid="' + guid + '"]').val()
+                let uri = '/languages/' + currentLanguage + '/' + key + '/' + guid;
+
+                toastr.remove();
+                $('body').toggleClass('loaded');
+
+                $.ajax({
+                    type: "POST",
+                    url: uri,
+                    data: JSON.stringify(value),
+                    success: function (data) {
+                        $('body').toggleClass('loaded');
+                        toastr.success('Value Saved');
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('body').toggleClass('loaded');
+                        toastr.error(JSON.parse(jqXHR.responseText) + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+
+            },
+            setHandlers: function () {
+                $('#languageSearchBox').on('keyup', function () {
+                    resourcelanguage.search($(this).val());
+                });
+                $('#btn_missing_filter').on('click', function () {
+                    resourcelanguage.filterMissing();
+                });
+                $('[data-buttontype="save"]').on('click', function () {
+                    resourcelanguage.save($(this).attr('data-key'), $(this).attr('data-guid'));
+                });
+
+
+            }
+        };
+
+        jQuery.expr[":"].icontains = jQuery.expr.createPseudo(function (arg) {
+            return function (elem) {
+                return jQuery(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+            };
+        });
+
+        resourcelanguage.init();
+    </script>
+}

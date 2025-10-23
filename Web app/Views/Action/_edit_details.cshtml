@@ -1,0 +1,131 @@
+﻿@model ActionEditViewModel
+@{
+    Dictionary<string, string> CmsLanguage = Model?.CmsLanguage ?? new Dictionary<string, string>();
+}
+
+<input asp-for="Id" type="hidden" />
+<input asp-for="CompanyId" type="hidden" />
+<input asp-for="TaskTemplateId" type="hidden" />
+<input asp-for="TaskId" type="hidden" />
+<input asp-for="CreatedAt" type="hidden" />
+<input asp-for="CreatedBy" type="hidden" />
+<input asp-for="CreatedById" type="hidden" />
+<input asp-for="IsResolved" type="hidden" />
+
+
+<div class="row">
+    <!-- left column -->
+    <div class="col-md-6">
+        <div class="card xcard-ezgo">
+            <div class="card-header">
+                <h3 class="card-title">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsCommentTitle, "Comment") ?? "Comment")</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <!-- textarea -->
+                <div class="form-group mb-0">
+                    <textarea asp-for="Comment" class="form-control form-control-sm" rows="6" placeholder="@(CmsLanguage?.GetValue(LanguageKeys.Action.EnterTextPlaceholder, "Enter text..") ?? "Enter text..")"></textarea>
+                </div>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer d-none"></div>
+        </div>
+        <!-- /.card -->
+    </div>
+    <!--/.col (left) -->
+    <!-- right column -->
+    <div class="col-md-6">
+        <div class="card xcard-ezgo">
+            <div class="card-header">
+                <div class="row">
+                    <div style="">
+                        <h3 class="card-title">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsActionTitle, "Action") ?? "Action")</h3>
+                    </div>
+                    @if (Model.ApplicationSettings.Features.MarketUltimoEnabled.HasValue && Model.ApplicationSettings.Features.MarketUltimoEnabled.Value)
+                    {
+                        <div style="margin-left: auto; text-align: right">
+                            <div class="custom-control custom-switch">
+                                <input asp-for="SendToUltimo" type="checkbox" class="custom-control-input" id="actionSendToUltimo" onchange="this.value=this.checked" value="@Model.SendToUltimo.ToString().ToLower()">
+                                <label style="font-weight: 400" class="custom-control-label card-text text-muted" for="actionSendToUltimo">Send to Ultimo</label>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <!-- textarea -->
+                <div class="form-group mb-0">
+                    <textarea asp-for="Description" class="form-control form-control-sm" rows="6" placeholder="@(CmsLanguage?.GetValue(LanguageKeys.Action.EnterTextPlaceholder, "Enter text..") ?? "Enter text..")"></textarea>
+                    @*<span asp-validation-for="Description" class="text-danger small"></span>*@
+
+                </div>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer d-none"></div>
+        </div>
+        <!-- /.card -->
+    </div>
+    <!--/.col (right) -->
+</div>
+<!-- /.row -->
+
+<div class="row mb-3">
+    <!-- left column -->
+    <div class="col-md-6">
+        <div class="card xcard-ezgo h-100">
+            <div class="card-header">
+                <h3 class="card-title">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsResourcesTitle, "Resources") ?? "Resources")</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <div class="form-group mb-0">
+                    <select id="Resources" name="resources" class="form-control form-control-sm selectpicker" multiple data-live-search="true" title="@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsResourcesTitleUsers, "Resource Users") ?? "Resource Users")">
+                        @foreach (UserBasicModel user in Model.ResourcesUsers)
+                        {
+                            <option value="@user.Id">@user.Name</option>
+                        }
+                    </select>
+                </div>
+                <br />
+                <div class="form-group mb-0">
+                    <select id="ResourcesAreas" name="resourcesareas" class="form-control form-control-sm selectpicker" multiple data-live-search="true" title="@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsResourcesTitleAreas, "Resource Areas") ?? "Resource Areas")">
+                        @foreach (AreaBasicModel area in Model.ResourcesAreas.OrderBy(o => o.FullDisplayName).ToList())
+                        {
+                            <option value="@area.Id" title="@area.Name">@area.FullDisplayName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer d-none"></div>
+        </div>
+        <!-- /.card -->
+    </div>
+    <!--/.col (left) -->
+    <!-- right column -->
+    <div class="col-md-6">
+        <div class="card xcard-ezgo h-100">
+            <div class="card-header">
+                <h3 class="card-title">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsDuedateTitle, "Due date") ?? "Due date")</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <div class="form-group mb-0">
+                    <input asp-for="DueDate" type="hidden" asp-format="{0:yyyy/MM/dd}" />
+                    <div class="input-group date" data-target-input="nearest">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="far fa-calendar-alt"></i></div>
+                        </div>
+                        <input type="datetime" id="DueDateInput" class="form-control form-control-sm" value="@(Model.DueDate.ToString("dd-MM-yyyy"))" />
+                    </div>
+                    <span asp-validation-for="DueDate" class="text-danger small"></span>
+                </div>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer d-none"></div>
+        </div>
+        <!-- /.card -->
+    </div>
+    <!--/.col (right) -->
+</div>

@@ -1,0 +1,53 @@
+﻿@model FactoryFeedViewModel
+@using WebApp.Models.FactoryFeed
+
+@using System.Security.Claims
+@using WebApp.Models.User
+@{
+    var username = User.Identity.Name;
+    var profileImg = Model.CurrentUser.Picture;
+    var profileImgUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, profileImg);
+    var defaultProfileImg = "/assets/img/user-placeholder.jpg";
+    if (profileImg == null || string.IsNullOrEmpty(profileImg) || profileImg == "emptyprofile")
+    {
+        profileImgUrl = defaultProfileImg;
+    }
+}
+
+<div class="card">
+    <div class="card-body d-flex pb-0 mb-0">
+        <div class="pull-left border-dark"><img class="rounded-circle border" src="/images/media-loading.gif" data-src="@profileImgUrl" style="width: 50px; height: 50px"  /></div>
+        <div class="w-100 ml-3 pb-0 mb-0">
+            <form class=" pb-0 mb-0">
+                <div class="form-group pb-0 mb-0">
+                    <textarea class="form-control w-100" id="postDescription" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.WhatDoYouWantToShare, "What do you want to share...") ?? "What do you want to share...")"></textarea>
+                </div>
+            </form>
+        </div>
+
+    </div>
+    <div class="card-footer text-left" style="background-color:transparent !important;">
+        <a class="btn btn-light" href="javascript:void(0);" onclick="ezgofactoryfeed.selectImage(this)">
+            <i class="far fa-image mr-2"></i>
+            @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.PictureTitle, "Picture") ?? "Picture")
+        </a>
+        <input type="file" style="display:none" accept=".jpg, .jpeg, .png" id="factoryfeedImage" />
+        <input type="file" style="display:none" accept=".mp4, .mov" id="factoryfeedVideo" />
+        <input type="file" style="display:none" accept=".pdf" id="factoryfeedPdf" />
+        <a class="btn btn-light ml-2" href="javascript:void(0);" onclick="ezgofactoryfeed.selectVideo(this)">
+            <i class="fas fa-video mr-2"></i>
+            @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.VideoTitle, "Video") ?? "Video")
+        </a>
+        <a class="btn btn-light ml-2" href="javascript:void(0);" onclick="ezgofactoryfeed.selectPdf(this)">
+            <i class="fas fa-file mr-2"></i>
+            Pdf
+        </a>
+        <button id="postFeedMessage" class="btn btn-ezgo ml-2 float-right" onclick="ezgofactoryfeed.sendPost();" style="color: #fff !important;" disabled="disabled">
+            <i class="fas fa-paper-plane mr-2"></i>
+            @(Model.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.PostTitle, "Post") ?? "Post")
+        </button>
+        <div class="postImageContainer mt-3 row" style="display: none; position: relative">
+            
+        </div>
+    </div>
+</div>

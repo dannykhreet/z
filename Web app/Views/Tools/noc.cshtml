@@ -1,0 +1,309 @@
+﻿@model WebApp.ViewModels.NocViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout_template";
+}
+
+<style>
+    .noc-content {
+        display: flex
+    }
+
+    .noc-content div {
+        width: 60px;
+        height: 60px;
+        font-size:10px;
+        float: left;
+        text-align: center;
+        margin: 5px;
+    }
+
+    .noc-content div.good {
+        background-color: green
+    }
+
+    .noc-content div.bad {
+        background-color: red
+    }
+</style>
+
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>EZGO PLATFORM NOC</h1>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+    <div class="container-fluid" style="height:calc(100vh - 175px);overflow:auto;">
+    @if(Model.ShowTestNoc)
+    {
+        <h4>Test</h4>
+        <div class="noc-content">
+            <div data-uri="https://ezgo.testapi.ezfactory.nl/health" data-nocdatatype="healthactive">API<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://dw.tst.ezfactory.nl" data-nocdatatype="healthactive">DW<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://biapi.test.ezfactory.nl/health" data-nocdatatype="healthactive">BI<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezfactorytestmediastorage.s3.eu-central-1.amazonaws.com" data-nocdatatype="healthactive">S3 VIDEO<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezfactory-test-storage.s3.eu-central-1.amazonaws.com" data-nocdatatype="healthactive">S3 OTHER<br /><span data-containertype="ms"></span></div>
+        </div>
+        <div class="noc-content">
+            <div data-uri="https://ezgo.testapi.ezfactory.nl/v1/actions/healthcheck" data-nocdatatype="healthactive">Actions<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezgo.testapi.ezfactory.nl/v1/actioncomments/healthcheck" data-nocdatatype="healthactive">Action<br />comments<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezgo.testapi.ezfactory.nl/v1/audits/healthcheck" data-nocdatatype="healthactive">Audits<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezgo.testapi.ezfactory.nl/v1/assessments/healthcheck" data-nocdatatype="healthactive">Assessments<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezgo.testapi.ezfactory.nl/v1/checklists/healthcheck" data-nocdatatype="healthactive">Checklists<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezgo.testapi.ezfactory.nl/v1/comments/healthcheck" data-nocdatatype="healthactive">Comments<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezgo.testapi.ezfactory.nl/v1/tasks/healthcheck" data-nocdatatype="healthactive">Tasks<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezgo.testapi.ezfactory.nl/v1/workinstructions/healthcheck" data-nocdatatype="healthactive">Work<br />instructions<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezgo.testapi.ezfactory.nl/v1/users/healthcheck" data-nocdatatype="healthactive">Users<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+        </div>
+    }
+
+    @if(Model.ShowAccNoc)
+    {
+        <h4>Acceptance</h4>
+        <div class="noc-content">
+            <div data-uri="https://ezgo.accapi.ezfactory.nl/health" data-nocdatatype="healthactive">API<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://dw.acc.ezfactory.nl" data-nocdatatype="healthactive">DW<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezfactory-media-acceptance.s3.eu-central-1.amazonaws.com" data-nocdatatype="healthactive">S3 VIDEO<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezfactory-acceptance-storage.s3.eu-central-1.amazonaws.com" data-nocdatatype="healthactive">S3 OTHER<br /><span data-containertype="ms"></span></div>
+        </div>
+        <div class="noc-content">
+            <div data-uri="https://ezgo.accapi.ezfactory.nl/v1/actions/healthcheck" data-nocdatatype="healthactive">Actions<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezgo.accapi.ezfactory.nl/v1/actioncomments/healthcheck" data-nocdatatype="healthactive">Action<br />comments<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezgo.accapi.ezfactory.nl/v1/audits/healthcheck" data-nocdatatype="healthactive">Audits<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezgo.accapi.ezfactory.nl/v1/assessments/healthcheck" data-nocdatatype="healthactive">Assessments<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezgo.accapi.ezfactory.nl/v1/checklists/healthcheck" data-nocdatatype="healthactive">Checklists<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezgo.accapi.ezfactory.nl/v1/comments/healthcheck" data-nocdatatype="healthactive">Comments<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezgo.accapi.ezfactory.nl/v1/tasks/healthcheck" data-nocdatatype="healthactive">Tasks<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezgo.accapi.ezfactory.nl/v1/workinstructions/healthcheck" data-nocdatatype="healthactive">Work<br />instructions<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezgo.accapi.ezfactory.nl/v1/users/healthcheck" data-nocdatatype="healthactive">Users<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+        </div>
+    }
+
+    @if(Model.ShowProdNoc)
+    {
+        <h4>Production</h4>
+        <div class="noc-content">
+            <div data-uri="https://connect.ezfactory.nl" data-nocdatatype="healthactive">API<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://connect.myez-go.com/health" data-nocdatatype="healthactive">DW<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezfactory-media.s3.eu-central-1.amazonaws.com" data-nocdatatype="healthactive">S3 VIDEO<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://ezfactory-production-storage.s3.eu-central-1.amazonaws.com" data-nocdatatype="healthactive">S3 OTHER<br /><span data-containertype="ms"></span></div>
+        </div>
+        <div class="noc-content">
+            <div data-uri="https://connect.ezfactory.nl/v1/actions/healthcheck" data-nocdatatype="healthactive">Actions<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://connect.ezfactory.nl/v1/actioncomments/healthcheck" data-nocdatatype="healthactive">Action<br />comments<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://connect.ezfactory.nl/v1/audits/healthcheck" data-nocdatatype="healthactive">Audits<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://connect.ezfactory.nl/v1/assessments/healthcheck" data-nocdatatype="healthactive">Assessments<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://connect.ezfactory.nl/v1/checklists/healthcheck" data-nocdatatype="healthactive">Checklists<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://connect.ezfactory.nl/v1/comments/healthcheck" data-nocdatatype="healthactive">Comments<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://connect.ezfactory.nl/v1/tasks/healthcheck" data-nocdatatype="healthactive">Tasks<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://connect.ezfactory.nl/v1/workinstructions/healthcheck" data-nocdatatype="healthactive">Work<br />instructions<br /><span data-containertype="ms"></span></div>
+            <div data-uri="https://connect.ezfactory.nl/v1/users/healthcheck" data-nocdatatype="healthactive">Users<br />&nbsp;<br /><span data-containertype="ms"></span></div>
+        </div>
+    }
+
+    <br /><br /><br />
+    <div>
+        <h4>Explanation</h4>
+        <div>
+            <h5>What is the noc test?</h5>
+            <p>
+                Noc test is a simple network connectivity test. Just like speed test you can use on your phone, the noc test checks your connectivity with the EZGO platform.
+            </p>
+            <p>
+                The tests are split between 2 parts. 1) connection to the full platform (API, DW, S3) represented by the first row, 2) connection to parts of the platform, represented by the second row.
+            </p>
+            <br />
+            <h5>What does it do? How does it work, what does it all mean?</h5>
+            <p>
+                Each square represents a connection. On the square, the title states which connection is being tested. Every x-number of seconds a check will be done to the EZ GO platform.
+                During this check the connection time is calculated. This time is also displayed on the square. The connection time is based on a round trip, which means from the location of the test to the location of the EZGO platform and back again.
+                The time is displayed in millisecond (ms). This check is done for each square and repeated until ons the page is closed.
+            </p>
+            <p>
+                In normal cases every square should be <span style="color:green">green</span>. If there is a connection blockade (e.g. no connection can be made) the square will be <span style="color:red">red</span>.
+            </p>
+            <p>
+                When per square the milliseconds are unstable (e.g. they are low, then high, then low, then high), the connection may be unstable. When the milliseconds are really high, the connection maybe overused, unstable or just really slow.
+            </p>
+            <p>
+                The first should at least have times between 50 and 200ms, where lower is better. The second row should at least average between 50 and 250, when averaged over all squared on that row.
+            </p>
+            <p>
+                For all squares, lower is better.
+            </p>
+            <br />
+            <h5>How to use it?</h5>
+            <p>
+                The noc test is connection location, location depended and time depended. Which means in certain locations it everything can be fine on the a certain time of day, in another location it can be not ok or even bad. Therefor the noc test should preferably be tested on multiple devices at multiple locations. And if possible at multiple times.
+            </p>
+            <p>
+                When starting the test it will take about a minute for the run to start. In normal cases you should let the test run at least a few minutes.
+            </p>
+            <br />
+            <h5>What are the limitation?</h5>
+            <p>
+                Due to the implementation we can not run a full speed test yet (this will be added later), therefor you can not determine the 'speed' (download/upload) of the internet, only the connection quality. 
+            </p>
+            <p>
+                EZGO platform is located within Europe. On a connection where the physical connection is located outside Europe the connection will be slower (ms will be higher).
+                On average this will be 2x for northern America, 2x~4x for southern America and 2x~4x in Asia, 6x for Korea and Australia when using a 'good/highspeed' connection.
+            </p>
+        </div>
+    </div>
+
+    @if (Model.ShowTextDebug)
+    {
+        <br />
+        <br />
+        <div>
+            <textarea id="logging" style="width:100%; height: 300px;">Loading....please wait..</textarea>
+        </div>
+    }
+       
+    </div>
+   
+</section>
+
+
+<script>
+    const timer = ms => new Promise(res => setTimeout(res, ms))
+
+    async function doNocs() {
+        const nocItems = document.querySelectorAll('[data-nocdatatype]');
+
+        for (const nocItem of nocItems) {
+            runNocCheck(nocItem.getAttribute('data-uri'), 20000, nocItem);
+            await timer(1234);
+        }
+    };
+
+    doNocs();
+
+    //retrieve('https://ezfactory-production-storage.s3.eu-central-1.amazonaws.com', document.querySelector('[data-uri="https://ezfactory-production-storage.s3.eu-central-1.amazonaws.com"]'))
+   
+    function runNocCheck(url,refreshRateInSeconds, resultItem) {
+        setInterval(function () {
+            retrieve(url, resultItem);
+          
+        }, refreshRateInSeconds);
+       
+    }
+
+    function retrieve(url, resultItem) {
+        let logItem = '[' + url + ']';
+        let startTime = new Date();
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', url);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send();
+        xhr.onload = function () {
+            logItem = logItem + ' [' + xhr.status + ']';
+            let endTime = new Date();
+            let diffTime = endTime - startTime;
+            logItem = logItem + ' [' + diffTime + ' ms]';
+            resultItem.querySelector('[data-containertype="ms"]').innerHTML = diffTime + ' ms';
+            resultItem.setAttribute('class', 'good');
+            displayLogging(logItem);
+        };
+        xhr.onerror = function () {
+            logItem = logItem + ' [' + xhr.status + ']';
+            let endTime = new Date();
+            let diffTime = endTime - startTime;
+            logItem = logItem + ' [' + diffTime + ' ms]';
+            resultItem.querySelector('[data-containertype="ms"]').innerHTML = diffTime + ' ms';
+            if (xhr.status == 403) {
+                //ignore 403, we only check root access. 
+                resultItem.setAttribute('class', 'good');
+            } else {
+                resultItem.setAttribute('class', 'bad');
+            }
+            displayLogging(logItem);
+        };
+    }
+
+    function displayLogging(message) {
+        if (document.getElementById('logging') != null) {
+            var current = document.getElementById('logging').value;
+            document.getElementById('logging').value = message + '\r\n' + current;
+        }
+    }
+
+    /*
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', 'https://ezgo.testapi.ezfactory.nl/health');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send();
+        xhr.onload = function () {
+            console.log(xhr.response);
+            console.log('activity');
+        };
+        xhr.onerror = function () {
+            console.log('activity');
+            //console.log('can not check activity status');
+        };
+        console.log('tada');
+
+        let xhr2 = new XMLHttpRequest();
+        xhr2.open('GET', 'https://dw.tst.ezfactory.nl');
+        xhr2.setRequestHeader('Content-Type', 'application/json');
+        xhr2.send();
+        xhr2.onload = function () {
+            console.log(xhr2.response);
+            console.log('activity2');
+        };
+        xhr2.onerror = function () {
+            console.log('activity2');
+            //console.log('can not check activity status');
+        };
+        console.log('tada2');
+
+        let xhr3 = new XMLHttpRequest();
+        xhr3.open('GET', 'https://biapi.test.ezfactory.nl/health');
+        xhr3.setRequestHeader('Content-Type', 'application/json');
+        xhr3.send();
+        xhr3.onload = function () {
+            console.log(xhr3.response);
+            console.log('activity2');
+        };
+        xhr3.onerror = function () {
+            console.log('activity2');
+            //console.log('can not check activity status');
+        };
+        console.log('tada3');
+
+
+
+        function Pinger_ping(ip, callback) {
+
+    if(!this.inUse) {
+
+    this.inUse = true;
+    this.callback = callback
+    this.ip = ip;
+
+    var _that = this;
+
+    this.img = new Image();
+
+    this.img.onload = function() {_that.good();};
+    this.img.onerror = function() {_that.good();};
+
+    this.start = new Date().getTime();
+    this.img.src = "http://" + ip;
+    this.timer = setTimeout(function() { _that.bad();}, 1500);
+
+    }
+    }
+
+    */
+
+    
+</script>

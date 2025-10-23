@@ -1,0 +1,12 @@
+﻿<div class="dropdown show">
+    <button id="btnSelectUser" class="btn btn-ezgo btn-block dropdown-toggle" aria-expanded="true" data-toggle="dropdown" type="button">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SelectAssessorTitle, "Select second assessor") ?? "Select second assessor")</button>
+    <div class="dropdown-menu w-100">
+        <div class="p-1 pt-2 pb-2">
+            <input class="w-100" type="search" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SearchAssessor, "Search assessor") ?? " Search assessor")" />
+        </div>
+        
+        <div id="userlist" style="height:200px;overflow-y:auto;">
+            <a class="dropdown-item" href="#">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.FirstItemTitle, "First Item") ?? "First Item")</a>
+        </div>
+    </div>
+</div>

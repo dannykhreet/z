@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+    <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+    <title>@ViewData["Title"] - Ezgo.Cms</title>
+    <link rel="stylesheet" href="~/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&amp;display=swap" />
+    <link rel="stylesheet" href="~/assets/fonts/ionicons.min.css">
+    <link rel="stylesheet" href="~/assets/css/styles.min.css">
+    <link rel="stylesheet" href="~/lib/aos/aos.css" />
+    <!-- Toastr -->
+    <link rel="stylesheet" href="/plugins/toastr/toastr.min.css" />
+
+    <!------ Include the above in your HEAD tag ---------->
+    <link rel="stylesheet" href="~/css/login.css" />
+
+    @RenderSection("HeaderScripts", required:false)
+</head>
+<body style="background-color: #f1f3f1;">
+
+    <main role="main" class="p-0">
+        @RenderBody()
+    </main>
+
+
+
+    <script src="~/assets/js/jquery.min.js"></script>
+    <script src="~/assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/lib/aos/aos.js"></script>
+    <script src="~/assets/js/script.min.js"></script>
+    <!-- Toastr -->
+    <script src="/plugins/toastr/toastr.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+
+    <partial name="_system_environment_display" />
+</body>
+</html>

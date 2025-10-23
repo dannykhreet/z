@@ -1,0 +1,1004 @@
+﻿@model WebApp.ViewModels.CompletedChecklistViewModel
+@using WebApp.Models.Checklist
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.StatsChecklistCompletedTitle, "Completed checklists") ?? "Completed checklists";
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+
+    var single = new WebApp.ViewModels.CompletedChecklistSingleViewModel();
+}
+
+@section CSS{
+    <style>
+        .my-circle {
+            display: inline-block;
+            border-radius: 60px;
+            padding: 0.8em 1.1em;
+            background-color: #3f903f;
+            color: #fff;
+        }
+
+            .my-circle i {
+                font-size: 20px;
+            }
+
+        .status-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff !important;
+            flex-grow: 0;
+            flex-shrink: 0;
+        }
+
+        .status-icon {
+            display: flex;
+            margin: auto;
+            font-size: 1.3em;
+        }
+
+        #fade-wrapper {
+            display: none;
+            position: fixed;
+            height: 100vh;
+            width: 100vw;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 10000;
+        }
+
+        .scale-up {
+            transform: translate(-15px, -140px);
+            width: 200%;
+            transition: all 0.2s ease-in-out;
+            border-radius: 6px !important;
+        }
+
+        #accordionChecklists .card .card-header {
+            cursor: pointer;
+        }
+
+        #completedChecklistContainer {
+            height: 400px;
+        }
+
+        .infoText {
+            position: fixed;
+            right: 0;
+            top: 0;
+            margin: 10px;
+        }
+
+        .score {
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            padding: 3px 10px 0px 14px;
+            font-size: 23px;
+        }
+
+        .score-large {
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            padding: 3px 0px 0px 8px;
+            font-size: 23px;
+        }
+
+        .checklistOngoing {
+            background-color: #93C54B;
+            border-radius: 20px;
+            color: white;
+            width: 80px;
+            padding: 0.2rem 0.5rem 0.2rem 0.5rem;
+            text-align: center;
+            float: right;
+        }
+
+        .ongoingSelected {
+            background-color: white;
+            color: #93C54B;
+        }
+
+        .list-group-item h5 {
+            color: black;
+            font-weight: 400;
+        }
+
+        .list-group-item .fa-calendar-lines-pen {
+            color: #93C54B;
+        }
+
+        #contentCol a.active h5 {
+            color: white;
+        }
+
+        #contentCol a.active i {
+            color: white;
+        }
+
+        .editedByUserPicture {
+            min-width: 40px;
+            width: 40px;
+            height: 40px;
+            top: 0px;
+            background-size: cover;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .editedByUserOverlay {
+            min-width: 40px;
+            width: 40px;
+            height: 40px;
+            background-size: cover;
+            border-radius: 50%;
+            position: absolute;
+            top: 0px;
+            right: 5px;
+            color: white;
+            font-size: 20px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(147,197,75,.7)
+        }
+
+        .no-border {
+            border: 0px;
+        }
+
+        [id^="completedChecklist-"] {
+            border: 0px;
+            border-radius: 0px !important;
+        }
+
+        .stageContainer
+        {
+            border: 0px solid white;
+            border-radius: 10px;
+        }
+
+        .stageHeader {
+            border-radius: 10px 10px 0px 0px;
+            color: white;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .stageBody {
+            border-radius: 0px 0px 10px 10px;
+        }
+
+        .checklistItem {
+            border-radius: 10px;
+            background-color: white;
+        }
+
+        .stageBody li:first-child {
+            margin-top: 0px !important;
+        }
+
+        .stageBody li:last-child {
+            margin-bottom: 0px !important;
+        }
+
+        .separateChecklistItem {
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.07), 1px 2px 2px 1px rgba(0, 0, 0, 0.07), 1px 3px 3px 1px rgba(0, 0, 0, 0.07), 1px 4px 4px 1px rgba(0, 0, 0, 0.07);
+        }
+
+
+
+        .itemEditedByUserPicture {
+            min-width: 40px;
+            width: 40px;
+            height: 40px;
+            background-size: cover;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .itemEditedByUserOverlay {
+            min-width: 40px;
+            width: 40px;
+            height: 40px;
+            background-size: cover;
+            border-radius: 50%;
+            position: absolute;
+            top: 0px;
+            right: 5px;
+            color: white;
+            font-size: 20px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(147,197,75,.7)
+        }
+
+        .signedStageInfoOverlay {
+            min-height: 120px;
+            height: 100%;
+            width: 120px;
+            float: left;
+            border-radius: 10px 0px 0px 10px;
+            background-size: cover;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            bottom: 0px;
+            color: #1ED760;
+            font-size: 80px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(20,20,40,.5)
+        }
+
+        .showExtraStageInfo {
+            font-size: 32px;
+        }
+
+        .shiftNotesEntered {
+            font-size: 32px;
+            color: #93C54B;
+        }
+
+        .stageContainer
+        {
+            border: 0px solid white;
+            border-radius: 10px;
+        }
+
+        .stageHeader {
+            border-radius: 10px 10px 0px 0px;
+            color: white;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .stageBody {
+            border-radius: 0px 0px 10px 10px;
+        }
+
+        .checklistItem {
+            border-radius: 10px;
+            background-color: white;
+        }
+
+        .stageBody li:first-child {
+            margin-top: 0px !important;
+        }
+
+        .stageBody li:last-child {
+            margin-bottom: 0px !important;
+        }
+
+        .separateChecklistItem {
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.07), 1px 2px 2px 1px rgba(0, 0, 0, 0.07), 1px 3px 3px 1px rgba(0, 0, 0, 0.07), 1px 4px 4px 1px rgba(0, 0, 0, 0.07);
+        }
+
+
+
+        .itemEditedByUserPicture {
+            min-width: 40px;
+            width: 40px;
+            height: 40px;
+            background-size: cover;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .itemEditedByUserOverlay {
+            min-width: 40px;
+            width: 40px;
+            height: 40px;
+            background-size: cover;
+            border-radius: 50%;
+            position: absolute;
+            top: 0px;
+            right: 5px;
+            color: white;
+            font-size: 20px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(147,197,75,.7)
+        }
+
+        .signedStageInfoOverlay {
+            min-height: 120px;
+            height: 100%;
+            width: 120px;
+            float: left;
+            border-radius: 10px 0px 0px 10px;
+            background-size: cover;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            bottom: 0px;
+            color: #1ED760;
+            font-size: 60px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(20,20,40,.5)
+        }
+
+        .showExtraStageInfo {
+            font-size: 32px;
+        }
+
+        .shiftNotesEntered {
+            font-size: 32px;
+            color: #93C54B;
+        }
+    </style>
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-6">
+                <a asp-controller="checklist" asp-action="index" style="display: block"><i class="fa fa-arrow-left"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.BackTitle, "Back to checklist overview") ?? "Back to checklist overview")</a>
+                <h1 id="completedChecklistTitle1">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsChecklistCompletedTitle, "Completed checklists") ?? "Completed checklists")</h1>
+                <div id="completedChecklistShowFiltersButton" class="btn btn-ezgo mb-1 mt-2 mr-1" style="display: none"><span class="pr-2">Filters</span> <i class="fa-solid fa-chevrons-down"></i></div>
+            </div>
+            
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                <a asp-controller="checklist" asp-action="details" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto d-none"></a>
+                @if (Model?.ApplicationSettings?.Features != null)
+                {
+                    @if (Model.ApplicationSettings.Features.ExportAdvancedEnabled.HasValue || Model.ApplicationSettings.Features.ExportEnabled.HasValue)
+                    {
+                        @if (Model.ApplicationSettings.Features.ExportTaskProperties != null && Model.ApplicationSettings.Features.ExportTaskProperties.Value && Model.ApplicationSettings.Features.ChecklistsPropertyValueRegistrationEnabled != null && Model.ApplicationSettings.Features.ChecklistsPropertyValueRegistrationEnabled.Value)
+                        {
+                            <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="checklisttaskproperties" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.DownloadDataTitle, "Download value registration data") ?? "Download value registration data")"><i class="far fa-object-group"></i></button>
+                        }
+
+                        @if (Model.ApplicationSettings.Features.ExportEnabled != null && Model.ApplicationSettings.Features.ExportEnabled.Value && Model.ApplicationSettings.Features.ChecklistsEnabled != null && Model.ApplicationSettings.Features.ChecklistsEnabled.Value)
+                        {
+                            <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="checklists" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.ExportTitle, "Export") ?? "Export")"><i class="fas fa-download"></i></button>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="container-fluid">
+        <div class="row" style="height:calc(100vh - 167px);">
+            <div id="completedChecklistsFilters" class="col-4">
+                <div class="card card-filter h-100">
+                    <div class="card-header pb-0">
+                        <h3 class="card-title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.CardTitle, "Filters") ?? "Filters")</h3>
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn" onclick="areaFilter_v2.reset('block')" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body card-filter pt-0">
+                        <partial name="_filters_block" model="Model.Filter" />
+                    </div>
+                </div>
+            </div>
+
+            <div id="completedChecklistsOverview" class="col-8" style="height:calc(100vh - 190px);">
+                <div class="card h-100">
+                    <div id="completedChecklistTitle2" class="card-header h5" style="text-align: center">
+                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsChecklistCompletedTitle, "Completed checklists") ?? "Completed checklists")
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div id="nocontent" class="pl-3 pt-3 pb-0 text-muted">
+                            <h4>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Reports.NoCompletedChecklistsFound, "No completed checklists found") ?? "No completed checklists found")</h4>
+                        </div>
+
+                        <div id="contentCol" class="list-group h-100" data-container="completed_checklists">
+                            @if (Model.CompletedChecklists != null)
+                            {
+                                @foreach (CompletedChecklistModel completeChecklist in Model.CompletedChecklists)
+                                {
+                                    {
+                                        single = ViewModelConverters.ConvertToViewModel(completeChecklist);
+                                        single.CompletedTextValue = "Ended"; //TODO TRANSLATE
+                                        single.ModifiedTextValue = "Last modified at"; //TODO TRANSLATE
+                                        single.OngoingTextValue = Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.OngoingLabel, "ONGOING") ?? "ONGOING";
+                                        single.ApplicationSettings = Model.ApplicationSettings;
+                                        single.Timezone = timezone;
+                                        single.Locale = Model?.Locale;
+                                    }
+                                    <partial name="~/Views/Report/Checklist/_completed_checklist.cshtml" model="single" />
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <div class="card-footer" style="text-align:center;">
+                        <span id="load_more_loader" style="margin-top:-10px;"></span>
+                        <div style="text-align:center;">
+                            <a class="btn btn-ezgo" style="width:200px;" data-actiontype="load_more"><i class="fas fa-angle-double-down"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tasklist" class="col-8" style="height:calc(100vh - 188px);display: none"></div>
+        </div>
+    </div>
+</section>
+
+
+<div class="modal fade" id="modalDeleteChecklist" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Checklist</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">You are about to delete:</div>
+                <div class="row" style="text-align:center"><div class="col-md-12"><h3><span id="span_checklistname"> </span> (<span id="span_checklistid"></span>)</h3></div></div>
+                <div class="row" style="text-align:center">
+                    <div class="col-md-12"><span style="color:red;font-size:15px;font-weight:bolder;">THIS ACTION CAN NOT BE UNDONE!</span></div>
+                </div>
+                <br /><br />
+                <div class="row form-group">
+                    <div class="col-md-12"><label for="txt_textvalidator" style="margin-top:5px;">Type the following text [DELETE] (without brackets)</label></div>
+
+                    <div class="input-group  col-md-12">
+                        <input type="text" id="txt_textvalidator" class="form-control" />
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="btn_delete_checklist" data-actiontype="confirmdelete" class="btn btn-danger btn-sm">Confirm delete</button>
+                <button type="button" id="closedelete" class="btn btn-info btn-sm" data-dismiss="modal" data-actiontype="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnClose, "Close") ?? "Close")</button>
+            </div>
+
+            <input type="hidden" id="hidden_deletechecklistid" id="hidden_deletechecklistid" />
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @if (Model.ApplicationSettings?.Features?.ExportAdvancedEnabled == true || Model.ApplicationSettings?.Features?.ExportEnabled == true)
+    {
+        <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+        <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+    }
+
+    @if (Model.ApplicationSettings?.Features?.AnalyticsEnabled == true)
+    {
+        <script src="~/js/analytics.js"></script>
+        <script>ezgoAnalytics.init('checklist');</script>
+    }
+
+    <script src="/js/areafilter_v2.js"></script>
+    <script>
+        $('document').ready(function () {
+            ezgomediafetcher.preloadImagesAndVideos();
+            ezgomediafetcher.preloadFancyboxAnchors();
+            localStorage.setItem('last_completed_overview_location', window.location.pathname + window.location.search);
+        });
+
+        areaFilter_v2.init('/config/getareatree', '', true);
+
+        $('#nocontent').hide();
+        $('#contentCol').on('filterDone', function () {
+            $('#nocontent').toggle(
+                $('#contentCol div.results:visible').length === 0
+            )
+        });
+
+        function report(companyid, taskcntr) {
+            if (typeof analytics !== 'undefined' && analytics != null) {
+                analytics.logEvent('download_completed_checklist_pdf', { name: 'completed_checklist', companyid: companyid });
+            }
+        }
+
+        function loadTasks(e, id) {
+            $('#tasklist').html('<div class="text-center w-100 pt-5"><img src="/images/factory-loading.gif" class="w-50" /></div>');
+            $('#contentCol a').removeClass('active');
+            $('#contentCol a .checklistOngoing').removeClass('ongoingSelected');
+            
+            completedChecklists.showDetailSectionWithoutFilter();
+
+            $.get('/report/checklist/completed/' + id, function (data) {
+                $('#tasklist').html(data);
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+            });
+
+            $(e.currentTarget).addClass('active');
+            
+            if ($(e.currentTarget).find('.checklistOngoing').length) {
+                $(e.currentTarget).find('.checklistOngoing').addClass('ongoingSelected');
+            }
+        }
+
+        function expandStageTagsInformation(stageId) {
+            if ($('#stageTags-' + stageId + ':visible').length > 0) {
+                $('#stageTags-' + stageId).hide('fast');
+
+                $('#showExtraStageTagsInfo-' + stageId + ' i').removeClass('fa-chevron-up');
+                $('#showExtraStageTagsInfo-' + stageId + ' i').addClass('fa-chevron-down');
+            }
+            else {
+                $('#stageTags-' + stageId).show('fast');
+
+                $('#showExtraStageTagsInfo-' + stageId + ' i').removeClass('fa-chevron-down');
+                $('#showExtraStageTagsInfo-' + stageId + ' i').addClass('fa-chevron-up');
+            }
+        }
+
+        function expandStageInformation(stageId) {
+            if ($('#extraStageInfo-' + stageId + ':visible').length > 0) {
+                $('#extraStageInfo-' + stageId).hide('fast');
+
+                $('#showExtraStageInfo-' + stageId + ' i').removeClass('fa-chevron-up');
+                $('#showExtraStageInfo-' + stageId + ' i').addClass('fa-chevron-down');
+            }
+            else {
+                $('#extraStageInfo-' + stageId).show('fast');
+
+                $('#showExtraStageInfo-' + stageId + ' i').removeClass('fa-chevron-down');
+                $('#showExtraStageInfo-' + stageId + ' i').addClass('fa-chevron-up');
+            }
+        }
+
+        function PrintDiv(divid) {
+            var contents = document.getElementById(divid).innerHTML;
+            var frame1 = document.createElement('iframe');
+            frame1.name = "frame1";
+            frame1.style.position = "absolute";
+            frame1.style.top = "-1000000px";
+            document.body.appendChild(frame1);
+            var frameDoc = frame1.contentWindow ? frame1.contentWindow : frame1.contentDocument.document ? frame1.contentDocument.document : frame1.contentDocument;
+            frameDoc.document.open();
+            frameDoc.document.write('<html><head><title>DIV Contents</title>');
+            frameDoc.document.write('</head><body>');
+            frameDoc.document.write(contents);
+            frameDoc.document.write('</body></html>');
+            frameDoc.document.close();
+            setTimeout(function () {
+                window.frames["frame1"].focus();
+                window.frames["frame1"].print();
+                document.body.removeChild(frame1);
+            }, 500);
+            return false;
+        }
+
+        function PrintCompletedChecklist(id) {
+            var iframe = document.createElement('iframe');
+            iframe.name = "checklist_" + id;
+            iframe.style.position = "absolute";
+            iframe.style.top = "-1000000px";
+            iframe.src = "/pdf/view/0/" + id;
+            document.body.appendChild(iframe);
+
+            setTimeout(function () {
+                window.frames["checklist_" + id].print();
+                document.body.removeChild(iframe);
+            }, 1000);
+
+            return false;
+        }
+
+        var completedChecklists = {
+            _version: '1.0',
+            language: {
+                openChecklists: 'Open checklists',
+                lastCompletedChecklists: 'Last completed checklists'
+            },
+            offset: 0,
+            nr: 10,
+            nrOfItemsLoaded: 0,
+            areaId: 0,
+            date: '',
+            templateId: @Model.TemplateId,
+            selectedChecklistId: @Model.ChecklistId,
+            iscompleted: true, 
+
+            clearItemContainer: function () {
+                $('[data-container="completed_checklists"]').html('');
+            },
+
+            init: function (startOffset, startNrOfItemsLoaded, nrOfItemsToRetrieve) {
+                if (startOffset != null) {
+                    completedChecklists.offset = startOffset;
+                }
+
+                if (startNrOfItemsLoaded != null) {
+                    completedChecklists.nrOfItemsLoaded = startNrOfItemsLoaded;
+                }
+
+                if (nrOfItemsToRetrieve != null) {
+                    completedChecklists.nr = nrOfItemsToRetrieve;
+                }
+
+                completedChecklists.initHandlers();
+                completedChecklists.showHideMoreButton();
+
+                if (completedChecklists.selectedChecklistId > 0 && $(`[data-checklistid='${completedChecklists.selectedChecklistId}']`).length) {
+                    $(`[data-checklistid='${completedChecklists.selectedChecklistId}']`)[0].click();
+                }
+            },
+            initHandlers: function () {
+                $('[data-actiontype="load_more"]').on('click', function () {
+                    completedChecklists.retrieveMore();
+                });
+
+                $('#areatree').on('click', 'a', function () {
+                    var areaDeselected = +$(this).data('id') != areaid;
+                    if (areaDeselected) {
+                        completedChecklists.areaId = null;
+                    }
+                    else {
+                        completedChecklists.areaId = $(this).data('id');
+                    }
+                    completedChecklists.clearDetails();
+
+                    completedChecklists.offset = 0;
+                    completedChecklists.clearItemContainer();
+                    completedChecklists.setLoaderStart('load_more_loader');
+                    completedChecklists.retrieve();
+                });
+
+                $('#tasklist').on('click','a[data-action="set_checklist_inactive"]', function() {
+                     completedChecklists.showDeleteCompany($(this).attr('data-id'), $(this).attr('data-name'));
+                });
+                
+                $('[data-actiontype="confirmdelete"]').on('click', function () {
+                    if ($('#txt_textvalidator').val() == 'DELETE') {
+                        completedChecklists.saveDeleteChecklist($('#hidden_deletechecklistid').val());
+                    } else {
+                        toastr.error('Validation is not correct. Please fill in [DELETE] without brackets.');
+                    }
+                });
+
+                $('[data-action="resetfilters"]').on('click', function () {
+                    const url = window.location.href.split('?')[0];
+
+                    window.history.pushState({}, "", url);
+                    
+                    $('#completedChecklistTitle1').html(completedChecklists.language.lastCompletedChecklists);
+                    $('#completedChecklistTitle2').html(completedChecklists.language.lastCompletedChecklists);
+
+                    completedChecklists.templateId = 0;
+                    completedChecklists.selectedChecklistId = 0;
+                    completedChecklists.areaId = 0;
+                    completedChecklists.startDate = '';
+                    completedChecklists.endDate = '';
+                    completedChecklists.iscompleted = true;
+                    completedChecklists.clearDetails();
+
+                    completedChecklists.offset = 0;
+                    completedChecklists.clearItemContainer();
+                    completedChecklists.setLoaderStart('load_more_loader');
+                    completedChecklists.retrieve();
+
+                    $('#filter_datechoice').val('');
+                });
+
+                $('#completedChecklistShowFiltersButton').on('click', function (e) {
+                    completedChecklists.showFilterSectionWithoutDetails();
+                });
+
+                $('#templateFilter').val('default').selectpicker("refresh");
+
+                $('#templateFilter').on('change', function (e) {
+                    completedChecklists.templateId = +this.value.replace('template', '');
+                    completedChecklists.clearDetails();
+
+                    completedChecklists.offset = 0;
+                    completedChecklists.clearItemContainer();
+                    completedChecklists.setLoaderStart('load_more_loader');
+                    completedChecklists.retrieve();
+                });
+
+                //show tooltips of templateFilter options
+                $('button[data-id="templateFilter"]').on('click', function (e) {
+                    $('#templateFilter option').each(function () {
+                        var id = '#' + $(this).attr('data-bs-select');
+                        var title = $(id).attr('title');
+                        if (title == undefined || title == '') {
+                            $(id).attr('title', $(this).attr('title'));
+                        }
+                    });
+                });
+
+                $('#iscompletedFilter').on('change', function () {
+                    var iscompletedFilterValue = $(this).val();
+
+                    if (iscompletedFilterValue == 'true') {
+                        completedChecklists.iscompleted = true;
+                        $('#completedChecklistTitle1').html(completedChecklists.language.lastCompletedChecklists);
+                        $('#completedChecklistTitle2').html(completedChecklists.language.lastCompletedChecklists);
+                    }
+                    else if (iscompletedFilterValue == 'false') {
+                        completedChecklists.iscompleted = false;
+                        $('#completedChecklistTitle1').html(completedChecklists.language.openChecklists);
+                        $('#completedChecklistTitle2').html(completedChecklists.language.openChecklists);
+                    }
+
+                    completedChecklists.clearDetails();
+
+                    completedChecklists.offset = 0;
+                    completedChecklists.clearItemContainer();
+                    completedChecklists.setLoaderStart('load_more_loader');
+                    completedChecklists.retrieve();
+                });
+            },
+
+            retrieveMore: function () {
+                if (completedChecklists.offset == null) { completedChecklists.offset = 0 };
+
+                completedChecklists.setLoaderStart('load_more_loader');
+                completedChecklists.retrieve();
+            },
+
+            retrieve: function () {
+                var queryParams = [];
+
+                if (completedChecklists.startDate != '' && completedChecklists.endDate != '' && completedChecklists.startDate != null && completedChecklists.endDate != null) {
+                    queryParams.push('startDate=' + completedChecklists.startDate);
+                    queryParams.push('endDate=' + completedChecklists.endDate);
+                }
+
+                if (completedChecklists.templateId != 0) {
+                    queryParams.push('templateId=' + completedChecklists.templateId);
+                }
+
+                if (completedChecklists.areaId != '' && completedChecklists.areaId != null) {
+                    queryParams.push('areaid=' + completedChecklists.areaId);
+                }
+                
+                if (completedChecklists.nr != 0) {
+                    queryParams.push('nr=' + completedChecklists.nr);
+                }
+
+                if (completedChecklists.iscompleted != null) {
+                    queryParams.push('iscompleted=' + completedChecklists.iscompleted);
+                }
+
+                if (completedChecklists.offset != 0) {
+                    queryParams.push('offset=' + completedChecklists.offset);
+                }
+
+                if (completedChecklists.mostRecentRequest != null) {
+                    completedChecklists.mostRecentRequest.abort();
+                }
+
+                completedChecklists.mostRecentRequest = $.ajax({
+                    type: "GET",
+                    url: '/report/checklist/completeddetails' + (queryParams.length ? '?' + queryParams.join('&') : ''),
+                    success: function (data) {
+                        $('[data-container="completed_checklists"]').append(data);
+                        completedChecklists.offset = completedChecklists.offset + completedChecklists.nr;
+                        completedChecklists.setLoaderEnd('load_more_loader');
+                        completedChecklists.showHideMoreButton();
+
+                        ezgomediafetcher.preloadImagesAndVideos();
+                        ezgomediafetcher.preloadFancyboxAnchors();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        completedChecklists.setLoaderEnd('load_more_loader');
+                        if (jqXHR.statusText == "abort") {
+                            return;
+                        }
+                        else {
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        }
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+
+            setLoaderStart: function (elementId) {
+                var loader = document.getElementById(elementId);
+                loader.innerHTML = '<img src="data:image/gif;base64,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" />';
+                completedChecklists.hideMoreButton();
+            },
+
+            setLoaderEnd: function (elementId) {
+                var loader = document.getElementById(elementId);
+                loader.innerHTML = '';
+                completedChecklists.showMoreButton();
+            },
+
+            hideMoreButton: function () {
+                $('[data-actiontype="load_more"]').hide();
+            },
+
+            showMoreButton: function () {
+                $('[data-actiontype="load_more"]').show();
+            },
+
+            showHideMoreButton: function () {
+                let nrOfItems = $('[data-container="completed_checklists"]').children('[data-containertype="resultitem"]').length;
+                if (nrOfItems == 0) {
+                    completedChecklists.hideMoreButton();
+                    completedChecklists.showNoContent();
+                } else {
+                    completedChecklists.hideNoContent();
+                    if ((nrOfItems % completedChecklists.nrOfItemsLoaded) > 0) {
+                        completedChecklists.hideMoreButton();
+                    } else {
+                        completedChecklists.showMoreButton();
+                    };
+                }
+            },
+            showFilterSectionWithoutDetails: function () {
+                $('#tasklist').hide('fast');
+
+                $('#completedChecklistsOverview').removeClass('col-4');
+                $('#completedChecklistsOverview').addClass('col-8');
+
+                $('#completedChecklistShowFiltersButton').hide();
+                $('#completedChecklistTitle1').show();
+
+                $('#completedChecklistsFilters').show('fast');
+            },
+            showDetailSectionWithoutFilter: function () {
+                $('#completedChecklistsFilters').hide('fast');
+
+                $('#completedChecklistsOverview').removeClass('col-8');
+                $('#completedChecklistsOverview').addClass('col-4');
+
+                $('#completedChecklistTitle1').hide();
+                $('#completedChecklistShowFiltersButton').show();
+
+                $('#tasklist').show('fast');
+            },
+            hideNoContent: function () {
+                $('#nocontent').hide();
+            },
+            
+            showNoContent: function () {
+                $('#nocontent').show();
+            },
+            
+            clearDetails: function () {
+                $('#tasklist').html('');
+            },
+            closeDeleteChecklist: function () {
+                $('#modalDeleteChecklist').modal('hide');
+                $('#hidden_deletechecklistid').val('');
+            },
+            showDeleteCompany: function (checklistid, checklistname) {
+                $('#txt_textvalidator').val('');
+                $('#span_checklistname').text(checklistname);
+                $('#span_checklistid').text(checklistid);
+                $('#hidden_deletechecklistid').val(checklistid);
+
+                //show modal
+                $('#modalDeleteChecklist').modal('show');
+
+            },
+            saveDeleteChecklist: function (checklistid) {
+                 if (checklistid != null) {
+                    toastr.remove();
+
+                    $.ajax({
+                        type: "POST",
+                        url: '/report/checklist/delete/' + checklistid,
+                        success: function (data) {
+                            $('#hidden_deletechecklistid').val('');
+                            completedChecklists.closeDeleteChecklist();
+                            completedChecklists.loadAfterDeleteChecklist();
+                            toastr.success('Delete checklist successful');
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        },
+                        contentType: "application/json; charset=utf-8"
+                    });
+                } else {
+                    toastr.error('Audit is not or not correctly removed.');
+                 }
+
+            },
+            loadAfterDeleteChecklist: function() {
+                completedChecklists.showFilterSectionWithoutDetails();
+                completedChecklists.clearDetails();
+                completedChecklists.offset = 0;
+                completedChecklists.clearItemContainer();
+                completedChecklists.setLoaderStart('load_more_loader');
+                completedChecklists.retrieve();
+              
+            }
+        }
+        completedChecklists.init(@WebApp.Controllers.ReportController.START_NR_OF_ITEMS, @(Model.CompletedChecklists != null ? Model.CompletedChecklists.Count : 0), @WebApp.Controllers.ReportController.MAX_NR_OF_DYNAMIC_ITEMS);
+
+        function downloadPdf(url) {
+            @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+            {
+                @:dataEntry = ezgoAnalytics.dataSpanStart("generate pdf completed", "checklist");
+            }
+
+            var newtab = window.open(url, "_blank");
+
+            @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+            {
+                @:newtab.addEventListener("unload", function () { ezgoAnalytics.dataSpanEnd(dataEntry); });
+            }
+        }
+            
+        $('#filter_datechoice').val('');
+
+        $('#filter_datechoice').daterangepicker({
+            showDropdowns: true,
+            autoUpdateInput: false,
+            opens: 'center', drops: 'down',
+            locale: {
+                format: 'DD MMM YYYY',
+                firstDay: 1,
+                cancelLabel: 'Clear'
+            }
+        });
+
+        $('#filter_datechoice').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD MMM YYYY') + ' - ' + picker.endDate.format('DD MMM YYYY'));
+
+            completedChecklists.startDate = picker.startDate.format("DD-MM-YYYY");
+            completedChecklists.endDate = picker.endDate.format("DD-MM-YYYY");
+
+            completedChecklists.clearDetails();
+
+            completedChecklists.offset = 0;
+            completedChecklists.clearItemContainer();
+            completedChecklists.setLoaderStart('load_more_loader');
+            completedChecklists.retrieve();
+
+        });
+
+        $('#filter_datechoice').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+        });
+
+        $('[data-action="cleardatefilter"]').on('click', function () {
+            $('#filter_datechoice').val('');
+            completedChecklists.startDate = '';
+            completedChecklists.endDate = '';
+
+            completedChecklists.clearDetails();
+
+            completedChecklists.offset = 0;
+            completedChecklists.clearItemContainer();
+            completedChecklists.setLoaderStart('load_more_loader');
+            completedChecklists.retrieve();
+        });
+
+        @if (Model.TemplateId != 0)
+        {
+            @:$('#templateFilter').selectpicker('val', 'template' + @(Model.TemplateId));
+        }
+
+        completedChecklists.language.openChecklists = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Reports.OpenChecklists, "Open checklists") ?? "Open checklists")';
+        completedChecklists.language.lastCompletedChecklists = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Reports.LastCompletedChecklists, "Last completed checklists") ?? "Last completed checklists")';
+    </script>
+}

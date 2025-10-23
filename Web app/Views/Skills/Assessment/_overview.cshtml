@@ -1,0 +1,122 @@
+﻿@model WebApp.ViewModels.AssessmentViewModel
+@{
+    Layout = null;
+}
+
+<style>
+    .tag-card:hover {
+        box-shadow: none !important;
+        border: none;
+        transform: none;
+    }
+</style>
+
+<div class="row no-gutters" id="contentCol">
+    @if (Model.SkillAssessmentTemplates != null && Model.SkillAssessmentTemplates.Count != 0)
+    {
+        @foreach (WebApp.Models.Skills.SkillAssessmentTemplate skillAssessment in Model.SkillAssessmentTemplates)
+        {
+            var id = skillAssessment.Id;
+            var hasImage = !string.IsNullOrEmpty(skillAssessment.Picture) ? "true" : "false";
+            var areaPathIds = skillAssessment.AreaPathIds != null ? skillAssessment.AreaPathIds.Replace(" -> ", ",") : "";
+            var tagsList = new List<int>();
+
+            if (skillAssessment.Tags != null && skillAssessment.Tags.Count > 0)
+            {
+                tagsList.AddRange(skillAssessment.Tags.Select(t => t.Id));
+            }
+
+            if (skillAssessment.SkillInstructions != null && skillAssessment.SkillInstructions.Count > 0)
+            {
+                foreach (var item in skillAssessment.SkillInstructions)
+                {
+                    if (item.Tags != null && item.Tags.Count > 0)
+                    {
+                        tagsList.AddRange(item.Tags.Select(t => t.Id));
+                    }
+                }
+            }
+
+            var uniqueTags = String.Join(',', tagsList.Distinct());
+
+            <div class="card w-100 results mr-1 my-1" data-id="@id"
+                 data-role=""
+                 data-instructions="@skillAssessment.NumberOfSkillInstructions;"
+                 data-hasimage="@hasImage"
+                 data-pathids="@areaPathIds"
+                 data-tags="@uniqueTags">
+
+                <div class="card-body p-0">
+                    @{
+                        var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, skillAssessment.Picture);
+                        if (string.IsNullOrEmpty(skillAssessment.Picture))
+                        {
+                            picture = @"/assets/img/normal_unavailable_image.png";
+                        }
+                    }
+                    <a class="text-muted fs-0 fs-lg-1" onclick="assessments.continueOrExecuteAssessment(this)" style="cursor: pointer">
+                        <div class="col-12 p-1">
+                            <div class="p-1">
+                                <div class="row" data-containertype="skillassessment_container" data-id="@skillAssessment.Id">
+                                    <div class="col-12">
+                                        <div class="row pt-2">
+                                            <div class="col-sm-5 col-md-3 col-lg-3 col-xl-2">
+                                                <img src="/images/media-loading.gif" data-src="@picture" class="img-fluid" loading="lazy" />
+                                            </div>
+
+                                            <div class="col-sm-5 col-md-7 col-lg-7 col-xl-8">
+                                                <h5 class="mt-3 mt-sm-0">@skillAssessment.Name</h5>
+                                                <p style="height: 3em; width: calc(100%); text-overflow: ellipsis; overflow: hidden">@skillAssessment.Description</p>
+                                                <p class="fs--1 mb-2 mb-md-3"><span class="badge badge-secondary">@skillAssessment.AreaPath</span></p>
+                                            </div>
+
+                                            <div class="col-2">
+                                                @if (skillAssessment.NumberOfOpenAssessments == 0)
+                                                {
+                                                    <span class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto w-100" data-id="@skillAssessment.Id" data-action="execute_person">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AssessmentExecute, "Execute") ?? "Execute")</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto w-100" data-id="@skillAssessment.Id" data-action="continue_assessment">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AssessmentContinue, "Continue") ?? "Continue")</span>
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <div class="row d-none" style="border-top: 1px solid rgba(0,0,0,.125);height:15px;"></div>
+
+                                        <div class="row">
+                                            <div class="col-2">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AssessmentId, "Id") ?? "Id"):<strong>@skillAssessment.Id</strong></div>
+                                            <div class="col-2">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AssessedTitle, "Assessed") ?? "Assessed"):<strong>@skillAssessment.NumberOfAssessments</strong></div>
+                                            <div class="col-2">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AssessmentInstructionDialogTitle, "Instructions") ?? "Instructions"):<strong>@skillAssessment.NumberOfSkillInstructions</strong></div>
+                                            <div class="col-3">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AssessmentOpenTitle, "Open") ?? "Open"):<strong>@skillAssessment.NumberOfOpenAssessments</strong></div>
+                                            <div class="col-3 text-right"><span class="mr-4" style="text-decoration:underline;cursor:pointer;" data-action="show_execution_report" data-url="/report/skillassessment/completed?templateid=@skillAssessment.Id">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AssessmentShowAllCompleted, "Show all completed") ?? "Show all completed")</span></div>
+                                        </div>
+
+                                        @if (skillAssessment.Tags?.Count > 0 && Model.ApplicationSettings?.Features?.TagsEnabled == true)
+                                        {
+                                            <div class="row">
+                                                @foreach (var tag in skillAssessment.Tags)
+                                                {
+                                                    <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                                                        <div class="tag-wrapper" style="color:white;">
+                                                            <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                            <span class="my-1 ml-1 mr-3 tag-span" style="font-size:.78rem;">@tag.Name</span>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <partial name="~/Views/Shared/_no_templates_message.cshtml" model="@Model" />
+    }
+</div>

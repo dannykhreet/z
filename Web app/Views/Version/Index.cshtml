@@ -1,0 +1,295 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model VersionOverviewViewModel
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = Model?.CmsLanguage?.GetValue(LanguageKeys.Version.OverviewTitle, "Versions overview") ?? "Versions overview";
+}
+
+@section CSS {
+
+    <style>
+
+    </style>
+
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                &nbsp;
+                <h1 class="m-0 text-dark">@(Model?.CmsLanguage.GetValue(LanguageKeys.Version.Versions, "Versions") ?? "Versions")</h1>
+            </div>
+
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                <button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" data-toggle="modal" data-target="#addVersionModal">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnAddNewCompany, "Add new version") ?? "Add new version")</button>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header">
+                <h3 id="cardHeader" class="card-title d-none d-sm-inline-block">@(Model?.CmsLanguage.GetValue(LanguageKeys.Version.OverviewTitle, "Version overview") ?? "Version overview") <span id="counter">&nbsp;</span></h3>
+                @* <div class="card-tools">
+                <div class="input-group input-group-sm">
+                <input type="text" id="companySearchBox" name="companySearchBox" class="form-control float-right" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.SearchPlaceholder, "Search") ?? "Search")" data-boxtype="search">
+
+                <div class="input-group-append">
+                <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                </div>
+                </div>
+                </div> *@
+            </div>
+        </div>
+
+        <div class="row pt-1" style="height:calc(100vh - 175px);overflow:auto;">
+            <div class="col-lg-12 col-xl-12">
+                <div id="contentBody" style="height: calc(100vh - 245px);overflow:auto;">
+                    <div class="row no-gutters" id="contentCol">
+                        @if (Model.Versions != null && Model.Versions.Count != 0)
+                        {
+                            @foreach (var version in Model.Versions)
+                            {
+                                <div class="card w-100 results" data-id="@version.Id" data-containertype="version_container" style="min-height:150px;">
+                                    <div class="card-header">
+                                        <div class="row text-muted">
+                                            <small>Id: <strong>@version.Id</strong></small>
+                                        </div>
+                                        <div class="row align-items-baseline">
+                                            <h5 class="mt-3 mt-sm-0" style="width:unset;" data-containertype="setting_version_name" data-filterchar="@version.AppVersion.Substring(0, 1).ToUpper()">@version.AppVersion</h5>
+                                            <div class="text-muted ml-3">
+                                                <small>@(Model?.CmsLanguage.GetValue(LanguageKeys.Version.ReleaseDate, "Release date") ?? "Release date"): <strong>@version.ReleaseDate.Value.ToLocaleShortDateString(Model.Locale)</strong></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="col-12 p-1" id="version-@(version.Id)" data-version="@(version.ToJsonFromObject())">
+                                            <div class="row" data-id="@version.Id" style="position:relative;">
+                                                <div class="col-lg-12 d-flex justify-content-between flex-column">
+                                                    <div class="row">
+                                                        <div class="col-3">
+                                                            <div class="col-md-12 col-lg-12 text-muted" style="overflow:auto; max-height:100px;">
+                                                                <small>@(Model?.CmsLanguage.GetValue(LanguageKeys.Version.AppName, "App name") ?? "App name"): <strong>@version.AppName</strong></small>
+                                                            </div>
+                                                            <div class="col-md-12 col-lg-12 text-muted">
+                                                                <small>@(Model?.CmsLanguage.GetValue(LanguageKeys.Version.AppVersionInternal, "Internal version") ?? "Internal version"): <strong>@version.AppVersionInternal</strong></small>
+                                                            </div>
+                                                            <div class="col-md-12 col-lg-12 text-muted">
+                                                                <small>@(Model?.CmsLanguage.GetValue(LanguageKeys.Version.AppVersion, "Version") ?? "Version"): <strong>@version.AppVersion</strong></small>
+                                                            </div>
+                                                            <div class="col-md-12 col-lg-12 text-muted">
+                                                                <small>@(Model?.CmsLanguage.GetValue(LanguageKeys.Version.OctopusVersion, "Octopus version") ?? "Octopus version"): <strong>@version.OctopusVersion</strong></small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-3">
+                                                            <div class="col-md-12 col-lg-12 text-muted">
+                                                                <small>@(Model?.CmsLanguage.GetValue(LanguageKeys.Version.Platform, "Platform") ?? "Platform"): <strong>@version.Platform</strong></small>
+                                                            </div>
+                                                            <div class="col-md-12 col-lg-12 text-muted">
+                                                                <small>@(Model?.CmsLanguage.GetValue(LanguageKeys.Version.IsValidated, "Validated") ?? "Validated"): <strong>@version.IsValidated</strong></small>
+                                                            </div>
+                                                            <div class="col-md-12 col-lg-12 text-muted">
+                                                                <small>@(Model?.CmsLanguage.GetValue(LanguageKeys.Version.IsLive, "Live") ?? "Live"): <strong>@version.IsLive</strong></small>
+                                                            </div>
+                                                            <div class="col-md-12 col-lg-12 text-muted">
+                                                                <small>@(Model?.CmsLanguage.GetValue(LanguageKeys.Version.IsCurrentLiveVersion, "Current live version") ?? "Current live version"): <strong>@version.IsCurrentActiveVersion</strong></small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <div class="col-md-12 col-lg-12 text-muted">
+                                                                <small>@(Model?.CmsLanguage.GetValue(LanguageKeys.Version.ReleaseNotes, "Release notes") ?? "Release notes"): <strong>@version.ReleaseNotes</strong></small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <button class="btn btn-ezgo btn-sm" onclick="versionApp.edit(@version.Id)">Edit</button>
+                                        <button class="btn btn-danger btn-sm ml-2" onclick="versionApp.remove(@version.Id)">Remove</button>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <partial name="~/Views/Shared/_no_templates_message.cshtml" model="@Model" />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div id="addVersionModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>Add version</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input id="nmbrId" type="number" class="d-none"/>
+                <div class="row">
+                    <label class="col-3">AppName</label>
+                    <input class="col-9" type="text" maxlength="240" id="txtAppName" name="txtAppName" placeholder="AppName" />
+                </div>
+                <div class="row mt-2">
+                    <label class="col-3">AppVersionInternal</label>
+                    <input class="col-9" type="text" maxlength="240" id="txtAppVersionInternal" name="txtAppVersionInternal" placeholder="AppVersionInternal" />
+                </div>
+                <div class="row mt-2">
+                    <label class="col-3">AppVersion</label>
+                    <input class="col-9" type="text" maxlength="240" id="txtAppVersion" name="txtAppVersion" placeholder="AppVersion" />
+                </div>
+                <div class="row mt-2">
+                    <label class="col-3">OctopusVersion</label>
+                    <input class="col-9" type="text" maxlength="240" id="txtOctopusVersion" name="txtOctopusVersion" placeholder="OctopusVersion" />
+                </div>
+                <div class="row mt-2">
+                    <label class="col-3">Platform</label>
+                    <input class="col-9" type="text" maxlength="240" id="txtPlatform" name="txtPlatform" placeholder="Platform" />
+                </div>
+                <div class="row mt-2">
+                    <label class="col-3">IsValidated</label>
+                    <input class="float-left" type="checkbox" maxlength="240" id="cbIsValidated" name="cbIsValidated" />
+                </div>
+                <div class="row mt-2">
+                    <label class="col-3">IsLive</label>
+                    <input class="float-left" type="checkbox" maxlength="240" id="cbIsLive" name="cbIsLive" />
+                </div>
+                <div class="row mt-2">
+                    <label class="col-3">IsCurrentActiveVersion <i class="fa-solid fa-circle-info" title="This version is currently the most recent for this platform"></i></label>
+                    <input class="float-left" type="checkbox" maxlength="240" id="cbIsCurrentActiveVersion" name="cbIsCurrentActiveVersion" />
+                </div>
+                <div class="row mt-2">
+                    <label class="col-3">ReleaseDate</label>
+                    <input class="col-9" type="date" maxlength="240" id="dateReleaseDate" name="dateReleaseDate" />
+                </div>
+                <div class="row mt-2">
+                    <label class="col-3">ReleaseNotes</label>
+                    <textarea class="col-9" type="text" maxlength="240" id="txtReleaseNotes" name="txtReleaseNotes" placeholder="ReleaseNotes"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-ezgo" onclick="versionApp.save()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            ezgomediafetcher.preloadImagesAndVideos();
+        });
+
+        var versionApp = {
+            init: function () {
+                $("#addVersionModal").on("hidden.bs.modal", function () {
+                    versionApp.resetModal();
+                });
+            },
+
+            save: function () {
+                let newVersion = {
+                    AppName: $('#txtAppName').val(),
+                    AppVersionInternal: $('#txtAppVersionInternal').val(),
+                    AppVersion: $('#txtAppVersion').val(),
+                    OctopusVersion: $('#txtOctopusVersion').val(),
+                    Platform: $('#txtPlatform').val(),
+                    IsValidated: $('#cbIsValidated').prop("checked"),
+                    IsLive: $('#cbIsLive').prop("checked"),
+                    IsCurrentActiveVersion: $('#cbIsCurrentActiveVersion').prop("checked"),
+                    ReleaseDate: $('#dateReleaseDate').val(),
+                    ReleaseNotes: $('#txtReleaseNotes').val()
+                }
+                let endpoint = "/version/add";
+                let id = $('#nmbrId').val();
+                if (id > 0) {
+                    newVersion.Id = id;
+                    endpoint = "/version/change/" + id;
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: endpoint,
+                    data: JSON.stringify(newVersion),
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (data) {
+                        toastr.success('Version saved');
+                        $('#addVersionModal').modal('hide');
+                        window.location.reload();
+                    },
+                    error: function (data) {
+                        toastr.error('Something went wrong while saving the version');
+                    }
+                });
+            },
+
+            edit: function (id) {
+                version = JSON.parse($('#version-' + id).attr('data-version'));
+                versionApp.fillModal(version);
+
+                $('#addVersionModal').modal('show');
+            },
+
+            remove: function (id) {
+                if (id > 0) {
+                    $.ajax({
+                        type: "POST",
+                        url: "version/delete/" + id,
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (data) {
+                            toastr.success('Version removed');
+                            window.location.reload();
+                        },
+                        error: function (data) {
+                            toastr.error('Something went wrong while deleting the version');
+                        }
+                    });
+                }
+            },
+
+            fillModal: function (version) {
+                $('#nmbrId').val(version.Id);
+                $('#txtAppName').val(version.AppName);
+                $('#txtAppVersionInternal').val(version.AppVersionInternal);
+                $('#txtAppVersion').val(version.AppVersion);
+                $('#txtOctopusVersion').val(version.OctopusVersion);
+                $('#txtPlatform').val(version.Platform);
+                $('#cbIsValidated').prop("checked", version.IsValidated);
+                $('#cbIsLive').prop("checked", version.IsLive);
+                $('#cbIsCurrentActiveVersion').prop("checked", version.IsCurrentActiveVersion);
+                $('#dateReleaseDate').val(new Date(version.ReleaseDate).toISOString().split('T')[0]); //only date
+                $('#txtReleaseNotes').val(version.ReleaseNotes);
+            },
+
+            resetModal: function () {
+                $('#nmbrId').val('');
+                $('#txtAppName').val('');
+                $('#txtAppVersionInternal').val('');
+                $('#txtAppVersion').val('');
+                $('#txtOctopusVersion').val('');
+                $('#txtPlatform').val('');
+                $('#cbIsValidated').prop("checked", false);
+                $('#cbIsLive').prop("checked", false);
+                $('#cbIsCurrentActiveVersion').prop("checked", false);
+                $('#dateReleaseDate').val('');
+                $('#txtReleaseNotes').val('');
+            }
+        }
+
+        versionApp.init();
+    </script>
+}

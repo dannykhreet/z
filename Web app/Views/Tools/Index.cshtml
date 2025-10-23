@@ -1,0 +1,145 @@
+﻿@model WebApp.ViewModels.ToolsViewModel
+@{
+    Layout = "_Layout_template";
+}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                &nbsp;
+                <h1 class="m-0 text-dark">Tools</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6 d-flex flex-row-reverse">
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="card">
+            <div class="card-header">
+                <h3 id="cardHeader" class="card-title d-none d-sm-inline-block">Overview<span id="counter">&nbsp;</span></h3>
+                <div class="card-tools">
+                    <div class="input-group input-group-sm">
+                       
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row pt-1" style="height:calc(100vh - 270px);overflow:auto;">
+
+            <div class="col-lg-12 col-xl-12">
+                <div id="contentBody" style="height: calc(100vh - 220px);">
+
+                    <div class="row no-gutters">
+
+                        <div class="card w-100 results">
+                            <div class="card-body p-0">
+                                <div class="col-12 p-1">
+                                    <div class="p-1">
+                                        <div class="row" style="height:100px;">
+                                            <div class="col-sm-1 col-md-1 col-lg-1 col-xl-1">
+                                                <div><small></small></div>
+                                                <div style="height:60px;vertical-align:middle; text-align:center;" title="">
+                                                    <i class="fa-solid fa-network-wired" style="margin-top:25px; font-size: 40px;color:#808080" title="NOC"></i>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <h5 class="mt-3 mt-sm-0">NOC Platform Tests</h5>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-12 d-flex justify-content-between flex-column">
+                                                        <div class="row">
+                                                            <div class="col-md-12 col-lg-12 text-muted">
+                                                                <small>
+                                                                    With the NOC Platform test the connectivity of the EZGO platform can be checked. This includes access to API's, Clients and Media. <br />
+                                                                    This test preferably should be run on location where the connectivity needs to be checked. The connectivity test will take about a minute to start and will repeat every period until the page is closed. 
+                                                                    When run with an administrator of the portal (management portal), debug information will also be shown. 
+                                                                </small>
+                                                            </div>
+                                                            <div class="col-md-12 col-lg-12 text-muted">
+                                                                <small>
+                                                                   
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-1 col-md-1 col-lg-1 col-xl-1" style="text-align: right;">
+                                                <a href="/tools/noc/overview" id="btn_noc" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto"><i class="fas fa-edit"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card w-100 results">
+                            <div class="card-body p-0">
+                                <div class="col-12 p-1">
+                                    <div class="p-1">
+                                        <div class="row" style="height:100px;">
+                                            <div class="col-sm-1 col-md-1 col-lg-1 col-xl-1">
+                                                <div><small></small></div>
+                                                <div style="height:60px;vertical-align:middle; text-align:center;" title="">
+                                                    <i class="fa-solid fa-users-gear" style="margin-top:25px; font-size: 40px;color:#808080" title="Provisioner"></i>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <h5 class="mt-3 mt-sm-0">Provisioner</h5>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-12 d-flex justify-content-between flex-column">
+                                                        <div class="row">
+                                                            <div class="col-md-12 col-lg-12 text-muted">
+                                                                <small>
+                                                                    Provisioner or user import tooling can be used to import a set with users based on certain rules. There are currently 2 types, one based on the external ATOSS rules and on based on the EZGO tools. 
+                                                                    NOTE! when using this tooling make sure the information imported is correct. When an import is done and mistakes are made you will need to manually change and or delete the data.
+                                                                </small>
+                                                            </div>
+                                                            <div class="col-md-12 col-lg-12 text-muted">
+                                                                <small>
+
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-1 col-md-1 col-lg-1 col-xl-1" style="text-align: right;">
+                                                <a href="/tools/provisioner/overview" id="btn_noc" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto"><i class="fas fa-edit"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts{
+
+    <script>
+
+
+    </script>
+
+}

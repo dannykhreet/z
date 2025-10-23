@@ -1,0 +1,131 @@
+﻿@model BaseViewModel
+
+@(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.CopyrightTitle, "Copyright @") ?? "Copyright @") @(DateTime.Today.Year) <a target="_blank" href="https://ezfactory.nl">EZ Factory B.V.</a>
+<span class="d-none d-md-inline-block">
+    @(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.RightsTitle, "All rights reserved") ?? "All rights reserved") - <a href="https://ezfactory.nl/en/privacy-statement/" target="_blank">@(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.PrivacyTitle, "Privacy") ?? "Privacy")</a>
+    @*- <a href="https://docs.ezfactory.nl" target="_blank">Documentation</a>*@
+</span>
+<div class="float-right d-none d-sm-inline-block">
+    <b>@(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.VersionTitle, "Version") ?? "Version")</b> @Model?.ApplicationVersion
+</div>
+<script>
+    var redirectTimeoutSet = false;
+    var redirect = false;
+    var countIssues = 0;
+    var maxNrOfIssues = 10;
+    var checkActivityRunning = false;
+
+    setInterval(function () {
+        console.log('Checking connectivity.');
+        //only check if not already running for some reason. 
+        if (!checkActivityRunning) {
+            checkActivityRunning = true;
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', '/check/activitystatus');
+            xhr.send();
+            xhr.onload = function () {
+                checkActivityRunning = false;
+                if (xhr.status != 200) {
+                    //possible issue found
+                    handleActivityCheckFailure();
+                } else {
+                    //everything is fine, reset all possibles. 
+                    redirectTimeoutSet = false;
+                    redirect = false;
+                    countIssues = 0;
+                    $('#modalSessionExpired').modal('hide');
+                    $('#connectivity_issue_container').hide();
+                }
+            };
+            xhr.onerror = function () {
+                checkActivityRunning = false;
+                handleActivityCheckFailure();
+            };
+        } else {
+            $('#connectivity_issue_container').show();
+        }
+        
+    }, 60000);
+
+    function handleActivityCheckFailure() {
+        countIssues = countIssues + 1;
+        
+        //start check
+        if (countIssues > maxNrOfIssues) {
+            if (!redirectTimeoutSet) {
+                doActivityExtraCheck(false);
+
+                setTimeout(() => {
+                    console.log('20s connection check.');
+                    //20s check
+                    doActivityExtraCheck(false);
+                }, 20000);
+
+                setTimeout(() => {
+                    console.log('40s connection check and redirect if still down or session expired.');
+                    //40s check
+                    //fullway check and or redirect if needed.
+                    doActivityExtraCheck(true);
+                }, 40000);
+
+                redirectTimeoutSet = true;
+            }
+        } else {
+            console.log('Possible network issue...');
+            $('#connectivity_issue_container').show();
+            //do extra check after failure.
+            doActivityExtraCheck(false);
+        }
+    }
+
+    function doActivityExtraCheck(doRedirect) {
+        //only check if not already running for some reason.
+        if (!checkActivityRunning) {
+            checkActivityRunning = true;
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', '/check/activitystatus');
+            xhr.send();
+            xhr.onload = function () {
+                checkActivityRunning = false;
+                if (xhr.status == 200) {
+                    //connection returned...or session reaquired, so reset all
+                    redirectTimeoutSet = false;
+                    redirect = false;
+                    countIssues = 0;
+                    $('#modalSessionExpired').modal('hide');
+                    $('#connectivity_issue_container').hide();
+                } else if (xhr.status == 401) {
+                    if (doRedirect) {
+                        console.log('redirecting...');
+                        document.location.href = '/logout';
+                    } else {
+                        $('#modalSessionExpired').modal('show');
+                    }
+                }
+                else {
+                    //connection still down, check for redirect, if so do redirect.
+                    if (doRedirect) {
+                        console.log('redirecting...');
+                        document.location.href = '/logout';
+                    } else {
+                        $('#connectivity_issue_container').show();
+                    }
+                }
+            };
+            xhr.onerror = function () {
+                checkActivityRunning = false;
+                if (doRedirect) {
+                    console.log('redirecting...');
+                    document.location.href = '/logout';
+                } else {
+                    $('#connectivity_issue_container').show();
+                }
+               
+            };
+        } else {
+            $('#connectivity_issue_container').show();
+        }
+        
+    }
+</script>
+

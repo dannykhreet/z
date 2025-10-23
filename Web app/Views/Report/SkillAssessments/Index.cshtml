@@ -1,0 +1,809 @@
+﻿@model WebApp.ViewModels.CompletedSkillAssessmentsViewModel
+@using WebApp.Models.Skills
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.StatsAssessmentsCompletedTitle, "Completed assessments") ?? "Completed assessments";
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+
+    var single = new WebApp.ViewModels.CompletedSkillAssessmentSingleViewModel();
+}
+
+@section CSS{
+    <style>
+        .my-circle {
+            display: inline-block;
+            border-radius: 60px;
+            padding: 0.8em 1.1em;
+            background-color: #3f903f;
+            color: #fff;
+        }
+
+            .my-circle i {
+                font-size: 20px;
+            }
+
+        .status-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff !important;
+            flex-grow: 0;
+            flex-shrink: 0;
+        }
+
+        .status-icon {
+            font-size: 1.5em;
+            display: flex;
+            margin: auto;
+        }
+
+        .status-circle-big {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff !important;
+            flex-grow: 0;
+            flex-shrink: 0;
+        }
+
+        .status-icon-big {
+            font-size: 2em;
+            display: flex;
+            margin: auto;
+        }
+
+        #fade-wrapper {
+            display: none;
+            position: fixed;
+            height: 100vh;
+            width: 100vw;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 10000;
+        }
+
+        .scale-up {
+            transform: translate(-15px, -140px);
+            width: 200%;
+            transition: all 0.2s ease-in-out;
+            border-radius: 6px !important;
+        }
+
+        #accordionChecklists .card .card-header {
+            cursor: pointer;
+        }
+
+        #completedChecklistContainer {
+            height: 400px;
+        }
+
+        .infoText {
+            position: fixed;
+            right: 0;
+            top: 0;
+            margin: 10px;
+        }
+
+        .score {
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            padding: 3px 10px 0px 14px;
+            font-size: 23px;
+        }
+
+        .score-large {
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            padding: 3px 0px 0px 8px;
+            font-size: 23px;
+        }
+
+        .inline-bold {
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .list-group-item.active {
+            z-index: 2;
+            color: #fff;
+            background-color: #93C54B;
+            border-color: #93c54b1f;
+        }
+
+        div.alternatingColors:nth-of-type(even) {
+            background-color: #FFFFFF;
+        }
+
+        div.alternatingColors:nth-of-type(odd) {
+            background-color: #F4F9ED;
+        }
+
+        .showExtraAssessmentInfo {
+            font-size: 32px;
+        }
+
+
+
+        .assessmentInstructionItem {
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.07), 1px 2px 2px 1px rgba(0, 0, 0, 0.07), 1px 3px 3px 1px rgba(0, 0, 0, 0.07), 1px 4px 4px 1px rgba(0, 0, 0, 0.07);
+        }
+
+        .text-light-gray {
+            color: #21252980;
+        }
+
+
+
+        .assessorPictureInstructionItem {
+            min-width: 40px;
+            width: 40px;
+            height: 40px;
+            background-size: cover;
+            border-radius: 50%;
+        }
+
+        .completedAssessmentOverviewElement {
+            color: #808080;
+            border-bottom: 1px solid #80808080;
+            border-bottom-right-radius: 0px;
+            border-bottom-left-radius: 0px;
+        }
+
+        .completedAssessmentOverviewElement:hover {
+            color: #808080;
+        }
+    </style>
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-12">
+                        <a asp-controller="skills" asp-action="index"><i class="fa fa-arrow-left"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.NavBackToAssessmentTitle, "Back to assessment overview") ?? "Back to assessment overview")</a>
+                    </div>
+                </div>
+                <h1 id="completedAssessmentTitle1">@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.LastCompletedAssessment, "Last completed assessments") ?? "Last completed assessments")</h1>
+                <div id="completedAssessmentShowFiltersButton" class="btn btn-ezgo mb-1 mt-2 mr-1" style="display: none"><span class="pr-2">Filters</span> <i class="fa-solid fa-chevrons-down"></i></div>
+            </div>
+
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                @if (Model?.ApplicationSettings?.Features != null)
+                {
+                    @if (Model.ApplicationSettings.Features.ExportAdvancedEnabled.HasValue || Model.ApplicationSettings.Features.ExportEnabled.HasValue)
+                    {
+                        @if (Model.ApplicationSettings.Features.ExportEnabled != null && Model.ApplicationSettings.Features.ExportEnabled.Value && Model.ApplicationSettings.Features.TasksEnabled != null && Model.ApplicationSettings.Features.TasksEnabled.Value)
+                        {
+                            <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="assessments" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AssessmentExportTitle, "Download assessments") ?? "Download assessments")"><i class="fas fa-download"></i></button>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section>
+    <div class="container-fluid">
+        <div class="row" style="height:calc(100vh - 167px);">
+            <div id="completedAssessmentsFilters" class="col-4">
+                <div class="card card-filter h-100">
+                    <div class="card-header pb-0">
+                        <h3 class="card-title d-none">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.CardTitle, "Filters") ?? "Filters")</h3>
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn" onclick="areaFilter_v2.reset('block')" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body card-filter pt-0">
+                        <partial name="_filters_block" model="Model.Filter" />
+                    </div>
+                </div>
+            </div>
+
+            <div id="completedAssessmentsOverview" class="col-8" style="height:calc(100vh - 190px);">
+                <div class="card h-100">
+                    <div id="completedAssessmentTitle2" class="card-header h5" style="text-align: center">
+                        @(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.LastCompletedAssessment, "Last completed assessments") ?? "Last completed assessments")
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div id="nocontent" class="pl-3 pt-3 pb-0 text-muted" style="display: none">
+                            <h4>@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.NoCompletedAssessmentsFound, "No completed assessments found") ?? "No completed assessments found")</h4>
+                        </div>
+
+                        <div id="contentCol" class="list-group h-100" data-container="completed_assessments">
+                            @if (Model.CompletedAssessments != null)
+                            {
+                                @foreach (SkillAssessment completeAssessessment in Model.CompletedAssessments)
+                                {
+                                    {
+                                        single = ViewModelConverters.ConvertToViewModel(completeAssessessment);
+                                        single.CompletedTextValue = Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.CompletedFor, "Completed for") ?? "Completed for";
+                                        single.Timezone = timezone;
+                                        single.Locale = Model?.Locale;
+                                    }
+                                    <partial name="~/Views/Report/SkillAssessments/_completed_skillassessment.cshtml" model="single" />
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <div class="card-footer" style="text-align:center;">
+                        <span id="load_more_loader" style="margin-top:-10px;"></span>
+                        <div style="text-align:center;">
+                            <a class="btn btn-ezgo" style="width:200px;" data-actiontype="load_more"><i class="fas fa-angle-double-down"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="detailslist" class="col-8" style="height:calc(100vh - 188px);display: none"></div>
+        </div>
+    </div>
+</section>
+
+@section Scripts{
+
+    @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+    {
+        <script src="~/js/analytics.js"></script>
+        <script>ezgoAnalytics.init('SkillAssessment');</script>
+    }
+
+    <script src="/js/areafilter_v2.js"></script>
+    @if (Model.ApplicationSettings.Features.ExportAdvancedEnabled.HasValue || Model.ApplicationSettings.Features.ExportEnabled.HasValue)
+    {
+        if (Model.ApplicationSettings.Features.ExportAdvancedEnabled.Value || Model.ApplicationSettings.Features.ExportEnabled.Value)
+        {
+            <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+            <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+        }
+    }
+    <script>
+
+        $('document').ready(function () {
+            ezgomediafetcher.preloadImagesAndVideos();
+            ezgomediafetcher.preloadFancyboxAnchors();
+            localStorage.setItem('last_completed_overview_location', window.location.pathname + window.location.search);
+        });
+
+        areaFilter_v2.init('/config/getareatree', '', true);
+
+        $('#nocontent').hide();
+
+        $('#contentCol').on('filterDone', function () {
+            $('#nocontent').toggle(
+                $('#contentCol div.results:visible').length === 0
+            )
+        });
+
+        function report(companyid, taskcntr) {
+            if (typeof analytics !== 'undefined') {
+                if (analytics != null) {
+                    analytics.logEvent('download_completed_assessment_pdf', { name: 'completed_assessment', companyid: companyid });
+                }
+            }
+        }
+
+        function loadTasks(e, id) {
+            $('#detailslist').html('<div class="text-center w-100 pt-5"><img src="/images/factory-loading.gif" class="w-50" /></div>');
+            $('#contentCol a').removeClass('active');
+
+            completedAssessments.showDetailSectionWithoutFilter();
+            
+            $.get('/report/skillassessment/completed/' + id, function (data) {
+                $('#detailslist').html(data);
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+            });
+
+            $(e.currentTarget).addClass('active');
+        }
+
+        function PrintDiv(divid) {
+            var contents = document.getElementById(divid).innerHTML;
+            var frame1 = document.createElement('iframe');
+            frame1.name = "frame1";
+            frame1.style.position = "absolute";
+            frame1.style.top = "-1000000px";
+            document.body.appendChild(frame1);
+            var frameDoc = frame1.contentWindow ? frame1.contentWindow : frame1.contentDocument.document ? frame1.contentDocument.document : frame1.contentDocument;
+            frameDoc.document.open();
+            frameDoc.document.write('<html><head><title>DIV Contents</title>');
+            frameDoc.document.write('</head><body>');
+            frameDoc.document.write(contents);
+            frameDoc.document.write('</body></html>');
+            frameDoc.document.close();
+            setTimeout(function () {
+                window.frames["frame1"].focus();
+                window.frames["frame1"].print();
+                document.body.removeChild(frame1);
+            }, 500);
+            return false;
+        }
+
+        function PrintCompletedChecklist(id) {
+
+            var iframe = document.createElement('iframe');
+            iframe.name = "checklist_" + id;
+            iframe.style.position = "absolute";
+            iframe.style.top = "-1000000px";
+            iframe.src = "/pdf/view/0/" + id;
+            document.body.appendChild(iframe);
+
+            setTimeout(function () {
+                window.frames["checklist_" + id].print();
+                document.body.removeChild(iframe);
+            }, 1000);
+
+            return false;
+        }
+
+
+        function expandAssessmentInstructionInformation(assessmentId, instructionId) {
+            if ($('#extraAssessmentInstructionInfo-' + assessmentId + '-' + instructionId + ':visible').length > 0) {
+                $('#extraAssessmentInstructionInfo-' + assessmentId + '-' + instructionId).hide('fast');
+
+                $('#showExtraAssessmentInstructionInfo-' + assessmentId + '-' + instructionId + ' i').removeClass('fa-chevron-up');
+                $('#showExtraAssessmentInstructionInfo-' + assessmentId + '-' + instructionId + ' i').addClass('fa-chevron-down');
+            }
+            else {
+                $('#extraAssessmentInstructionInfo-' + assessmentId + '-' + instructionId).show('fast');
+
+                $('#showExtraAssessmentInstructionInfo-' + assessmentId + '-' + instructionId + ' i').removeClass('fa-chevron-down');
+                $('#showExtraAssessmentInstructionInfo-' + assessmentId + '-' + instructionId + ' i').addClass('fa-chevron-up');
+            }
+        }
+
+
+        function expandAssessmentInstructionMetadata(assessmentId, instructionId) {
+            if ($('#extraAssessmentInstructionMetadata-' + assessmentId + '-' + instructionId + ':visible').length > 0) {
+                $('#extraAssessmentInstructionMetadata-' + assessmentId + '-' + instructionId).hide('fast');
+
+                $('#showExtraAssessmentInstructionInfoText-' + assessmentId + '-' + instructionId).html('Show more info');
+            }
+            else {
+                $('#extraAssessmentInstructionMetadata-' + assessmentId + '-' + instructionId).show('fast');
+
+                $('#showExtraAssessmentInstructionInfoText-' + assessmentId + '-' + instructionId).html('Hide more info');
+            }
+        }
+
+        var completedAssessments = {
+            language: {
+                openAssessments: 'Open assessments',
+                lastCompletedAssessments: 'Last completed assessments'
+            },
+            filters: {
+                areaId: 0,
+                startDate: null,
+                endDate: null,
+                assessorIds: '',
+                assesseeId: 0,
+                templateId: @Model.TemplateId,
+                iscompleted: true,
+                offset: 0,
+                limit: 10
+            },
+            selectedAssessmentId: @Model.AssessmentId,
+            _version: '1.0',
+            assessmentsLoaded: false,
+            assessmentId: 0,
+            clearItemContainer: function () {
+                $('[data-container="completed_assessments"]').html(''); //contentCol
+            },
+            initHandlers: function () {
+                $('[data-actiontype="load_more"]').on('click', function () {
+                    //retrieve
+                    completedAssessments.retrieve();
+                });
+                $('#areatree').on('click', 'a', function () {
+                    $('#detailslist').html('');
+                    var areaDeselected = +$(this).data('id') != areaid;
+                    if (areaDeselected) {
+                        completedAssessments.filters.areaId = null;
+                    }
+                    else {
+                        completedAssessments.filters.areaId = $(this).data('id');
+                    }
+                    //clear results
+                    $('#contentCol').html('');
+                    completedAssessments.filters.offset = 0;
+                    //retrieve
+                    completedAssessments.retrieve();
+                });
+
+                $('#assessorsFilter').on('change', function (e) {
+                    $('#detailslist').html('');
+                    completedAssessments.filters.assessorIds = $('#assessorsFilter').val().join(",");
+                    //clear results
+                    $('#contentCol').html('');
+                    completedAssessments.filters.offset = 0;
+                    //retrieve
+                    completedAssessments.retrieve();
+                });
+
+                $('#assesseeFilter').on('change', function (e) {
+                    $('#detailslist').html('');
+                    completedAssessments.filters.assesseeId = +this.value;
+                    //clear results
+                    $('#contentCol').html('');
+                    completedAssessments.filters.offset = 0;
+                    //retrieve
+                    completedAssessments.retrieve();
+                });
+
+                $('[data-action="resetfilters"]').on('click', function () {
+                    $('#detailslist').html('');
+                    completedAssessments.filters.templateId = 0;
+                    completedAssessments.selectedAssessmentId = 0;
+
+                    completedAssessments.filters.areaId = 0;
+                    completedAssessments.filters.startDate = '';
+                    completedAssessments.filters.endDate = '';
+
+                    completedAssessments.filters.templateId = 0;
+
+                    completedAssessments.filters.assessorIds = '';
+                    completedAssessments.filters.assesseeId = 0;
+                    completedAssessments.filters.iscompleted = true;
+
+                    completedAssessments.filters.offset = 0;
+                    completedAssessments.filters.limit = 10;
+                    
+                    
+                    //reset url filtering
+                    const url = window.location.href.split('?')[0];
+
+                    window.history.pushState({}, "", url);
+                    //reset filters on left side
+
+                    $('#completedAtFilter').val('');
+                    //clear results
+                    $('#contentCol').html('');
+                    
+                    $('#completedAssessmentTitle1').html(completedAssessments.language.lastCompletedAssessments);
+                    $('#completedAssessmentTitle2').html(completedAssessments.language.lastCompletedAssessments);
+
+                    completedAssessments.filters.offset = 0;
+                    //retrieve
+                    completedAssessments.retrieve();
+                });
+
+                $('#completedAssessmentShowFiltersButton').on('click', function (e) {
+                    completedAssessments.showFilterSectionWithoutDetails();
+                });
+
+                $('#templateFilter').val('default').selectpicker("refresh");
+
+                $('#templateFilter').on('change', function (e) {
+                    $('#detailslist').html('');
+                    completedAssessments.filters.templateId = +this.value.replace('template', '');
+                    //clear results
+                    $('#contentCol').html('');
+                    completedAssessments.filters.offset = 0;
+                    //retrieve
+                    completedAssessments.retrieve();
+                });
+
+                //show tooltips of templateFilter options
+                $('button[data-id="templateFilter"]').on('click', function (e) {
+                    $('#templateFilter option').each(function () {
+                        var id = '#' + $(this).attr('data-bs-select');
+                        var title = $(id).attr('title');
+                        if (title == undefined || title == '') {
+                            $(id).attr('title', $(this).attr('title'));
+                        }
+                    });
+                });
+
+                $('#iscompletedFilter').on('change', function () {
+                    var iscompletedFilterValue = $(this).val();
+
+                    if (iscompletedFilterValue == 'true') {
+                        completedAssessments.filters.iscompleted = true;
+                        $('#completedAssessmentTitle1').html(completedAssessments.language.lastCompletedAssessments);
+                        $('#completedAssessmentTitle2').html(completedAssessments.language.lastCompletedAssessments);
+                        $('#completedAtFilterContainer').show();
+                    }
+                    else if (iscompletedFilterValue == 'false') {
+                        completedAssessments.filters.iscompleted = false;
+                        $('#completedAssessmentTitle1').html(completedAssessments.language.openAssessments);
+                        $('#completedAssessmentTitle2').html(completedAssessments.language.openAssessments);
+                        $('#completedAtFilter').val('');
+                        $('#completedAtFilterContainer').hide();
+                        completedAssessments.filters.startDate = '';
+                        completedAssessments.filters.endDate = '';
+                    }
+
+                    completedAssessments.clearDetails();
+
+                    completedAssessments.filters.offset = 0;
+                    completedAssessments.clearItemContainer();
+                    completedAssessments.setLoaderStart('load_more_loader');
+                    completedAssessments.retrieve();
+                });
+            },
+
+            retrieveMore: function () {
+                if (completedAssessments.offset == null) { completedAssessments.offset = 0 };
+
+                completedAssessments.setLoaderStart('load_more_loader');
+                completedAssessments.retrieve();
+            },
+            
+            retrieve: function() {
+                var loadAssessmentsRequestURL = "";
+                var url = '/report/skillassessment/completeddetails';
+                var urlParams = [];
+                if (completedAssessments.assessmentsLoaded) {
+                    return;
+                }
+                //show loader
+                completedAssessments.setLoaderStart('load_more_loader');
+                completedAssessments.hideMoreButton();
+ 
+                if (completedAssessments.filters.areaId != "" && completedAssessments.filters.areaId != null) {
+                    urlParams.push("areaid=" + completedAssessments.filters.areaId);
+                }
+
+                if (completedAssessments.filters.iscompleted != null) {
+                    urlParams.push("iscompleted=" + completedAssessments.filters.iscompleted);
+                }
+
+                if (completedAssessments.filters.startDate != "" && completedAssessments.filters.endDate != "" && completedAssessments.filters.startDate != null && completedAssessments.filters.endDate != null) {
+                    urlParams.push("startDate=" + completedAssessments.filters.startDate);
+                    urlParams.push("endDate=" + completedAssessments.filters.endDate);
+                }
+
+                if (completedAssessments.filters.assessorIds != '') {
+                    urlParams.push("assessorids=" + completedAssessments.filters.assessorIds);
+                }
+
+                if (completedAssessments.filters.assesseeId > 0) {
+                    urlParams.push("assesseeid=" + completedAssessments.filters.assesseeId);
+                }
+
+                if (completedAssessments.filters.templateId > 0) {
+                    urlParams.push("templateid=" + completedAssessments.filters.templateId);
+                }
+
+                if (completedAssessments.filters.limit > 0) {
+                    urlParams.push("limit=" + completedAssessments.filters.limit);
+                }
+
+                if (completedAssessments.filters.offset > 0) {
+                    urlParams.push("offset=" + completedAssessments.filters.offset);
+                }
+
+                if (urlParams.length > 0) {
+                    loadAssessmentsRequestURL = url + '?' + urlParams.join('&');
+                }
+                else {
+                    loadAssessmentsRequestURL = url;
+                }
+
+                if (completedAssessments.mostRecentRequest != null) {
+                    completedAssessments.mostRecentRequest.abort();
+                }
+
+                completedAssessments.mostRecentRequest = $.ajax({
+                    type: "GET",
+                    url: loadAssessmentsRequestURL,
+                    success: function (data) {
+                        $('#contentCol').append(data);
+
+                        var amountOfAssessments = $('#assessmentCounter').val();
+                        $('#assessmentCounter').remove();
+                        
+                        if (amountOfAssessments == 0) {
+                            completedAssessments.hideMoreButton();
+                            completedAssessments.showNoContent();
+                        }
+                        else if (amountOfAssessments < 10) {
+                            completedAssessments.hideMoreButton();
+                            completedAssessments.hideNoContent();
+                        }
+                        else {
+                            completedAssessments.showMoreButton();
+                            completedAssessments.hideNoContent();
+                        }
+
+                        ezgomediafetcher.preloadImagesAndVideos();
+                        ezgomediafetcher.preloadFancyboxAnchors();
+
+                        completedAssessments.filters.offset += 10;
+                        completedAssessments.setLoaderEnd('load_more_loader');
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.statusText == "abort") {
+                            return;
+                        }
+                        else { 
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        }
+                        $('#actionOverviewLoader').hide();
+                    }
+                });
+            },
+            setLoaderStart: function (elementId) {
+                var loader = document.getElementById(elementId);
+                loader.innerHTML = '<img src="data:image/gif;base64,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" />';
+            },
+            setLoaderEnd: function (elementId) {
+                var loader = document.getElementById(elementId);
+                loader.innerHTML = '';
+            },
+            hideMoreButton: function () {
+                $('[data-actiontype="load_more"]').hide();
+            },
+            showMoreButton: function () {
+                $('[data-actiontype="load_more"]').show();
+            },
+            showHideMoreButton: function () {
+                let nrOfItems = $('[data-container="completed_assessments"]').children('[data-containertype="resultitem"]').length;
+                if (nrOfItems == 0) {
+                    completedAssessments.hideMoreButton();
+                    completedAssessments.showNoContent();
+                } else {
+                    completedAssessments.hideNoContent();
+                    completedAssessments.showMoreButton();
+                }
+            },
+            showHideNoContent: function () {
+                let nrOfItems = $('[data-container="completed_assessments"]').children('[data-containertype="resultitem"]').length;
+                if (nrOfItems == 0) {
+                    completedAssessments.showNoContent();
+                } else {
+                    completedAssessments.hideNoContent();
+                }
+            },
+            showFilterSectionWithoutDetails: function () {
+                $('#detailslist').hide('fast');
+
+                $('#completedAssessmentsOverview').removeClass('col-4');
+                $('#completedAssessmentsOverview').addClass('col-8');
+
+                $('#completedAssessmentShowFiltersButton').hide();
+                $('#completedAssessmentTitle1').show();
+
+                $('#completedAssessmentsFilters').show('fast');
+            },
+            showDetailSectionWithoutFilter: function () {
+                $('#completedAssessmentsFilters').hide('fast');
+
+                $('#completedAssessmentsOverview').removeClass('col-8');
+                $('#completedAssessmentsOverview').addClass('col-4');
+
+                $('#completedAssessmentTitle1').hide();
+                $('#completedAssessmentShowFiltersButton').show();
+
+                $('#detailslist').show('fast');
+            },
+            hideNoContent: function () {
+                $('#nocontent').hide();
+            },
+            showNoContent: function () {
+                $('#nocontent').show();
+            },
+            clearDetails: function () {
+                $('#tasklist').html('');
+            }
+
+        }
+
+        function downloadPdf(url) {
+        @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+        {
+            @:dataEntry = ezgoAnalytics.dataSpanStart("generate pdf completed", "SkillAssessment");
+        }
+
+                    var newtab = window.open(url, "_blank");//, "noopener noreferrer")
+
+        @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+        {
+            @:newtab.addEventListener("unload", function () { ezgoAnalytics.dataSpanEnd(dataEntry); });
+        }
+                }
+
+    </script>
+    <script>
+        $('#completedAtFilter').val('');
+
+        $('#completedAtFilter').daterangepicker({
+            autoUpdateInput: false,
+            showDropdowns: true,
+            opens: 'center', drops: 'down',
+            locale: {
+                format: 'DD MMM YYYY',
+                firstDay: 1,
+                cancelLabel: 'Clear'
+            }
+        });
+
+        $('#completedAtFilter').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD MMM YYYY') + ' - ' + picker.endDate.format('DD MMM YYYY'));
+
+            completedAssessments.filters.startDate = picker.startDate.format("DD-MM-YYYY");
+            completedAssessments.filters.endDate = picker.endDate.format("DD-MM-YYYY");
+
+            //clear results
+            $('#contentCol').html('');
+            completedAssessments.filters.offset = 0;
+            //retrieve
+            completedAssessments.retrieve();
+        });
+
+        $('#completedAtFilter').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+
+            completedAssessments.filters.startDate = "";
+            completedAssessments.filters.endDate = "";
+
+            //clear results
+            $('#contentCol').html('');
+            completedAssessments.filters.offset = 0;
+            //retrieve
+            completedAssessments.retrieve();
+        });
+
+        $('[data-action="cleardatefilter"]').on('click', function () {
+            $('#completedAtFilter').val('');
+            completedAssessments.filters.startDate = '';
+            completedAssessments.filters.endDate = '';
+
+            completedAssessments.clearDetails();
+
+            completedAssessments.filters.offset = 0;
+            completedAssessments.clearItemContainer();
+            completedAssessments.setLoaderStart('load_more_loader');
+            completedAssessments.retrieve();
+        });
+
+
+        //fancybox
+        $(document).on('afterShow.fb', function () {
+            //load videos
+            ezgomediafetcher.preloadVisibleVideos();
+        });
+
+        completedAssessments.initHandlers();
+
+        @if(Model.TemplateId != 0)
+        {
+            @:$('#templateFilter').selectpicker('val', 'template' + @(Model.TemplateId));
+        }
+
+        completedAssessments.retrieve();
+        completedAssessments.initialSelectedItemInterval = setInterval(function () {
+            if (completedAssessments.mostRecentRequest != undefined && completedAssessments.mostRecentRequest.readyState == 4 && 
+                completedAssessments.selectedAssessmentId > 0 && $(`[data-assessmentid='${completedAssessments.selectedAssessmentId}']`).length) {
+                    $(`[data-assessmentid='${completedAssessments.selectedAssessmentId}']`)[0].click();
+                    clearInterval(completedAssessments.initialSelectedItemInterval);
+                }
+        },250);
+        
+    </script>
+    <script>
+        ezgomediafetcher.preloadImagesAndVideos();
+        ezgomediafetcher.preloadFancyboxAnchors();
+    </script>
+}

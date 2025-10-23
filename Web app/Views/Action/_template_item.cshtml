@@ -1,0 +1,50 @@
+﻿@model ActionModelViewModel
+@{
+    var picture = string.Empty;
+    if (Model.Images != null && Model.Images.Any())
+    {
+        picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Images[0]);
+        if (string.IsNullOrEmpty(Model.Images[0].Trim()))
+        {
+            picture = @"/assets/img/normal_unavailable_image.png";
+        }
+        picture = picture.Replace("/media/media", "/media"); //fix for incorrect data in db
+    }
+}
+
+<a class="text-muted fs-0 fs-lg-1" asp-controller="action" asp-action="details" asp-route-id="@Model.Id">
+    <div class="col-12 p-1">
+        <div class="p-1">
+            <div class="row" data-containertype="checklist_container" data-id="@Model.Id">
+                <div class="col-sm-5 col-md-3 col-lg-3 col-xl-2">
+                    <img src="/images/media-loading.gif" data-src="@picture" class="img-fluid" loading="lazy" />
+                </div>
+
+                <div class="col-sm-7 col-md-9 col-lg-9 col-xl-10">
+                    <div class="row">
+                        <div class="col">
+                            <h5 class="mt-3 mt-sm-0 mb-0">@Model.Comment</h5>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col col-lg-9">
+                            <p class="mb-1">@Model.Description</p>
+                            <p class="mb-0"><span class="mr-2 text-right @(Model.IsOverdue ? "text-danger" : null)">@(Model?.Duedate ?? "Due date"): @(Model.DueDate.ToString("d MMMM yyyy"))</span> @(Model?.Author ?? "Author"): @Model.CreatedBy</p>
+                        </div>
+
+                        <div class="col col-lg-3">
+                            @if (Model.UnviewedCommentNr > 0)
+                            {
+                                <span class="fa-stack mr-2 float-right" style="vertical-align: top;">
+                                    <i class="far fa-circle fa-stack-2x"></i>
+                                    <i class="fas fa-comments fa-stack-1x"></i>
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</a>

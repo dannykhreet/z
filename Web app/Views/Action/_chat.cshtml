@@ -1,0 +1,101 @@
+﻿@model ChatViewModel
+@{
+}
+<style>
+    .bg-ezgo {
+        background-color: #93C54B !important;
+    }
+
+    .direct-chat-primary .right > .direct-chat-text::after, .direct-chat-primary .right > .direct-chat-text::before {
+        border-left-color: #93C54B !important;
+    }
+
+    .direct-chat-primary .right > .direct-chat-text {
+        border-color: #93c54b1f;
+        background-color: #93C54B;
+    }
+
+    .direct-chat-messages {
+        overflow: auto;
+        height: 100%;
+    }
+
+    .direct-chat-text img {
+        object-fit: cover;
+        width: 60px;
+        height: 60px;
+        border-radius: 3px;
+    }
+
+    .direct-chat-text ul.list-group.list-group-horizontal {
+        height: auto;
+        border-right: none;
+    }
+
+    .direct-chat-text ul.list-group li.list-group-item {
+        background-color: transparent;
+        padding: 0;
+        margin: 0;
+    }
+</style>
+
+<!-- DIRECT CHAT PRIMARY -->
+<div class="card card-ezgo card-outline direct-chat direct-chat-primary h-100">
+
+    <div class="card-header">
+        <h3 class="card-title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Action.DetailsCommentsTitle, "Comments") ?? "Comments")</h3>
+
+        <div class="card-tools">
+            <span data-toggle="tooltip" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Action.LastRefreshTitle, "last refresh") ?? "last refresh")" class="direct-chat-timestamp text-ezgo mr-1" id="chat-date"></span>
+            <a id="chat_pause" class="text-ezgo" onclick="abortTimer()" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Action.PauseRefreshTitle, "pause refresh") ?? "pause refresh")" style="cursor: pointer">
+                <i class="far fa-pause-circle"></i>
+            </a>
+            <a id="chat_play" class="text-ezgo d-none" onclick="startTimer()" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Action.StartRefreshTitle, "start refresh") ?? "start refresh")" style="cursor: pointer">
+                <i class="far fa-play-circle text-warning"></i>
+            </a>
+            @*
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-tool" data-toggle="tooltip" title="Contacts"
+                        data-widget="chat-pane-toggle">
+                    <i class="fas fa-comments"></i>
+                </button>
+                <button type="button" class="btn btn-tool" data-card-widget="remove">
+                    <i class="fas fa-times"></i>
+                </button>
+            *@
+        </div>
+    </div>
+
+    <div id="chat-container" class="card-body">
+        <!-- Conversations are loaded here -->
+        <div class="direct-chat-messages" id="chat">
+
+            <partial name="~/Views/Action/_comments.cshtml" model="Model._CommentsViewModel" />
+
+        </div>
+    </div>
+
+    @if (!Model.ActionIsResolved)
+    {
+        <div class="card-footer">
+            @*<form asp-controller="action" asp-action="postcomment">*@
+                <div class="input-group">
+
+                    <input asp-for="Input.ActionId" type="hidden" id="comment_action_id"/>
+                    <input asp-for="Input.UserId" type="hidden" id="comment_user_id" />
+
+                    <input asp-for="Input.Comment" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Action.DetailsTypeMessage, "Type Message") ?? "Type Message")" class="form-control" id="comment_comment" />
+                    @*<input type="text" name="message" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Action.DetailsTypeMessage, "Type Message") ?? "Type Message")" class="form-control" disabled>*@
+                    <span class="input-group-append">
+                        <a class="btn btn-ezgo xdisabled" onclick="postComment(event)">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Action.DetailsSendButton, "Send") ?? "Send")</a>
+                    </span>
+
+                </div>
+            @*</form>*@
+        </div>
+    }
+
+</div>
+<!--/.direct-chat -->

@@ -1,0 +1,115 @@
+﻿@model WebApp.ViewModels.TaskViewModel
+@{
+    Layout = null;
+}
+
+<div class="row no-gutters" id="contentCol">
+    @if (Model.TaskTemplates.Count != 0)
+    {
+        <input type="text" value="@Model.TaskTemplates.Count" id="taskTemplatesCounter" style="display: none" />
+
+        @foreach (WebApp.Models.Task.TaskTemplateModel taskTemplate in Model.TaskTemplates)
+        {
+            var id = taskTemplate.Id;
+            var instructions = 0;
+
+            if (taskTemplate.Steps != null)
+            {
+                instructions = taskTemplate.Steps.Sum(item => taskTemplate.StepsCount) + taskTemplate.Steps.Where(item => taskTemplate.DescriptionFile != null).Count();
+            }
+
+            var hasImage = !string.IsNullOrEmpty(taskTemplate.Picture) ? "true" : "false";
+            var hasVideo = !string.IsNullOrEmpty(taskTemplate.VideoThumbnail) ? "true" : "false";
+            var areaPathIds = !string.IsNullOrEmpty(taskTemplate.AreaPathIds) ? taskTemplate.AreaPathIds.Replace(" -> ", ",") : "";
+            var recurrence = taskTemplate.RecurrencyType;
+            var tagsList = new List<int>();
+
+            if (taskTemplate.Tags != null && taskTemplate.Tags.Count > 0)
+            {
+                tagsList.AddRange(taskTemplate.Tags.Select(t => t.Id));
+            }
+
+            var uniqueTags = String.Join(',', tagsList.Distinct());
+
+            <div class="card w-100 results mr-1 my-1" data-id="@id"
+                 data-role="@taskTemplate.Role"
+                 data-instructions="@instructions"
+                 data-hasimage="@hasImage"
+                 data-pathids="@areaPathIds"
+                 data-recurrence="@recurrence"
+                 data-hasvideo="@hasVideo"
+                 data-tags="@uniqueTags">
+
+                <div class="card-body p-0">
+                    @{
+                        var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, taskTemplate.Picture);
+                        if (string.IsNullOrEmpty(taskTemplate.Picture))
+                        {
+                            if (!string.IsNullOrEmpty(taskTemplate.VideoThumbnail))
+                            {
+                                picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, taskTemplate.VideoThumbnail);
+                            }
+                            else
+                            {
+                                picture = @"/assets/img/normal_unavailable_image.png";
+                            }
+                        }
+                    }
+
+                    <a class="text-muted fs-0 fs-lg-1" asp-controller="task" asp-action="details" asp-route-id="@taskTemplate.Id">
+                        <div class="col-12 p-1">
+                            <div class="p-1">
+                                <div class="row" data-containertype="task_container" data-id="@taskTemplate.Id">
+                                    <div class="col-sm-5 col-md-3 col-lg-3 col-xl-2">
+                                        <img src="/images/media-loading.gif" data-src="@picture" loading="lazy" class="img-fluid" />
+                                    </div>
+
+                                    <div class="col-sm-7 col-md-9 col-lg-9 col-xl-10">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <h5 class="mt-3 mt-sm-0">@taskTemplate.Name</h5>
+                                                <p class="fs--1 mb-2 mb-md-2"><span class="badge badge-secondary">@taskTemplate.AreaPath</span></p>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-12 d-flex justify-content-between flex-column">
+                                                <div class="row checklistRow">
+                                                    <div class="col-md-6 col-lg-2 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TemplateId, "Id") ?? "Id"): <strong>@taskTemplate.Id</strong></small></div>
+                                                    <div class="col-md-6 col-lg-2 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.InstructionDialogTitle, "Instructions") ?? "Instructions"): <strong>@taskTemplate?.StepsCount</strong></small></div>
+                                                    <div class="col-md-6 col-lg-2 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TemplateRoleTitle, "Role") ?? "Role"): <strong>@taskTemplate.Role</strong></small></div>
+                                                    <div class="col-md-6 col-lg-2 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TemplateRecurrenceTitle, "Recurrence") ?? "Recurrence"): <strong> @(Model?.CmsLanguage?.GetValue(taskTemplate?.Recurrency?.RecurrencyType.ToUpperInvariant(), taskTemplate?.Recurrency?.RecurrencyType).ToLower() ?? taskTemplate?.Recurrency?.RecurrencyType.ToLower())</strong></small></div>
+                                                    <div class="col-md-6 col-lg-2 text-muted @(String.IsNullOrEmpty(taskTemplate.DeepLinkTo) ? "d-none" : "")"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TemplateLinkTitle, "Link") ?? "Link"): <strong>@(taskTemplate.DeepLinkTo == "checklist" ? "Checklist" : "Audit") #@taskTemplate.DeepLinkId</strong></small></div>
+                                                    <div class="col-md-6 col-lg-2 text-muted @(String.IsNullOrEmpty(taskTemplate.DescriptionFile) ? "d-none" : "")"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TemplateAttachmentTitle, "Attachment") ?? "Attachment"): <strong>PDF</strong></small></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        @if (taskTemplate.Tags?.Count > 0 && Model.ApplicationSettings?.Features?.TagsEnabled == true)
+                                        {
+                                            <div class="row">
+                                                @foreach (var tag in taskTemplate.Tags)
+                                                {
+                                                    <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                                                        <div class="tag-wrapper" style="color:white;">
+                                                            <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                            <span class="my-1 ml-1 mr-3 tag-span" style="font-size:.78rem;">@tag.Name</span>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <partial name="~/Views/Shared/_no_templates_message.cshtml" model="@Model" />
+    }
+</div>

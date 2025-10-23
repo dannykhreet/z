@@ -1,0 +1,451 @@
+﻿@model WebApp.ViewModels.AuditingViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@{
+    Layout = null;
+    ViewData["Title"] = Model?.CmsLanguage.GetValue(LanguageKeys.Auditing.AuditingTitle, "Audit trail") ?? "Audit trail";
+}
+
+<style>
+    .custom-control-input:checked ~ .custom-control-label::before {
+        color: #fff;
+        border-color: #93c54b1f;
+        background-color: #93C54B;
+        box-shadow: none;
+    }
+
+    .filters label {
+        font-weight: normal !important;
+    }
+
+    input[type="datetime-local"], input[type=date], input[type=datetime] {
+        text-align: center;
+    }
+
+    div.custom-control-right {
+        padding-right: 3rem;
+        padding-left: 0;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+        div.custom-control-right .custom-control-label::after {
+            right: -1.5rem;
+            left: auto;
+        }
+
+        div.custom-control-right .custom-control-label::before {
+            right: -2.35rem;
+            left: auto;
+        }
+
+    .list-group-item.active .badge.badge-audit-trail {
+        color: #343a40;
+        background-color: #fff;
+    }
+
+    .badge-audit-trail {
+        color: #fff;
+        background-color: #bfbfbf;
+    }
+</style>
+
+<section class="content-header row">
+    <div class="container-fluid">
+        <br />
+
+        <div class="row mb-2">
+            <div class="col-auto">
+                <h1 class="m-0 text-dark">@(Model?.CmsLanguage.GetValue(LanguageKeys.Auditing.AuditingTitle, "Audit trail") ?? "Audit trail")</h1>
+            </div><!-- /.col -->
+
+            <div class="col">
+                <div class="card mb-0">
+                    <div class="card-body p-2">
+                        <div class="row">
+                            <div class="col-12 d-flex">
+                                <!-- FILTERS -->
+                                <div class="filters" style="width: 100%">
+                                    <div class="row d-flex pb-1">
+                                        <div class="col-12">
+                                            <div class="d-flex justify-content-between align-items-baseline flex-wrap">
+                                                <div class="custom-control custom-switch custom-control-right">
+                                                    <input type="checkbox" class="custom-control-input toggleFilter" id="checklisttempl" onchange="auditingOverview.toggleFilter('@Model.ChecklistTemplate', this.checked)" data-name="filtercontrol">
+                                                    <label style="font-weight: 400" class="custom-control-label card-text text-muted" for="checklisttempl">Checklists</label>
+                                                </div>
+
+                                                <div class="custom-control custom-switch custom-control-right">
+                                                    <input type="checkbox" class="custom-control-input toggleFilter" id="audittempl" onchange="auditingOverview.toggleFilter('@Model.AuditTemplate', this.checked)" data-name="filtercontrol">
+                                                    <label style="font-weight: 400" class="custom-control-label card-text text-muted" for="audittempl">Audits</label>
+                                                </div>
+
+                                                <div class="custom-control custom-switch custom-control-right">
+                                                    <input type="checkbox" class="custom-control-input toggleFilter" id="tasktempl" onchange="auditingOverview.toggleFilter('@Model.TaskTemplate', this.checked)" data-name="filtercontrol">
+                                                    <label style="font-weight: 400" class="custom-control-label card-text text-muted" for="tasktempl">Tasks</label>
+                                                </div>
+
+                                                <div class="custom-control custom-switch custom-control-right">
+                                                    <input type="checkbox" class="custom-control-input toggleFilter" id="assessmenttempl" onchange="auditingOverview.toggleFilter('@Model.AssessmentTemplate', this.checked)" data-name="filtercontrol">
+                                                    <label style="font-weight: 400" class="custom-control-label card-text text-muted" for="assessmenttempl">Assessments</label>
+                                                </div>
+
+                                                <div class="custom-control custom-switch custom-control-right mr-auto">
+                                                    <input type="checkbox" class="custom-control-input toggleFilter" id="workitnstructionstempl" onchange="auditingOverview.toggleFilter('@Model.WorkInstructionsTemplate', this.checked)" data-name="filtercontrol">
+                                                    <label style="font-weight: 400" class="custom-control-label card-text text-muted" for="workitnstructionstempl">Work instructions</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row d-flex">
+                                        <div class="col-12">
+                                            <div class="d-flex justify-content-between align-items-baseline flex-wrap">
+                                                <div class="mr-auto">
+                                                    <div class="custom-control pl-0" style="display: inline-block">
+                                                        <label for="start_date">From </label>
+                                                        <input type="date" id="start_date" />
+                                                    </div>
+
+                                                    <div class="custom-control" style="display: inline-block">
+                                                        <label for="end_date">To </label>
+                                                        <input type="date" id="end_date" />
+                                                    </div>
+
+                                                    <div class="custom-control" style="display: inline-block">
+                                                        <label for="day_picker">Entire day </label>
+                                                        <input type="date" id="day_picker" />
+                                                    </div>
+                                                </div>
+
+                                                <div class="ml-auto">
+                                                    <button class="btn" onclick="auditingOverview.resetFilter()">
+                                                        <i class="fas fa-redo mr-2"></i>Reset
+                                                    </button>
+
+                                                    @if (Model.ApplicationSettings?.Features?.ExportAdvancedEnabled == true || Model.ApplicationSettings?.Features?.ExportEnabled == true)
+                                                    {
+                                                        <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="auditinglog" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Auditing.ExportLog, "Download audit trail log") ?? "Download audit trail log")"><i class="fa fa-download"></i></button>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</section>
+
+<div class="content pb-3">
+    <div class="row">
+        <div class="col-4" style="height: 100%;">
+            <div class="card h-100">
+                <div class="card-header h5">Changes</div>
+
+               <div class="card-body p-0" style="height: 70vh; overflow: auto;">
+                    <div id="auditingOverviewList"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-8" style="height: 100%;">
+            <div class="card h-100">
+                <div class="card-header h5">Details</div>
+
+                <div class="card-body p-0" style="height: 70vh; overflow: auto;">
+                    <div id="auditingDetails">
+                        <div class="pl-3">Select a change to view a detailed descritpion</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.ApplicationSettings?.Features?.ExportAdvancedEnabled == true || Model.ApplicationSettings?.Features?.ExportEnabled == true)
+{
+    <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+    <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+}
+
+<script>
+    var auditingOverview = {
+        currentOffset: 0,
+        pagingInterval: 10,
+        types: [],
+        filter: "",
+        _element: document.getElementById('auditingOverviewList'),
+        _endOfContent: false,
+        init: function () {
+            auditingOverview.getChanges();
+            auditingOverview._element.parentElement.addEventListener("scroll", function () {
+                if (auditingOverview.scrolledToBottom()) {
+                    auditingOverview.getChanges();
+                }
+            });
+            document.getElementById('start_date').onchange = function () {
+                auditingOverview.getNewResults();
+            };
+            document.getElementById('end_date').onchange = function () {
+                auditingOverview.getNewResults();
+            };
+            document.getElementById('day_picker').onchange = function () {
+                auditingOverview.getNewResults();
+            };
+        },
+
+        getNewResults: function () {
+            auditingOverview._endOfContent = false;
+            auditingOverview.currentOffset = 0;
+            auditingOverview._element.innerHTML = "";
+            auditingOverview.ulChangeLog = undefined;
+            auditingOverview.getChanges();
+        },
+
+        getChanges: function () {
+            if (!auditingOverview._loadingMore && !auditingOverview._endOfContent) {
+                auditingOverview.lockLoading();
+                var startDateTime = document.getElementById('start_date').value;
+                var endDateTime = document.getElementById('end_date').value;
+                var day = document.getElementById('day_picker').value;
+                var timespan = '';
+                if (startDateTime || endDateTime) {
+                    if (startDateTime) {
+                        let date = new Date(Date.parse(startDateTime));
+                        timespan += '&createdonstart=' + date.toISOString().slice(0, -5);
+                    }
+
+                    if (endDateTime) {
+                        let date = new Date(Date.parse(endDateTime));
+                        date.setDate(date.getDate() + 1);
+                        timespan += '&createdonend=' + date.toISOString().slice(0, -5);
+                    }
+                }
+                else if (day) {
+                    let date = new Date(Date.parse(day));
+                    timespan += '&createdonstart=' + date.toISOString().slice(0, -5);
+                    date.setDate(date.getDate() + 1);
+                    timespan += '&createdonend=' + date.toISOString().slice(0, -5);
+                }
+
+                $.ajax({
+                    type: "GET",
+                    url: '/auditing/all?limit=' + auditingOverview.pagingInterval + '&offset=' + auditingOverview.currentOffset + auditingOverview.filter + timespan,
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (data) {
+                        if (data) {
+                            var changes = JSON.parse(data);
+                            if (auditingOverview.ulChangeLog == undefined) {
+                                auditingOverview.ulChangeLog = document.createElement('ul');
+                                auditingOverview.ulChangeLog.setAttribute('class', 'list-group h-auto');
+                                auditingOverview._element.appendChild(auditingOverview.ulChangeLog);
+                            }
+
+                            $(changes).each(function () {
+                                auditingOverview.addItemToList(this);
+                            });
+
+                            if (changes.length == auditingOverview.pagingInterval) {
+                                auditingOverview.currentOffset += auditingOverview.pagingInterval;
+                            } 
+                            else {
+                                auditingOverview._endOfContent = true;
+
+                                var a = document.createElement('div');
+                                a.setAttribute('class', 'list-group-item list-group-item-action');
+
+                                var div = document.createElement('div');
+                                div.setAttribute('class', 'd-flex w-100 justify-content-center');
+
+                                var h5 = document.createElement('h5');
+                                h5.setAttribute('class', 'mb-0');
+
+                                var li = document.createElement('li');
+                                li.setAttribute('style', 'background-color: #ffffff00;');
+                                h5.innerHTML = "No more items";//translate
+                                div.appendChild(h5);
+
+                                a.appendChild(div);
+                                li.appendChild(a);
+
+                                auditingOverview.ulChangeLog.appendChild(li);
+                            }
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(jqXHR);
+                    },
+                    complete: function () {
+                        auditingOverview.unlockLoading();                       
+                    }
+                });
+            }
+        },
+
+        lockLoading: function () {
+            auditingOverview._loadingMore = true;
+            document.querySelectorAll("[data-name='filtercontrol']").forEach(function (element) {
+                element.disabled = true;
+            });
+        },
+
+        unlockLoading: function () {
+            auditingOverview._loadingMore = false;
+            document.querySelectorAll("[data-name='filtercontrol']").forEach(function (element) {
+                element.disabled = false;
+            });
+        },
+
+        resetFilter: function () {
+            document.getElementById('start_date').value = "";
+            document.getElementById('end_date').value = "";
+            document.getElementById('day_picker').value = "";
+            document.querySelectorAll('.toggleFilter').forEach(function (e) {
+                e.checked = false;
+            });
+            auditingOverview.filter = "";
+            auditingOverview.getNewResults();
+        },
+
+        toggleFilter: function (filteredType, includeInFilter) {
+            if (includeInFilter) {
+                auditingOverview.types.push(filteredType);
+            } 
+            else {
+                let index = auditingOverview.types.indexOf(filteredType);
+                auditingOverview.types.splice(index, 1);
+            }
+
+            auditingOverview.filter = "";
+            for (var i = 0; i < auditingOverview.types.length; i++) {
+                auditingOverview.filter += "&objecttypes=" + auditingOverview.types[i];
+            }
+
+            auditingOverview.getNewResults();
+        },
+
+        loadDetails: function (e, id, objecttype) {
+            $('#auditingDetails').html('<div class="pl-3">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Reports.LoadingChecklistTaskContent, "Loading...") ?? "Loading...")</div>');
+            $('#auditingOverviewList a').removeClass('active');
+            $.get('/auditing/details/' + id + '?objecttype=' + objecttype, function (data) {
+                $('#auditingDetails').html(data);
+                auditingOverview.setPropertyNameWidth();
+            });
+            $(e.currentTarget).addClass('active');
+        },
+
+        scrolledToBottom: function () {
+            var el = auditingOverview._element.parentElement;
+            return el.scrollTop + el.clientHeight >= el.scrollHeight - 5;
+        },
+
+        addItemToList: function (item) {
+            var changeDate = new Date(item.CreatedOn);
+            var itemType;
+            switch (item.ObjectType) {
+                case "checklists_checklisttemplate":
+                    itemType = "@(Model.CmsLanguage.GetValue(LanguageKeys.Auditing.ChecklistTemplate, "Checklist template") ?? "Checklist template")";
+                    break;
+                case "audits_audittemplate":
+                    itemType = "@(Model.CmsLanguage.GetValue(LanguageKeys.Auditing.AuditTemplate, "Audit template") ?? "Audit template")";
+                    break;
+                case "assessment_templates":
+                    itemType = "@(Model.CmsLanguage.GetValue(LanguageKeys.Auditing.AssessmentTemplate, "Assessment template") ?? "Assessment template")";
+                    break;
+                case "workinstruction_templates":
+                    itemType = "@(Model.CmsLanguage.GetValue(LanguageKeys.Auditing.WorkInstructionTemplate, "Work instruction template") ?? "Work instruction template")";
+                    break;
+                case "tasks_tasktemplate":
+                    itemType = "@(Model.CmsLanguage.GetValue(LanguageKeys.Auditing.TaskTemplate, "Task template") ?? "Task template")";
+                    break;
+            }
+
+            var a = document.createElement('a');
+            a.setAttribute('href', '#');
+            a.setAttribute('onclick', 'auditingOverview.loadDetails(event, ' + item.Id + ', "' + item.ObjectType + '")')
+            a.setAttribute('class', 'list-group-item list-group-item-action');
+
+            var div = document.createElement('div');
+            div.setAttribute('class', 'd-flex w-100 justify-content-between');
+
+            var DivNameDesc = document.createElement('div');
+            var DivDateUser = document.createElement('div');
+            DivNameDesc.setAttribute('style', 'display: flex; flex-direction: column;');
+            DivDateUser.setAttribute('style', 'text-align: right; display: flex; flex-direction: column; justify-content: flex-end;');
+
+            var h5 = document.createElement('h5');
+            h5.setAttribute('class', 'mb-0');
+
+            var h6 = document.createElement('h6');
+            h5.setAttribute('class', 'mb-0');
+
+            var smallDate = document.createElement('small');
+            var badgeItemType = document.createElement('div');
+            var p = document.createElement('p');
+            p.setAttribute('class', 'mb-0');
+            smallDate.setAttribute('class', 'mb-2');
+            badgeItemType.setAttribute('class', 'badge badge-audit-trail');
+
+            var li = document.createElement('li');
+            li.setAttribute('style', 'background-color: #ffffff00;');
+
+            badgeItemType.innerHTML = itemType;
+            h5.innerHTML = item.ObjectName;
+            h6.innerHTML = item.Description;
+
+            p.innerHTML = item.UserFullName;
+            smallDate.innerHTML = changeDate.toLocaleString();
+
+            DivNameDesc.appendChild(h5);
+            DivNameDesc.appendChild(h6);
+            DivDateUser.appendChild(p);
+            DivDateUser.appendChild(smallDate);
+            div.appendChild(DivNameDesc);
+            div.appendChild(DivDateUser);
+
+            a.appendChild(badgeItemType);
+            a.appendChild(div);
+            li.appendChild(a);
+
+            auditingOverview.ulChangeLog.appendChild(li);
+        },
+
+        setPropertyNameWidth: function () {
+            var highestWidth = 0;
+
+            //determine highest width among property name cells
+            $('.propertyName').each(function () {
+                if (highestWidth < this.clientWidth) {
+                    highestWidth = this.clientWidth;
+                }
+            });
+
+            //set every propery name cell to highest width
+            $('.propertyName').each(function () {
+                if (highestWidth > this.clientWidth) {
+                    this.style.width = highestWidth + 'px';
+                }
+            });
+        }
+    }
+
+    function defer(method) {
+        if (window.jQuery) {
+            method();
+        } else {
+            setTimeout(function () { defer(method) }, 50);
+        }
+    }
+
+     $(document).ready(function () {
+          auditingOverview.init();
+      });
+
+    defer(ezgomediafetcher.preloadImagesAndVideos);
+</script>

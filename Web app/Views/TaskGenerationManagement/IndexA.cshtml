@@ -1,0 +1,621 @@
+﻿@model TaskGenerationManagerViewModel
+@using EZGO.Api.Models
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = "Task generation management"; //translate
+    string locale = Model.Locale ?? "en-US";
+}
+<!-- NOTE: Please check if this is still used anywhere -->
+<style>
+    .custom-control-input:checked ~ .custom-control-label::before {
+        color: #fff;
+        border-color: #93c54b1f;
+        background-color: #93C54B;
+        box-shadow: none;
+    }
+</style>
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <br />
+                <h1 class="m-0 text-dark">Task generation management</h1> @*//translate*@
+            </div><!-- /.col -->
+            <div class="col-sm-6 d-flex flex-row-reverse">
+
+                <button id="btnSavePlanning" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" onclick="taskManagement.save()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.TaskGenerationManagement.BtnSave, "Save") ?? "Save")</button>
+                <button id="btnDeleteCurrentPlan" class="btn btn-danger btn-sm mr-2 shadow-sm mt-auto" onclick="taskManagement.deleteCurrentPlan()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.TaskGenerationManagement.BtnDelete, "Delete") ?? "Delete")</button>
+                <button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" id="planTab-new" onclick="taskManagement.newCurrentPlan()">New</button>
+            </div>
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</section><!-- /.content-header -->
+
+<section class="content" style="height:calc(100vh - 174px); overflow: auto;">
+
+    @if (Model.DowntimePlannings != null)
+    {
+        for (int i = 0; i < Model.DowntimePlannings.Count; i++)
+        {
+
+            <div class="card w-100 results m-1" data-containertype="planning_item" data-index="@i">
+                <div class="card-body p-0">
+                    <div class="col-12 p-1 results1">
+                        <div class="p-1">
+                            <div class="row">
+                                <div class="col-sm-12 col-md-12">
+                                    <div class="row">
+                                        <div class="col-sm-7 col-md-7"><h5 class="mt-3 mt-sm-0"> @Model.DowntimePlannings[i].Reason</h5></div>
+                                        <div class="col-sm-5 col-md-5" style="text-align:right;">@if (Model.DowntimePlannings[i].DisabledFrom != null && Model.DowntimePlannings[i].DisabledTo != null) { @string.Concat(Model.DowntimePlannings[i].DisabledFrom.Value.ToString("dd-MM-yyyy"), " ~ ", Model.DowntimePlannings[i].DisabledTo.Value.ToString("dd-MM-yyyy")); }</div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-3 col-md-3">
+                                            <div>Disabled areas</div>
+                                            @if (Model.DowntimePlannings[i].AreaIds != null && Model.DowntimePlannings[i].AreaIds.Count > 0)
+                                            {
+                                                @foreach (var areaid in Model.DowntimePlannings[i].AreaIds)
+                                                {
+                                                    if (Model.Areas != null)
+                                                    {
+                                                        var possibleAra = Model.Areas.Where(x => x.Id == areaid).FirstOrDefault();
+                    
+                                                        <span class="badge badge-secondary">@if (possibleAra != null) { @possibleAra.Name } else { @areaid }</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-secondary">@areaid</span>
+                                                    }
+
+                                                }
+
+                                            }
+
+                                        </div>
+                                        <div class="col-sm-3 col-md-3">
+                                            <div>Disabled shifts</div>
+                                            @if (Model.DowntimePlannings[i].ShiftIds != null && Model.DowntimePlannings[i].ShiftIds.Count > 0)
+                                            {
+                                                @foreach (var shiftid in Model.DowntimePlannings[i].ShiftIds)
+                                                {
+                                                    if (Model.Shifts != null)
+                                                    {
+                                                        var possibleShift = Model.Shifts.Where(x => x.Id == shiftid).FirstOrDefault();
+                                                        var startTime = possibleShift != null ? string.Join(":", possibleShift.Start.Split(":").Take(2)) : "";
+                                                        var endTime = possibleShift != null ? string.Join(":", possibleShift.End.Split(":").Take(2)) : "";
+                                                        
+                                                        <span class="badge badge-secondary">@if (possibleShift != null) { @string.Concat((((DayOfWeek)possibleShift.Weekday).GetTextTranslation(locale)), ": " ,startTime ,"-", endTime) } else { @possibleShift }</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-secondary">@shiftid</span>
+                                                    }
+                                                 
+                                                }
+
+                                            }
+
+                                        </div>
+                                        <div class="col-sm-3 col-md-3">
+                                            <div>Disabled task templates</div>
+                                            @if (Model.DowntimePlannings[i].TaskIds != null && Model.DowntimePlannings[i].TaskIds.Count > 0)
+                                            {
+                                                @foreach (var taskid in Model.DowntimePlannings[i].TaskIds)
+                                                {
+                                                      if (Model.Tasks != null)
+                                                    {
+                                                        var possibleTaskTemplate = Model.Tasks.Where(x => x.Id == taskid).FirstOrDefault();
+                                                       
+                                                        <span class="badge badge-secondary">@if (possibleTaskTemplate != null) { @string.Concat(possibleTaskTemplate.Name, " (", taskid, ")") } else { @taskid }</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-secondary">@taskid</span>
+                                                    }
+                                                    
+                                                }
+
+                                            }
+
+                                        </div>
+
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12 col-md-12" style="text-align:right;"><button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" style="width: 32px; height: 24px " onclick="taskManagement.loadExistingPlan(@i)" data-index="@i"><i class="fas fa-pencil-alt" style="width: 14px; height: 14px"></i></button><button class="btn btn-sm mr-2 shadow-sm mt-auto" style="width: 32px; height: 24px; background-color: rgb(220, 53, 69); color: white" data-index="@i"><i class="fas fa-trash" style="width: 14px; height: 14px"></i></button></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            @*<div class="col">
+                <button class="btn btn-secondary" id="planTab-@i" onclick="taskManagement.loadExistingPlan(@i)" style="margin-left: 0.5rem;">
+
+                </button>
+                </div>*@
+        }
+    }
+
+
+
+    <div id="planTabs" class="row justify-content-start" style="display:none;">
+        @if (Model.DowntimePlannings != null)
+        {
+            for (int i = 0; i < Model.DowntimePlannings.Count; i++)
+            {
+                @*<div class="col">*@
+                <button class="btn btn-secondary" id="planTab-@i" onclick="taskManagement.loadExistingPlan(@i)" style="margin-left: 0.5rem;">
+                    @Model.DowntimePlannings[i].Reason
+                </button>
+                @*</div>*@
+            }
+        }
+
+    </div>
+    <div data-containertype="current-planning-container" style="display:none;">
+        <div class="row card-group">
+            <div class="col-4">
+                <div class="card">
+                    <div class="card-header"><h4>Info</h4></div>
+                    <div class="card-body">
+                        <div class="row align-items-center mb-2">
+                            <label for="reason" class="col-1 mb-0">Reason </label>
+                            <input id="reason" class="form-control col-11" type="text" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.TaskGenerationManagement.ReasonPlaceholder, "Give a reason why no tasks should be generated during the given period") ?? "Give a reason why no tasks should be generated during the given period")">
+                        </div>
+
+                        @if (Model.MoreGenerationOptionsEnabled)
+                        {
+                            <div class="row align-items-center mb-2">
+                                <label for="from_date" class="col-1 mb-0">From </label>
+                                <input type="datetime-local" id="from-date" />
+                            </div>
+
+                            <div class="row align-items-center">
+                                <label for="to_date" class="col-1 mb-0">To </label>
+                                <input type="datetime-local" id="to-date" />
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-8">
+                <div id="shifts" class="card" style="height: calc(100% - 1rem)">
+                    <div class="card-header"><h4>Shifts</h4></div>
+                    <div class="card-body">
+                        @for (int i = 0; i < 7; i++)
+                        {
+                            int day = i + 1;
+                            if (day > 6) { day = 0; }
+                            <div class="d-inline-block m-1">
+                                @(((DayOfWeek)day).GetTextTranslation(locale))
+
+                                @foreach (var shift in Model.Shifts.Where(shift => shift.Weekday.Equals(day)).ToList())
+                                {
+                                    <div class="custom-control custom-checkbox">
+                                        @{
+                                            var startTime = string.Join(":", shift.Start.Split(":").Take(2));
+                                            var endTime = string.Join(":", shift.End.Split(":").Take(2));
+                                        }
+                                        <input type="checkbox" class="custom-control-input @(((DayOfWeek)day).GetTextTranslation(locale)) shift" data-type="shift" id="@shift.Id" name="Shifts" value="@shift.Id">
+                                        <label class="custom-control-label font-weight-normal" for="@shift.Id">@(startTime + "-" + endTime)</label>
+                                    </div>
+                                    <small id="shift-@shift.Id-disabled-text"></small>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row card-group">
+            <div id="areas" class="col-6" style="height: calc(100vh - 399px - 1rem);">
+                <div class="card h-100" style="overflow: auto;">
+                    <div class="card-header"><h4>Areas</h4></div>
+                    <div class="accordion card p-0">
+                        @foreach (var area in Model.Areas)
+                        {
+                            displayArea(area);
+                            if (!Model.Areas.Last().Equals(area))
+                            {
+                                <hr class="mt-0 mb-0" />
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+            @if (Model.MoreGenerationOptionsEnabled)
+            {
+                <div class="col-6" style="height: calc(100vh - 399px - 1rem);">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h4>Tasks</h4>
+                        </div>
+                        @*todo: show preview here instead of tasks for first version*@
+
+                        <div id="area-tasks" class="card-body" style="overflow: auto;">
+
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+@functions{
+    void displayArea(Area area)
+    {
+        string locale = Model.Locale ?? "en-US";
+
+        <div class="card mb-0">
+            <div class="card-header" id="heading-@area.Id">
+                <div class="row">
+                    <button class="btn btn-ezgo text-left col-10" type="button" data-toggle="collapse" data-target="#collapse-@area.Id" aria-expanded="false" aria-controls="collapse-@area.Id">
+                        @area.Name
+                    </button>
+                    @if (Model.MoreGenerationOptionsEnabled)
+                    {
+                        <button class="btn btn-secondary text-left col-1" onclick="taskManagement.getTasks(@area.Id)">
+                            Tasks
+                        </button>
+                    }
+
+                </div>
+                <div class="row">
+                    <div class="custom-control custom-checkbox col-4">
+                        <input type="checkbox" class="custom-control-input area" data-slave="area-@area.ParentId" data-group-id="Areas" data-type="area" id="area-@area.Id" name="Areas" value="@area.Id">
+                        <label class="custom-control-label font-weight-normal" for="area-@area.Id">Stop task generation in this area</label>
+                    </div>
+                    <small id="area-@area.Id-disabled-text"></small>
+                </div>
+            </div>
+        </div>
+
+        @if (area.Children.Count > 0)
+        {
+            <div id="collapse-@area.Id" class="collapse" aria-labelledby="heading-@area.Id">
+                <div class="card-body pt-0 pb-0 pr-0">
+                    @foreach (var childArea in area.Children)
+                    {
+                        <hr class="mt-0 mb-0" />
+                        displayArea(childArea);
+                    }
+                </div>
+            </div>
+        }
+    }
+}
+</div>
+
+<script>
+
+    var taskManagement = {
+        completePlanning: JSON.parse('@Html.Raw(Model.DowntimePlannings.ToJsonFromObject())'),
+        currentPlan: {
+            Reason: "",
+            DisabledFrom: null,
+            DisabledTo: null,
+            AreaIds: [],
+            TaskIds: [],
+            ShiftIds: []
+        },
+        areaTitles: [],
+        shiftTitles: [],
+        taskTitles: [],
+
+        init: function () {
+            //add listeners for change events on checkboxes
+
+            document.querySelectorAll("input").forEach(function (input) {
+                input.addEventListener("change", function () {
+                    if (input.getAttribute("type") == "checkbox") {
+                        taskManagement.toggleSelection(input);
+                    }
+                });
+            });
+
+            taskManagement.fillExistingPlansText();
+        },
+
+        getTasks: function (id) {
+            $.get('/taskgenerationmanagement/' + id + '/tasks', function (data) {
+                $('#area-tasks').html(data);
+                //console.log(taskManagement.currentPlan);
+                taskManagement.currentPlan.TaskIds.forEach(function (id) {
+                    let checkbox = document.querySelector("input#task-" + id);
+                    //console.log(checkbox);
+                    if (checkbox != null) checkbox.checked = true;
+                });
+            });
+        },
+
+        save: function () {
+            taskManagement.addCurrentPlan();
+            var url = "/taskgenerationmanagement/save";
+            var xhr = new XMLHttpRequest();
+            var data = JSON.stringify(taskManagement.completePlanning);
+           // console.log(data);
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(data);
+            document.querySelector('[data-containertype="current-planning-container"]').style.display = 'none';
+            //TODO update OVERVIEW.
+            if (document.querySelectorAll('[data-containertype="planning_item"]') != null) document.querySelectorAll('[data-containertype="planning_item"]').forEach(function (el) { el.style.display = 'block'; });
+        },
+
+        //add the current plan to the complete planning
+        addCurrentPlan: function () {
+            //console.log(taskManagement.currentPlan);
+            if (taskManagement.completePlanning == null) taskManagement.completePlanning = [];
+            taskManagement.currentPlan.Reason = document.querySelector("#reason").value;
+            if (taskManagement.currentPlan.Reason != "") {
+                if (document.querySelector("#from-date") != null) {
+                    taskManagement.currentPlan.DisabledFrom = document.querySelector("#from-date").value != "" ? document.querySelector("#from-date").value : null;
+                }
+                if (document.querySelector("#to-date") != null) {
+                    taskManagement.currentPlan.DisabledTo = document.querySelector("#to-date").value != "" ? document.querySelector("#to-date").value : null;
+                }
+                if (!taskManagement.completePlanning.includes(taskManagement.currentPlan)) {
+                    let index = taskManagement.completePlanning.push(taskManagement.currentPlan) -1;
+                    taskManagement.addPlanButton(index);
+                }
+                return true;
+            } else if (taskManagement.currentPlan.DisabledFrom == null
+                && taskManagement.currentPlan.DisabledTo == null
+                && taskManagement.currentPlan.AreaIds.length == 0
+                && taskManagement.currentPlan.TaskIds == 0
+                && taskManagement.currentPlan.ShiftIds == 0) {
+                //disregard adding the empty plan
+
+                return true;
+            } else {
+                toastr.error("You must give a reason for disabling task generation.");
+                return false;
+            }
+        },
+
+        removeCurrentPlan: function () {
+            if (taskManagement.completePlanning.includes(taskManagement.currentPlan)) {
+                let index = taskManagement.completePlanning.indexOf(taskManagement.currentPlan);
+                taskManagement.completePlanning.splice(index, 1);
+                return index;
+            }
+            return -1;
+        },
+
+        resetCurrentPlan: function () {
+            taskManagement.currentPlan = {
+                Reason: "",
+                DisabledFrom: null,
+                DisabledTo: null,
+                AreaIds: [],
+                TaskIds: [],
+                ShiftIds: []
+            }
+        },
+
+        fillExistingPlansText: function () {
+
+            taskManagement.completePlanning.forEach(function (currentPlan) {
+                currentPlan.AreaIds.forEach(function (areaId) {
+                    let small = document.querySelector("#area-" + areaId + "-disabled-text");
+                    if (small != null) {
+                        taskManagement.fillInnerHtmlDisabledFromToText(small, currentPlan);
+                    }
+                });
+                currentPlan.TaskIds.forEach(function (taskId) {
+                    let small = document.querySelector("#task-" + taskId + "-disabled-text");
+                    if (small != null) {
+                        taskManagement.fillInnerHtmlDisabledFromToText(small, currentPlan);
+                    }
+                });
+                currentPlan.ShiftIds.forEach(function (shiftId) {
+                    let small = document.querySelector("#shift-" + shiftId + "-disabled-text");
+                    if (small != null) {
+                        taskManagement.fillInnerHtmlDisabledFromToText(small, currentPlan);
+                    }
+                });
+            });
+        },
+
+        //add the text about the other plans
+        fillInnerHtmlDisabledFromToText: function (element, currentPlan) {
+            if (currentPlan.DisabledFrom != null && currentPlan.DisabledTo != null) {
+                let fromDate = new Date(currentPlan.DisabledFrom);
+                let toDate = new Date(currentPlan.DisabledTo);
+                let locales = [];
+                let options = {
+                    dateStyle: "short",
+                    timeStyle: "short"
+                };
+                if (element.innerHTML != "") {
+                    element.innerHTML += "<br>";
+                }
+                element.innerHTML += "Disabled from " + fromDate.toLocaleString(locales, options) + " to " + toDate.toLocaleString(locales, options); /*+ " <div class='ezgo-tooltip' style='margin-left: 0.3em;'><i class='fa fa-info-circle'></i><span class='tooltiptext shadow'>" + currentPlan.Reason + "</span></div>";*/
+            } else {
+                if (element.innerHTML != "") {
+                    element.innerHTML += "<br>";
+                }
+                element.innerHTML += "Disabled"
+            }
+
+        },
+
+        emptyExistingPlansText: function () {
+            document.querySelectorAll("[id$='-disabled-text'").forEach(function (e) {
+                e.innerHTML = "";
+            })
+        },
+
+        refreshDisabledText: function () {
+            taskManagement.emptyExistingPlansText();
+            taskManagement.fillExistingPlansText();
+        },
+
+        //toggles the selection of items (areas, shifts, tasks) in the current downtime plan
+        toggleSelection: function (e) {
+            let objectId = Number(e.value);
+            if (e.dataset.type == "area") {
+                if (e.checked) {
+                    taskManagement.currentPlan.AreaIds.push(objectId);
+                    @if (!Model.MoreGenerationOptionsEnabled)
+                    {
+                        //disable shifts for first version
+                        @:taskManagement.disableShifts(true);
+                    }
+                } else {
+                    let index = taskManagement.currentPlan.AreaIds.indexOf(objectId);
+                    taskManagement.currentPlan.AreaIds.splice(index, 1);
+                    @if (!Model.MoreGenerationOptionsEnabled)
+                    {
+                        //enable shifts again if no areas are selected
+                        <text>
+                        if (taskManagement.currentPlan.AreaIds.length == 0) {
+                            taskManagement.disableShifts(false);
+                        }
+                    </text>
+                    }
+                }
+            } else if (e.dataset.type == "shift") {
+                if (e.checked) {
+                    taskManagement.currentPlan.ShiftIds.push(objectId);
+                    @if (!Model.MoreGenerationOptionsEnabled)
+                    {
+                        //disable areas for first version
+                        @:taskManagement.disableAreas(true);
+                    }
+                } else {
+                    let index = taskManagement.currentPlan.ShiftIds.indexOf(objectId);
+                    taskManagement.currentPlan.ShiftIds.splice(index, 1);
+                    @if (!Model.MoreGenerationOptionsEnabled)
+                    {
+                        //enable areas again if no areas are selected
+                        <text>
+                        if (taskManagement.currentPlan.ShiftIds.length == 0)
+                        {
+                            taskManagement.disableAreas(false);
+                        }
+                        </text>
+                    }
+                    }
+            } else if (e.dataset.type == "task") {
+                if (e.checked) {
+                    taskManagement.currentPlan.TaskIds.push(objectId);
+                } else {
+                    let index = taskManagement.currentPlan.TaskIds.indexOf(objectId);
+                    taskManagement.currentPlan.TaskIds.splice(index, 1);
+                }
+            }
+        },
+
+        //Set reason, dates, and mark all checkboxes for the downtime plan with given index
+        loadExistingPlan: function (index) {
+            if (document.querySelectorAll('[data-containertype="planning_item"]') != null) document.querySelectorAll('[data-containertype="planning_item"]').forEach(function (el) { el.style.display = 'none'; });
+            if (document.querySelector('[data-containertype="planning_item"][data-index="' + index + '"]') != null) document.querySelector('[data-containertype="planning_item"][data-index="' + index + '"]').style.display = 'block';
+            document.querySelector('[data-containertype="current-planning-container"]').style.display = 'block';
+            if (taskManagement.addCurrentPlan()) {
+                taskManagement.currentPlan = taskManagement.completePlanning[index];
+                taskManagement.refreshInputs();
+                taskManagement.refreshDisabledText();
+            }
+        },
+
+        newCurrentPlan: function () {
+            if (document.querySelectorAll('[data-containertype="planning_item"]') != null) document.querySelectorAll('[data-containertype="planning_item"]').forEach(function (el) { el.style.display = 'none'; });
+            document.querySelector('[data-containertype="current-planning-container"]').style.display = 'block';
+            taskManagement.resetCurrentPlan();
+            taskManagement.refreshInputs();
+        },
+
+        refreshInputs: function() {
+            document.querySelector("#reason").value = taskManagement.currentPlan.Reason;
+            if (document.querySelector("#from-date") != null) {
+                document.querySelector("#from-date").value = taskManagement.currentPlan.DisabledFrom || "";
+            }
+            if (document.querySelector("#to-date") != null) {
+                document.querySelector("#to-date").value = taskManagement.currentPlan.DisabledTo || "";
+
+            }
+
+            document.querySelectorAll("input").forEach(function (input) {
+                let objectId = Number(input.value);
+                if (input.dataset.type == "area") {
+                    input.checked = taskManagement.currentPlan.AreaIds.includes(objectId);
+                } else if (input.dataset.type == "shift") {
+                    input.checked = taskManagement.currentPlan.ShiftIds.includes(objectId);
+                } else if (input.dataset.type == "task") {
+                    input.checked = taskManagement.currentPlan.TaskIds.includes(objectId);
+                }
+            });
+        },
+
+        addPlanButton: function (index) {
+            //var div = document.createElement('div');
+            //div.setAttribute('class', 'col');
+            var button = document.createElement('button');
+            button.setAttribute('class', 'btn btn-secondary');
+            button.setAttribute('id', 'planTab-' + index);
+            button.setAttribute('onclick', 'taskManagement.loadExistingPlan(' + taskManagement.completePlanning.indexOf(taskManagement.currentPlan) + ')');
+            button.setAttribute('style', 'margin-left: 0.5rem;');
+            button.innerHTML = taskManagement.currentPlan.Reason;
+            //div.appendChild(button);
+            document.querySelector('#planTabs').appendChild(button);
+        },
+
+        deleteCurrentPlan: function () {
+            let index = taskManagement.removeCurrentPlan()
+            taskManagement.newCurrentPlan();
+            if (index >= 0) {
+                // if index is not negative, the plan was saved in the completePlanning array and should be removed from the interface
+                taskManagement.removePlanTab(index);
+                taskManagement.refreshDisabledText();
+            }
+        },
+
+        removePlanTab: function (index) {
+            document.querySelector("#planTab-" + index).remove();
+            for (var i = index; i < taskManagement.completePlanning.length; i++) {
+                let planTab = document.querySelector("#planTab-" + (i + 1));
+                planTab.setAttribute('id', 'planTab-' + (i));
+                planTab.setAttribute('onclick', 'taskManagement.loadExistingPlan(' + (i) + ')');
+            }
+        },
+
+        disableAreas: function (bool) {
+            var areasRoot = document.querySelector('#areas');
+            taskManagement.disableAllChildren(areasRoot, bool);
+        },
+
+        disableShifts: function (bool) {
+            var shiftsRoot = document.querySelector('#shifts');
+            taskManagement.disableAllChildren(shiftsRoot, bool);
+        },
+
+        disableAllChildren: function (element, bool) {
+            if (bool) {
+                element.setAttribute('disabled', bool);
+            } else {
+                element.removeAttribute('disabled');
+            }
+
+            element.children.forEach(function (e) {
+                taskManagement.disableAllChildren(e, bool);
+            });
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', (event) => {
+        taskManagement.init();
+    });
+
+</script>

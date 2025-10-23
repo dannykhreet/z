@@ -1,0 +1,1051 @@
+﻿@model PdfChecklistTemplateViewModel
+@using WebApp.Logic.Services;
+@using WebApp.Helpers
+@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>@(Model?.CmsLanguage.GetValue(LanguageKeys.PdfChecklistTemplate.ChecklistTemplate, "Checklist template") ?? "Checklist template") @Model.ChecklistTemplate.Name</title>
+    <link rel="stylesheet" href="/css/pdf.css" />
+    <partial name="_pdfCss" /> @*above link doesnt work on docker for some reason*@
+    <!-- ezgomediafetcher -->
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1337.0.min.js"></script>
+    <script src="~/js/ezgomediafetcher.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/plugins/fontawesome-pro-6.5.2-web/css/all.min.css" />
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1337.0.min.js"></script>
+    <script src="/js/ezgomediafetcher.js"></script>
+
+    <style>
+        body {
+            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,'Noto Sans Malayalam','Noto Sans KR','Noto Sans Thai',"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+        }
+        
+        hr {
+            border-top: 2px solid #8E8E8E7F;
+        }
+        
+        h1, h5 {
+            color: black;
+            font-weight: 600;
+        }
+
+        p {
+            color: black;
+        }
+
+        strong {
+            font-weight: 600;
+        }
+
+        * {
+            -webkit-print-color-adjust: exact !important; /* Chrome, Safari 6 – 15.3, Edge */
+            color-adjust: exact !important; /* Firefox 48 – 96 */
+            print-color-adjust: exact !important; /* Firefox 97+, Safari 15.4+ */
+        }
+
+        .overviewtext {
+            display: inline-block;
+            font-size: 16px;
+        }
+
+        .overview-cell {
+            display: inline-block;
+        }
+
+        .stepstext {
+        }
+
+        .steptitle {
+            padding: 0rem 1rem 1rem 1rem;
+            box-sizing: border-box;
+        }
+
+        .informationtext {
+            vertical-align: top;
+            padding-left: 1rem;
+        }
+
+        .overlaytop {
+            position: absolute;
+            padding: 0px;
+            margin: 0px;
+            top: 0;
+            left: 0;
+            width: 3em;
+            height: 3em;
+            line-height: 3em;
+            vertical-align: middle;
+            text-align: center;
+            background: #E07200;
+            color: white;
+        }
+
+        .overlaybottom {
+            position: absolute;
+            padding: 0px;
+            margin: 0px;
+            left: 0;
+            bottom: 0;
+            width: 2em;
+            height: 2em;
+            line-height: 2em;
+            vertical-align: middle;
+            text-align: center;
+            background: black;
+            color: white;
+        }
+
+        .fancyshadow {
+            /*box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;*/
+            box-shadow: rgb(0 0 0 / 10%) 0px 0px 5px 1px;
+            /*display: inline-block;*/
+        }
+
+        .autosize {
+            width: 1%;
+            white-space: nowrap !important;
+        }
+
+        .avoid-break-steps tr {
+            page-break-inside: avoid;
+        }
+
+        .avoid-break {
+            page-break-inside: avoid;
+        }
+
+        .avoid-break-before {
+            page-break-before: avoid;
+        }
+
+        .avoid-break-after {
+            page-break-after: avoid;
+        }
+
+        .step-instruction-description {
+            width: 30%;
+            height: 100%;
+            font-size: 15px;
+            vertical-align: top;
+            text-overflow: ellipsis;
+            float: left;
+            min-height: 5rem;
+            box-sizing: border-box;
+            padding: 0rem 1rem;
+            overflow-wrap: break-word;
+        }
+
+        .alternatingcolors:nth-child(even) {
+            background: #f7f6fb;
+        }
+
+        <!-- Tags -->
+        .card {
+            position: relative;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: #ffffff;
+            background-clip: border-box;
+            border: 0 solid rgba(0, 0, 0, 0.125);
+            border-radius: 0.25rem;
+        }
+
+        .tag-card {
+            display: inline-block;
+            width: 9em;
+            color: white;
+            align-content: center;
+            align-items: center;
+        }
+
+        .tag-wrapper {
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+            display: flex;
+            height: 2.6em;
+            line-height: 1.1;
+        }
+
+        .tag-span {
+            text-align: center;
+            align-self: center;
+            display: inline-block;
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+        }
+
+        .nav-icon {
+            float: left;
+            display: inline-block;
+        }
+        .card {
+            box-shadow: none;
+            border-radius: 10px;
+        }
+
+        .vertical-space-between-evenly {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .item-container {
+            position: relative;
+            display: block;
+            vertical-align: top;
+        }
+
+        .image-wrapper {
+            width: 100%;
+            min-width: 245px;
+        }
+
+        .image-wrapper img {
+            max-height: 100%;
+            max-width: 245px;
+            min-width: 245px;
+        }
+
+        .step-image-wrapper {
+            width: 100%;
+        }
+
+        .step-image-wrapper img {
+            height: 200px;
+            max-height: 200px;
+            min-height: 200px;
+            width: 100%;
+            max-width: 100%;
+            min-width: 100%;
+            object-fit: cover;
+        }
+
+        .tag {
+            padding:4px;
+            margin:2px;
+            border-radius: 0.25rem;
+            font-size: 12px;
+            display: inline-block;
+            font-weight: bolder;
+            color: #FFFFFF
+        }
+
+        .tag-wrapper {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        .property {
+            position: relative;
+            display: inline-block;
+            margin-left: 2px;
+            height: 100px;
+            width: 100px;
+            overflow: hidden;
+        }
+
+        .property-wrapper {
+            display: table;
+        }
+
+        .property-title {
+            margin-top: 2px;
+            width: 100px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bolder;
+            height: 25px;
+            vertical-align: middle;
+            line-height: normal;
+            display: inline-table;
+            overflow: hidden;
+        }
+
+        .property-value {
+            width: 100px;
+            text-align: center;
+            font-size: 10px;
+            height: 50px;
+            vertical-align: middle;
+            line-height: normal;
+            display: inline-table;
+            overflow: hidden;
+        }
+
+        .property-date {
+            width: 100px;
+            text-align: center;
+            font-size: 10px;
+            height: 10px;
+            vertical-align: middle;
+            line-height: normal;
+            display: inline-table;
+            overflow: hidden;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <!-- Root div -->
+    <div style="padding: 1rem">
+        <!-- Overview section -->
+        <div class="avoid-break avoid-break-after" style="width: 100%; height: auto; margin-bottom: 1rem; overflow: hidden;">
+            
+            <!-- Overview Title -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="overviewtext" style="text-transform: uppercase; font-size: 27px; padding-top: 1.2rem; padding-bottom: 1rem; width:100%; float:left; box-sizing:border-box;">
+                        <h1>@Model.ChecklistTemplate.Name</h1>
+                    </div>
+                </div>
+            </div>
+            @{
+                var pictureUrl = Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(Model.ChecklistTemplate.Picture))
+                {
+                    pictureUrl = MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.ChecklistTemplate.Picture);
+                }
+            }
+
+            <div class="row">
+                <div class="col-5">
+                    <div class="imageWrapper"><img data-src="@pictureUrl" /></div>
+
+                </div>
+                <div class="col-7" style="font-size: 16px; color: black">
+                    <!-- Overview ID -->
+                    <div class="py-1">
+                        <div class="overviewtext overview-cell"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistTemplate.ChecklistId, "Checklist ID") ?? "Checklist ID"): </strong></div>
+                        <div class="overview-cell" style="font-size: 16px; vertical-align: top; display: inline-block">@Model.ChecklistTemplate.Id</div>
+                    </div>
+                    <!-- Overview Role -->
+                    <div class="py-1">
+                        <div class="overviewtext overview-cell"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistTemplate.Role, "Role") ?? "Role"): </strong></div>
+                        @if (Model.ChecklistTemplate.Role.ToLower().Equals("basic"))
+                        {
+                            <div class="overview-cell" style="font-size: 16px; vertical-align: top">@(Model?.CmsLanguage?.GetValue(LanguageKeys.User.Basic, "Basic user") ?? "Basic user")</div>
+                        }
+                        else if (Model.ChecklistTemplate.Role.ToLower().Equals("shift_leader"))
+                        {
+                            <div class="overview-cell" style="font-size: 16px; vertical-align: top">@(Model?.CmsLanguage?.GetValue(LanguageKeys.User.ShiftLeader, "Shift leader") ?? "Shift leader")</div>
+                        }
+                        else if (Model.ChecklistTemplate.Role.ToLower().Equals("manager"))
+                        {
+                            <div class="overview-cell" style="font-size: 16px; vertical-align: top">@(Model?.CmsLanguage?.GetValue(LanguageKeys.User.Manager, "Manager") ?? "Manager")</div>
+                        }
+                    </div>
+                    <!-- Overview Signature(s) -->
+                    <div class="py-1">
+                        <div class="overviewtext overview-cell"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistTemplate.Signatures, "Signature(s)") ?? "Signature(s)"): </strong></div>
+                        <div class="overview-cell" style="font-size: 16px; vertical-align: top;">
+                            @if (@Model.ChecklistTemplate.IsDoubleSignatureRequired)
+                            {<span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.OptionTwoSignature, "Two signatures") ?? "Two signatures")</span> }
+                            else if (@Model.ChecklistTemplate.IsSignatureRequired)
+                            { <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.OptionOneSignature, "One signature") ?? "One signature")</span> }
+                            else
+                            { <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.OptionNone, "None") ?? "None")</span>}
+                        </div>
+                    </div>
+
+                    <!-- Overview areas -->
+                    <div class="py-1">
+                        <div class="overviewtext overview-cell" style="vertical-align: top !important"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistTemplate.Areas, "Areas") ?? "Areas"): </strong></div>
+                        <div class="overview-cell" style="font-size: 16px; vertical-align: top !important">@Model.ChecklistArea.FullDisplayName</div>
+                    </div>
+
+                    @if (Model != null && Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null && Model.ApplicationSettings.Features.RequiredProof.Value)
+                    {
+                        <div class="py-1">
+                            <div class="overviewtext overview-cell" style="vertical-align: top !important"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.PictureProofTitle, "Picture Proof") ?? "Picture Proof"): </strong></div>
+                            <div class="overview-cell" style="font-size: 16px; vertical-align: top !important">
+                                @if (Model.ChecklistTemplate.TaskTemplates != null) 
+                                {
+                                    if (Model.ChecklistTemplate.TaskTemplates.All(t => t.HasPictureProof))
+                                    {
+                                        @:Yes
+                                    }
+                                    else if (Model.ChecklistTemplate.TaskTemplates.Any(t => t.HasPictureProof))
+                                    {
+                                        @:Partially
+                                    }
+                                    else
+                                    {
+                                        @:No
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Tags section -->
+        @if (Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null &&
+             Model.ApplicationSettings.Features.TagsEnabled.HasValue && Model.ApplicationSettings.Features.TagsEnabled.Value &&
+             Model.ChecklistTemplate.Tags != null)
+        {
+            foreach (var tag in Model.ChecklistTemplate.Tags)
+            {
+                <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; margin: 0.25rem">
+                    <div class="tag-wrapper" style="">
+                        <i style="margin-top: auto; margin-bottom: auto; margin-left: 0.5rem; margin-right: 0px" class="nav-icon my-auto ml-2 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                        <span style="margin-top: auto; margin-bottom: auto; margin-right: 0.5rem" class="my-auto mr-2 tag-span">@tag.Name</span>
+                    </div>
+                </div>
+            }
+        }
+
+        <!-- Open fields -->
+        @if (Model.ChecklistTemplate.OpenFieldsProperties != null && Model.ChecklistTemplate.OpenFieldsProperties.Count > 0)
+        {
+            <div class="avoid-break">
+                <h5 class="py-2" style="font-weight: 600">Open fields</h5>
+                <div class="row">
+                    @for (int i = 0; i < Model.ChecklistTemplate.OpenFieldsProperties.Count; i++)
+                    {
+                        <div class="col-6">
+                            <div class="row" style="height: 100%">
+                                <div class="col-6" style="overflow-wrap: anywhere;align-content: center;height:100%">
+                                    <label class="title">
+                                        @Model.ChecklistTemplate.OpenFieldsProperties[i].TitleDisplay
+                                    </label>
+                                </div>
+                                <div class="col-6" style="color: #8E8E8E; text-align: center; align-content: center;overflow-wrap: anywhere;height:100%">
+                                    <span class="value">
+                                        @if (Model.ChecklistTemplate.OpenFieldsProperties[i].IsRequired.HasValue && Model.ChecklistTemplate.OpenFieldsProperties[i].IsRequired.Value)
+                                        {
+                                            <div>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistTemplate.OpenFieldsRequired, "Required") ?? "Required")</div>
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <hr />
+        }
+
+        <!-- Checklist items section -->
+        @if (Model?.ApplicationSettings?.Features?.ChecklistStagesEnabled != null && Model.ApplicationSettings.Features.ChecklistStagesEnabled.Value == true && Model.ChecklistTemplate.StageTemplates != null && Model.ChecklistTemplate.StageTemplates.Count > 0)
+        {
+            <div class="tasks-container">
+            @foreach(var stage in Model.ChecklistTemplate.StageTemplates)
+            {
+                var stageTasks = Model.ChecklistTemplate.TaskTemplates.Where(t => stage.TaskTemplateIds != null && stage.TaskTemplateIds.Contains(Convert.ToInt32(t.Id))).ToList();
+
+                <div class="my-3" style="border: 2px solid #93C54B">
+                    <div class="row m-0" style="color: white; background-color: #93C54B">
+                        <div class="col-12 p-0">
+                            <h5 class="pl-4 py-2 m-0" style="color: white">@stage.Name</h5>
+                        </div>
+                    </div>
+                    <div class="row m-0" style="color: black; background-color: white">
+                        <div class="col-12 p-2">
+                                @if(stage.NumberOfSignaturesRequired == 0)
+                                {
+                                    <strong>Signatures: </strong>@:None
+                                }
+                                else if(stage.NumberOfSignaturesRequired != 0)
+                                {
+                                    <strong>Signatures: </strong>@stage.NumberOfSignaturesRequired
+                                }
+
+                                @if(stage.LockStageAfterCompletion && stage.BlockNextStagesUntilCompletion)
+                                {
+                                    <strong>Lock: </strong>@:Yes
+                                }
+                                else 
+                                {
+                                    <strong>Lock: </strong>@:No
+                                }
+
+                                @if(stage.UseShiftNotes)
+                                {
+                                    <strong>Notes: </strong>@:Yes
+                                }
+                                else 
+                                {
+                                    <strong>Notes: </strong>@:No
+                                }
+                        </div>
+                    </div>
+
+                    <div class="row m-0" style="color: black; background-color: white">
+                        <div class="col-12 p-2">
+
+                            @foreach (var checklistItem in stageTasks)
+                            {
+                                <div class="avoid-break">
+                                    @{
+                                        var itemIndex = stageTasks.IndexOf(checklistItem);
+                                    }
+                                    @if(itemIndex > 0) {
+                                        <hr />
+                                    }
+                                    <div class="row">
+                                        <div class="col-auto">
+                                            <div style="display: inline-block;"><h5 style="font-weight: 600">@(Model.ChecklistTemplate.TaskTemplates.IndexOf(checklistItem) + 1) </h5></div>
+                                        </div>
+                                        <div class="col">
+                                            <div style="display: inline-block;"><h5 style="font-weight: 600">@checklistItem.Name</h5></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="item-container">
+                                        @{
+                                            string mediaImageUrl = Constants.General.ImageUnavailableUrl;
+
+                                            if (!string.IsNullOrEmpty(checklistItem.Picture))
+                                            {
+                                                mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, checklistItem.Picture);
+                                            }
+                                            else if (!string.IsNullOrEmpty(checklistItem.VideoThumbnail))
+                                            {
+                                                mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, checklistItem.VideoThumbnail);
+                                            }
+                                        }
+
+                                        <div class="item-main">
+                                            <div class="row">
+                                                <div class="image-container col-auto">
+                                                    <div class="image-wrapper"><img data-src="@mediaImageUrl" /></div>
+                                                </div>
+
+                                                @{
+                                                    bool itemHasTags = (Model.ApplicationSettings.Features?.TagsEnabled == true && checklistItem.Tags != null && checklistItem.Tags.Count > 0);
+                                                    bool itemHasOnlyTagsNoDescription = (string.IsNullOrEmpty(checklistItem.Description)) && itemHasTags;
+                                                }
+
+                                                <div class="item-details col">
+
+                                                    <div class="row" style="height: 100%; color: black ">
+                                                        @if (!string.IsNullOrEmpty(checklistItem.Description))
+                                                        {
+                                                            <div class="col-12 item-details-name p-1 pl-3" style="height: auto; align-self: @(itemHasTags ? "flex-end" : "center ")">
+                                                                <div>@checklistItem.Description</div>
+                                                            </div>
+                                                        }
+                                                        @if (itemHasTags)
+                                                        {
+                                                            <div class="col-12 p-1 pl-3" style="height: auto; align-self: @(itemHasOnlyTagsNoDescription ? "center" : "flex-start")">
+                                                                <div class="tag-container">
+                                                                    @foreach (var tag in checklistItem.Tags)
+                                                                    {
+                                                                        <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; margin: 0.25rem">
+                                                                            <div class="tag-wrapper" style="">
+                                                                                <i style="margin-top: auto; margin-bottom: auto; margin-left: 0.5rem; margin-right: 0px" class="nav-icon my-auto ml-2 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                                                <span style="margin-top: auto; margin-bottom: auto; margin-right: 0.5rem" class="my-auto mr-2 tag-span">@tag.Name</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-12">
+
+                                                @if (checklistItem.Properties != null && checklistItem.Properties.Count() > 0)
+                                                {
+                                                    <div class="properties-container pt-3">
+                                                        <div class="pb-2"><strong>Properties:</strong></div>
+                                                        @for (int i = 0; i < checklistItem.Properties.Count(); i++)
+                                                        {
+                                                            var templateProperty = checklistItem.Properties[i];
+                                                            if (templateProperty != null && templateProperty.Id > 0)
+                                                            {
+                                                                string color = "rgb(100, 104, 107)";
+
+                                                                <div class="property" style="border: 1px solid @color; color: @color">
+                                                                    <div class="property-wrapper">
+                                                                        
+                                                                        @if (templateProperty.IsRequired == true)
+                                                                        {
+                                                                            <i class="fa-solid fa-asterisk m-1" style="color: red; position: absolute; top: 1px; right: 1px;"></i>
+                                                                        }
+                                                                        <div class="property-title">
+                                                                            @if (!String.IsNullOrEmpty(templateProperty.TitleDisplay))
+                                                                            {
+                                                                                <span>@templateProperty.TitleDisplay</span>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <span>@templateProperty.Property.ShortName</span>
+                                                                            }
+                                                                        </div>
+
+                                                                        <div class="property-value" data-fulltext="@templateProperty.PrimaryStringValue">
+                                                                            @if (templateProperty.BoolValue == null && templateProperty.PrimaryDateTimeValue == null &&
+                                                                            templateProperty.PrimaryDecimalValue == null && templateProperty.PrimaryIntValue == null &&
+                                                                            templateProperty.PrimaryStringValue == null && templateProperty.PrimaryTimeValue == null)
+                                                                            {
+                                                                                <div style="height: 100%; display: flex; align-items: center; justify-content: center"><span> </span></div>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <div style="height: 100%; display: flex; align-items: center; justify-content: center">
+                                                                                    <span>
+                                                                                        @templateProperty.BoolValue
+                                                                                        @templateProperty.PrimaryDateTimeValue @(templateProperty.SecondaryDateTimeValue != null ? $" - {templateProperty.SecondaryDateTimeValue}" : "")
+                                                                                        @(templateProperty.PrimaryDecimalValue / 1.000000000000000000000000000000000m) @(templateProperty.SecondaryDecimalValue != null ? $" - {templateProperty.SecondaryDecimalValue / 1.000000000000000000000000000000000m}" : "")
+                                                                                        @templateProperty.PrimaryIntValue @(templateProperty.SecondaryIntValue != null ? $" - {templateProperty.SecondaryIntValue}" : "")
+                                                                                        @templateProperty.PrimaryStringValue @(templateProperty.SecondaryStringValue != null ? $" - {templateProperty.SecondaryStringValue}" : "")
+                                                                                        @templateProperty.PrimaryTimeValue @(templateProperty.SecondaryDateTimeValue != null ? $" - {templateProperty.SecondaryDateTimeValue}" : "")
+                                                                                    </span>
+                                                                                </div>
+                                                                            }
+
+                                                                        </div>
+                                                                        <div class="property-date">
+                                                                            <span>@templateProperty.PropertyValueDisplay</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        }
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    @:<strong>Properties: </strong>None
+                                                }
+
+                                                @if (Model != null && Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null && Model.ApplicationSettings.Features.RequiredProof.Value)
+                                                {
+                                                    @:<strong>Picture proof: </strong>
+                                                    @if (checklistItem.HasPictureProof)
+                                                    {
+                                                        @:On
+                                                    }
+                                                    else
+                                                    {
+                                                        @:Off
+                                                    }
+                                                }
+
+                                                @if (checklistItem.Attachments != null && checklistItem.Attachments.Count > 0)
+                                                {
+                                                    @:<strong>Instructions: </strong>
+                                                    if (checklistItem.Attachments[0].AttachmentType.ToLower() == "link")
+                                                    {
+                                                        @:Link
+                                                    }
+                                                    else if (checklistItem.Attachments[0].AttachmentType.ToLower() == "pdf")
+                                                    {
+                                                        @:PDF
+                                                    }
+                                                }
+                                                else if (checklistItem.Steps != null && checklistItem.Steps.Count > 0)
+                                                {
+                                                    @:<div class="pb-2"><strong>Instructions: </strong></div>
+
+                                                    <div class="row" style="page-break-inside: avoid">
+                                                        @foreach (var step in checklistItem.Steps)
+                                                        {
+                                                            var stepPictureUrl = Constants.General.ImageUnavailableUrl;
+                                                            if (!string.IsNullOrEmpty(step.Picture))
+                                                            {
+                                                                stepPictureUrl = MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, step.Picture);
+                                                            }
+                                                            else if (!string.IsNullOrEmpty(step.VideoThumbnail))
+                                                            {
+                                                                stepPictureUrl = MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, step.VideoThumbnail);
+                                                            }
+
+                                                            <div class="col-4">
+                                                                <div>
+                                                                    <div class="step-image-wrapper" style="width: 100%"><img data-src="@stepPictureUrl" /></div>
+                                                                    <div class="row">
+                                                                        <div class="col-auto pr-1">
+                                                                            <div style="display: inline-block;"><h6 style="font-weight: 600">@(checklistItem.Steps.IndexOf(step) + 1)</h6></div>
+                                                                        </div>
+                                                                        <div class="col pl-1">
+                                                                            <div style="display: inline-block;"><h6>@step.Description</h6></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                }
+                                                else if (checklistItem.WorkInstructionRelations != null && checklistItem.WorkInstructionRelations.Count > 0 && Model.WorkInstructions != null && Model.WorkInstructions.Count > 0)
+                                                {
+                                                    var workInstructionRelation = checklistItem.WorkInstructionRelations.FirstOrDefault();
+                                                    if (workInstructionRelation != null)
+                                                    {
+                                                        var workInstructionTemplate = Model.WorkInstructions.Where(w => w.Id == workInstructionRelation.WorkInstructionTemplateId).FirstOrDefault();
+
+                                                        @:<div class="pb-2"><strong>Instructions: </strong>Linked workinstruction</div>
+
+                                                        if (workInstructionTemplate != null)
+                                                        {
+                                                            var wiPictureUrl = Constants.General.ImageUnavailableUrl;
+                                                            if (!string.IsNullOrEmpty(workInstructionTemplate.Picture))
+                                                            {
+                                                                wiPictureUrl = MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, workInstructionTemplate.Picture);
+                                                            }
+
+                                                            <div class="row" style="page-break-inside: avoid">
+                                                                <div class="image-container col-auto">
+                                                                    <div class="image-wrapper"><img data-src="@wiPictureUrl" /></div>
+                                                                </div>
+
+                                                                <div class="item-details col">
+                                                                    <div class="row" style="height: 100%; color: black; display: flex">
+                                                                        @if (!string.IsNullOrEmpty(workInstructionTemplate.Name))
+                                                                        {
+                                                                            <div class="col-12 item-details-name p-1 pl-3" style="height: auto; align-self: center">
+                                                                                <strong>@workInstructionTemplate.Name</strong>
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    @:<strong>Instructions: </strong>None
+                                                }
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            }
+            </div>
+        }
+        else if(Model?.ChecklistTemplate.TaskTemplates != null)
+        {
+            <div class="tasks-container">
+                
+                @foreach (var checklistItem in Model.ChecklistTemplate.TaskTemplates)
+                {
+                    <div class="avoid-break">
+                        @{
+                            var itemIndex = Model.ChecklistTemplate.TaskTemplates.IndexOf(checklistItem);
+                        }
+
+                        @if(itemIndex > 0) {
+                            <hr />
+                        }
+
+                        <div class="row">
+                            <div class="col-auto">
+                                <div style="display: inline-block;"><h5 style="font-weight: 600">@(Model.ChecklistTemplate.TaskTemplates.IndexOf(checklistItem) + 1) </h5></div>
+                            </div>
+                            <div class="col">
+                                <div style="display: inline-block;"><h5 style="font-weight: 600">@checklistItem.Name</h5></div>
+                            </div>
+                        </div>
+
+                        <div class="item-container">
+                            @{
+                                string mediaImageUrl = Constants.General.ImageUnavailableUrl;
+
+                                if (!string.IsNullOrEmpty(checklistItem.Picture))
+                                {
+                                    mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, checklistItem.Picture);
+                                } 
+                                else if (!string.IsNullOrEmpty(checklistItem.VideoThumbnail))
+                                {
+                                    mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, checklistItem.VideoThumbnail);
+                                }
+                            }
+
+                            <div class="item-main">
+                                <div class="row">
+                                    <div class="image-container col-auto">
+                                        <div class="image-wrapper"><img data-src="@mediaImageUrl" /></div>
+                                    </div>
+
+                                    @{
+                                        bool itemHasTags = (Model.ApplicationSettings.Features?.TagsEnabled == true && checklistItem.Tags != null && checklistItem.Tags.Count > 0);
+                                        bool itemHasOnlyTagsNoDescription = (string.IsNullOrEmpty(checklistItem.Description)) && itemHasTags;
+                                    }
+
+                                    <div class="item-details col">
+
+                                        <div class="row" style="height: 100%; color: black ">
+                                            @if(!string.IsNullOrEmpty(checklistItem.Description))
+                                            {
+                                                <div class="col-12 item-details-name p-1 pl-3" style="height: auto; align-self: @(itemHasTags ? "flex-end" : "center ")">
+                                                    <div>@checklistItem.Description</div>
+                                                </div>
+                                            }
+                                            @if (itemHasTags)
+                                            {
+                                                <div class="col-12 p-1 pl-3" style="height: auto; align-self: @(itemHasOnlyTagsNoDescription ? "center" : "flex-start")">
+                                                    <div class="tag-container">
+                                                        @foreach (var tag in checklistItem.Tags)
+                                                        {
+                                                            <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; margin: 0.25rem">
+                                                                <div class="tag-wrapper" style="">
+                                                                    <i style="margin-top: auto; margin-bottom: auto; margin-left: 0.5rem; margin-right: 0px" class="nav-icon my-auto ml-2 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                                    <span style="margin-top: auto; margin-bottom: auto; margin-right: 0.5rem" class="my-auto mr-2 tag-span">@tag.Name</span>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+
+                                    @if (checklistItem.Properties != null && checklistItem.Properties.Count() > 0)
+                                    {
+                                        <div class="properties-container pt-3">
+                                            <div class="pb-2"><strong>Properties:</strong></div>
+                                            @for (int i = 0; i < checklistItem.Properties.Count(); i++)
+                                            {
+                                                var templateProperty = checklistItem.Properties[i];
+                                                if (templateProperty != null && templateProperty.Id > 0)
+                                                {
+                                                    string color = "rgb(100, 104, 107)";
+
+                                                    <div class="property" style="border: 1px solid @color; color: @color">
+                                                        <div class="property-wrapper">
+
+                                                            @if (templateProperty.IsRequired == true)
+                                                            {
+                                                                <i class="fa-solid fa-asterisk m-1" style="color: red; position: absolute; top: 1px; right: 1px;"></i>
+                                                            }
+                                                            <div class="property-title">
+                                                                @if (!String.IsNullOrEmpty(templateProperty.TitleDisplay))
+                                                                {
+                                                                    <span>@templateProperty.TitleDisplay</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span>@templateProperty.Property.ShortName</span>
+                                                                }
+                                                            </div>
+
+                                                            <div class="property-value" data-fulltext="@templateProperty.PrimaryStringValue">
+                                                                @if (templateProperty.BoolValue == null && templateProperty.PrimaryDateTimeValue == null &&
+                                                               templateProperty.PrimaryDecimalValue == null && templateProperty.PrimaryIntValue == null &&
+                                                               templateProperty.PrimaryStringValue == null && templateProperty.PrimaryTimeValue == null)
+                                                                {
+                                                                    <div style="height: 100%; display: flex; align-items: center; justify-content: center"><span> </span></div>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <div style="height: 100%; display: flex; align-items: center; justify-content: center">
+                                                                        <span>
+                                                                            @templateProperty.BoolValue
+                                                                            @templateProperty.PrimaryDateTimeValue @(templateProperty.SecondaryDateTimeValue != null ? $" - {templateProperty.SecondaryDateTimeValue}" : "")
+                                                                            @(templateProperty.PrimaryDecimalValue / 1.000000000000000000000000000000000m) @(templateProperty.SecondaryDecimalValue != null ? $" - {templateProperty.SecondaryDecimalValue / 1.000000000000000000000000000000000m}" : "")
+                                                                            @templateProperty.PrimaryIntValue @(templateProperty.SecondaryIntValue != null ? $" - {templateProperty.SecondaryIntValue}" : "")
+                                                                            @templateProperty.PrimaryStringValue @(templateProperty.SecondaryStringValue != null ? $" - {templateProperty.SecondaryStringValue}" : "")
+                                                                            @templateProperty.PrimaryTimeValue @(templateProperty.SecondaryDateTimeValue != null ? $" - {templateProperty.SecondaryDateTimeValue}" : "")
+                                                                        </span>
+                                                                    </div>
+                                                                }
+
+                                                            </div>
+                                                            <div class="property-date">
+                                                                <span>@templateProperty.PropertyValueDisplay</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        @:<strong>Properties: </strong>None
+                                    }
+
+                                    @if (Model != null && Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null && Model.ApplicationSettings.Features.RequiredProof.Value)
+                                    {
+                                        @:<strong>Picture proof: </strong>
+                                        @if (checklistItem.HasPictureProof)
+                                        {
+                                            @:On
+                                        }
+                                        else
+                                        {
+                                            @:Off
+                                        }
+                                    }
+
+                                    @if(checklistItem.Attachments != null && checklistItem.Attachments.Count > 0)
+                                    {
+                                        @:<strong>Instructions: </strong>
+                                        if (checklistItem.Attachments[0].AttachmentType.ToLower() == "link")
+                                        {
+                                            @:Link
+                                        }
+                                        else if (checklistItem.Attachments[0].AttachmentType.ToLower() == "pdf")
+                                        {
+                                            @:PDF
+                                        }
+                                    }
+                                    else if(checklistItem.Steps != null && checklistItem.Steps.Count > 0)
+                                    {
+                                        @:<div class="pb-2"><strong>Instructions: </strong></div>
+
+                                        <div class="row" style="page-break-inside: avoid">
+                                            @foreach(var step in checklistItem.Steps)
+                                            {
+                                                var stepPictureUrl = Constants.General.ImageUnavailableUrl;
+                                                if (!string.IsNullOrEmpty(step.Picture))
+                                                {
+                                                    stepPictureUrl = MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, step.Picture);
+                                                }
+                                                else if (!string.IsNullOrEmpty(step.VideoThumbnail))
+                                                {
+                                                    stepPictureUrl = MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, step.VideoThumbnail);
+                                                }
+
+                                                <div class="col-4">
+                                                    <div>
+                                                        <div class="step-image-wrapper" style="width: 100%"><img data-src="@stepPictureUrl" /></div>
+                                                        <div class="row">
+                                                            <div class="col-auto pr-1">
+                                                                <div style="display: inline-block;"><h6 style="font-weight: 600">@(checklistItem.Steps.IndexOf(step) + 1)</h6></div>
+                                                            </div>
+                                                            <div class="col pl-1">
+                                                                <div style="display: inline-block;"><h6>@step.Description</h6></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                    else if (checklistItem.WorkInstructionRelations != null && checklistItem.WorkInstructionRelations.Count > 0 && Model.WorkInstructions != null && Model.WorkInstructions.Count > 0)
+                                    {
+                                        var workInstructionRelation = checklistItem.WorkInstructionRelations.FirstOrDefault();
+                                        if (workInstructionRelation != null)
+                                        {
+                                            var workInstructionTemplate = Model.WorkInstructions.Where(w => w.Id == workInstructionRelation.WorkInstructionTemplateId).FirstOrDefault();
+
+                                            @:<div class="pb-2"><strong>Instructions: </strong>Linked workinstruction</div>
+                                            
+                                            if(workInstructionTemplate != null)
+                                            {
+                                                var wiPictureUrl = Constants.General.ImageUnavailableUrl;
+                                                if (!string.IsNullOrEmpty(workInstructionTemplate.Picture))
+                                                {
+                                                    wiPictureUrl = MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, workInstructionTemplate.Picture);
+                                                }
+
+                                               <div class="row" style="page-break-inside: avoid">
+                                                  <div class="image-container col-auto">
+                                                      <div class="image-wrapper"><img data-src="@wiPictureUrl" /></div>
+                                                  </div>
+
+                                                  <div class="item-details col">
+                                                      <div class="row" style="height: 100%; color: black; display: flex">
+                                                          @if (!string.IsNullOrEmpty(workInstructionTemplate.Name))
+                                                          {
+                                                              <div class="col-12 item-details-name p-1 pl-3" style="height: auto; align-self: center">
+                                                                  <strong>@workInstructionTemplate.Name</strong>
+                                                              </div>
+                                                          }
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        @:<strong>Instructions: </strong>None
+                                    }
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+            </div>
+        }
+
+    <script>
+        ezgomediafetcher.preloadImagesAndVideos();
+
+        
+        var checklistImgs = document.images,
+            checklistImgsLength = checklistImgs.length,
+            checklistImgsCounter = 0,
+            checklistImgsLoaded = false,
+            checklistImgsCheckerInterval = null;
+
+        [].forEach.call(checklistImgs, function (img) {
+            if (img.complete && $(img).attr('src') != undefined && ($(img).attr('src').includes('normal_unavailable_image.png') || $(img).attr('src').startsWith('blob:')))
+                incrementCounter();
+            else
+                img.addEventListener('load', incrementCounter, false);
+        });
+
+        function incrementCounter() {
+            checklistImgsCounter++;
+            if (checklistImgsCounter === checklistImgsLength) {
+                checklistImgsLoaded = true
+            }
+        }
+
+        window.onload = function () {
+            checklistImgsCheckerInterval = setInterval(() => {
+                if (!checklistImgsLoaded) {
+                    //do nothing
+                }
+                else {
+                    clearInterval(checklistImgsCheckerInterval);
+                    setTimeout(() => {
+                        window.print();
+                    });
+                    setTimeout(function () { window.close(); }, 2000);
+                }
+
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

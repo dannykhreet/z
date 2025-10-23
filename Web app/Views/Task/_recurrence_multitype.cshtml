@@ -1,0 +1,436 @@
+﻿@model WebApp.ViewModels.RecurrencyViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+
+}
+<form asp-action="Recurrency" asp-controller="Task" id="recurrence-form" class="form-inline">
+    @* NOTE! do not use asp-for for model.id construction. Due to mapping issue in .net core it will map to the parent object model.id, and there for mix the recurrency id (id) with the template id (main model.id)... *@
+    <input type="hidden" value="@Model.Id" name="Id" id="Id" />
+    <input type="hidden" asp-for="@Model.CompanyId" />
+    <input type="hidden" asp-for="@Model.AreaId" />
+    <input type="hidden" asp-for="@Model.TemplateId" />
+    <input type="hidden" asp-for="@Model.RecurrencyType" />
+    <input type="hidden" asp-for="@Model.Schedule.Date" asp-format="{0:yyyy/MM/dd}" />
+    <input type="hidden" asp-for="@Model.Schedule.StartDate" asp-format="{0:yyyy/MM/dd}" />
+    <input type="hidden" asp-for="@Model.Schedule.EndDate" asp-format="{0:yyyy/MM/dd}" />
+    <input type="hidden" asp-for="@Model.FromdateName" />
+    <input type="hidden" asp-for="@Model.Schedule.IsOncePerMonth" />
+    <input type="hidden" asp-for="@Model.Schedule.IsOncePerWeek" />
+    <input type="hidden" asp-for="@Model.Schedule.Day" />
+
+    <div class="row w-100">
+
+        <!-- recurrency type switch -->
+        <div class="col-12 col-lg-2 mb-4 mb-lg-0">
+            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                @if (Model.RecurrencyTypes != null)
+                {
+                    @foreach (SelectListItem type in Model.RecurrencyTypes.Items)
+                    {
+                        @if (type.Value == "periodday")
+                        {
+                            if (Model.ApplicationSettings?.Features != null && Model.ApplicationSettings.Features.TaskTypePeriodDayEnabled.HasValue || Model.RecurrencyType == "periodday")
+                            {
+                                if (Model.ApplicationSettings.Features.TaskTypePeriodDayEnabled.Value == true || Model.RecurrencyType == "periodday")
+                                {
+                                    <a class="nav-link recurrency @(type.Selected ? "active": null)" data-value="@type.Value" id="v-pills-@(type.Value)-tab" data-toggle="pill" href="#v-pills-@type.Value" role="tab" aria-controls="v-pills-@type.Value" aria-selected="@(type.Selected ? true: false)" data-actiontype="recurrencytype_change">
+                                        @(Model._CmsLanguage?.GetValue(type.Text.ToUpperInvariant(), type.Text) ?? type.Text)
+                                    </a>
+                                }
+                            }
+
+                        }
+                        else if (type.Value == "dynamicday")
+                        {
+                            if (Model.ApplicationSettings?.Features != null && Model.ApplicationSettings.Features.TaskTypeDynamicDayEnabled.HasValue || Model.RecurrencyType == "dynamicday")
+                            {
+                                if (Model.ApplicationSettings.Features.TaskTypeDynamicDayEnabled.Value == true || Model.RecurrencyType == "dynamicday")
+                                {
+                                    <a class="nav-link recurrency @(type.Selected ? "active": null)" data-value="@type.Value" id="v-pills-@(type.Value)-tab" data-toggle="pill" href="#v-pills-@type.Value" role="tab" aria-controls="v-pills-@type.Value" aria-selected="@(type.Selected ? true: false)" data-actiontype="recurrencytype_change">
+                                        @(Model._CmsLanguage?.GetValue(type.Text.ToUpperInvariant(), type.Text) ?? type.Text)
+                                    </a>
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            <a class="nav-link recurrency @(type.Selected ? "active": null)" data-value="@type.Value" id="v-pills-@(type.Value)-tab" data-toggle="pill" href="#v-pills-@type.Value" role="tab" aria-controls="v-pills-@type.Value" aria-selected="@(type.Selected ? true: false)" data-actiontype="recurrencytype_change">
+                                @(Model._CmsLanguage?.GetValue(type.Text.ToUpperInvariant(), type.Text) ?? type.Text)
+                            </a>
+                        }
+
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-10 pl-md-5">
+
+            <!-- start-/end-date -->
+            <div id="forever" class="row w-100 mb-3 mb-xl-0 @(Model.RecurrencyType == "no recurrency" ? "d-none" : null)">
+
+                <div class="col-12 col-xl-10 pull-left">
+
+                    <div class="row">
+
+                        <div class="col-12 col-lg-4">
+                            <div class="btn-group btn-group-sm btn-group-toggle mb-3" data-toggle="buttons" style="display:flex;">
+                                <label class="btn btn-light text-muted @(Model.Forever ? "active": null)" style="flex:1;">
+                                    <input type="radio" name="recurrence-options" id="forever" value="forever" @(Model.Forever ? "checked" : null) onclick="$('.period').addClass('d-none')">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionRecurring, "Recurring") ?? "Recurring")
+                                </label>
+                                <label class="btn btn-light text-muted @(!Model.Forever ? "active": null)" style="flex:1;">
+                                    <input type="radio" name="recurrence-options" id="daterange" @(!Model.Forever ? "checked" : null) value="daterange" onclick="$('.period').removeClass('d-none')">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionFixed, "Fixed") ?? "Fixed")
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-8 pull-right">
+                            <div class="row period text-left text-xl-center @(Model.Forever ? "d-none": null)">
+
+                                <label class="font-weight-normal col-12 col-lg-1">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionFixedFrom, "from") ?? "from")</label>
+                                <div class="form-group col-12 col-md-12 col-lg-5">
+                                    <div class="input-group w-100" id="startdatepicker">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                <i class="far fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                        @if (Model.Schedule != null && ((Model.Schedule.StartDate.HasValue && Model.Schedule.StartDate.Value < DateTime.Today) ||(Model.PreviousTaskCount > 0)))
+                                        {
+                                            <input type="text" onchange="return false;" onclick="noClick(event, this);" style="pointer-events: none;" class="form-control form-control-sm float-right" id="startdateinput" data-startdate="@(Model.Schedule != null && Model.Schedule.StartDate.HasValue ? Model.Schedule?.StartDate.Value.ToString("dd-MM-yyyy") : null)" />
+                                        } else
+                                        {
+                                            <input type="text" class="form-control form-control-sm float-right" displaytype="datepicker" id="startdateinput" data-startdate="@(Model.Schedule != null && Model.Schedule.StartDate.HasValue ? Model.Schedule?.StartDate.Value.ToString("dd-MM-yyyy") : null)">
+                                            <div class="input-group-append">
+                                                <div class="input-group-text"><i class="fas fa-calendar-times" onclick="clearstartdate()"></i></div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <label class="font-weight-normal col-12 col-lg-1">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionFixedTill, "till") ?? "till")</label>
+                                <div class="form-group col-12 col-lg-5">
+                                    <div class="input-group w-100" id="enddatepicker">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                <i class="far fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm float-right" id="enddateinput" data-enddate="@(Model.Schedule != null && Model.Schedule.EndDate.HasValue ? Model.Schedule.EndDate.Value.ToString("dd-MM-yyyy") : null)">
+                                        <div class="input-group-append">
+                                            <div class="input-group-text"><i class="fas fa-calendar-times" onclick="clearenddate()"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row w-100">
+
+                <div class="tab-content col-12" id="v-pills-tabContent">
+
+                    <!-- only once -->
+                    <div class="tab-pane fade @(Model.RecurrencyType == "no recurrency" ? "show active" : null)" id="v-pills-norecurrency" role="tabpanel" aria-labelledby="v-pills-norecurrency-tab">
+                        <div class="row w-100">
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label for="fromdate" class="font-weight-normal mr-3">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.RecurrenceOnceFromdate, "Date") ?? "Date")</label>
+                                    <div class="input-group date" data-target-input="nearest">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="far fa-calendar-alt"></i></div>
+                                        </div>
+                                        <input type="datetime" id="fromdate" class="form-control form-control-sm" value="@(Model.Schedule != null && Model.Schedule.Date.HasValue ? Model.Schedule.Date.Value.ToString("dd-MM-yyyy") : DateTime.Now.ToString("dd-MM-yyyy"))" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-1"></div>
+                            <div class="col">
+                                <ul class="list-inline m-2">
+                                    @if (Model.OnlyOnceShiftDays != null)
+                                    {
+                                        @foreach (KeyValuePair<DayOfWeek, List<SelectListItem>> day in Model.OnlyOnceShiftDays)
+                                        {
+                                            <li class="list-inline-item shiftday mr-3 d-none">
+
+                                                <input type="hidden" id="@(day.Key.ToString().ToLower() + "_once_shiftname")" data-shiftname="shiftname" value="@(day.Key.ToString().ToLower() + "_once")" />
+
+                                                <!-- Default indeterminate -->
+                                                <div class="custom-control custom-checkbox mb-2">
+                                                    <input type="checkbox" class="custom-control-input shiftmaster" id="@(day.Key.ToString().ToLower() + "_once")" data-master="@(day.Key.ToString().ToLower() + "_once")">
+                                                    <label class="custom-control-label justify-content-start" for="@(day.Key.ToString().ToLower() + "_once")">@(day.Key.GetTextTranslation(Model.Locale))</label>
+                                                </div>
+
+                                                <ul class="list-unstyled">
+                                                    @foreach (SelectListItem shift in day.Value)
+                                                    {
+                                                        <li class="mb-1">
+                                                            <!-- Default checked -->
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input shift @(day.Key.ToString().ToLower()) @(day.Key.ToString().ToLower() + "_once")" data-slave="@(day.Key.ToString().ToLower() + "_once")" data-group-id="Shifts_once" id="@(shift.Value)_once" name="Shifts" value="@shift.Value" @(shift.Selected ? "checked" : null)>
+                                                                <label class="custom-control-label font-weight-normal" for="@(shift.Value)_once">@(shift.Text)</label>
+                                                            </div>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- shifts -->
+                    <div class="tab-pane fade @(Model.RecurrencyType == "shifts" ? "show active" : null)" id="v-pills-shifts" role="tabpanel" aria-labelledby="v-pills-shifts-tab">
+                        <style>
+                            ul.list-inline > li.list-inline-item {
+                                vertical-align: top;
+                            }
+                        </style>
+
+                        <div class="custom-control custom-checkbox" style="margin-left: 8px;">
+                            <input type="checkbox" class="custom-control-input all-shifts" id="all-shifts" data-master="all-shifts" />
+                            <label class="custom-control-label justify-content-start" for="all-shifts" style="width:fit-content;">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.AllShifts, "All shifts") ?? "All shifts")</label>
+                        </div>
+
+                        <ul class="list-inline m-2" id="shiftlist">
+
+                            @if (Model.ShiftDays != null)
+                            {
+                                @foreach (KeyValuePair<DayOfWeek, List<SelectListItem>> day in Model.ShiftDays)
+                                {
+                                    <li class="list-inline-item shiftday mr-3 mb-4">
+
+                                        <input type="hidden" id="@(day.Key.ToString().ToLower() + "_shiftname")" data-shiftname="shiftname" value="@(day.Key.ToString().ToLower())" />
+
+                                        <!-- Default indeterminate -->
+                                        <div class="custom-control custom-checkbox mb-2">
+                                            <input type="checkbox" class="custom-control-input shiftmaster" id="@(day.Key.ToString().ToLower())" data-master="@(day.Key.ToString().ToLower())" data-slave="all-shifts">
+                                            <label class="custom-control-label justify-content-start" for="@(day.Key.ToString().ToLower())">@(day.Key.GetTextTranslation(Model.Locale))</label>
+                                        </div>
+
+                                        <ul class="list-unstyled">
+                                            @foreach (SelectListItem shift in day.Value)
+                                            {
+                                                <li class="mb-1">
+                                                    <!-- Default checked -->
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input @(day.Key.ToString().ToLower()) shift" data-slave="@(day.Key.ToString().ToLower())" data-group-id="Shifts" id="@shift.Value" name="Shifts" value="@shift.Value" @(shift.Selected ? "checked" : null)>
+                                                        <label class="custom-control-label font-weight-normal" for="@shift.Value">@(shift.Text)</label>
+                                                    </div>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+                                }
+                            }
+
+                        </ul>
+                    </div>
+
+                    <!-- week -->
+                    <div class="tab-pane fade @(Model.RecurrencyType == "week" ? "show active" : null)" id="v-pills-week" role="tabpanel" aria-labelledby="v-pills-week-tab">
+                        <div class="row w-100 mb-3">
+                            <ul class="list-inline m-2">
+                                <li class="list-inline-item mr-2">
+                                    @(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionWeekRecurEvery, "Recur every") ?? "Recur every")
+                                </li>
+                                <li class="list-inline-item mr-2"><input class="form-control form-control-sm" asp-for="Schedule.Week" id="week1" /></li>
+                                <li class="list-inline-item mr-2">
+                                    @(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionWeekWeekon, "week on") ?? "week on")
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="row w-100">
+                            <ul class="list-inline m-2">
+
+                                <li class="list-inline-item mr-3">
+
+                                    <!-- Default indeterminate -->
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input class="custom-control-input" asp-for="Schedule.Weekday1" />
+                                        <label class="custom-control-label font-weight-normal justify-content-start" asp-for="Schedule.Weekday1">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionMonday, "monday") ?? "monday")</label>
+                                    </div>
+
+                                </li>
+                                <li class="list-inline-item mr-3">
+
+                                    <!-- Default indeterminate -->
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input class="custom-control-input" asp-for="Schedule.Weekday2" />
+                                        <label class="custom-control-label font-weight-normal" asp-for="Schedule.Weekday2">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionTuesday, "tuesday") ?? "tuesday")</label>
+                                    </div>
+
+                                </li>
+                                <li class="list-inline-item mr-3">
+
+                                    <!-- Default indeterminate -->
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input class="custom-control-input" asp-for="Schedule.Weekday3" />
+                                        <label class="custom-control-label font-weight-normal" asp-for="Schedule.Weekday3">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionWednesday, "wednesday") ?? "wednesday")</label>
+                                    </div>
+
+                                </li>
+                                <li class="list-inline-item mr-3">
+
+                                    <!-- Default indeterminate -->
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input class="custom-control-input" asp-for="Schedule.Weekday4" />
+                                        <label class="custom-control-label font-weight-normal" asp-for="Schedule.Weekday4">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionThursday, "thursday") ?? "thursday")</label>
+                                    </div>
+
+                                </li>
+                                <li class="list-inline-item mr-3">
+
+                                    <!-- Default indeterminate -->
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input class="custom-control-input" asp-for="Schedule.Weekday5" />
+                                        <label class="custom-control-label font-weight-normal" asp-for="Schedule.Weekday5">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionFriday, "friday") ?? "friday")</label>
+                                    </div>
+
+                                </li>
+                                <li class="list-inline-item mr-3">
+
+                                    <!-- Default indeterminate -->
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input class="custom-control-input" asp-for="Schedule.Weekday6" />
+                                        <label class="custom-control-label font-weight-normal" asp-for="Schedule.Weekday6">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionSaturday, "saturday") ?? "saturday")</label>
+                                    </div>
+
+                                </li>
+                                <li class="list-inline-item mr-3">
+
+                                    <!-- Default indeterminate -->
+                                    <div class="custom-control custom-checkbox mb-2">
+                                        <input class="custom-control-input" asp-for="Schedule.Weekday0" />
+                                        <label class="custom-control-label font-weight-normal" asp-for="Schedule.Weekday0">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionSunday, "sunday") ?? "sunday")</label>
+                                    </div>
+
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- month -->
+                    <div class="tab-pane fade @(Model.RecurrencyType == "month" ? "show active" : null)" id="v-pills-month" role="tabpanel" aria-labelledby="v-pills-month-tab">
+
+                        <style>
+                            .li-hide {
+                                opacity: 0.25;
+                                cursor: not-allowed;
+                                pointer-events: none;
+                            }
+                        </style>
+                        <div class="row mb-3">
+
+                            <div class="col-12">
+                                <ul class="list-inline">
+                                    <li class="list-inline-item col-md-2 mr-2 mb-2">
+                                        <!-- Group of default radios - option 1 -->
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" class="custom-control-input" id="MonthRecurrencyType1" name="Schedule.MonthRecurrencyType" value="day_of_month" @(Model.Schedule != null && Model.Schedule.MonthRecurrencyType == "day_of_month" ? "checked" : Model.Schedule != null && Model.Schedule.MonthRecurrencyType == "weekday" ? null : "checked")>
+                                            <label class="custom-control-label font-weight-normal justify-content-start" for="MonthRecurrencyType1">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.MonthSpecificDate, "Specific date") ?? "Specific date")</label>
+                                        </div>
+                                    </li>
+                                    <li class="list-inline-item mr-2 mb-2 li-hide">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionMonthEvery, "Every") ?? "Every")</li>
+                                    <li class="list-inline-item mr-2 mb-2 li-hide"><select asp-items="Model.DaysOfMonth" class="form-control form-control-sm" data-id="DaysOfMonth" xdata-selected="@Model.Schedule?.Day" id="specific_choosen_day" onchange="document.getElementById('Schedule_Day').value = this.value;"></select></li>
+                                    <li class="list-inline-item mr-2 mb-2 li-hide">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.MonthDayOfEvery, "day of every") ?? "day of every")</li>
+                                    <li class="list-inline-item mr-2 mb-2 li-hide"><select asp-for="Schedule.Month" asp-items="Model.Months" id="month1" class="form-control form-control-sm" data-id="Month"></select></li>
+                                    <li class="list-inline-item mr-2 mb-2 li-hide">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.MonthMonths, "months") ?? "months")</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-12">
+                                <ul class="list-inline">
+                                    <li class="list-inline-item col-md-2 mr-2">
+                                        <!-- Group of default radios - option 2 -->
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" class="custom-control-input" id="MonthRecurrencyType2" name="Schedule.MonthRecurrencyType" value="weekday" @(Model.Schedule?.MonthRecurrencyType == "weekday" ? "checked" : null)>
+                                            <label class="custom-control-label font-weight-normal justify-content-start" for="MonthRecurrencyType2">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.MonthSpecificWeek, "Specific week") ?? "Specific week")</label>
+                                        </div>
+                                    </li>
+                                    <li class="list-inline-item mr-2 li-hide">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionMonthEvery, "Every") ?? "Every")</li>
+                                    <li class="list-inline-item mr-2 li-hide"><select asp-for="Schedule.WeekDayNumber" asp-items="Model.Weeks" id="week2" class="form-control form-control-sm"></select></li>
+                                    <li class="list-inline-item mr-2 li-hide"><select asp-for="Schedule.WeekDay" asp-items="Model.WeekDays" class="form-control form-control-sm"></select></li>
+                                    <li class="list-inline-item mr-2 li-hide">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.MonthDayOfEvery, "day of every") ?? "day of every")</li>
+                                    <li class="list-inline-item mr-2 li-hide"><select asp-for="Schedule.Month" asp-items="Model.Months" id="month2" class="form-control form-control-sm"></select></li>
+                                    <li class="list-inline-item mr-2 mb-2 li-hide">@(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.MonthMonths, "months") ?? "months")</li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    @if (Model.ApplicationSettings?.Features != null && Model.ApplicationSettings.Features.TaskTypePeriodDayEnabled.HasValue || Model.RecurrencyType == "periodday")
+                    {
+                        if (Model.ApplicationSettings.Features.TaskTypePeriodDayEnabled.Value == true || Model.RecurrencyType == "periodday")
+                        {
+                            <!-- periode day -->
+                            <div class="tab-pane fade @(Model.RecurrencyType == "periodday" ? "show active" : null)" id="v-pills-periodday" role="tabpanel" aria-labelledby="v-pills-periodday-tab">
+                                <div class="row w-100 mb-3">
+                                    <ul class="list-inline m-2">
+                                        <li class="list-inline-item mr-2">
+                                            @(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionWeekRecurEvery, "Recur every") ?? "Recur every")
+                                        </li>
+                                        <li class="list-inline-item mr-2"><input class="form-control form-control-sm" value="@Model?.Schedule?.Day" id="periode_day" onchange="document.getElementById('Schedule_Day').value = this.value;" onkeypress="document.getElementById('Schedule_Day').value = this.value;" onkeydown="document.getElementById('Schedule_Day').value = this.value;" onkeyup="document.getElementById('Schedule_Day').value = this.value;" /></li>
+                                        <li class="list-inline-item mr-2">
+                                            @(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionDays, "days") ?? "days")
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="row w-100">
+                                    <!--Something Something Details-->
+                                </div>
+                            </div>
+                        }
+                    }
+
+                    <!-- periode hour -->
+                    <!-- periode minute -->
+
+                    @if (Model.ApplicationSettings?.Features != null && Model.ApplicationSettings.Features.TaskTypeDynamicDayEnabled.HasValue || Model.RecurrencyType == "dynamicday")
+                    {
+                        if (Model.ApplicationSettings.Features.TaskTypeDynamicDayEnabled.Value == true || Model.RecurrencyType == "dynamicday")
+                        {
+                            <!-- periode day -->
+                            <div class="tab-pane fade @(Model.RecurrencyType == "dynamicday" ? "show active" : null)" id="v-pills-dynamicday" role="tabpanel" aria-labelledby="v-pills-dynamicday-tab">
+                                <div class="row w-100 mb-3">
+                                    <ul class="list-inline m-2">
+                                        <li class="list-inline-item mr-2">
+                                            @(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionDynamicDayRecurAfter, "Recur after") ?? "Recur after")
+                                        </li>
+                                        <li class="list-inline-item mr-2"><input class="form-control form-control-sm" value="@Model?.Schedule?.Day" id="dynamic_day" onchange="document.getElementById('Schedule_Day').value = this.value;" onkeypress="document.getElementById('Schedule_Day').value = this.value;" onkeydown="document.getElementById('Schedule_Day').value = this.value;" onkeyup="document.getElementById('Schedule_Day').value = this.value;" /></li>
+                                        <li class="list-inline-item mr-2">
+                                            @(Model?._CmsLanguage?.GetValue(LanguageKeys.Task.OptionDays, "days") ?? "days")
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="row w-100">
+                                    <!--Something Something Details-->
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</form>
+<!-- !!!! -->

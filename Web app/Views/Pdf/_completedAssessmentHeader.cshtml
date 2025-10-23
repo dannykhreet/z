@@ -1,0 +1,54 @@
+﻿@model CompletedAssessmentPdfHeaderModel
+@using WebApp.Models.Pdf;
+@{
+    Layout = null;
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+}
+@{
+    DateTime headerDate = TimeZoneInfo.ConvertTime(Model.CompletedAt.ToLocalTime(), timezone);
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <style>
+
+        #header {
+            font-family: 'Cascadia Mono','Courier New',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+            font-size: 18px;
+            margin: 0px;
+            padding: 0px;
+            width: 100%;
+            height: 2.75rem;
+            color: white;
+            background-color: #00a054;
+            border-spacing: 0 0;
+            border-collapse: collapse;
+            vertical-align: bottom;
+        }
+    </style>
+</head>
+<body>
+    <table id="header" style="width: 100%; top: 0px; left: 0px; right: 0px">
+        <tr style="width: 100%; top: 0; height: auto">
+            <td colspan="3" style="text-align: left; padding-left: 2.5rem; padding-bottom: 0.5rem; padding-top: 2rem; font-size: 28px; word-wrap: break-word">
+                <strong>@(string.IsNullOrEmpty(Model.CompletedAssessmentName) ? Html.Raw("&nbsp;") : Model.CompletedAssessmentName.Length > 60 ? string.Concat(Model.CompletedAssessmentName.Substring(0, 55), " ... ") : Model.CompletedAssessmentName)</strong>
+                <br />
+                @(string.IsNullOrEmpty(Model.CompletedAssessmentDescription) ? Html.Raw("&nbsp;") : Model.CompletedAssessmentDescription.Length > 80 ? string.Concat(Model.CompletedAssessmentDescription.Substring(0, 75), " ... ") : Model.CompletedAssessmentDescription)
+            </td>
+        </tr>
+        <tr style="width: 100%; top: 0; height: auto">
+            <td colspan="2" rowspan="2" style="text-align: left; padding-left: 2.5rem; padding-bottom: 2rem; padding-top: 0.5rem; font-size: 20px">
+                Completed by: @Model.CompletedBy<br />
+                Assessor: @Model.Assessor<br />
+                
+            </td>
+            <td style="text-align: right; padding-right: 1rem; color: white; vertical-align: top;">
+                @headerDate.ToLongDateString() @headerDate.ToShortTimeString()<br />
+                Assessment score: @Model.AssessmentScore
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

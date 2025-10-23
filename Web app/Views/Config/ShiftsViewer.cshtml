@@ -1,0 +1,70 @@
+﻿@model WebApp.ViewModels.ConfigViewModel
+@{
+    Dictionary<string, string> CmsLanguage = Model.CmsLanguage;
+    string Locale = Model.Locale ?? "en-US";
+    Layout = null;
+    ViewData["Title"] = CmsLanguage?.GetValue(LanguageKeys.Config.ButtonShifts, "Days, times and shifts") ?? "Days, times and shifts";
+}
+
+@section CSS{
+
+    <style>
+        .card.action:hover {
+            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+        }
+
+        .shifterror {
+            color: red;
+        }
+    </style>
+
+}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-12">
+                <br />
+                <h1>@(CmsLanguage?.GetValue(LanguageKeys.Config.ButtonShifts, "Days, times and shifts") ?? "Days, times and shifts")</h1>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+
+    <div class="container-fluid">
+        <div class="row" style="height:auto">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        @(CmsLanguage?.GetValue(LanguageKeys.Config.SchedulerTitle, "Shift scheduler") ?? "Shift scheduler")
+                    </div>
+                    <div class="card-body">
+                        <partial name="_days_times_shifts_viewer.cshtml" model="Model" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--div class="row">
+            <div class="col-md-12">
+                <div class="card action shadow-none" style="background-color:transparent;border:dashed 1px silver;">
+                    <div class="body p-3 text-center">
+                        <a href="#" class="disabled">+ Add new shift schedule</a>
+                    </div>
+                </div>
+            </div>
+        </div-->
+    </div>
+
+</section>
+
+<script>
+    function defer(method) {
+        if (window.jQuery) {
+            method();
+        } else {
+            setTimeout(function() { defer(method) }, 50);
+        }
+    }
+    defer(ezgomediafetcher.preloadImagesAndVideos);
+</script>

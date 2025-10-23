@@ -1,0 +1,69 @@
+﻿@model CommentsViewModel
+@{ 
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+}
+@if (Model?.Comments != null)
+{
+    foreach (var (comment, index) in Model.Comments.Select((value, i) => (value, i)))
+    {
+        DateTime createdAt = TimeZoneInfo.ConvertTime(comment.CreatedAt.Value.ToLocalTime(), timezone);
+        <div class="direct-chat-msg @(comment.UserId == Model.CurrentUser.Id ? "right" : null)">
+            <div class="direct-chat-infos clearfix">
+                <span class="direct-chat-name @(comment.UserId == Model.CurrentUser.Id ? "float-right" : "float-left")">@comment.CreatedBy</span>
+                <span class="direct-chat-timestamp @(comment.UserId == Model.CurrentUser.Id ? "float-left" : "float-right")">@createdAt.ToLocaleFullDateShortTimeString(Model.Locale)</span>
+            </div>
+            <!-- /.direct-chat-infos -->
+            <img class="direct-chat-img" src="/images/media-loading.gif" data-src="@comment.UserPicture" alt="@comment.CreatedBy">
+            <!-- /.direct-chat-img -->
+            <div class="direct-chat-text">
+                @if (!string.IsNullOrWhiteSpace(comment.Comment))
+                {
+                    @comment.Comment
+                }
+                else if (!(comment.Images?.Any() ?? false) && (string.IsNullOrWhiteSpace(comment.VideoThumbnail)))
+                {
+                    @Html.Raw("&nbsp;")
+                }
+
+                @*@Html.Raw((!string.IsNullOrWhiteSpace(comment.Comment)) ? comment.Comment : ((comment.Images?.Any() ?? false) || (!string.IsNullOrWhiteSpace(comment.VideoThumbnail))) ? null : "&nbsp;")*@
+                @if ((comment.Images?.Any() ?? false) || !string.IsNullOrWhiteSpace(comment.VideoThumbnail))
+                {
+                    <ul class="list-group list-group-horizontal">
+                        @if (comment.Images?.Any() ?? false)
+                        {
+                            @foreach (string img in comment.Images)
+                            {
+                                var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, img);
+                                picture = picture.Replace("/media/media", "/media"); //fix for incorrect data in db
+                                <li class="list-group-item">
+                                    <a href="/images/media-loading.gif" data-href="@picture" data-fancybox="comment">
+                                        <img class="chat-img" loading="lazy" src="/images/media-loading.gif" data-src="@picture">
+                                    </a>
+                                </li>
+                            }
+                        }
+                        @if (!string.IsNullOrWhiteSpace(comment.VideoThumbnail))
+                        {
+                            var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, comment.VideoThumbnail);
+                            picture = picture.Replace("/media/media", "/media"); //fix for incorrect data in db
+                            var videourl = AppUrlsResolver.Video(comment.Video);
+
+                            <li class="list-group-item">
+                                <a href="#video_@index" data-fancybox="comment">
+                                    <img class="chat-img" loading="lazy" src="/images/media-loading.gif" data-src="@picture">
+                                </a>
+
+                                <video src="/images/media-loading.mp4" data-src="@videourl" controls id="video_@index" style="display:none;">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+            <!-- /.direct-chat-text -->
+        </div>
+        <!-- /.direct-chat-msg -->
+    }
+}

@@ -1,0 +1,275 @@
+@model WebApp.ViewModels.UserPermissionViewModel
+@using WebApp.Models.User
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = Model?.CmsLanguage?.GetValue(LanguageKeys.User.OverviewTitle, "Users overview") ?? "Users overview";
+}
+
+@section CSS{
+
+    <style>
+        .userprofile {
+            transition: transform .2s; /* Animation */
+        }
+
+            .userprofile:hover {
+                border: solid 1px #93c54b;
+                box-shadow: 0 .425rem .75rem rgba(0,0,0,.075) !important;
+                color: #93c54b !important;
+                transform: scale(1.02);
+            }
+    </style>
+
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-6">
+                &nbsp;
+                <h1>@(Model?.CmsLanguage?.GetValue(LanguageKeys.User.OverviewTitle, "Users overview") ?? "Users overview")</h1>
+            </div>
+            <div class="col-sm-6 d-flex  flex-row-reverse">
+                <a asp-controller="UserPermission" asp-action="Details" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto">@(Model?.CmsLanguage?.GetValue(LanguageKeys.User.ButtonAddUser, "Add User") ?? "Add User") </a>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+
+    <div class="container-fluid">
+
+        <div class="row pt-1" style="height:calc(100vh - 165px);">
+
+            <div class="col-xl-3 d-none d-xl-inline-block" style="padding-right: 15px">
+                <div class="card card-filter h-100">
+                    <div class="card-header pb-0 d-flex" style="border-bottom: none;width:100%">
+                        <h3 class="card-title d-flex" style="width:100%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.CardTitle, "Filters") ?? "Filters")</h3>
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn" onclick="resetFilters()" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")"><i class="fas fa-undo"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body pt-0">
+                        <partial name="_filters_block" model="Model.Filter" />
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-lg-12 col-xl-9" style="padding-left: 7.5px">
+                <div class="card mb-1" style="margin-left: 0px">
+                    <div class="card-header d-flex" style="margin-left:-11px; height: 55px">
+                        <div style="display: flex; height: 100%; width: 100%; align-items: center">
+                            <h3 class="card-title d-sm-inline-block">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.User.OverviewListTitle, "Users") ?? "Users") <span id="counter"></span>
+                            </h3>
+                        </div>
+                        <div style="width: auto; text-align: right">
+                            <div class="card-tools" style="width: 236px; display: inline-block">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.User.ListSearchTitle, "Search") ?? "Search")" class="form-control float-right" id="searchField">
+
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-default d-block d-xl-none" data-toggle="collapse" data-target=".collapseFilter"><i class="fas fa-filter"></i></button>
+                                        <button type="button" class="btn btn-default d-xl-none" onclick="resetFilters()" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-xl-none" style="padding-left: 5px; padding-right: 5px">
+                        <div class="card-header collapse collapseFilter px-0">
+                            <partial name="_filters_inline" model="Model.Filter" />
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="contentCol" class="row card-deck align-content-start" style="height: calc(100vh - 235px);overflow:auto;padding-top:6px;">
+                    @{
+                        var userProfiles = Model.UserProfiles;
+                        @if (!Model.CurrentUser.IsServiceAccount)
+                        {
+                            userProfiles = Model.UserProfiles.Where(p => !p.IsServiceAccount).ToList();
+                        }
+                    }
+
+                    @foreach (UserProfile profile in userProfiles)
+                    {
+                        var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, profile.Picture);
+
+                        <div class="col-lg-3 col-md-4 col-sm-12 p-0 pb-3 results" data-role="@profile.Role">
+
+                            <div class="card userprofile" data-containertype="user_container" data-role="@profile.Role" data-id="@profile.Id" style="cursor:pointer;min-height:250px;">
+                                <div class="body">
+                                    <div class="cp_img text-center mt-3">
+                                        <img src="/images/media-loading.gif" data-src="@picture" alt="Product" class="img-fluid rounded-circle" loading="lazy" style="width: 125px;height: 125px;object-fit: cover;object-position: center;">
+                                    </div>
+                                    <div class="product_details text-center mt-3">
+                                        <h5>@profile.FirstName @profile.LastName</h5>
+                                        <ul class="product_price list-unstyled">
+                                            <li>@profile.Role.Replace('_', ' ')</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div id="area_full_container" style="display:none">
+    <partial name="_area_list" model="Model.Areas" />
+</div>
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="/js/areafilter.js"></script>
+    <script>
+        $(document).ready(function () {
+            ezgomediafetcher.preloadVisibleImagesAndVideos();
+            var cntr = $('#contentCol .card:visible').length;
+            $('#counter').html('&nbsp;(' + cntr + ')');
+
+            var filters = localStorage.getItem('userfilters');
+            if (filters !== null) {
+                var filtersJson = JSON.parse(filters);
+                filterObj = filtersJson;
+                //apply filters
+                $('#roleFilter').val(filterObj.role).selectpicker('refresh');
+                $('#roleFilterInline').val(filterObj.role).selectpicker('refresh');;
+                //scroll to scrollYPosition
+                $('#contentBody').scrollTop(filterObj.scrollYPosition);
+                var arr = $('#roleFilter').selectpicker().val();
+                if (arr !== undefined) {
+                    var roles = arr.join(",");
+                }
+                filter(roles);
+                var cntr = $('#contentCol .card:visible').length;
+                $('#counter').html('&nbsp;(' + cntr + ')');
+                $('.bootstrap-select button .filter-option').addClass('d-flex');
+                ezgomediafetcher.preloadVisibleImagesAndVideos();
+            }
+
+            $("#searchField").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#contentCol div.userprofile").filter(function () {
+                    $(this).parent('div').toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+                var cntr = $('#contentCol .card:visible').length;
+                $('#counter').html('&nbsp;(' + cntr + ')');
+                ezgomediafetcher.preloadVisibleImagesAndVideos();
+            });
+
+            $('[data-containertype="user_container"]').on('click', function () {
+                $('.userRow').css('backgroundColor', '');
+                $(this).css('backgroundColor', '#fff');
+                document.location.href = '/userpermission/details/' + $(this).data('id');
+            });
+
+            $('#btn-close').on('click', function (e) {
+                $('.userRow').css('backgroundColor', '');
+                $('.panel-wrap').css('transform', 'translateX(100%)');
+            });
+
+            $('#myModal').on('shown.bs.modal', function () {
+                $('#myInput').focus()
+            });
+
+            $('[data-role="roleFilterInline"]').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+                $(`#roleFilter`).val($(`#roleFilterInline`).val()).selectpicker("refresh");
+
+                $(`#roleFilter`).trigger('changed.bs.select');
+            });
+
+            $('[data-role="roleFilter"]').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+
+                var arr = $('#roleFilter').selectpicker().val();
+                if (arr !== undefined) {
+                    var roles = arr.join(",");
+                }
+                filterObj.role = arr;
+
+                localStorage.setItem('userfilters', JSON.stringify(filterObj));
+
+                $(`#roleFilterInline`).val($(`#roleFilter`).val()).selectpicker("refresh");
+                filter(roles);
+                var cntr = $('#contentCol .card:visible').length;
+                $('#counter').html('&nbsp;(' + cntr + ')');
+                $('.bootstrap-select button .filter-option').addClass('d-flex');
+                ezgomediafetcher.preloadVisibleImagesAndVideos();
+            });
+
+            $("#contentCol").on('filterDone', function () {
+                var cntr = $('#contentCol .card:visible').length;
+                $('#counter').html('&nbsp;(' + cntr + ')');
+            });
+
+            $('.bootstrap-select button .filter-option').addClass('d-flex');
+        });
+
+        function resetFilters() {
+            $("#roleFilter").val('default').selectpicker("refresh");
+            $("#roleFilterInline").val('default').selectpicker("refresh");
+
+            $('#searchField').val('');
+
+            filterObj.role = "";
+
+            localStorage.setItem('userfilters', JSON.stringify(filterObj));
+            $("#contentCol div.results").show();
+            var cntr = $('#contentCol .card:visible').length;
+            $('#counter').html('&nbsp;(' + cntr + ')');
+            $('.bootstrap-select button .filter-option').addClass('d-flex');
+        }
+
+        function filter(value) {
+            if (!value) {
+                $("#contentCol div.results").show();
+                return;
+            }
+            $("#contentCol div.results").hide();
+            if (value) {
+                var roles = String(value).split(',');
+                $(roles).each(function (index, role) {
+                    //console.log('role: ' + role);
+                    $("#contentCol div.results").each(function (index, item) {
+                        var card = $(item);
+                        var inRole = card.data('role') === role;
+                        //console.log(index + ' -> ' + card.data('role') + ' -> inrole: ' + inRole);
+                        if (inRole) {
+                            var id = card.data('id')
+                            card.show();
+                        }
+                    });
+
+                });
+            }
+        }
+    </script>
+    <script>
+        $('#contentCol').on('scroll', function () {
+            ezgomediafetcher.preloadVisibleImagesAndVideos();
+
+        });
+
+        var filterObj = {
+            role: ""
+        }
+    </script>
+}

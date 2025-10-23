@@ -1,0 +1,146 @@
+﻿@model WebApp.ViewModels.ToolsViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout_template";
+}
+
+<style>
+
+</style>
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Provisioner</h1>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+    <div class="container-fluid" style="height:calc(100vh - 175px);overflow:auto;">
+        <div class="row">
+            <div class="col-10"> 
+                <select id="provisioner_type" name="provisioner_type" class="form-control">
+                    <option value="ezgo">EZGO (based on EZGO rules)</option>
+                    <option value="atoss">ATOSS (based on ATOSS rules)</option>
+                </select>
+            </div>
+            <div class="col-2">
+                <button id="btn_process" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto form-control">Start</button>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-12">
+                <label for="provisioner_data">Data to process:</label>
+                <textarea id="provisioner_data" style="width:100%; height: 200px;" class="form-control"></textarea>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-12">
+                <label for="provisioner_data">Results:</label>
+                <textarea id="provisioner_logging" style="width:100%; height: 200px;" class="form-control"></textarea>
+            </div>
+        </div>
+        <br />
+        <div id="example_ezgo"> 
+            <b>Example data for ezgo:</b><br /><br />
+            <i>
+                userid;companyid;firstname;lastname;email;upn<br />
+                0;136;TEST FIRSTNAME;TEST LASTNAME;TEST@SOMETHING;UPN1<br />
+                0;136;TEST FIRSTNAME;TEST LASTNAME;TEST@SOMETHING;UPN2<br />
+                0;136;TEST FIRSTNAME;TEST LASTNAME;TEST@SOMETHING;UPN3<br />
+
+            </i>
+        </div>
+        <br />
+        <div id="example_atoss"> 
+            <b>Example data for atoss:</b><br /><br />
+            <i>
+                Personeelsnummer;Voornaam;Achternaam;Datum indiensttreding;leave_date;Company_ID;E-mailadres;Inactief<br />
+                T2017;TEST FIRSTNAME;TEST LASTNAME;02-01-2023;;33;;nee<br />
+                T2019;TEST USER;USER TEST;01-01-2024;;31;;nee<br />
+                T2016;FNAME1;FNAME1;02-01-2023;;33;;nee<br />
+                T2013;FNAME2;FNAME2;02-01-2023;;33;;nee<br />
+                01002;FNAME3;FNAME3;01-01-2023;;32;;nee<br />
+                01000;FNAME4;FNAME4;02-01-2023;;32;;nee<br />
+            </i>
+        </div>
+        <br />
+        <br />
+        <div style="color:red;font-size:20px;text-align:center;">
+            NOTE! do not send headers, only data. 
+            Make sure data is correct and correctly formatted. 
+            There are no advanced controls/validations. 
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+
+
+    <script>
+
+
+        var provisioner = {
+            _type: '',
+            clear: function () {
+                 $('#provisioner_data').val('');
+                 $('#provisioner_logging').val('');
+            },
+            init: function () {
+                 provisioner.setHandlers();
+                 provisioner.setDefaults();
+            },
+            save: function () {
+                //$('body').toggleClass('loaded');
+                let content = $('#provisioner_data').val();
+                $('body').toggleClass('loaded');
+               
+                console.log(content);
+
+                $.ajax({
+                    type: "POST",
+                    url: '/tools/provisioner/' + provisioner._type + '/processing',
+                    data: JSON.stringify(content),
+                    success: function (data) {
+                        $('body').toggleClass('loaded');
+
+                        $('#provisioner_logging').val(data);
+
+                        toastr.success('Done');
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('body').toggleClass('loaded');
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+
+            },
+            setDefaults: function() {
+                provisioner._type = $('#provisioner_type').val();
+            },
+            setHandlers: function () {
+                $('#provisioner_type').on('click', function () {
+                    provisioner._type = $('#provisioner_type').val();
+                });
+                $('#btn_process').on('click', function () {
+                    provisioner.save();
+                });
+            }
+         };
+
+         provisioner.init();
+
+    </script>
+
+
+}

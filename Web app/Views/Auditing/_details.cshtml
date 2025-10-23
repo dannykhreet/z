@@ -1,0 +1,100 @@
+﻿@model WebApp.ViewModels.AuditingDetailsFullViewModel
+@using WebApp.Models.LogAuditing
+@using Newtonsoft.Json.Linq
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@{
+    //lists of fields to ignore
+    List<string> ignoreList = new List<string> { "modified_at", "created_at", "company_id" };
+    List<string> ignoreListForChecklists = new List<string> { "machine_status" };
+
+    //form a complete list of properties to ignore for the object type being viewed
+    List<string> completeIgnroreList = new List<string>(ignoreList);
+    if (Model.ObjectType.Equals("checklists_checklisttemplate"))
+    {
+        completeIgnroreList.AddRange(ignoreListForChecklists);
+    }
+}
+
+<style>
+    #slide-in .details {
+        height: calc(100vh - 120px);
+        overflow: auto;
+    }
+
+    .value {
+        display: inline-block;
+        padding: 0px 7px;
+        max-width: 100%;
+        overflow-wrap: break-word;
+    }
+
+    .oldValue {
+        background-color: #e3e3e3;
+        text-decoration: line-through;
+    }
+
+    .newValue {
+        background-color: #cde1a6;
+    }
+
+    .propertyName {
+        vertical-align: middle;
+    }
+</style>
+
+<div class="details">
+    @if (Model.ItemChangeDetails.Count == 0)
+    {
+        <div style="padding-left: 1.25rem;">
+            @(Model.CmsLanguage?.GetValue(LanguageKeys.Auditing.NoItemsMessage, "The item was saved without any new changes, or an unused item has been deleted.") ?? "The item was saved without any new changes, or an unused item has been deleted.")
+        </div>
+    }
+    <ul class="list-group h-auto">
+        @foreach (AuditingDetailsViewModel details in Model.ItemChangeDetails)
+        {
+            <li class="list-group-item" style="background: transparent;">
+                <div class="mb-3">
+                    <div style="font-size: medium; font-weight: bold;">@details.Description</div>
+                    @if (!(details.ObjectName == null || details.ObjectName.Equals("")))
+                    {
+                        <div style="font-size: larger; font-weight: normal;">Name: @details.ObjectName</div>
+                    }
+                </div>
+
+                @foreach (AuditingLogChange change in details.AuditingLogChanges)
+                {
+                    <text>
+                        <div style="display:flex; align-items:center;">
+                            <div style="width:25%;">
+                                <div class="pr-3 mb-2" style="overflow-wrap: break-word;">
+                                    @change.Name
+                                </div>
+                            </div>
+
+                            <div style="width:75%;">
+                                @foreach (string value in change.AddedValues)
+                                {
+                                    if (!value.IsNullOrEmpty())
+                                    {
+                                        <div class="value newValue mb-2">@value</div>
+                                    }
+                                }
+
+                                @foreach (string value in change.RemovedValues)
+                                {
+                                    if (!value.IsNullOrEmpty())
+                                    {
+                                        <div class="value oldValue mb-2">@value</div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </text>
+                }
+            </li>
+        }
+    </ul>
+</div>

@@ -1,0 +1,190 @@
+﻿@model WebApp.ViewModels.DatawarehouseViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<div class="row no-gutters" id="contentCol">
+
+@if(Model.Users != null && Model.Users.Any())
+{
+        
+    foreach(EZ.Api.DataWarehouse.Models.User user in Model.Users)
+    {
+        <div class="card w-100 results" data-id="@user.Id" data-containertype="datawarehouse_user_container" style="height:200px;">
+            <div class="card-body p-0">
+                <div class="col-12 p-1">
+                    <div class="p-1">
+                        <div class="row" data-id="@user.Id" style="position:relative;">
+                            <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                                <div style="text-align:center;">
+                                        <h5 class="mt-3 mt-sm-0">@user.Username</h5>
+                                </div>
+                            </div>
+                            <div class="col-sm-5 col-md-5 col-lg-5 col-xl-5">
+                                <div class="row">
+                                    <div class="col-lg-12 d-flex justify-content-between flex-column">
+                                        <div class="row">
+                                            <div class="col-md-6 col-lg-6 text-muted">
+                                                <small>
+                                                    <strong>Holding</strong>:
+                                                    @user.HoldingId 
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 col-lg-6 text-muted">
+                                                <small>
+                                                    <strong>Company</strong>:
+                                                    @user.CompanyId
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12 col-lg-12 text-muted">
+                                                <small>
+                                                    <strong>App ID</strong>:<br />
+                                                    @user.AppId
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12 col-lg-12 text-muted">
+                                                <small>
+                                                    <strong>Bi Key</strong>:<br />
+                                                    @user.BIKey
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="row"> 
+                                            <div class="col-md-12 col-lg-12 text-muted">
+                                                <small>
+                                                    <strong>Ip list</strong>: <br />
+                                                    @(!string.IsNullOrEmpty(user.IpValidationList) ? string.Join((string)", ", user.IpValidationList.Split(',')) : "")
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
+                                <div class="row">
+                                    <small>
+                                        <strong>Modules</strong>:<br />
+                                        @(!string.IsNullOrEmpty(user.Modules) ? string.Join((string)", ", user.Modules.Split(',')) : "")
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2" style="text-align: right;">
+                                <div>
+                                    <a id="edit_bulk_btn_@user.Id" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" data-id="@user.Id" data-actiontype="bulk" date-name="@user.Username" title="Set bulk base tables"><i class="fa-solid fa-wrench"></i></a>
+                                    <a id="edit_iprange_btn_@user.Id" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" data-id="@user.Id" data-actiontype="editiprange" date-name="@user.Username" title="Set IP / IP ranges"><i class="fas fa-network-wired"></i></a>
+                                    <a id="edit_modules_btn_@user.Id" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" data-id="@user.Id" data-actiontype="editmodules" date-name="@user.Username" title="Set Modules"><i class="fas fa-project-diagram"></i></a>
+                                        <a id="edit_bikey_btn_@user.Id" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" data-id="@user.Id" data-actiontype="editbikey" date-name="@user.Username" title="Set Bi Key"><i class="fa-solid fa-key"></i></a>
+                                    <a id="edit_user_btn_@user.Id" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" data-id="@user.Id" data-actiontype="updateuser" date-name="@user.Username" title="Update user structures"><i class="fa-solid fa-folder-tree"></i></a>
+                                    @if(user.Id != 1)
+                                    {
+                                        <a id="remove_btn_@user.Id" class="btn btn-danger btn-sm mr-2 shadow-sm mt-auto" data-id="@user.Id" data-actiontype="deleteuser" date-name="@user.Username" style="color: #FFFFFF;" title="Delete user"><i class="far fa-trash-alt"></i></a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 p-1" data-container-type="editcontainer" id="edit_container_@user.Id">
+                </div>
+            </div>
+            <div style="position:absolute; bottom:2px; left:5px">
+                <div><small>Id: <strong>@user.Id</strong></small></div>
+            </div>
+            <input type="hidden" id="data_store_@user.Id" name="data_store_@user.Id" value="@user.ToJsonFromObject()" />
+        </div>
+    }   
+}
+
+</div>
+<style>h3 { font-size: 18px;}</style>
+<div id="user_container" style="display:none" class="card">
+    <div class="p-1">
+        <div class="row">
+            <div class="col-12 card-header">
+                <div data-display-delete="true" style="display:none;"><h3>
+                        You are about to delete this user. Are you sure you want to do this?
+                    </h3>
+                    This will remove all data from the datawarehouse and disable this user.
+                    This action can not be undone. Type [DELETE] (without brackets) to remove this user. <br /><br />
+                    <input type="text" id="delete_validation" name="delete_validation" class="form-control from-control-sm text-danger" style="align-content: center; text-align: center" placeholder="TYPE HERE!"/>
+                    <br />
+                </div>
+                <div data-display-new-user="true" style="display:none;">
+                    <h3>
+                        You are about to create a new user.
+                    </h3>This will create all tables and add this user to the datawarehouse. Syncing of data will start after creation within a few hours.
+                </div>
+                <div data-display-update-user="true" style="display:none;">
+                    <h3>You are about to update the structures of an existing user.</h3>
+                    This will create all tables that do not exist. This can be used when structural changes are made to the datawarehouse.
+                    Syncing of data will continue as is.
+                </div>
+                <div data-display-change-ip="true" style="display:none;">
+                    <h3>Change ip listing.</h3>
+                    Ip listing can be added or changes. This must be a comma separated string. (e.g. 0.0.0.0,1.1.1.1)<br />
+                    Other fields than Ip listing will not be saved if changed.
+                </div>
+                <div data-display-change-module="true" style="display:none;">
+                    <h3>Change modules.</h3>
+                    Modules can be added or changed. This must be a comma separated string. (e.g. actions,checklists) <br />
+                    Other fields than Modules will not be saved if changed.
+                </div>
+                <div data-display-bulk="true" style="display:none;">
+                    <h3>Base tables bulk data.</h3>
+                    Update base table information so it will be synced to the datawarehouse. <br />
+                    This will update the modified date of the impacted objects.
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 card-body" style="">
+                <input type="hidden" id="user_id" name="user_id" value="0" /> 
+                <div class="form-group"><label for="user_username">User name</label><input type="text" id="user_username" name="user_username" class="form-control form-control-sm" placeholder="User name" title="User name" data-display-user="true" /></div>
+                <div class="form-group" data-display-password="true"><label for="user_password">Password</label><input type="password" id="user_password" name="user_password" class="form-control form-control-sm" placeholder="Password" title="Password" data-display-user="true" /></div>
+                <div class="form-group">
+                    <label for="user_appid">App ID</label>
+                    <input type="text" id="user_appid" name="user_appid" class="form-control form-control-sm" placeholder="App ID" title="App ID" data-display-user="true" />
+                    <div class="float-right"><button type="button" id="btn_generate_guid" data-display-user="true" class="btn btn-ezgo btn-default btn-sm">Generate</button></div>
+                </div>
+                <div class="form-group"><label for="user_holding_id">Holding ID</label><input type="text" id="user_holding_id" name="user_holding_id" class="form-control form-control-sm" placeholder="Holding ID" title="Holding ID" data-display-user="true" /></div>
+                <div class="form-group"><label for="user_company_id">Company ID</label><input type="text" id="user_company_id" name="user_company_id" class="form-control form-control-sm" placeholder="Company ID" title="Company ID" data-display-user="true" /></div>
+                <div class="form-group"><label for="user_iprange">IP Range</label><input type="text" id="user_iprange" name="user_iprange" class="form-control form-control-sm" placeholder="Ip range" title="Ip range" data-display-change-ip="true" data-display-user="true" /></div>
+                <div class="form-group"><label for="user_model">Modules</label><input type="text" id="user_module" name="user_module" class="form-control form-control-sm" placeholder="Modules" title="Modules" data-display-change-module="true" data-display-user="true" /></div>
+                <div class="form-group">
+                    <label for="user_bikey">BI Key</label><input type="text" id="user_bikey" name="user_bikey" class="form-control form-control-sm" placeholder="BI Key" title="BI Key" data-display-change-module="true" data-display-user="true" />
+                    <div class="float-right"><button type="button" id="btn_generate_guid_bi" data-display-user="true" class="btn btn-ezgo btn-default btn-sm">Generate</button></div>
+                </div>
+                <div class="form-group"><label for="user_version">DW Version</label><input type="text" id="user_version" name="user_version" class="form-control form-control-sm" placeholder="DW Version" title="DW Version" data-display-change-module="true" data-display-user="true" /></div>
+
+                <div class="float-right">
+                    <div style="margin-top: 5px;">
+                        <button type="button" id="btn_user_save" data-display-new-user="true" class="btn btn-ezgo btn-default btn-sm">Save new user</button>
+                        <button type="button" id="btn_user_update" data-display-update-user="true" class="btn btn-ezgo btn-default btn-sm">Update user</button>
+                        <button type="button" id="btn_user_iprange_save" data-display-change-ip="true" class="btn btn-ezgo btn-default btn-sm">Save ip listing</button>
+                        <button type="button" id="btn_user_module_save" data-display-change-module="true" class="btn btn-ezgo btn-default btn-sm">Save modules</button>
+                        <button type="button" id="btn_user_bikey_save" data-display-change-bikey="true" class="btn btn-ezgo btn-default btn-sm">Save Bi key</button>
+                        <button type="button" id="btn_user_bulk_save" data-display-bulk="true" class="btn btn-ezgo btn-default btn-sm">Bulk update</button>
+                        <button type="button" id="btn_user_drop" data-display-delete="true" class="btn btn-danger btn-sm" style="color:#FFFFFF">Delete user</button>
+                    </div>
+                </div>
+                 
+                
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 card-body" style="text-align:center">
+                <button type="button" id="btn_user_save_generate" data-display-user="true" class="btn btn-ezgo btn-default btn-sm">Generate new user script</button>
+                <button type="button" id="btn_user_update_generate" data-display-user="true" class="btn btn-ezgo btn-default btn-sm">Generate update user script</button>
+                <button type="button" id="btn_user_drop_generate" data-display-user="true" class="btn btn-ezgo btn-default btn-sm">Generate delete user script</button>
+                <button type="button" id="btn_user_check_structures" data-display-user="true" class="btn btn-ezgo btn-default btn-sm">Check user structures</button>
+            </div>
+        </div>
+        <div class="row"><div class="col-12 card-body" style="text-align:center; color: orange">NOTE! validation are currently disabled. Please make sure data is correct before submitting.</div></div>
+    </div>
+</div>

@@ -1,0 +1,887 @@
+﻿@model WebApp.ViewModels.UserProfileViewModel
+@using WebApp.Models.User
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = Model.CmsLanguage?.GetValue(LanguageKeys.User.OverviewTitle, "Users overview") ?? "Users overview";
+    string PasswordValidationRegEx = Model.ApplicationSettings.PasswordValidationRegEx;              
+}
+
+
+<style>
+    li.selected-area div.area-title {
+        background-color: #93C54B;
+    }
+
+    div.area-title-selected {
+        font-weight: bolder;
+    }
+
+    div.area-title {
+        cursor: pointer;
+    }
+
+        div.area-title:hover {
+            cursor: pointer;
+            font-weight: bolder;
+        }
+
+    .badge-primary {
+        margin-left: 5px;
+        margin-top: 3px;
+        cursor: pointer;
+        height: 20px;
+        vertical-align: middle;
+        padding-top: 4px;
+    }
+
+    .main-image-pencil {
+        background: #93c54b;
+        width: 35px;
+        height: 35px;
+        margin: 10px;
+        opacity: 0.8;
+        z-index: 1;
+        color: #fff;
+        border: solid 1px #333333 !important;
+        cursor: pointer;
+    }
+
+        .main-image-pencil i {
+            width: 35px;
+            height: 33px;
+            position: relative;
+            display: flex;
+        }
+
+        .main-image-pencil:hover {
+            border: solid 1px #fff !important;
+        }
+
+    .custom-control-input:checked ~ .custom-control-label::before,
+    .custom-control-input:indeterminate ~ .custom-control-label::before {
+        background-color: #93C54B;
+        border-color: #93c54b1f;
+    }
+
+    .custom-control-input:checked ~ .custom-control-label::before {
+        color: #fff;
+        border-color: #93c54b1f;
+        background-color: #93C54B;
+        box-shadow: none;
+    }
+
+    .custom-switch .custom-control-input:disabled:checked ~ .custom-control-label::before {
+        background-color: rgba(147,197,75,.5);
+    }
+
+    .custom-switch .custom-control-input:disabled ~ .custom-control-label::before {
+        background-color: rgba(222,226,230,.5);
+        border-color: rgb(173,181,189,0.5);
+    }
+
+    .custom-switch .custom-control-input:disabled:checked ~ .custom-control-label::after {
+        background-color: rgb(173,181,189,0.5);
+    }
+
+    .custom-switch .custom-control-input:disabled ~ .custom-control-label::after {
+        background-color: rgb(173,181,189,0.5);
+    }
+</style>
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <a asp-controller="UserPermission" asp-action="Index"><i class="fa fa-arrow-left"></i> @(Model.CmsLanguage?.GetValue(LanguageKeys.User.NavigateBack, "Back to users") ?? "Back to users")</a>
+                <h1>@(Model.CmsLanguage?.GetValue(LanguageKeys.User.UserProfileTitle, "User Profile") ?? "User Profile")</h1>
+            </div>
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                <button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" onclick="profile.save()">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.Save, "Save") ?? "Save")</button>
+                @{
+                    if (Model.UserProfile != null && Model.UserProfile.Id > 0)
+                    {
+                            <input data-id="@Model.UserProfile.Id" data-name="@Model.UserProfile.FirstName @Model.UserProfile.LastName" type="button" class="btn btn-danger btn-sm mr-2 shadow-sm mt-auto" id="delete_user_button" onclick="profile.delete()" value="@(Model.CmsLanguage?.GetValue(LanguageKeys.User.Delete, "Delete") ?? "Delete")" />
+                            <input type="button" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" id="change_password_button" value="@(Model.CmsLanguage?.GetValue(LanguageKeys.User.ChangePassword, "Change Password") ?? "Change Password")" />
+                    }
+                    else
+                    {
+                            <button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" onclick="profile.save(true)">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.AddAnotherUser, "Add another user") ?? "Add another user")</button>
+                    }
+                }
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row pt-1" style="height:calc(100vh - 175px);overflow:auto;">
+            <div class="col-12">
+                <partial name="_userprofiledetails" model="@Model" />
+                <input type="hidden" value="@Model.SecurityKey" name="validation_key" id="validation_key" />
+            </div>
+            @if (Model.TwoFactorySetup != null && Model.TwoFactorySetup.Enabled == true)
+            {
+                <div class="col-12">
+                    <!-- AAA --> <img src="@Model.TwoFactorySetup.QrCodeSetupImageUrl" /><br /><span>@Model.TwoFactorySetup.ManualEntryKey</span>
+                </div>
+
+            }
+        </div>
+    </div>
+</section>
+
+
+
+<partial name="~/Views/Shared/_auditing_history.cshtml" model="@(new AuditingLogViewModel { ItemType="userpermission",TemplateId=Model.UserProfile.Id, EnablingAuditing = Model.EnablingAuditing})" />
+
+<div class="modal fade" id="modalChangePassword" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.ChangePassword, "Change password") ?? "Change password")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form asp-controller="UserPermission" asp-action="ChangePassword" method="post">
+                    <div class="form-group">
+                        <label for="password">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.DialogPasswordPlaceholder, "Password") ?? "Password")</label>
+                        <input type="password" class="form-control" name="change_password" id="change_password" placeholder="@(Model.CmsLanguage?.GetValue(LanguageKeys.User.DialogPasswordPlaceholder, "Password") ?? "Password")" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.DialogConfirmPasswordPlaceholder, "Confirm Password") ?? "Confirm Password")</label>
+                        <input type="password" name="change_password_confirm" class="form-control" id="change_password_confirm" placeholder="@(Model.CmsLanguage?.GetValue(LanguageKeys.User.DialogConfirmPasswordPlaceholder, "Confirm Password") ?? "Confirm Password")" required>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline btn-sm" data-dismiss="modal">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.DialogPasswordCancel, "Cancel") ?? "Cancel")</button>
+                <button id="modalChangePasswordButton" type="button" class="btn btn-ezgo btn-sm" data-actiontype="change">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.DialogPasswordSave, "Save") ?? "Save")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalChooseAreas" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.ProfileChangeButton, "Change areas") ?? "Change areas")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div>
+                <div class="card-tools" style="margin:5px;">
+                    <div class="input-group input-group-sm">
+                        <input type="text" placeholder="@(Model.CmsLanguage?.GetValue(LanguageKeys.User.UserAreaSearchMessage, "Search") ?? "Search")"
+                               class="form-control float-right" id="areaChoiceSearchBox">
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-default"><i class="fas fa-search" title="@(Model.CmsLanguage?.GetValue(LanguageKeys.User.UserAreaSearchMessage, "Search") ?? "Search")"></i></button>
+                            <button type="button" class="btn btn-default" id="clear_search_btn" title="@(Model.CmsLanguage?.GetValue(LanguageKeys.User.UserAreaSearchResetMessage, "Reset search") ?? "Reset search")"><i class="fas fa-sync"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-body" style="overflow: auto; height:400px;">
+                <partial name="_area_list" model="Model.Areas" />
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline btn-sm" data-dismiss="modal">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.DialogPasswordCancel, "Cancel") ?? "Cancel")</button>
+                <button id="modalUpdateAreasButton" type="button" class="btn btn-ezgo btn-sm" data-actiontype="change">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.Save, "Update") ?? "Update")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDeleteUser" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.ProfileDeleteMessageTitle, "Delete user") ?? "Delete user")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        @string.Format((Model.CmsLanguage?.GetValue(LanguageKeys.User.ProfileDeleteMessage, "Are you sure you want to delete [{0} {1}]?") ?? "Are you sure you want to delete [{0} {1}]?"), Model.UserProfile.FirstName, Model.UserProfile.LastName)
+                        <br />
+                        @(Model.CmsLanguage?.GetValue(LanguageKeys.User.ProfileDeleteMessageUndone, "This action can not be undone.") ?? "This action can not be undone.")
+                    </div>
+
+                    @if (Model.UserProfiles != null && Model.UserProfiles.Count > 1 && Model.CurrentUserProfileHasActions)
+                    {
+                        <div class="form-group">
+                            <label for="modalSuccessor">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.ProfileDeleteSuccessorMessage, "If needed please select a successor.") ?? "If needed please select a successor.")</label>
+                            <select id="modalSuccessor" class="form-control">
+                                <option value="">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.SelectSuccessor, "Select successor") ?? "Select successor")</option>
+                                @foreach (var profile in Model.UserProfiles.OrderBy(x => x.FirstName))
+                                {
+                                    if (Model.UserProfile.Id != profile.Id)
+                                    {
+                                        <option value="@profile.Id">@profile.FirstName @profile.LastName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    }
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline btn-sm" data-dismiss="modal">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.DialogPasswordCancel, "Cancel") ?? "Cancel")</button>
+                <button id="modalDeleteButton" type="button" class="btn btn-danger btn-sm" data-actiontype="delete">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.Delete, "Delete") ?? "Delete")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="/js/ezgoUtils.js"></script>
+    <script>
+        $(document).ready(function () {
+            profile.init();
+            ezgomediafetcher.preloadImagesAndVideos();
+        });
+
+        var profile = {
+            _mediaarray: [],
+            _mediapath: '@(string.IsNullOrEmpty(Model.ApplicationSettings?.MediaLocations?.ImageMediaBaseUri) ? Constants.General.MediaUrl : Model.ApplicationSettings?.MediaLocations?.ImageMediaBaseUri)',
+            defaultImage: '/assets/img/normal_unavailable_image.png',
+            tempImage: null,
+            tempImageType: null,
+            _temparea_storageselector: '#allowed_area_ids',
+            _displayarea_storageselector: '#user_allowed_areas',
+            delete: function () {
+                $('#modalDeleteUser').modal('show');
+                // -> /js/ezgoUtils.js
+                //refactor
+            },
+            deleteUser: function () {
+                var profileId = $('#delete_user_button').attr('data-id');
+                var deleteUserObj = { UserId: parseInt(profileId) };
+
+                if ($('#modalSuccessor').val() !== null && $('#modalSuccessor').val() !== '') {
+                    deleteUserObj.SuccessorId = parseInt($('#modalSuccessor').val());
+                } else {
+                    deleteUserObj.SuccessorId = null;
+                }
+                deleteUserObj.ValidationKey = $('#validation_key').val();
+
+                $('body').toggleClass('loaded');
+                $.ajax({
+                    type: "POST",
+                    url: '/userpermission/deleteuser',
+                    data: JSON.stringify(deleteUserObj),
+                    success: function (data) {
+                        $('body').toggleClass('loaded');
+                        toastr.success('@(Model.CmsLanguage?.GetValue(LanguageKeys.User.UserDeleteDialogReload, "User deleted..reloading.") ?? "User deleted..reloading.")');
+                        $('#modalDeleteUser').modal('hide');
+                        setTimeout(() => {
+                            location.href = '/userpermission';
+                        }, 1000);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('body').toggleClass('loaded');
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        $('#modalDeleteUser').modal('hide');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            fixImage: function (imageUrl) {
+                let imageout = '';
+                if (imageUrl.includes('unavailable')) {
+                    return imageout;
+                } else {
+                    imageout = imageUrl.replace(profile._mediapath, '');
+                    return imageout;
+                }
+            },
+            generatePassword() {
+                ///userpermission/generate/password
+            },
+            init: function () {
+                profile.initHandlers();
+                profile.getChangesByUser();
+            },
+            initHandlers: function () {
+                $('#change_password_button').on('click', function () {
+                    profile.initPasswordModal();
+                });
+                $('#choose_allowed_areas_button, #user_allowed_areas span').on('click', function () {
+                    profile.initAreasModal();
+                });
+                $('[data-containertype="area_choice"]').on('click', function (e) {
+                    if ($(this).attr('data-selected') == 'true') {
+                        $(this).attr('data-selected', false);
+                        $(this).removeClass('selected-area');
+                        $($(this).children('div.area-title')[0]).removeClass('area-title-selected');
+                        $($(this).find('span[data-buttontype="deselect"]')[0]).hide();
+                    } else {
+                        $(this).attr('data-selected', true);
+                        $(this).addClass('selected-area');
+                        $($(this).children('div.area-title')[0]).addClass('area-title-selected');
+                        $($(this).find('span[data-buttontype="deselect"]')[0]).show();
+                    }
+                    e.stopPropagation();
+                });
+                $('#modalUpdateAreasButton').on('click', function () {
+                    profile.updateAreas();
+                });
+                $('#modalDeleteButton').on('click', function () {
+                    profile.deleteUser();
+                });
+                $('#modalChangePasswordButton').on('click', function () {
+                    profile.savePassword();
+                });
+                $('#user_profile_form input[type="password"],input[type="password"],select').on('change', function () {
+
+                });
+                $('#areaChoiceSearchBox').on('keydown, keyup', function () {
+                    profile.searchAreas($(this).val());
+                });
+                $('#clear_search_btn').on('click', function () {
+                    profile.resetAreaSearchUI(true);
+                });
+                $('#btnLoadMoreAuditingByUser').on('click', function () {
+                    profile.getChangesByUser();
+                });
+                $('#UserProfile_Role').on('change', function () {
+                    if (this.value == 'manager') {
+                        $('#is_tag_manager').prop('disabled', false);
+                    } else {
+                        $('#is_tag_manager').prop('disabled', true);
+                        $('#is_tag_manager').prop('checked', false);
+                        $("label[for='is_tag_manager']").prop('title', 'Only manager accounts can be flagged as a tag manager'); // TRANSLATION
+                    }
+                });
+                $('#modalChangePassword').on('hidden.bs.modal', function () {
+                    $('#change_password').val('');
+                    $('#change_password_confirm').val('');
+                });
+                $('#modalChangePassword').on('shown.bs.modal', function () {
+                    $('#change_password').focus();
+                });
+            },
+            initAreasModal: function () {
+                profile.resetAreaSearchUI(true);
+                $('[data-containertype="area_choice"]').attr('data-selected', false);
+                if ($(this._temparea_storageselector).val() != null) {
+                    var selectedIds = $(this._temparea_storageselector).val().split(',');
+                    for (var i = 0; i < selectedIds.length; i++) {
+                        $('[data-containertype="area_choice"][data-id="' + selectedIds[i] + '"]').attr('data-selected', true);
+                        $('[data-containertype="area_choice"][data-id="' + selectedIds[i] + '"]').addClass('selected-area');
+                        $($('[data-containertype="area_choice"][data-id="' + selectedIds[i] + '"]').children('div.area-title')[0]).addClass('area-title-selected');
+                        $($('[data-containertype="area_choice"][data-id="' + selectedIds[i] + '"]').find('span[data-buttontype="deselect"]')[0]).show();
+                    }
+                }
+                $('#modalChooseAreas').modal('show');
+            },
+            initPasswordModal: function () {
+                $('#modalChangePassword').modal('show');
+            },
+            previewFile: async function (input) {
+                var maxSizeMB = 0.3;
+
+                const options = {
+                    maxWidthOrHeight: 480,
+                    useWebWorker: true,
+                    maxIteration: 1
+                };
+
+                var previewElement = $(input).data('preview');
+                var compressedFile = event.target.files[0];
+
+                if (compressedFile != undefined && compressedFile !== null) {
+                    //First only resize image
+                    compressedFile = await imageCompression(compressedFile, options);
+
+                    //Then compress image if necessary
+                    while (compressedFile.size / 1024 / 1024 > maxSizeMB) {
+                        options.maxSizeMB = maxSizeMB;
+                        compressedFile = await imageCompression(compressedFile, options);
+                    }
+
+                    var ext = compressedFile.name.split('.').pop();
+                    var fileReader = new FileReader();
+                    fileReader.onload = function () {
+                        var url = URL.createObjectURL(compressedFile, { oneTimeOnly: true });
+                        profile.tempImage = url;
+                        profile.tempImageType = ext;
+                        $(previewElement).attr("src", url).parent('a').attr('href', url);
+                    };
+                    fileReader.readAsDataURL(compressedFile);
+                }
+            },
+            removeFile: function (rmbutton) {
+                var previewElement = $(rmbutton).attr('data-preview');
+                profile.tempImage = null;//reset image to null
+                profile.tempImageType = null; //reset image type to null
+                $(previewElement).attr('src', profile.defaultImage); //reset to default image
+                $('#Picture').val(''); //empty value of input used for saving profile picture
+                $('#uploaderTemplate').val(''); //empty value of input used for previewing picture
+            },
+            resetAreaSearchUI: function (includeInput) {
+                if (includeInput != undefined && includeInput !== null) {
+                    if (includeInput === true) {
+                        $('#areaChoiceSearchBox').val('');
+                    }
+                }
+                $('[data-containertype="area_choice_list"] li').show(); //enable all
+                $('[data-containertype="area_choice_list"] [data-containertype="title"]').removeClass('font-italic'); //cleanup previous searches
+            },
+            saveMedia: async function () {
+                let output = null;
+                if (profile.tempImage != null) {
+                    if (String(profile.tempImage).startsWith('blob:') || String(profile.tempImage).startsWith('data:')) {
+                        var url = profile.tempImage;
+                        var ext = '.' + profile.tempImageType;
+                        profile._mediaarray.push({ type: 'user', url: url, ext: ext, delay: 1000, kind: 'pic' });
+                    }
+
+                    //array, but only 1 item will be filled.
+                    if (profile._mediaarray != null && profile._mediaarray.length > 0) {
+                        //uploading media
+                        const tasks = profile._mediaarray.map(profile.uploadMedia);
+                        const results = await Promise.all(tasks);
+                        results.forEach(x => output = x);
+                        profile._mediaarray = []; //reset media array;
+                    }
+                }
+                return output;
+            },
+            save: async function (addAnotherUser) {
+                if (!profile.validate()) return;
+
+                toastr.remove();
+                $('body').toggleClass('loaded');
+
+                var mediaOut = await profile.saveMedia(); //save all media if there is media
+                var newImage = $('#user_image').data('src'); //get possible image
+
+                //TODO: move to create method
+                let changedProfile = {
+                    Id: @Model.UserProfile.Id,
+                    Email: $('#UserProfile_Email').val(),
+                    FirstName: $('#UserProfile_FirstName').val(),
+                    LastName: $('#UserProfile_LastName').val(),
+                    Picture: $('#Picture').val(),
+                    Role: $('#UserProfile_Role').val(),
+                    UPN: $('#UserProfile_UPN').val(),
+                    UserName: $('#UserProfile_UserName').val(),
+                    Password: '',
+                    PasswordConfirmation: '',
+                    @if (Model.CurrentUser.IsServiceAccount)
+                    {
+                        @:IsTagManager: $('#UserProfile_Role').val() == 'manager' && document.getElementById('is_tag_manager').checked,
+                    }
+                    AllowedAreas: [],
+                    SapPmUsername: $('#UserProfile_SapPmUsername').val(),
+                    ValidationKey: $('#validation_key').val()
+
+            }
+            profile.Picture = mediaOut == null ? profile.fixImage(changedProfile.Picture) : profile.fixImage(newImage); //force new picture
+         
+
+            //TODO: mode to append method
+            let selectedAreaIds = $(this._temparea_storageselector).val().split(',');
+            if(selectedAreaIds != null && selectedAreaIds.length > 0) {
+                for (var i = 0; i < selectedAreaIds.length; i++) {
+                    if (selectedAreaIds[i] != null
+                        && selectedAreaIds[i] !== 'undefined'
+                        && parseInt(selectedAreaIds[i]) > 0) {
+
+                        let area = {
+                            Id: parseInt(selectedAreaIds[i])
+                        }
+                        changedProfile.AllowedAreas.push(area);
+                    }
+                }
+            }
+
+            if (changedProfile.Id == null || changedProfile.Id == 0) {
+                changedProfile.Password = $('#UserProfile_Password').val();
+                changedProfile.PasswordConfirmation = $('#UserProfile_PasswordConfirmation').val();
+            }
+
+            changedProfile.UserExtendedDetails = profile.getExtendedValues();
+            changedProfile.Roles = profile.getRoles();
+
+            //add responses management from api (invalid password, upn already exists, username already exists etc,.)
+            $.ajax({
+                type: "POST",
+                url: '/userpermission/addchangeuser/' + @Model.UserProfile.Id.ToString(),
+                data: JSON.stringify(changedProfile),
+                success: function (data) {
+                    $('body').toggleClass('loaded');
+                    if (changedProfile.Id > 0) {
+                        toastr.success('@(Model.CmsLanguage?.GetValue(LanguageKeys.User.UserSavedDialog, "User saved.") ?? "User saved.")');
+                        location.href = '/userpermission/details/' + changedProfile.Id;
+                       
+                    } else {
+                        toastr.success('@(Model.CmsLanguage?.GetValue(LanguageKeys.User.UserSavedDialogReload, "User saved..reloading.") ?? "User saved..reloading.")');
+                        setTimeout(() => {
+                            //if we want to add another user, reload without id to go to add user page
+                            reloadid = addAnotherUser ? '' : data;
+                            location.href = '/userpermission/details/' + reloadid;
+                        }, 1000)
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('body').toggleClass('loaded');
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                },
+                contentType: "application/json; charset=utf-8"
+            });
+        },
+        getExtendedValues: function() {
+            if ($('#UserProfile_UserExtendedDetails_EmployeeId') != null) {
+                let changedUserExtendedDetails = {
+                    UserId: @Model.UserProfile.Id,
+                    Bio: $('#UserProfile_UserExtendedDetails_Bio').val(),
+                    Description: $('#UserProfile_UserExtendedDetails_Description').val(),
+                    EmployeeId: $('#UserProfile_UserExtendedDetails_EmployeeId').val(),
+                    EmployeeFunction: $('#UserProfile_UserExtendedDetails_EmployeeFunction').val()
+                }
+
+                return changedUserExtendedDetails;
+            }
+        },
+        getRoles: function() {
+            if($('*[name="chk_roles"]') == null || $('*[name="chk_roles"]').length == 0) {
+                return;
+            }
+            let checked = $('*[name="chk_roles"]:checked');
+            let checkedRoles = [];
+            if(checked != null && checked.length > 0) {
+                for(var ic = 0; ic < checked.length; ic++) {
+                    checkedRoles.push(Number(checked[ic].value));
+                }
+            }
+            return checkedRoles;
+        },
+        savePassword: function () {
+            if (!profile.validatePassword('#change_password', '#change_password_confirm')) return;
+            toastr.remove();
+            $('body').toggleClass('loaded');
+
+            //TODO: move to create method
+            var changedPassword = {
+                UserId: @Model.UserProfile.Id,
+                NewPassword: $('#change_password').val(),
+                NewPasswordValidation: $('#change_password_confirm').val(),
+                ValidationKey: $('#validation_key').val()
+            };
+
+            //add responses management from api (invalid password etc.)
+            $.ajax({
+                type: "POST",
+                url: '/userpermission/changepassword',
+                data: JSON.stringify(changedPassword),
+                success: function (data) {
+                    $('body').toggleClass('loaded');
+                    toastr.success('@(Model.CmsLanguage?.GetValue(LanguageKeys.User.UserPasswordSaveDialog, "Password saved.") ?? "Password saved.")');
+                    $('#modalChangePassword').modal('hide');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('body').toggleClass('loaded');
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                },
+                contentType: "application/json; charset=utf-8"
+            });
+        },
+        searchAreas: function (searchValue) {
+            let currentValue = searchValue;
+            let foundItems = [];
+
+            profile.resetAreaSearchUI();
+
+            if (currentValue != null && currentValue !== '') {
+                $('[data-containertype="area_choice_list"] li').hide(); //hide everything when searching
+                $('[data-containertype="area_choice_list"] li').each(function () {
+                    if ($($(this).find('[data-containertype="title"]')[0]).text().toLowerCase().includes(currentValue.toLowerCase())) {
+                        foundItems.push(this); //if item found add to found array
+                    };
+                });
+                if (foundItems != null) {
+                    //display all found items and parents to keep tree intact
+                    if (foundItems.length > 0) {
+                        for (var i = 0; i < foundItems.length; i++) {
+                            $(foundItems[i]).find('[data-containertype="title"]').addClass('font-italic');
+                            $(foundItems[i]).show();
+                            $(foundItems[i]).parents().show();
+                        }
+                    }
+                }
+            }
+        },
+        updateAreas: function () {
+            var selectedIds = [];
+            $('#user_allowed_areas').html('');
+            $('[data-containertype="area_choice"][data-selected="true"]').each(function () {
+                let id = $(this).attr('data-id');
+                let name = $(this).attr('data-name');
+                let fullname = $(this).attr('data-fullname');
+                selectedIds.push(id);
+                $('#user_allowed_areas').append('<span class="badge badge-primary" data-areaid="' + id + '" data-fullname="' + fullname + '" title="' + fullname + '">' + name + '</span>');
+            });
+            $(this._temparea_storageselector).val(selectedIds.join(','));
+
+            $('#modalChooseAreas').modal('hide');
+        },
+        uploadMedia: async function (spec) {
+            let blob = await fetch(spec.url).then(
+                r => r.blob()
+            );
+            var file = new File([blob], $.utils.createUUID() + spec.ext);
+            var formData = new FormData();
+            formData.append("file", file);
+            formData.append("filekind", spec.kind);
+            formData.append("itemtype", spec.type);
+
+            return fetch('/userpermission/details/upload', {
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => (response.text()))
+                .then(path => {
+                    var returnedPath = String(path).replaceAll('"', '');
+                    $('#user_image').data('src', profile._mediapath + returnedPath);
+                    $('#Picture').val(returnedPath);
+
+                    ezgomediafetcher.preloadImagesAndVideos();
+                })
+                .then(text => `Fetched ${spec.url}, and got back ${text}`);
+        },
+        uploadImage: function () {
+        },
+        validate: function () {
+            let val = true;
+
+            if ($('#UserProfile_Role').val() != 'basic' && $('#UserProfile_Role').val() != 'shift_leader' && $('#UserProfile_Role').val() != 'manager') {
+                toastr.error('@(Model.CmsLanguage?.GetValue(LanguageKeys.User.UserValidationDialogRoleRequired, "Role is a required field.") ?? "Role is a required field.")');
+                val = false;
+            }
+
+            if ($('#UserProfile_UserName').val() === '') {
+                toastr.error('@(Model.CmsLanguage?.GetValue(LanguageKeys.User.UserValidationDialogUserNameRequired, "User name is a required field.") ?? "User name is a required field.")');
+                val = false;
+            }
+
+            if ($('#UserProfile_LastName').val() === '') {
+                toastr.error('@(Model.CmsLanguage?.GetValue(LanguageKeys.User.UserValidationDialogLastNameRequired, "Last name is a required field.") ?? "Last name is a required field.")');
+                val = false;
+            }
+
+            if ($(this._temparea_storageselector).val() === '' && $('#UserProfile_Role').val() != 'manager') {
+                toastr.error('@(Model.CmsLanguage?.GetValue(LanguageKeys.User.UserValidationDialogAreasRequired, "Areas are required.") ?? "Areas are required.")');
+                val = false;
+            }
+
+            if (@Model.UserProfile.Id <= 0) {
+                if (!profile.validatePassword('#UserProfile_Password', '#UserProfile_PasswordConfirmation')) {
+                    val = false;
+                }
+            }
+
+            return val;
+        },
+        validatePassword: function (passwordFieldSelector, passwordConfirmationFieldSelector) {
+            let val = true;
+            if ($(passwordFieldSelector).val() === '') {
+                toastr.error('@(Model.CmsLanguage?.GetValue(LanguageKeys.User.UserValidationDialogPasswordRequired, "Password is a required field.") ?? "Password is a required field.")');
+                val = false;
+            }
+
+            if ($(passwordConfirmationFieldSelector).val() === '') {
+                toastr.error('@(Model.CmsLanguage?.GetValue(LanguageKeys.User.UserValidationDialogPasswordConfirmationRequired, "Password confirmation is a required field.") ?? "Password confirmation is a required field.")');
+                val = false;
+            }
+
+            if ($(passwordConfirmationFieldSelector).val() !== $(passwordFieldSelector).val()) {
+                toastr.error('@(Model.CmsLanguage?.GetValue(LanguageKeys.User.UserValidationDialogPasswordPasswordConfirmationRequired, "Password and password confirmation can not be different.") ?? "Password and password confirmation can not be different.")');
+                val = false;
+            } else {
+                var isMatch = /@PasswordValidationRegEx/gm.test($(passwordFieldSelector).val());
+                if (!isMatch) {
+                        let passwordValidationRegEx = '@PasswordValidationRegEx';
+                        let numberOfCharactersRequired = passwordValidationRegEx.substring(
+                        passwordValidationRegEx.indexOf(".{") + 2,
+                        passwordValidationRegEx.lastIndexOf(",}")
+                    );
+                    toastr.error('@(Model.CmsLanguage?.GetValue(LanguageKeys.User.UserValidationDialogPasswordValidationRules, "Password must contain at least {0} character, uppercase characters, lowercase characters and a number.") ?? "Password must contain at least {0} character, uppercase characters, lowercase characters and a number.")'.replace('{0}', numberOfCharactersRequired));
+                    val = false;
+                }
+            }
+            $('.bootstrap-select button .filter-option').addClass('d-flex');
+            return val;
+        },
+        pagingInterval: 10,
+            currentOffset: 0,
+                //changeLogByUser: "",
+        @*getChangesByUser: function () {
+            $.ajax({
+            type: "GET",
+            url: '/userpermission/getchangesbyuser/' + @Model.UserProfile.Id + '?limit=10&offset=' + profile.currentOffset,
+            success: function (data) {
+            var changes = JSON.parse(data);
+            $(changes).each(function () {
+            var changeDate = new Date(this.CreatedOn);
+            profile.changeLogByUser += "Change made: " + this.Description + ", in " + this.ObjectType +" with id: "+this.ObjectId + " on " + changeDate.toLocaleString() + "<br>";
+            });
+
+            if (changes.length == 10) {
+            profile.currentOffset += 10;
+            } else {
+            $('#btnLoadMoreAuditingByUser').hide();
+            }
+            $('#auditing-log-by-user').html(profile.changeLogByUser);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+            },
+            contentType: "application/json; charset=utf-8"
+            });
+            },*@
+                getChangesByUser: function () {
+                    $.ajax({
+                        type: "GET",
+                        //url: '/userpermission/getchangesbyuser/' + @Model.UserProfile.Id + '?limit=10&offset=' + profile.currentOffset,
+                        url: '/auditing/all?limit=' + profile.pagingInterval + '&offset=' + profile.currentOffset + '&userid=@Model.UserProfile.Id',
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (data) {
+                            if (data) {
+                                var changes = JSON.parse(data);
+                                if (changes.length > 0) {
+                                    if (profile.ulChangeLogByUser == undefined) {
+                                        profile.ulChangeLogByUser = document.createElement('ul');
+                                        profile.ulChangeLogByUser.setAttribute('class', 'list-group h-auto');
+                                        document.getElementById('auditing-log-by-user').appendChild(profile.ulChangeLogByUser);
+                                    }
+
+                                    $(changes).each(function () {
+                                        profile.addAuditingItemToList(this);
+                                    });
+
+                                    if (changes.length == profile.pagingInterval) {
+                                        profile.currentOffset += profile.pagingInterval;
+                                    } else {
+                                        $('#btnLoadMoreAuditingByUser').hide();
+                                    }
+
+                                    $('[data-container="auditing_data_container"]').show();
+                                } else {
+                                    if (profile.currentOffset == 0) {
+                                        $('[data-container="auditing_data_container"]').hide();
+                                    }
+                                }
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.log(jqXHR);
+                        }
+                    });
+                },
+
+        loadAuditingDetails: function (e, id, objecttype) {
+            $('#auditingDetails').html('@(Model?.CmsLanguage?.GetValue(LanguageKeys.Reports.LoadingChecklistTaskContent, "Loading...") ?? "Loading...")');
+            //$('#auditingDetails').html('<div class="text-center w-100 pt-5"><img src="/images/factory-loading.gif" class="w-50" /></div>');
+            $('#auditing-log-by-user a').removeClass('active');
+            $.get('/auditing/details/' + id + '?objecttype=' + objecttype, function (data) {
+                $('#auditingDetails').html(data);
+            });
+            $(e.currentTarget).addClass('active');
+        },
+
+        addAuditingItemToList: function (item) {
+            var changeDate = new Date(item.CreatedOn);
+            var templateName;
+            switch (item.ObjectType) {
+                case "checklists_checklisttemplate":
+                    templateName = "@(Model.CmsLanguage.GetValue(LanguageKeys.Auditing.ChecklistTemplate, "Checklist template") ?? "Checklist template")";
+                    break;
+                case "audits_audittemplate":
+                    templateName = "@(Model.CmsLanguage.GetValue(LanguageKeys.Auditing.AuditTemplate, "Audit template") ?? "Audit template")";
+                    break;
+                case "assessment_templates":
+                    templateName = "@(Model.CmsLanguage.GetValue(LanguageKeys.Auditing.AssessmentTemplate, "Assessment template") ?? "Assessment template")";
+                    break;
+                case "workinstruction_templates":
+                    templateName = "@(Model.CmsLanguage.GetValue(LanguageKeys.Auditing.WorkInstructionTemplate, "Work instruction template") ?? "Work instruction template")";
+                    break;
+                case "tasks_tasktemplate":
+                    templateName = "@(Model.CmsLanguage.GetValue(LanguageKeys.Auditing.TaskTemplate, "Task template") ?? "Task template")";
+                    break;
+            }
+
+            var a = document.createElement('a');
+            a.setAttribute('href', '#');
+            a.setAttribute('onclick', 'profile.loadAuditingDetails(event, ' + item.Id + ', "' + item.ObjectType + '")')
+            a.setAttribute('class', 'list-group-item list-group-item-action');
+            @if (!Model.EnablingAuditing)
+            {
+                <text>a.setAttribute('style', 'pointer-events: none;'); </text>
+            }
+
+            var div = document.createElement('div');
+            div.setAttribute('class', 'd-flex w-100 justify-content-between');
+
+            var DivNameDesc = document.createElement('div');
+            var DivDateUser = document.createElement('div');
+            DivNameDesc.setAttribute('style', 'display: flex; flex-direction: column;');
+            DivDateUser.setAttribute('style', 'text-align: right; display: flex; flex-direction: column; justify-content: flex-end;');
+
+            var h5 = document.createElement('h5');
+            h5.setAttribute('class', 'mb-0');
+
+            var h6 = document.createElement('h6');
+            h5.setAttribute('class', 'mb-0');
+
+            var smallDate = document.createElement('small');
+            var smallTemplateType = document.createElement('small');
+            var p = document.createElement('p');
+            p.setAttribute('class', 'mb-0');
+            smallDate.setAttribute('class', 'mb-2');
+
+            var li = document.createElement('li');
+            li.setAttribute('style', 'background-color: #ffffff00;');
+
+            smallTemplateType.innerHTML = templateName;
+            h5.innerHTML = item.ObjectName;
+            h6.innerHTML = item.Description;
+
+            p.innerHTML = item.UserFullName;
+            smallDate.innerHTML = changeDate.toLocaleString();
+
+            DivNameDesc.appendChild(h5);
+            DivNameDesc.appendChild(h6);
+            DivDateUser.appendChild(p);
+            DivDateUser.appendChild(smallDate);
+            div.appendChild(DivNameDesc);
+            div.appendChild(DivDateUser);
+
+            a.appendChild(smallTemplateType);
+            a.appendChild(div);
+            li.appendChild(a);
+
+            profile.ulChangeLogByUser.appendChild(li);
+        }
+    }
+    </script>
+}

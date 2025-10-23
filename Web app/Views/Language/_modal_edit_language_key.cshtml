@@ -1,0 +1,39 @@
+﻿@model LanguageResourceItemModel
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<form asp-action="EditResource" data-item="editKey" id="editresourceform">
+
+    <input type="hidden" asp-for="Guid" />
+    <input type="hidden" asp-for="ResourceKey" />
+    <input type="hidden" asp-for="Locale" />
+
+    <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">@Model?.ResourceKey</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label asp-for="Description"></label>
+            <input asp-for="Description" class="form-control" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ResourceValue"></label>
+            <input asp-for="ResourceValue" class="form-control" />
+            <span asp-validation-for="ResourceValue" class="text-danger"></span>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Language.BtnClose, "Close") ?? "Close")*@
+        <button type="button" class="btn btn-primary" onclick="savemodal(event)">Save</button>
+        @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Language.BtnSave, "Save") ?? "Save")*@
+    </div>
+
+</form>

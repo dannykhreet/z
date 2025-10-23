@@ -1,0 +1,499 @@
+﻿@model WebApp.ViewModels.CompletedAuditViewModel
+@using WebApp.Models.Audit
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.StatsAuditCompletedTitle, "Completed audits") ?? "Completed audits";
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+
+    var single = new WebApp.ViewModels.CompletedAuditSingleViewModel();
+}
+
+@section CSS {
+    <style>
+        .my-circle {
+            display: inline-block;
+            border-radius: 60px;
+            padding: 0.8em 1.1em;
+            background-color: #3f903f;
+            color: #fff;
+        }
+
+            .my-circle i {
+                font-size: 20px;
+            }
+
+        .status-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff !important;
+            flex-grow: 0;
+            flex-shrink: 0;
+        }
+
+        .status-icon {
+            display: flex;
+            margin: auto;
+            font-size: 1.3em;
+        }
+
+        #fade-wrapper {
+            display: none;
+            position: fixed;
+            height: 100vh;
+            width: 100vw;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 10000;
+        }
+
+        .scale-up {
+            transform: translate(-15px, -140px);
+            width: 200%;
+            transition: all 0.2s ease-in-out;
+            border-radius: 6px !important;
+        }
+
+        #accordionChecklists .card .card-header {
+            cursor: pointer;
+        }
+
+        #completedChecklistContainer {
+            height: 400px;
+        }
+
+        .infoText {
+            position: fixed;
+            right: 0;
+            top: 0;
+            margin: 10px;
+        }
+
+        .score {
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            padding: 3px 10px 0px 14px;
+            font-size: 23px;
+        }
+
+        .score-large {
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            padding: 3px 0px 0px 8px;
+            font-size: 23px;
+        }
+    </style>
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-6">
+                <a asp-controller="audit" asp-action="index"><i class="fa fa-arrow-left"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.NavBackTitle, "Back to audit overview") ?? "Back to audit overview")</a>
+                <h1>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsAuditCompletedTitle, "Completed audits") ?? "Completed audits")</h1>
+            </div>
+
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                <a asp-controller="checklist" asp-action="details" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto d-none"></a>
+                @if (Model?.ApplicationSettings?.Features != null)
+                {
+                    @if (Model.ApplicationSettings.Features.ExportAdvancedEnabled.HasValue || Model.ApplicationSettings.Features.ExportEnabled.HasValue)
+                    {
+                        @if (Model.ApplicationSettings.Features.ExportTaskProperties != null && Model.ApplicationSettings.Features.ExportTaskProperties.Value && Model.ApplicationSettings.Features.AuditsPropertyValueRegistrationEnabled != null && Model.ApplicationSettings.Features.AuditsPropertyValueRegistrationEnabled.Value && Model.ApplicationSettings.Features.AuditsEnabled != null && Model.ApplicationSettings.Features.AuditsEnabled.Value)
+                        {
+                            <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="audittaskproperties" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Audit.DownloadDataTitle, "Download value registration data") ?? "Download value registration data")"><i class="far fa-object-group"></i></button>
+                        }
+
+                        @if (Model.ApplicationSettings.Features.ExportEnabled != null && Model.ApplicationSettings.Features.ExportEnabled.Value && Model.ApplicationSettings.Features.AuditsEnabled != null && Model.ApplicationSettings.Features.AuditsEnabled.Value)
+                        {
+                            <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="audits" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.DownloadAudits, "Download audits") ?? "Download audits")"><i class="fas fa-download"></i></button>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section>
+    <div class="container-fluid">
+        <div class="row" style="height:calc(100vh - 167px);">
+            <div class="col-xl-3 d-none d-xl-inline-block">
+                <div class="card card-filter h-100">
+                    <div class="card-header pb-0">
+                        <h3 class="card-title d-none">
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.CardTitle, "Filters") ?? "Filters")
+                        </h3>
+                        
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn" onclick="areaFilter_v2.reset('block')" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body card-filter pt-0">
+                        <partial name="_filters_block" model="Model.Filter" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 d-xl-inline-block" style="height:calc(100vh - 190px);">
+                <div class="card h-100">
+                    <div class="card-header h5">
+                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsAuditCompletedTitle, "Completed audits") ?? "Completed audits")
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div id="nocontent" class="pl-3 pt-3 pb-0 text-muted">
+                            <h4>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Reports.NoCompletedAuditsFound, "No completed audits found") ?? "No completed audits found")</h4>
+                        </div>
+
+                        <div id="contentCol" class="list-group h-100" data-container="completed_audits">
+                            @if (Model.CompletedAudits != null)
+                            {
+                                @foreach (CompletedAuditModel completeAudit in Model.CompletedAudits)
+                                {
+                                    if (completeAudit.Signatures.Any())
+                                    {
+                                        {
+                                            single = ViewModelConverters.ConvertToViewModel(completeAudit);
+                                            single.CompletedTextValue = Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.CompletedBy, "Completed by") ?? "Completed by";
+                                            single.Timezone = timezone;
+                                            single.Locale = Model?.Locale;
+                                        }
+                                        <partial name="~/Views/Report/Audit/_completed_audit.cshtml" model="single" />
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <div class="card-footer" style="text-align:center;">
+                        <span id="load_more_loader" style="margin-top:-10px;"></span>
+                        <div style="text-align:center;margin-top:5px;">
+                            <a class="btn btn-ezgo" style="width:200px;" data-actiontype="load_more"><i class="fas fa-angle-double-down"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tasklist" class="col-xl-5 d-xl-inline-block" style="height:calc(100vh - 188px);"></div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @if (Model.ApplicationSettings.Features.ExportAdvancedEnabled.HasValue || Model.ApplicationSettings.Features.ExportEnabled.HasValue)
+    {
+        if (Model.ApplicationSettings.Features.ExportAdvancedEnabled.Value || Model.ApplicationSettings.Features.ExportEnabled.Value)
+        {
+            <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+            <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+        }
+    }
+
+    <script src="/js/areafilter_v2.js"></script>
+    <script>
+        $('document').ready(function () {
+            ezgomediafetcher.preloadImagesAndVideos();
+            ezgomediafetcher.preloadFancyboxAnchors();
+            localStorage.setItem('last_completed_overview_location', window.location.pathname + window.location.search);
+        });
+
+        areaFilter_v2.init('/config/getareatree', '', true);
+
+        $('#nocontent').hide();
+        $('#contentCol').on('filterDone', function () {
+            $('#nocontent').toggle(
+                $('#contentCol div.results:visible').length === 0
+            )
+        });
+
+        function loadTasks(e, id) {
+                $('#tasklist').html('<div class="text-center w-100 pt-5"><img src="/images/factory-loading.gif" class="w-50" /></div>');
+            $('#contentCol a').removeClass('active');
+            $(e.currentTarget).addClass('active');
+            $.get('/report/audit/completed/' + id, function (data) {
+                $('#tasklist').html(data);
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+            });
+        }
+
+        function PrintCompletedAudit(id) {
+
+            var iframe = document.createElement('iframe');
+            iframe.name = "audit_" + id;
+            iframe.style.position = "absolute";
+            iframe.style.top = "-1000000px";
+            iframe.src = "/pdf/create/1/" + id;
+            document.body.appendChild(iframe);
+
+            setTimeout(function () {
+                window.frames["audit_" + id].print();
+                document.body.removeChild(iframe);
+            }, 1000);
+
+            return false;
+        }
+
+        var completedAudits = {
+            _version: '1.0',
+            offset: 0,
+            nr: 10,
+            nrOfItemsLoaded: 0,
+            areaId: 0,
+            date: '',
+            templateId: @Model.TemplateId,
+            selectedAuditId: @Model.AuditId,
+            clearItemContainer: function () {
+                $('[data-container="completed_audits"]').html('');
+            },
+            init: function (startOffset, startNrOfItemsLoaded, nrOfItemsToRetrieve) {
+                if (startOffset != null) {
+                    completedAudits.offset = startOffset;
+                }
+                if (startNrOfItemsLoaded != null) {
+                    completedAudits.nrOfItemsLoaded = startNrOfItemsLoaded;
+                }
+                if (nrOfItemsToRetrieve != null) {
+                    completedAudits.nr = nrOfItemsToRetrieve;
+                }
+                completedAudits.initHandlers();
+                completedAudits.showHideMoreButton();
+
+                if (completedAudits.selectedAuditId > 0 && $(`[data-auditid='${completedAudits.selectedAuditId}']`).length) {
+                    $(`[data-auditid='${completedAudits.selectedAuditId}']`)[0].click();
+                }
+            },
+            initHandlers: function () {
+                $('[data-actiontype="load_more"]').on('click', function () {
+                    completedAudits.retrieveMore();
+                });
+                $('#areatree').on('click', 'a', function () {
+
+                    var areaDeselected = +$(this).data('id') != areaid;
+                    if (areaDeselected) {
+                        completedAudits.areaId = null;
+                    }
+                    else {
+                        completedAudits.areaId = $(this).data('id');
+                    }
+                    completedAudits.clearDetails();
+
+                    completedAudits.offset = 0;
+                    completedAudits.clearItemContainer();
+                    completedAudits.setLoaderStart('load_more_loader');
+                    completedAudits.retrieve();
+                });
+                $('[data-action="resetfilters"]').on('click', function () {
+                    const url = window.location.href.split('?')[0];
+
+                    window.history.pushState({}, "", url);
+                    completedAudits.templateId = 0;
+                    completedAudits.selectedChecklistId = 0;
+                    completedAudits.areaId = 0;
+                    completedAudits.startDate = '';
+                    completedAudits.endDate = '';
+                    completedAudits.clearDetails();
+
+                    completedAudits.offset = 0;
+                    completedAudits.clearItemContainer();
+                    completedAudits.setLoaderStart('load_more_loader');
+                    completedAudits.retrieve();
+
+                    $('#filter_datechoice').val('');
+                });
+
+                $('#templateFilter').val('default').selectpicker("refresh");
+
+                $('#templateFilter').on('change', function (e) {
+                    completedAudits.templateId = +this.value.replace('template', '');
+                    completedAudits.clearDetails();
+
+                    completedAudits.offset = 0;
+                    completedAudits.clearItemContainer();
+                    completedAudits.setLoaderStart('load_more_loader');
+                    completedAudits.retrieve();
+                });
+
+                //show tooltips of resourceFilter options
+                $('button[data-id="templateFilter"]').on('click', function (e) {
+                    $('#templateFilter option').each(function () {
+                        var id = '#' + $(this).attr('data-bs-select');
+                        var title = $(id).attr('title');
+                        if (title == undefined || title == '') {
+                            $(id).attr('title', $(this).attr('title'));
+                        }
+                    });
+                });
+
+            },
+            retrieveMore: function () {
+                if (completedAudits.offset == null) { completedAudits.offset = 0 };
+
+                completedAudits.setLoaderStart('load_more_loader');
+
+                completedAudits.retrieve();
+            },
+            retrieve: function () {
+                var queryParams = [];
+                if (completedAudits.startDate != '' && completedAudits.endDate != '' && completedAudits.startDate != null && completedAudits.endDate != null) {
+                    queryParams.push('startDate=' + completedAudits.startDate);
+                    queryParams.push('endDate=' + completedAudits.endDate);
+                }
+
+                if (completedAudits.templateId != 0) {
+                    queryParams.push('templateId=' + completedAudits.templateId);
+                }
+
+                if (completedAudits.areaId != '' && completedAudits.areaId != null) {
+                    queryParams.push('areaid=' + completedAudits.areaId);
+                }
+
+                if (completedAudits.nr != 0) {
+                    queryParams.push('nr=' + completedAudits.nr);
+                }
+
+                if (completedAudits.offset != 0) {
+                    queryParams.push('offset=' + completedAudits.offset);
+                }
+
+                if (completedAudits.mostRecentRequest != null) {
+                    completedAudits.mostRecentRequest.abort();
+                }
+
+                completedAudits.mostRecentRequest = $.ajax({
+                    type: "GET",
+                    url: '/report/audit/completeddetails' + (queryParams.length ? '?' + queryParams.join('&') : ''),
+                    success: function (data) {
+                        $('[data-container="completed_audits"]').append(data);
+                        completedAudits.offset = completedAudits.offset + completedAudits.nr;
+                        completedAudits.setLoaderEnd('load_more_loader');
+                        completedAudits.showHideMoreButton();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        completedAudits.setLoaderEnd('load_more_loader');
+                        if (jqXHR.statusText == "abort") {
+                            return;
+                        }
+                        else {
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        }
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            setLoaderStart: function (elementId) {
+                var loader = document.getElementById(elementId);
+                loader.innerHTML = '<img src="data:image/gif;base64,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" />';
+            },
+            setLoaderEnd: function (elementId) {
+                var loader = document.getElementById(elementId);
+                loader.innerHTML = '';
+            },
+            hideMoreButton: function () {
+                $('[data-actiontype="load_more"]').hide();
+            },
+            showMoreButton: function () {
+                $('[data-actiontype="load_more"]').show();
+            },
+            showHideMoreButton: function () {
+                let nrOfItems = $('[data-container="completed_audits"]').children('[data-containertype="resultitem"]').length;
+                if (nrOfItems == 0) {
+                    completedAudits.hideMoreButton();
+                    completedAudits.showNoContent();
+                } else {
+                    completedAudits.hideNoContent();
+                    if ((nrOfItems % completedAudits.nrOfItemsLoaded) > 0) {
+                        completedAudits.hideMoreButton();
+                    } else {
+                        completedAudits.showMoreButton();
+                    };
+                }
+
+            },
+            hideNoContent: function () {
+                $('#nocontent').hide();
+            },
+            showNoContent: function () {
+                $('#nocontent').show();
+            },
+            clearDetails: function () {
+                $('#tasklist').html('');
+            }
+
+        }
+
+        completedAudits.init(@WebApp.Controllers.ReportController.START_NR_OF_ITEMS, @(Model.CompletedAudits != null ? Model.CompletedAudits.Count : 0), @WebApp.Controllers.ReportController.MAX_NR_OF_DYNAMIC_ITEMS);
+
+
+        @if (Model.TemplateId != 0)
+        {
+            @:$('#templateFilter').selectpicker('val', 'template' + @(Model.TemplateId));
+        }
+
+    </script>
+    <script>
+            $('#filter_datechoice').val('');
+
+        $('#filter_datechoice').daterangepicker({
+            showDropdowns: true,
+            autoUpdateInput: false,
+            opens: 'center', drops: 'up',
+            locale: {
+                format: 'DD MMM YYYY',
+                firstDay: 1,
+                cancelLabel: 'Clear'
+            }
+        });
+
+        $('#filter_datechoice').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD MMM YYYY') + ' - ' + picker.endDate.format('DD MMM YYYY'));
+
+            completedAudits.startDate = picker.startDate.format("DD-MM-YYYY");
+            completedAudits.endDate = picker.endDate.format("DD-MM-YYYY");
+
+            completedAudits.clearDetails();
+
+            completedAudits.offset = 0;
+            completedAudits.clearItemContainer();
+            completedAudits.setLoaderStart('load_more_loader');
+            completedAudits.retrieve();
+
+        });
+
+        $('#filter_datechoice').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+        });
+
+        $('[data-action="cleardatefilter"]').on('click', function () {
+            $('#filter_datechoice').val('');
+            completedAudits.startDate = '';
+            completedAudits.endDate = '';
+
+            completedAudits.clearDetails();
+
+            completedAudits.offset = 0;
+            completedAudits.clearItemContainer();
+            completedAudits.setLoaderStart('load_more_loader');
+            completedAudits.retrieve();
+        });
+
+        @if (Model.TemplateId != 0)
+        {
+            @:$('#templateFilter').selectpicker('val', 'template' + @(Model.TemplateId));
+        }
+    </script>
+
+
+}

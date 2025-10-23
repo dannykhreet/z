@@ -1,0 +1,504 @@
+﻿@model WebApp.ViewModels.DatawarehouseViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout_template";
+}
+
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                &nbsp;
+                <h1 class="m-0 text-dark">Datawarehouse</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                <button type="button" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" id="btn_tools" data-actiontype="dwtools" onclick="document.location.href='/datawarehouse/tools';">Tools</button>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+
+<section class="content">
+
+    <div class="container-fluid">
+
+        <div class="card">
+            <div class="card-header">
+                <h3 id="cardHeader" class="card-title d-none d-sm-inline-block">User overview<span id="counter">&nbsp;</span></h3>
+                <div class="card-tools">
+                    <div class="input-group input-group-sm">
+                        <button type="button" class="btn btn-ezgo btn-default btn-sm" id="btn_create_new_user" data-actiontype="newuser" style="display:none">New user</button>
+              
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-2">
+                        <input type="text" id="dw_username" name="dw_username" class="form-control form-control-sm" placeholder="User name" />
+                    </div>
+                    <div class="col-2">
+                        <input type="password" id="dw_password" name="dw_password" class="form-control form-control-sm" placeholder="Password" />
+                    </div>
+                    <div class="col-2">
+                        <input type="text" id="dw_appid" name="dw_appid" class="form-control form-control-sm" placeholder="App Id" />
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-default btn-sm" id="btn_retrieve_users">Retrieve data</button>
+                        <button type="button" class="btn btn-default btn-sm" id="btn_do_migrations">Run migrations</button>
+                        <button type="button" class="btn btn-default btn-sm" id="btn_update_users_all">Update all user structures</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row pt-1" style="height:calc(100vh - 175px);overflow:auto;">
+            <div class="col-lg-12 col-xl-12">
+                <div id="contentBody" style="height: calc(100vh - 245px);overflow:auto;">
+                    Please enter user name, password and app id for an datawarehouse administrator user and retrieve data. 
+                    User name, password and app id are all mandetory for all actions that can be done on this page. 
+                    Every call to the datawarehouse is validated based on these values. 
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div style="display:none;">
+    <a id="download_data"></a>
+</div>
+
+<div class="modal fade modal-xl" id="modal_information" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modal_title"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" id="modal_content">
+                <textarea id="modal_information_content" name="modal_information_content" style="height:400px;width:750px;"></textarea>
+                <input type="text" id="run_migration_validation" name="run_migration_validation" class="form-control from-control-sm text-danger" style="align-content: center; text-align: center" placeholder="TYPE HERE!" />
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm none" data-action="run_migration" id="btn_run_migration">Run migration</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script>
+        var dw = {
+            clearUser: function() {
+                $('#delete_validation').val();
+                $('#user_id').val('');
+                $('#user_username').val('');
+                $('#user_password').val('');
+                $('#user_appid').val('');
+                $('#user_holding_id').val('');
+                $('#user_company_id').val('');
+                $('#user_iprange').val('');
+                $('#user_module').val('');
+            },
+            cleanModal: function() {
+                $('#btn_run_migration').hide();
+                $('#modal_information_content').val('');
+                $('#run_migration_validation').val('');
+                $('#run_migration_validation').hide();
+            },
+            displayUser: function(displayType) {
+                $('#user_container').show();
+               
+                $('[data-display-delete="true"]').hide();
+                $('[data-display-new-user="true"]').hide();
+                $('[data-display-update-user="true"]').hide();
+                $('[data-display-user="true"]').hide();
+                $('[data-display-change-ip="true"]').hide();
+                $('[data-display-change-module="true"]').hide();
+                $('#btn_generate_guid').hide();
+                $('#btn_generate_guid_bi').hide();
+                $('[data-display-password="true"]').hide();
+                $('[data-display-bulk="true"]').hide();
+                $('[data-display-change-bikey]').hide();
+                
+                if (displayType == 'iprange') {
+                    $('[data-display-user="true"]').show();
+                    $('[data-display-change-ip="true"]').show();
+                    $('#btn_generate_guid').hide();
+                    $('#btn_generate_guid_bi').hide();
+                    $('#user_password').hide();
+                    $('[data-display-password="true"]').hide();
+                };
+                if(displayType == 'bikey') {
+                    $('[data-display-user="true"]').show();
+                    $('[data-display-change-bikey="true"]').show();
+                    $('#btn_generate_guid').hide();
+                    $('#btn_generate_guid_bi').show();
+                    $('#user_password').hide();
+                    $('[data-display-password="true"]').hide();
+                };
+                if (displayType == 'modules') {
+                    $('[data-display-user="true"]').show();
+                    $('[data-display-change-module="true"]').show();
+                    $('#btn_generate_guid').hide();
+                    $('#btn_generate_guid_bi').hide();
+                    $('#user_password').hide();
+                    $('[data-display-password="true"]').hide();
+                };
+                if (displayType == 'bulk') {
+                    $('[data-display-user="true"]').show();
+                    $('[data-display-bulk="true"]').show();
+                    $('#btn_generate_guid').hide();
+                    $('#btn_generate_guid_bi').hide();
+                    $('#user_password').hide();
+                    $('[data-display-password="true"]').hide();
+                };
+                if (displayType == 'newuser') {
+                    dw.clearUser();
+                    $('#btn_generate_guid').show();
+                    $('#btn_generate_guid_bi').show();
+                    $('[data-display-new-user="true"]').show();
+                    $('[data-display-user="true"]').show();
+                    $('[data-display-password="true"]').show();
+                };
+                 if (displayType == 'updateuser') {
+                    $('[data-display-update-user="true"]').show();
+                    $('[data-display-user="true"]').show();
+                    $('#btn_generate_guid').hide();
+                    $('#btn_generate_guid_bi').hide();
+                    $('#user_password').hide();
+                    $('[data-display-password="true"]').hide();
+                };
+                if (displayType == 'deleteuser') {
+                    $('[data-display-user="true"]').show();
+                    $('[data-display-delete="true"]').show();
+                    $('#btn_generate_guid').hide();
+                    $('#btn_generate_guid_bi').hide();
+                    $('#user_password').hide();
+                    $('[data-display-password="true"]').hide();
+                };
+            },
+            dropUser: function () {
+                if($('#delete_validation').val() == 'DELETE') {
+                    dw.post('/datawarehouse/dropuser');
+                } else {
+                    toastr.error('Please enter "DELETE" before removing an user.');
+                }
+            },
+            generateCreateUser: function() {
+                dw.post('/datawarehouse/generatecreateuser', true);
+            },
+            generateUpdateUser: function () {
+                dw.post('/datawarehouse/generateupdateuser', true);
+            },
+            generateDropUser: function() {
+                dw.post('/datawarehouse/generatedropuser', true);
+            },
+            getDwUser: function() {
+                 let dwUser = {
+                    Username: $('#user_username').val(),
+                    Password: $('#user_password').val(),
+                    AppId: $('#user_appid').val(),
+                    CompanyId: parseInt($('#user_company_id').val()),
+                    HoldingId: parseInt($('#user_holding_id').val()),
+                    Modules: $('#user_module').val(),
+                    IpValidationList: $('#user_iprange').val(),
+                    Id: $('#user_id').val() != null && $('#user_id').val() != '' ? parseInt($('#user_id').val()) : 0,
+                    BiKey: $('#user_bikey').val(),
+                    Version: $('#user_version').val()
+                };
+                return dwUser;
+            },
+            getDwData: function() {
+                let dwData = {
+                    UserName: $('#dw_username').val(),
+                    Password: $('#dw_password').val(),
+                    AppId: $('#dw_appid').val(),
+                    User: dw.getDwUser()
+                };
+                return dwData;
+            },
+            init: function() {
+                dw.cleanModal();
+                dw.initHandlers();
+            },
+            initHandlers: function() {
+                $('#btn_retrieve_users').on('click',function() { 
+                    dw.retrieve();
+                });
+                $('#btn_do_migrations').on('click', function() {
+                    dw.cleanModal();
+                    dw.postRetrieve('/datawarehouse/migrations/retrieve');
+                    $('#btn_run_migration').show();
+                    $('#run_migration_validation').show();
+                });
+                $('#btn_run_migration').on('click', function() {
+                    if($('#run_migration_validation').val() == 'RUN MIGRATION') {
+                        dw.postRetrieve('/datawarehouse/migrations/execute');
+                        $('#btn_run_migration').hide();
+                    } else {
+                        toastr.warning('Type [RUN MIGRATION] into validation field.');
+                    }
+                    
+                });
+                $('body').on('click','#btn_generate_guid',function () {
+                    dw.generateGuid('app');
+                });
+                $('body').on('click','#btn_generate_guid_bi',function () {
+                    dw.generateGuid('bi');
+                });
+                $('body').on('click','#btn_user_save',function() {
+                    dw.saveNewUser();
+                });
+                $('body').on('click', '#btn_user_iprange_save', function () {
+                    dw.saveIp();
+                });
+                $('body').on('click', '#btn_user_module_save', function () {
+                    dw.saveModules();
+                });
+                $('body').on('click', '#btn_user_bikey_save', function () {
+                    dw.saveBiKey();
+                });
+                $('body').on('click', '#btn_user_update', function () {
+                    dw.saveUpdateUser();
+                });
+                $('body').on('click', '#btn_user_bulk_save', function () {
+                    dw.saveBulk();
+                });
+                 $('body').on('click','#btn_user_drop',function() {
+                    dw.dropUser();
+                });
+                $('body').on('click', '#btn_user_save_generate', function () {
+                    dw.generateCreateUser();
+                });
+                $('body').on('click', '#btn_user_update_generate', function () {
+                    dw.generateUpdateUser();
+                });
+                $('body').on('click', '#btn_user_drop_generate', function () {
+                    dw.generateDropUser();
+                });
+                $('body').on('click', '#btn_user_check_structures', function () {
+                    dw.cleanModal();
+                    dw.postRetrieve('/datawarehouse/userstructures/', true);
+                });
+                $('body').on('click', '[data-actiontype="editiprange"]', function () {
+                    dw.loadUser($('#data_store_' + $(this).attr('data-id')).val());
+                    dw.displayUser('iprange');
+                });
+                $('body').on('click', '[data-actiontype="editmodules"]', function () {
+                    dw.loadUser($('#data_store_' + $(this).attr('data-id')).val());
+                    dw.displayUser('modules');
+                });
+                $('body').on('click', '[data-actiontype="editbikey"]', function () {
+                    dw.loadUser($('#data_store_' + $(this).attr('data-id')).val());
+                    dw.displayUser('bikey');
+                });
+                $('body').on('click', '[data-actiontype="newuser"]', function () {
+                    dw.displayUser('newuser');
+                });
+                $('body').on('click', '[data-actiontype="updateuser"]', function () {
+                    dw.loadUser($('#data_store_' + $(this).attr('data-id')).val());
+                    dw.displayUser('updateuser');
+                });
+                $('body').on('click', '[data-actiontype="deleteuser"]', function () {
+                    dw.loadUser($('#data_store_' + $(this).attr('data-id')).val());
+                    dw.displayUser('deleteuser');
+                });
+                $('body').on('click', '[data-actiontype="bulk"]', function () {
+                    dw.loadUser($('#data_store_' + $(this).attr('data-id')).val());
+                    dw.displayUser('bulk');
+                });
+                 $('#btn_update_users_all').on('click',function() {
+                    dw.saveUpdateUserAll();
+                });
+            },
+            generateGuid: function(gentype) {
+                $.ajax({
+                    type: "GET",
+                    url: '/company/holding/generateguid',
+                    success: function (data) {
+                        if (data != null) {
+                            if(gentype == 'app') {
+                                $('#user_appid').val(JSON.parse(data));
+                            } else if (gentype == 'bi') {
+                                $('#user_bikey').val(JSON.parse(data));
+                            }
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            handleFile: function(fileData) {
+                var el = document.getElementById("download_data");
+                var myblob = new Blob([fileData], {
+                    type: 'text/plain'
+                });
+                el.href = window.URL.createObjectURL(myblob);
+                el.download = 'script.psql';
+                el.click();
+            },
+            loadUser: function(userData) {
+                if(userData!=null) {
+                    let user = JSON.parse(userData);
+                    //{"Id":1,"Username":"xxxxxx","AppId":"xxxxxxxxxxxx","CompanyId":0,"HoldingId":0,"Modules":"xxxxxx", "IpValidationList":"xxxxxx"}
+                    $('#user_id').val(user.Id);
+                    $('#user_username').val(user.Username);
+                    $('#user_appid').val(user.AppId);
+                    $('#user_holding_id').val(user.HoldingId);
+                    $('#user_company_id').val(user.CompanyId);
+                    $('#user_iprange').val(user.IpValidationList);
+                    $('#user_module').val(user.Modules);
+                    $('#user_version').val(user.Version);
+                    $('#user_bikey').val(user.BIKey);
+                }
+            },
+            retrieve: function () {
+                toastr.remove();
+
+                let dwData = {
+                    UserName: $('#dw_username').val(),
+                    Password: $('#dw_password').val(),
+                    AppId: $('#dw_appid').val()
+                };
+
+                //add responses management from api (invalid password etc.)
+                $.ajax({
+                    type: "POST",
+                    url: '/datawarehouse/useroverview',
+                    data: JSON.stringify(dwData),
+                    success: function (data) {
+                        toastr.success('Generating display');
+                        $('#contentBody').html(data);
+                        $('#btn_create_new_user').show();
+                        toastr.remove();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            saveNewUser: function() {
+                dw.post('/datawarehouse/createuser');
+            },
+            saveUpdateUser: function () {
+                dw.post('/datawarehouse/updateuser');
+            },
+            saveUpdateUserAll: function () {
+                dw.post('/datawarehouse/updateuser/all');
+            },
+            saveIp: function() {
+                dw.post('/datawarehouse/setip');
+            },
+            saveBiKey: function() {
+                dw.post('/datawarehouse/setbikey');
+            },
+            saveModules: function() {
+                dw.post('/datawarehouse/setmodules');
+            },
+            saveBulk: function() {
+                dw.post('/datawarehouse/bulk/base');
+            },
+            post: function(uri, download) {
+                toastr.remove();
+
+                /*
+                fields:
+                    user_id
+                    user_username
+                    user_password
+                    user_appid
+                    user_holding_id
+                    user_company_id
+                    user_iprange
+                    user_module
+                usernames:
+                    Username
+                    Password
+                    AppId
+                    CompanyId
+                    HoldingId
+                    Modules
+                    IpValidationList
+                    Id
+                */
+                let dwUser = dw.getDwUser();
+
+                let dwData = dw.getDwData();
+
+                $.ajax({
+                    type: "POST",
+                    url: uri,
+                    data: JSON.stringify(dwData),
+                    success: function (data) {
+                        if(download != null && download == true) {
+                            dw.handleFile(data);
+                        } else {
+                            toastr.success('Saved..retrieving users');
+                            dw.retrieve();
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            postRetrieve: function(uri, isJson) {
+                toastr.remove();
+               
+                let dwUser = dw.getDwUser();
+                let dwData = dw.getDwData();
+
+                $.ajax({
+                    type: "POST",
+                    url: uri,
+                    data: JSON.stringify(dwData),
+                    success: function (data) {
+                        if(isJson != null && isJson != undefined && isJson) {
+                            $('#modal_information_content').val(JSON.stringify(JSON.parse(data), undefined, 4));
+                            $('#modal_information').modal('show');
+
+                        } else {
+                            $('#modal_information_content').val(data);
+                            $('#modal_information').modal('show');
+                        }
+                        //console.log(JSON.parse(data));
+                        
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            ValidateLogin: function () {
+                if ($('#dw_username').val() != null && $('#dw_username').val() != '' &&
+                    $('#dw_password').val() != null && $('#dw_password').val() != '' &&
+                    $('#dw_appid').val() != null && $('#dw_appid').val() != '') {
+                        return true;
+                    }
+                return false;
+            }
+        }
+
+        dw.init();
+        ezgomediafetcher.preloadImagesAndVideos();
+    </script>
+}

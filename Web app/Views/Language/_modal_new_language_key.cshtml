@@ -1,0 +1,38 @@
+﻿@model LanguageResourceItemModel
+@{
+
+}
+<form asp-action="CreateResource" data-item="createKey" id="createresourceform">
+    <input type="hidden" asp-for="Guid" />
+
+    <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">New Resource Key</h5>
+        @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Language.NewResourceKeyTitle, "New Resource Key") ?? "New Resource Key")*@
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label asp-for="ResourceKey"></label>
+            <input asp-for="ResourceKey" class="form-control" style="text-transform: uppercase;" />
+            <span asp-validation-for="ResourceKey" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Description">Internal description of this key</label>
+            @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Language.InternalDescriptionOfThisKey, "Internal description of this key") ?? "Internal description of this key")*@
+            <input asp-for="Description" class="form-control" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Language.BtnClose, "Close") ?? "Close")*@
+        <button type="button" class="btn btn-primary" onclick="savemodal(event)">Save</button>
+        @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Language.BtnSave, "Save") ?? "Save")*@
+    </div>
+
+</form>

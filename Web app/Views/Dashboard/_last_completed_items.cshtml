@@ -1,0 +1,48 @@
+﻿@model WebApp.ViewModels.DashboardViewModel
+
+@{
+    Layout = null;
+}
+@if (Model.ApplicationSettings?.Features?.ChecklistsEnabled != null)
+{
+    if (Model.ApplicationSettings.Features.ChecklistsEnabled.HasValue && Model.ApplicationSettings.Features.ChecklistsEnabled.Value)
+    {
+
+        <div id="dashboardCompletedChecklists" class="col-md-3">
+            <partial name="_last_completed_checklists" model="Model" />
+        </div>
+    }
+}
+
+@if (Model.ApplicationSettings?.Features?.TasksEnabled != null)
+{
+    if (Model.ApplicationSettings.Features.TasksEnabled.HasValue && Model.ApplicationSettings.Features.TasksEnabled.Value)
+    {
+        <div id="dashboardCompletedTasks" class="col-md-3">
+            <partial name="_last_completed_tasks" model="Model" />
+        </div>
+
+    }
+}
+
+@if (Model.ApplicationSettings?.Features?.AuditsEnabled != null)
+{
+    if (Model.ApplicationSettings.Features.AuditsEnabled.HasValue && Model.ApplicationSettings.Features.AuditsEnabled.Value)
+    {
+        <div id="dashboardCompletedAudits" class="col-md-3">
+            <partial name="_last_completed_audits" model="Model" />
+        </div>
+
+    }
+}
+
+@if (Model.ApplicationSettings?.Features?.ActionsEnabled != null)
+{
+    if (Model.ApplicationSettings.Features.ActionsEnabled.HasValue && Model.ApplicationSettings.Features.ActionsEnabled.Value)
+    {
+        <div id="dashboardActions" class="col-md-3">
+            <partial name="_last_actions" model="Model" />
+        </div>
+
+    }
+}

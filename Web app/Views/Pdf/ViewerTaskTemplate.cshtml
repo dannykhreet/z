@@ -1,0 +1,896 @@
+﻿@model PdfTaskTemplateViewModel
+@using WebApp.Helpers
+@using WebApp.ViewModels
+@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>@(Model?.CmsLanguage.GetValue(LanguageKeys.PdfTaskTemplate.TaskTemplate, "Task template") ?? "Task template") @Model.TaskTemplate.Name</title>
+    <link rel="stylesheet" href="/css/pdf.css" />
+    <partial name="_pdfCss" /> @*above link doesnt work on docker for some reason*@
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/plugins/fontawesome-pro-6.5.2-web/css/all.min.css" />
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1337.0.min.js"></script>
+    <script src="/js/ezgomediafetcher.js"></script>
+    <style>
+        table {
+        table-layout: fixed;
+        border-collapse: separate;
+        border-spacing: 0px;
+        padding: 0px;
+        margin: 0px;
+        }
+
+        td {
+        color: #3d3c41;
+        background-size: 100% 100%;
+        background-position-x: 0;
+        background-position-y: 0;
+        overflow: hidden;
+        word-wrap: break-word;
+        }
+
+        tr, td, th {
+        page-break-inside: avoid !important;
+        word-wrap: break-word;
+        padding: unset;
+        }
+
+        .overviewtext {
+        font-size: 18px;
+        padding-left: 2rem;
+        padding-top: 0.3rem;
+        padding-bottom: 0.3rem;
+        vertical-align: top;
+        }
+
+        .stepstext {
+        }
+
+        .informationtext {
+        vertical-align: top;
+        padding-left: 1rem;
+        }
+
+        .overlaytop {
+        position: absolute;
+        padding: 0px;
+        margin: 0px;
+        top: 0;
+        left: 0;
+        width: 3em;
+        height: 3em;
+        line-height: 3em;
+        vertical-align: middle;
+        text-align: center;
+        background: #08498B;
+        color: white;
+        }
+
+        .overlaybottom {
+        position: absolute;
+        padding: 0px;
+        margin: 0px;
+        top: 0;
+        left: 0;
+        width: 2em;
+        height: 2em;
+        line-height: 2em;
+        vertical-align: middle;
+        text-align: center;
+        background: #08498B;
+        color: white;
+        }
+
+        .fancyshadow {
+        box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+        }
+
+        tr:nth-child(even).alternatingcolors {
+        background: #FFF
+        }
+
+        tr:nth-child(odd).alternatingcolors {
+        background: #f7f6fb
+        }
+
+        .autosize {
+        width: 1%;
+        white-space: nowrap !important;
+        }
+
+        table.print-friendly tr td, table.print-friendly tr th {
+        page-break-inside: avoid;
+        }
+
+        <!-- Tags -->
+        .card {
+        position: relative;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #ffffff;
+        background-clip: border-box;
+        border: 0 solid rgba(0, 0, 0, 0.125);
+        border-radius: 0.25rem;
+        }
+
+        .tag-card {
+        display: inline-block;
+        width: 9em;
+        color: white;
+        align-content: center;
+        align-items: center;
+        }
+
+        .tag-wrapper {
+        width: 100%;
+        width: -moz-available;
+        width: -webkit-fill-available;
+        display: flex;
+        height: 2.6em;
+        line-height: 1.1;
+        }
+
+        .tag-span {
+        text-align: center;
+        align-self: center;
+        display: inline-block;
+        width: 100%;
+        width: -moz-available;
+        width: -webkit-fill-available;
+        }
+
+        .nav-icon {
+        float: left;
+        display: inline-block;
+        }
+        .card {
+        box-shadow: none;
+        border-radius: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <partial name="_header.cshtml" model="@("TASK TEMPLATE")" />
+    <!-- Root table with one td -->
+    <table style="width: 100%; height: 100%;">
+        <!-- Root tr with one td -->
+        <tr>
+            <!-- Root td -->
+            <td style="padding: 1rem;">
+                <!-- Overview section -->
+                <table style="width: 100%; height: auto; margin-bottom: 1rem; page-break-inside: avoid;">
+                    @{
+                        var pictureUrl = Constants.General.ImageUnavailableUrl;
+                        if (!string.IsNullOrEmpty(Model.TaskTemplate.Picture))
+                        {
+                            pictureUrl = MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.TaskTemplate.Picture);
+                        }
+                        if (!string.IsNullOrEmpty(Model.TaskTemplate.VideoThumbnail))
+                        {
+                            pictureUrl = MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.TaskTemplate.VideoThumbnail);
+                        }
+                        <!-- Overview image and title -->
+                        <tr style="width: 100%">
+                            <td rowspan=8 colspan=2 style="vertical-align: top; padding-top: 1rem">
+                                <div class="imageWrapper">
+                                    <img data-src="@pictureUrl" @*style="width: 100%; object-fit: cover; object-position: center; max-height: 300px"*@ />
+                                </div>
+                            </td>
+                            <td colspan=2 class="overviewtext" style="text-transform: uppercase; font-size: 27px; padding-top: 2rem; padding-bottom: 1rem; padding-left: 2rem"><strong style="color: #08498B">@Model.TaskTemplate.Name</strong></td>
+                        </tr>
+                    }
+                    <!-- Overview task description -->
+                    <tr>
+                        <td colspan=2 class="overviewtext" style="font-size: 18px; padding-left: 2rem; padding-right: 1rem; padding-bottom: 1rem; text-overflow: ellipsis"> @Model.TaskTemplate.Description</td>
+                    </tr>
+                    <!-- Overview ID -->
+                    <tr>
+                        <td class="overviewtext"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.TaskId, "Task ID") ?? "Task ID"): </strong></td>
+                        <td style="font-size: 18px">@Model.TaskTemplate.Id</td>
+                    </tr>
+                    <!-- Overview Role -->
+                    <tr>
+                        <td class="overviewtext"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.Role, "Role") ?? "Role"): </strong></td>
+                        @if (Model.TaskTemplate.Role.ToLower().Equals("basic"))
+                        {
+                            <td style="font-size: 18px">@(Model?.CmsLanguage?.GetValue(LanguageKeys.User.Basic, "Basic user") ?? "Basic user")</td>
+                        }
+                        else if (Model.TaskTemplate.Role.ToLower().Equals("shift_leader"))
+                        {
+                            <td style="font-size: 18px">@(Model?.CmsLanguage?.GetValue(LanguageKeys.User.ShiftLeader, "Shift leader") ?? "Shift leader")</td>
+                        }
+                        else if (Model.TaskTemplate.Role.ToLower().Equals("manager"))
+                        {
+                            <td style="font-size: 18px">@(Model?.CmsLanguage?.GetValue(LanguageKeys.User.Manager, "Manager") ?? "Manager")</td>
+                        }
+                    </tr>
+
+                    <!-- Overview connect this task -->
+                    <tr>
+                        <td class="overviewtext" style="vertical-align: top !important"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.Connect, "Connect this task") ?? "Connect this task"): </strong></td>
+                        <td style="font-size: 18px; vertical-align: top !important">
+                            @if (Model.TaskTemplate.DeepLinkTo == "audit")
+                            {
+                                <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionConnectAudit, "Audit") ?? "Audit") @(Model.TaskTemplate.DeepLinkId)</span>
+                            }
+                            else if (Model.TaskTemplate.DeepLinkTo == "checklist")
+                            {
+                                <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionConnectChecklist, "Checklist") ?? "Checklist") @(Model.TaskTemplate.DeepLinkId)</span>
+                            }
+                            else
+                            {
+                                <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionNoConnect, "Do not connect") ?? "Do not connect")</span>
+                            }
+                        </td>
+                    </tr>
+                    <!-- Overview instructions -->
+                    <tr>
+                        <td class="overviewtext" style="vertical-align: top !important"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.Instructions, "Instructions") ?? "Instructions"): </strong></td>
+                        <td style="font-size: 18px; vertical-align: top !important">
+                            @if (Model.TaskTemplate.Steps != null && Model.TaskTemplate.Steps.Count > 0)
+                            {
+                                <span style="font-size: 18px">@Model.TaskTemplate.StepsCount steps</span>
+                            }
+                            else if (!string.IsNullOrEmpty(Model.TaskTemplate.DescriptionFile))
+                            {
+                                <span style="font-size: 18px">Pdf</span>
+                            }
+                            else
+                            {
+                                <span style="font-size: 18px">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.OptionNone, "None") ?? "None")</span>
+                            }
+                        </td>
+                    </tr>
+                    <!-- Overview areas -->
+                    <tr>
+                        <td class="overviewtext" style="vertical-align: top !important"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.Areas, "Areas") ?? "Areas"): </strong></td>
+                        <td style="font-size: 18px; vertical-align: top !important">@Model.TaskArea.FullDisplayName</td>
+                    </tr>
+
+                    @if (Model != null && Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null && Model.ApplicationSettings.Features.RequiredProof.Value)
+                    {
+                        <tr>
+                            <td class="overviewtext overview-cell" style="vertical-align: top !important"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.PictureProofTitle, "Picture Proof") ?? "Picture Proof"): </strong></td>
+                            <td class="overview-cell" style="font-size: 18px; vertical-align: top !important">
+                                @(Model.TaskTemplate.HasPictureProof ? "Yes" : "No")
+                            </td>
+                        </tr>
+                    }
+                </table>
+                <!-- Tags section -->
+                @if (Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null &&
+                  Model.ApplicationSettings.Features.TagsEnabled.HasValue && Model.ApplicationSettings.Features.TagsEnabled.Value &&
+                  Model.TaskTemplate.Tags != null)
+                {
+                    foreach (var tag in Model.TaskTemplate.Tags)
+                    {
+                        <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; margin: 0.25rem">
+                            <div class="tag-wrapper" style="">
+                                <i style="margin-top: auto; margin-bottom: auto; margin-left: 0.5rem; margin-right: 0px" class="nav-icon my-auto ml-2 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                <span style="margin-top: auto; margin-bottom: auto; margin-right: 0.5rem" class="my-auto mr-2 tag-span">@tag.Name</span>
+                            </div>
+                        </div>
+                    }
+                }
+                <!-- Steps section -->
+                <!-- Root steps table -->
+                @if (Model.TaskTemplate.Steps?.Count > 0)
+                {
+                    <table style="width: 100%; height: 100%; background-color: #F7F7F7; margin-top: 1rem; margin-bottom: 1rem; table-layout: auto" class="fancyshadow">
+                        <tr style="padding-bottom: 1rem; page-break-after:avoid; page-break-inside:avoid">
+                            <td id="autosize" style="text-transform: uppercase; background-color: #08498b; font-size: 24px; padding-left: 2rem; padding-right: 2rem; line-height: 2em">
+                                <strong style="color: white">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.InstructionsTitle, "Instructions") ?? "Instructions")</strong>
+                            </td>
+                            <td style="width: 100%">&nbsp;</td>
+                        </tr>
+                        <tr style="page-break-before:avoid">
+                            <td colspan="2" style="padding-top: 1rem">
+                                @{
+                                    string mediaImageUrl = Constants.General.ImageUnavailableUrl;
+
+                                    if (!string.IsNullOrEmpty(Model.TaskTemplate.Picture))
+                                    {
+                                        mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.TaskTemplate.Picture);
+                                    }
+                                    if (!string.IsNullOrEmpty(Model.TaskTemplate.VideoThumbnail))
+                                    {
+                                        mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.TaskTemplate.VideoThumbnail);
+                                    }
+                                    <!-- Steps instructions -->
+                                    <!-- Steps instructions table -->
+                                    <table style="background-color: #F7F7F7; width: 100%; border-spacing: 1em" @*class="fancyshadow"*@>
+                                        @for (int i = 0; i < Model.TaskTemplate.Steps.Count; i += 2)
+                                        {
+                                            var stepAUrl = Constants.General.ImageUnavailableUrl;
+                                            if (!string.IsNullOrEmpty(Model.TaskTemplate.Steps[i].Picture))
+                                            {
+                                                stepAUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.TaskTemplate.Steps[i].Picture);
+                                            }
+                                            if (!string.IsNullOrEmpty(Model.TaskTemplate.Steps[i].VideoThumbnail))
+                                            {
+                                                stepAUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.TaskTemplate.Steps[i].VideoThumbnail);
+                                            }
+
+                                            <tr style="page-break-inside: avoid; page-break-after:auto">
+                                                <!-- Step instruction image and number overlay -->
+                                                <td style="width: 20%; height: 5rem; vertical-align: top; position: relative; background: #F7F7F7">
+                                                    <div class="imageWrapper">
+                                                        <img class="background-image" data-src="@stepAUrl" @*style="width: 100%; object-fit: cover; object-position: center; max-height: 150px; vertical-align: bottom"*@ />
+                                                    </div>
+                                                    <div class="overlaybottom"><h3 style="margin: 0; padding: 0;">@(i + 1)</h3></div>
+                                                </td>
+                                                <!-- Step instruction description -->
+                                                <td style="width: 30%; height: 5rem; max-height: 5rem; font-size: 15px; vertical-align: top; text-overflow: ellipsis" class="stepstext">@Model.TaskTemplate.Steps[i].Description</td>
+
+                                                <!-- Render two instructions per for loop -->
+                                                @if (i < Model.TaskTemplate.Steps.Count - 1)
+                                                {
+                                                    var stepBUrl = Constants.General.ImageUnavailableUrl;
+                                                    if (!string.IsNullOrEmpty(Model.TaskTemplate.Steps[i + 1].Picture))
+                                                    {
+                                                        stepBUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.TaskTemplate.Steps[i + 1].Picture);
+                                                    }
+                                                    if (!string.IsNullOrEmpty(Model.TaskTemplate.Steps[i].VideoThumbnail))
+                                                    {
+                                                        stepBUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.TaskTemplate.Steps[i + 1].VideoThumbnail);
+                                                    }
+                                                    <!-- Step instruction B image and number overlay -->
+                                                    <td style="width: 20%; height: 5rem; vertical-align: top; position: relative; background: #F7F7F7">
+                                                        <div class="imageWrapper">
+                                                            <img class="background-image" data-src="@stepBUrl" @*style="width: 100%; object-fit: cover; object-position: center; max-height: 150px; vertical-align: bottom"*@ />
+                                                        </div>
+                                                        <div class="overlaybottom"><h3 style="margin: 0; padding: 0;">@(i + 2)</h3></div>
+                                                    </td>
+                                                    <!-- Step instruction B description -->
+                                                    <td style="width: 30%; height: 5rem; font-size: 15px; vertical-align: top; text-overflow: ellipsis" class="stepstext">@Model.TaskTemplate.Steps[i + 1].Description</td>
+                                                }
+                                                else
+                                                {
+                                                    <td style="width: 20%; height: 5rem"></td>
+                                                    <td style="width: 30%; height: 5rem; font-size: 15px"></td>
+                                                }
+                                            </tr>
+                                        }
+                                    </table>
+
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                }
+
+                <!-- Value properties -->
+                @if (Model?.TaskTemplate.Properties != null)
+                {
+                    <!-- Value properties table -->
+                    <table class="fancyshadow print-friendly" style="width: 100%; white-space: nowrap; height: auto; margin-top: 1rem; margin-bottom: 1rem; table-layout: auto; page-break-inside: avoid !important">
+                        <tr>
+                            <td id="autosize" style="text-transform: uppercase; background-color: #08498b; font-size: 24px; padding-left: 2rem; padding-right: 2rem; line-height: 2em">
+                                <strong style="color: white">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.ValuePropertiesTitle, "Value properties") ?? "Value properties")</strong>
+                            </td>
+                            <td style="width: 100%">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="width: 100%; height: 100%">
+                                <table style="width: 100%; height: 100%">
+                                    <tr>
+                                        <td>
+                                            @if (Model?.TaskTemplate.Properties != null && Model.TaskTemplate.Properties.Count > 0)
+                                            {
+                                                <table style="height: auto; width: 100%; padding: 1rem;">
+                                                    @foreach (var property in Model?.TaskTemplate.Properties)
+                                                    {
+                                                        <tr class="alternatingcolors">
+                                                            <td style="font-size: 18px; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em">
+                                                                <strong>@(Model?.CmsLanguage?.GetValue($"{(property.Property?.ResourceKeyName ?? "")}_NAME", property.Property?.Name ?? "") ?? property.Property?.Name ?? "")</strong>
+                                                            </td>
+                                                            <td style="font-size: 18px; vertical-align: middle; line-height: 1.6em">@property.ToFormattedPropertyValue()</td>
+                                                            @if (property != null && property.IsRequired.HasValue && property.IsRequired.Value)
+                                                            {
+                                                                <td style="width: 20%">Required</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td style="width: 20%"></td>
+                                                            }
+                                                        </tr>
+                                                    }
+                                                </table>
+                                            }
+                                            else
+                                            {
+                                                <table style="height: 100%; width: 100%;">
+                                                    <tr>
+                                                        <td colspan="2" style="font-size: 18px; padding-left: 1rem; padding-right: 1rem; height: 100%; line-height: 1.6em; vertical-align: top !important">
+                                                            <!-- Using Audit.OptionNone for lack of a better language resource key -->
+                                                            <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.OptionNone, "None") ?? "None")</span>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            }
+                                        </td>
+                                        <td>
+                                            <table style="background-color: #08498B; height: auto; width: 100%; padding: 1rem; margin-left: 2rem; margin-right: 0; margin-top: 1rem; margin-bottom: 1rem;">
+                                                <tr>
+                                                    <td style="font-size: 18px; color: white"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.ValuePropertiesMachineStatus, "Machine status") ?? "Machine status"):</strong></td>
+                                                    <td style="font-size: 18px; color: white">
+                                                        @if (Model.TaskTemplate.MachineStatus == "stopped")
+                                                        {
+                                                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionStopped, "Stopped") ?? "Stopped")
+                                                        }
+                                                        else if (Model.TaskTemplate.MachineStatus == "running")
+                                                        {
+                                                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionRunning, "Running") ?? "Running")
+                                                        }
+                                                        else
+                                                        {
+                                                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionNotApplicable, "Stopped") ?? "Stopped")
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="font-size: 18px; color: white"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.ValuePropertiesPlannedTime, "Planned time") ?? "Planned time"):</strong></td>
+                                                    <td style="font-size: 18px; color: white">@Model.TaskTemplate.PlannedTime @(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.PlannedTimeMinutesTitle, "minutes") ?? "minutes")</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                }
+
+                <!-- Recurrence table -->
+                <table class="fancyshadow print-friendly" style="width: 100%; white-space: nowrap; height: auto; margin-top: 1rem; margin-bottom: 1rem; table-layout: auto; page-break-inside: avoid !important">
+                    <tr style="margin-bottom: 1em;">
+                        <td id="autosize" style="text-transform: uppercase; background-color: #08498B; font-size: 24px; padding-left: 2rem; padding-right: 2rem; line-height: 2em">
+                            <strong style="color: white">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.RecurrenceTitle, "Recurrence") ?? "Recurrence")</strong>
+                        </td>
+                        <td style="width: 100%"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <table style="width: 100%">
+                                @if (Model?.TaskTemplate.RecurrencyType == "no recurrency")
+                                {
+                                    <!-- Recurrence No recurrency case-->
+                                    <tr>
+                                        <td colspan="5">
+                                            <table style="height: auto; width: 100%; padding: 1rem">
+                                                <tr class="alternatingcolors">
+                                                    <td colspan=1 style="font-size: 18px; width: 30%; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em">
+                                                        <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.RecurrenceNone, "No recurrence") ?? "No recurrence")</strong>
+                                                    </td>
+                                                    <td colspan=4 style="font-size: 18px; width: 70%; vertical-align: middle; line-height: 1.6em">&nbsp;</td>
+                                                </tr>
+                                                <tr class="alternatingcolors" style="width: 50%">
+                                                    <td colspan=1 style="font-size: 18px; width: 30%; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em">
+                                                        <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.RecurrenceOnceFromdate, "On date") ?? "On date")</strong>
+                                                    </td>
+                                                    <td colspan=4 style="font-size: 18px; width: 70%; vertical-align: middle; line-height: 1.6em">
+                                                        @if (@Model?.TaskTemplate?.Recurrency?.Schedule?.Date.HasValue != null)
+                                                        {
+                                                            <span>@Model.TaskTemplate.Recurrency.Schedule.Date.Value.ToString("dd-MM-yyyy")</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>@(Model?.CmsLanguage.GetValue(LanguageKeys.PdfTaskTemplate.Unknown, "Unknown") ?? "Unknown")</span>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                <tr class="alternatingcolors" style="width: 50%">
+                                                    <td colspan=1 style="font-size: 18px; width: 30%; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em ">
+                                                        @if (@Model?.TaskTemplate?.Recurrency?.Schedule?.Date.HasValue != null)
+                                                        {
+                                                            <strong>@Model.TaskTemplate.Recurrency.Schedule.Date.Value.DayOfWeek</strong>
+                                                        }
+                                                    </td>
+                                                    <td colspan=4 style="font-size: 18px; width: 70%; vertical-align: middle; line-height: 1.6em">
+                                                        @foreach (var shift in Model?.TaskShifts)
+                                                        {
+                                                            <span>@(shift.Value.Start) - @(shift.Value.End)</span>
+
+                                                            if (Model.TaskShifts.Last().Key != shift.Key)
+                                                            {
+                                                                <span> / </span>
+                                                            }
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                }
+                                else if (Model?.TaskTemplate.RecurrencyType == "shifts")
+                                {
+                                    <!-- Recurrence Shifts recurrency case-->
+                                    <tr>
+                                        <td colspan="5">
+                                            <table style="height: auto; width: 100%; padding: 1rem;">
+                                                @if (Model.TaskTemplate.Recurrency.Schedule.EndDate.HasValue)
+                                                {
+                                                    <!-- Recurrency type shifts fixed -->
+                                                    <tr class="alternatingcolors">
+                                                        <td colspan=1 style="font-size: 18px; width: 30%; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em">
+                                                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.RecurrenceShifts, "Shifts") ?? "Shifts")</strong>
+                                                        </td>
+                                                        <td colspan=4 style="font-size: 18px; width: 70%; vertical-align: middle; line-height: 1.6em">
+                                                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.RecurrenceFixed, "Fixed") ?? "Fixed")
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="alternatingcolors" style="width: 50%">
+                                                        <td colspan=1 style="font-size: 18px; width: 30%; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em">
+                                                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionFixedFrom, "From date") ?? "From date")</strong>
+                                                        </td>
+                                                        <td colspan=4 style="font-size: 18px; width: 70%; vertical-align: middle; line-height: 1.6em">
+                                                            @if (Model.TaskTemplate.Recurrency.Schedule.StartDate.HasValue)
+                                                            {
+                                                                @Model.TaskTemplate.Recurrency.Schedule.StartDate.Value.ToString("dd-MM-yyyy")
+                                                            }
+                                                            else
+                                                            {
+                                                                @Model.TaskTemplate.Recurrency.Schedule.Date.Value.ToString("dd-MM-yyyy")
+                                                            }
+                                                            &nbsp;@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionFixedTill, "till date") ?? "till date")&nbsp;
+                                                            @Model.TaskTemplate.Recurrency.Schedule.EndDate.Value.ToString("dd-MM-yyyy")
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                else
+                                                {
+                                                    <tr class="alternatingcolors">
+                                                        <td colspan=1 style="font-size: 18px; width: 30%; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em">
+                                                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.RecurrenceShifts, "Shifts") ?? "Shifts")</strong>
+                                                        </td>
+                                                        <td colspan=4 style="font-size: 18px; width: 70%; vertical-align: middle; line-height: 1.6em">
+                                                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.RecurrenceRecurring, "Recurring") ?? "Recurring")
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                @foreach (var dayshifts in Model.TaskShifts.GroupBy(s => s.Value.Weekday))
+                                                {
+                                                    <tr class="alternatingcolors" style="width: 50%">
+                                                        <td colspan=1 style="font-size: 18px; width: 30%; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em ">
+                                                            @switch (dayshifts.Key)
+                                                            {
+                                                                case 0:
+                                                                    <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionMonday, "Monday") ?? "Monday")</strong>
+                                                                    break;
+                                                                case 1:
+                                                                    <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionTuesday, "Tuesday") ?? "Tuesday")</strong>
+                                                                    break;
+                                                                case 2:
+                                                                    <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionWednesday, "Wednesday") ?? "Wednesday")</strong>
+                                                                    break;
+                                                                case 3:
+                                                                    <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionThursday, "Thursday") ?? "Thursday")</strong>
+                                                                    break;
+                                                                case 4:
+                                                                    <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionFriday, "Friday") ?? "Friday")</strong>
+                                                                    break;
+                                                                case 5:
+                                                                    <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionSaturday, "Saturday") ?? "Saturday")</strong>
+                                                                    break;
+                                                                case 6:
+                                                                    <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionSunday, "Sunday") ?? "Sunday")</strong>
+                                                                    break;
+                                                                default:
+                                                                    <strong>@(Model?.CmsLanguage.GetValue(LanguageKeys.Task.OptionUnknownDay, "Unknown day of week") ?? "Unknown day of week")</strong>
+                                                                    break;
+                                                            }
+                                                        </td>
+                                                        <td colspan=4 style="font-size: 18px; width: 70%; vertical-align: middle; line-height: 1.6em">
+                                                            @foreach (var shift in dayshifts)
+                                                            {
+                                                                if (dayshifts.Last().Value.Id != shift.Value.Id)
+                                                                {
+                                                                    <span>@(shift.Value.Start) - @(shift.Value.End) / </span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span>@(shift.Value.Start) - @(shift.Value.End)</span>
+                                                                }
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </table>
+                                        </td>
+                                    </tr>
+                                }
+                                else if (Model?.TaskTemplate.RecurrencyType == "week")
+                                {
+                                    <!-- Recurrence Week recurrency case-->
+                                    <tr>
+                                        <td colspan="5">
+                                            <table style="height: auto; width: 100%; padding: 1rem;">
+                                                @if (Model.TaskTemplate.Recurrency.Schedule.EndDate.HasValue)
+                                                {
+                                                    <tr class="alternatingcolors">
+                                                        <td colspan=1 style="font-size: 18px; width: 30%; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em">
+                                                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.RecurrenceWeek, "Week") ?? "Week")</strong>
+                                                        </td>
+                                                        <!-- Recurrency type shifts fixed -->
+                                                        <td colspan=4 style="font-size: 18px; width: 70%; vertical-align: middle; line-height: 1.6rem">
+                                                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.RecurrenceFixed, "Fixed") ?? "Fixed")
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="alternatingcolors" style="width: 50%">
+                                                        <td colspan=1 style="font-size: 18px; width: 30%; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em">
+                                                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionFixedFrom, "From date") ?? "From date")</strong>
+                                                        </td>
+                                                        <td colspan=4 style="font-size: 18px; width: 70%; vertical-align: middle; line-height: 1.6em">
+                                                            @if (Model.TaskTemplate.Recurrency.Schedule.StartDate.HasValue)
+                                                            {
+                                                                @Model.TaskTemplate.Recurrency.Schedule.StartDate.Value.ToString("dd-MM-yyyy")
+                                                            }
+                                                            else
+                                                            {
+                                                                @Model.TaskTemplate.Recurrency.Schedule.Date.Value.ToString("dd-MM-yyyy")
+                                                            }
+                                                            &nbsp;@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionFixedTill, "till date") ?? "till date")&nbsp;
+                                                            @Model.TaskTemplate.Recurrency.Schedule.EndDate.Value.ToString("dd-MM-yyyy")
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                else
+                                                {
+                                                    <tr class="alternatingcolors">
+                                                        <td colspan=1 style="font-size: 18px; width: 30%; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em">
+                                                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.RecurrenceWeek, "Week") ?? "Week")</strong>
+                                                        </td>
+                                                        <td colspan=4 style="font-size: 18px; width: 70%; vertical-align: middle; line-height: 1.6em">
+                                                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.RecurrenceRecurring, "Recurring") ?? "Recurring")
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                <tr class="alternatingcolors" style="width: 50%">
+                                                    <td colspan=1 style="font-size: 18px; width: 30%; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em ">
+                                                        <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionWeekRecurEvery, "Recur every") ?? "Recur every")</strong>
+                                                    </td>
+                                                    <td colspan=4 style="font-size: 18px; width: 70%; vertical-align: middle; line-height: 1.6em">
+                                                        <span>@Model.TaskTemplate.Recurrency.Schedule.Week</span>
+                                                        <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionWeekWeekon, "week(s)") ?? "week(s)")</strong>
+                                                        @{
+                                                            List<string> days = new List<string>();
+                                                            @if (Model.TaskTemplate.Recurrency.Schedule.Weekday0.HasValue && Model.TaskTemplate.Recurrency.Schedule.Weekday0 == true)
+                                                            {
+                                                                days.Add((Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionSunday, "Sunday") ?? "Sunday"));
+                                                            }
+                                                            @if (Model.TaskTemplate.Recurrency.Schedule.Weekday1.HasValue && Model.TaskTemplate.Recurrency.Schedule.Weekday1 == true)
+                                                            {
+                                                                days.Add((Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionMonday, "Monday") ?? "Sunday"));
+                                                            }
+                                                            @if (Model.TaskTemplate.Recurrency.Schedule.Weekday2.HasValue && Model.TaskTemplate.Recurrency.Schedule.Weekday2 == true)
+                                                            {
+                                                                days.Add((Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionTuesday, "Tuesday") ?? "Tuesday"));
+                                                            }
+                                                            @if (Model.TaskTemplate.Recurrency.Schedule.Weekday3.HasValue && Model.TaskTemplate.Recurrency.Schedule.Weekday3 == true)
+                                                            {
+                                                                days.Add((Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionWednesday, "Wednesday") ?? "Wednesday"));
+                                                            }
+                                                            @if (Model.TaskTemplate.Recurrency.Schedule.Weekday4.HasValue && Model.TaskTemplate.Recurrency.Schedule.Weekday4 == true)
+                                                            {
+                                                                days.Add((Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionThursday, "Thursday") ?? "Thursday"));
+                                                            }
+                                                            @if (Model.TaskTemplate.Recurrency.Schedule.Weekday5.HasValue && Model.TaskTemplate.Recurrency.Schedule.Weekday5 == true)
+                                                            {
+                                                                days.Add((Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionFriday, "Friday") ?? "Friday"));
+                                                            }
+                                                            @if (Model.TaskTemplate.Recurrency.Schedule.Weekday6.HasValue && Model.TaskTemplate.Recurrency.Schedule.Weekday6 == true)
+                                                            {
+                                                                days.Add((Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionSaturday, "Saturday") ?? "Saturday"));
+                                                            }
+                                                            <span>@string.Join(", ", days)</span>
+                                                        }
+
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                }
+                                else if (Model?.TaskTemplate.RecurrencyType == "month")
+                                {
+                                    <!-- Recurrence Month recurrency case-->
+                                    <tr>
+                                        <td colspan="5">
+                                            <table style="height: auto; width: 100%; padding: 1rem;">
+                                                @if (Model.TaskTemplate.Recurrency.Schedule.EndDate.HasValue)
+                                                {
+                                                    <tr class="alternatingcolors">
+                                                        <td colspan=1 style="font-size: 18px; width: 30%; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em">
+                                                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.RecurrenceMonth, "Month") ?? "Month")</strong>
+                                                        </td>
+                                                        <!-- Recurrency type shifts fixed -->
+                                                        <td colspan=4 style="font-size: 18px; width: 70%; vertical-align: middle; line-height: 1.6em">
+                                                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.RecurrenceFixed, "Fixed") ?? "Fixed")
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="alternatingcolors" style="width: 50%">
+                                                        <td colspan=1 style="font-size: 18px; width: 30%; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em ">
+                                                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionFixedFrom, "From date") ?? "From date")</strong>
+                                                        </td>
+                                                        <td colspan=4 style="font-size: 18px; width: 70%; vertical-align: middle; line-height: 1.6em">
+                                                            @if (Model.TaskTemplate.Recurrency.Schedule.StartDate.HasValue)
+                                                            {
+                                                                @Model.TaskTemplate.Recurrency.Schedule.StartDate.Value.ToString("dd-MM-yyyy")
+                                                            }
+                                                            else
+                                                            {
+                                                                @Model.TaskTemplate.Recurrency.Schedule.Date.Value.ToString("dd-MM-yyyy")
+                                                            }
+                                                            &nbsp;@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionFixedTill, "till date") ?? "till date")&nbsp;
+                                                            @Model.TaskTemplate.Recurrency.Schedule.EndDate.Value.ToString("dd-MM-yyyy")
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                else
+                                                {
+                                                    <tr class="alternatingcolors">
+                                                        <td colspan=1 style="font-size: 18px; width: 30%; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em ">
+                                                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.RecurrenceMonth, "Month") ?? "Month")</strong>
+                                                        </td>
+                                                        <td colspan=4 style="font-size: 18px; width: 70%; vertical-align: middle; line-height: 1.6em">
+                                                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfTaskTemplate.RecurrenceRecurring, "Recurring") ?? "Recurring")
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                @if (Model.TaskTemplate.Recurrency.Schedule.MonthRecurrencyType == "day_of_month")
+                                                {
+                                                    <tr class="alternatingcolors" style="width: 50%">
+                                                        <td colspan=1 style="font-size: 18px; width: 30%; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em ">
+                                                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.MonthSpecificDate, "Specific date") ?? "Specific date")</strong>
+                                                        </td>
+                                                        <td colspan=4 style="font-size: 18px; width: 70%; vertical-align: middle; line-height: 1.6em">
+                                                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionMonthEvery, "Every") ?? "Every")</strong>
+                                                            <span>@Model.TaskTemplate.Recurrency.Schedule.Day</span>
+                                                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.MonthDayOfEvery, "day of every") ?? "day of every")</strong>
+                                                            <span>@Model.TaskTemplate.Recurrency.Schedule.Month</span>
+                                                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.MonthMonths, "months") ?? "months")</strong>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                else
+                                                {
+                                                    <tr class="alternatingcolors" style="width: 50%">
+                                                        <td colspan=1 style="font-size: 18px; width: 30%; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em ">
+                                                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.MonthSpecificWeek, "Specific week") ?? "Specific week")</strong>
+                                                        </td>
+                                                        <td colspan=4 style="font-size: 18px; width: 70%; vertical-align: middle; line-height: 1.6em">
+                                                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionMonthEvery, "Every") ?? "Every")</strong>
+                                                            @switch (Model.TaskTemplate.Recurrency.Schedule.WeekDayNumber)
+                                                            {
+                                                                case 1:
+                                                                    <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionMonthFirst, "First") ?? "First")</span>
+                                                                    break;
+                                                                case 2:
+                                                                    <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionMonthSecond, "Second") ?? "Second")</span>
+                                                                    break;
+                                                                case 3:
+                                                                    <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionMonthThird, "Third") ?? "Third")</span>
+                                                                    break;
+                                                                case 4:
+                                                                    <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionMonthFourth, "Fourth") ?? "Fourth")</span>
+                                                                    break;
+                                                                default:
+                                                                    <span>-</span>
+                                                                    break;
+                                                            }
+                                                            @switch (Model.TaskTemplate.Recurrency.Schedule.WeekDay)
+                                                            {
+                                                                case 1:
+                                                                    <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionSunday, "Sunday") ?? "Sunday")</span>
+                                                                    break;
+                                                                case 2:
+                                                                    <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionMonday, "Monday") ?? "Monday")</span>
+                                                                    break;
+                                                                case 3:
+                                                                    <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionTuesday, "Tuesday") ?? "Tuesday")</span>
+                                                                    break;
+                                                                case 4:
+                                                                    <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionWednesday, "Wednesday") ?? "Wednesday")</span>
+                                                                    break;
+                                                                case 5:
+                                                                    <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionThursday, "Thursday") ?? "Thursday")</span>
+                                                                    break;
+                                                                case 6:
+                                                                    <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionFriday, "Friday") ?? "Friday")</span>
+                                                                    break;
+                                                                case 7:
+                                                                    <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.OptionSaturday, "Saturday") ?? "Saturday")</span>
+                                                                    break;
+                                                                default:
+                                                                    <span>-</span>
+                                                                    break;
+                                                            }
+                                                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.MonthDayOfEvery, "day of every") ?? "day of every")</strong>
+                                                            <span>@Model.TaskTemplate.Recurrency.Schedule.Month</span>
+                                                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.MonthMonths, "months") ?? "months")</strong>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </table>
+                                        </td>
+                                    </tr>
+                                }
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+
+    <partial name="_footer.cshtml" model="@("#08498b")" />
+
+    <script>
+        var taskImgs = document.images,
+            taskImgsLength = taskImgs.length,
+            taskImgsCounter = 0,
+            taskImgsLoaded = false,
+            taskImgsCheckerInterval = null;
+
+        $(taskImgs).each(function(index, img) {
+            if (img.complete && $(img).attr('src') != undefined && ($(img).attr('src').includes('normal_unavailable_image.png') || $(img).attr('src').startsWith('blob:')))
+            {
+                incrementCounter();
+            }
+            else
+            {
+                console.log(img);
+                console.log(img.complete);
+                img.addEventListener('load', incrementCounter, false);
+            }
+        })
+
+        function incrementCounter() {
+            taskImgsCounter++;
+            if (taskImgsCounter === taskImgsLength) {
+                taskImgsLoaded = true
+            }
+        }
+
+        function checkTaskImgsLoaded() {
+            if (!taskImgsLoaded) {
+                //do nothing
+                console.log("waiting for images to load");
+            }
+            else {
+                clearInterval(taskImgsCheckerInterval);
+                setTimeout(() => {
+                    window.print();
+                });
+                setTimeout(function () { window.close(); }, 2000);
+            }
+        }
+
+        checkTaskImgsLoaded();
+        window.onload = function () {
+            taskImgsCheckerInterval = setInterval(() => {
+                checkTaskImgsLoaded();
+
+            }, 1000);
+        }
+
+        ezgomediafetcher.preloadImagesAndVideos();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1078 @@
+﻿@using EZGO.Api.Models.Enumerations;
+@model WebApp.ViewModels.TagGroupsViewModel
+@{
+    Dictionary<string, string> CmsLanguage = Model.CmsLanguage;
+    Layout = null;
+    ViewData["Title"] = (Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsMainTitle, "Tags") ?? "Tags");
+    Dictionary<TagableObjectEnum, string> featureLabelTranslations = new Dictionary<TagableObjectEnum, string>
+    {
+        {TagableObjectEnum.Action, CmsLanguage?.GetValue(LanguageKeys.Action.ActionsLabel, "Action") ?? "Action" },
+        {TagableObjectEnum.Assessment, CmsLanguage?.GetValue(LanguageKeys.Skills.AssessmentsLabel, "Assessment") ?? "Assessment" },
+        {TagableObjectEnum.Audit, CmsLanguage?.GetValue(LanguageKeys.Audit.AuditsLabel, "Audit") ?? "Audit" },
+        {TagableObjectEnum.Checklist, CmsLanguage?.GetValue(LanguageKeys.Checklist.ChecklistsLabel, "Checklist") ?? "Checklist" },
+        {TagableObjectEnum.Comment, CmsLanguage?.GetValue(LanguageKeys.Comment.CommentsLabel, "Comment") ?? "Comment" },
+        {TagableObjectEnum.Task, CmsLanguage?.GetValue(LanguageKeys.Task.TasksLabel, "Task") ?? "Task" },
+        {TagableObjectEnum.WorkInstruction, CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.WorkInsctructionsLabel, "WorkInstruction") ?? "WorkInstruction" }
+    };
+}
+
+ <style>
+        #contentBody .card {
+            border: solid 1px transparent;
+            transition: transform .2s; /* Animation */
+        }
+
+        .tag-table {
+            max-height: 100%;
+            max-height: -moz-available;
+            max-height: -webkit-fill-available;
+        }
+
+            .tag-table::-webkit-scrollbar {
+                height: 10px !important;
+            }
+
+        .group {
+            height: 3em;
+            line-height: 1.2;
+            text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+        }
+
+            .group:hover {
+                color: dimgray;
+            }
+
+            .group .nav-icon {
+                float: left;
+                --fa-animation-iteration-count: 1;
+                --fa-animation-delay: 300s
+            }
+
+        .disabled-group, .disabled-group:disabled {
+            color: dimgrey !important;
+            text-shadow: -1px 0 lightgrey, 0 1px lightgrey, 1px 0 lightgrey, 0 -1px lightgrey;
+            opacity: 1;
+        }
+
+            .disabled-group:hover {
+                color: dimgrey;
+                cursor: default;
+            }
+
+        .group-column {
+            color: white;
+            text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+            float: left;
+            min-width: 13em;
+            width: 12.5%;
+            text-align: center;
+            max-height: 100%;
+            max-height: -moz-available;
+            max-height: -webkit-fill-available;
+            background-color: #ededed;
+            padding: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+            overflow-y: scroll;
+            scrollbar-width: none;
+        }
+
+            .group-column:hover {
+                filter: brightness(0.99);
+                cursor: default;
+                color: white;
+            }
+
+            .group-column::-webkit-scrollbar, .tag-in-taggroup::-webkit-scrollbar {
+                display: none;
+            }
+
+            .group-column:nth-child(2n+1) {
+                background-color: #f5f5f5;
+            }
+
+                .group-column:nth-child(2n+1):hover {
+                    filter: brightness(0.99);
+                }
+
+                .group-column:nth-child(2n+1) .group-header-bg {
+                    background-color: #93c54b;
+                }
+
+            .group-column:nth-child(2n) .group-header-bg {
+                background-color: #7EA439;
+            }
+
+            .group-column:first-child {
+                border-top-left-radius: .5em !important;
+                border-bottom-left-radius: .5em !important;
+            }
+
+            .group-column:last-child {
+                border-top-right-radius: .5em !important;
+                border-bottom-right-radius: .5em !important;
+            }
+
+            .group-column:first-child .group-header-bg {
+                border-top-left-radius: .5em;
+            }
+
+            .group-column:last-child .group-header-bg {
+                border-top-right-radius: .5em;
+            }
+
+        .group-header-bg {
+            line-height: 1.2;
+            display: flex;
+        }
+
+        .group-header {
+            line-height: 1.2;
+            height: 2.6em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.1em 1em;
+            margin: auto;
+        }
+
+        .holding-hidden {
+            display: none;
+        }
+
+        .item-count {
+            display: inline-block;
+            font-size: small;
+            font-style: italic;
+            color: #93c54b;
+        }
+
+        .tag-div {
+            color: white;
+            display: flex;
+            position: relative;
+            word-break: break-word;
+            background-color: #B2BEB5;
+            margin: 1em;
+            padding: .3em;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tag.tag-div:hover, .system-tag.tag-div:hover, .holding-tag.tag-div:hover {
+            color: white;
+            cursor: default;
+        }
+
+        .holding-tag {
+            color: lightgrey;
+        }
+
+            .holding-tag:hover {
+                color: lightgrey !important;
+            }
+
+        .icon {
+            display: flex;
+            margin: auto .3em;
+        }
+
+        .tag-name { /* span with the name of the tag */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-icon { /* right aligned edit icon */
+            display: flex;
+            margin: auto .3em;
+        }
+
+            .edit-icon:hover {
+                color: dimgray;
+                cursor: pointer;
+                box-shadow: 5px;
+            }
+
+        .lock-icon {
+            color: dimgrey;
+            display: flex;
+            margin: auto .3em;
+            padding: 0;
+        }
+
+        .float-right-icon {
+            float: right;
+            margin: auto .3em;
+        }
+
+        .add-btn {
+            background-color: #93C54B;
+            color: white;
+        }
+
+            .add-btn:hover {
+                color: #93C54B;
+                background-color: white;
+                cursor: pointer;
+            }
+
+        .btn-ezgo:hover {
+            color: #93C54B;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .custom-control-input:checked,
+        .custom-control-input:checked ~ .custom-control-label::before {
+            color: #fff;
+            border-color: #93c54b1f;
+            background-color: #93C54B;
+            box-shadow: none;
+        }
+
+        .custom-switch .custom-control-input:disabled:checked ~ .custom-control-label::before {
+            background-color: rgba(147,197,75,.5);
+        }
+
+        .custom-switch-modal {
+            padding-top: calc(0.375rem + 1px);
+        }
+
+        .width-available {
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+        }
+
+        .overflow-visible {
+            display: none;
+        }
+
+        .more-button {
+            z-index: 1;
+            background-color: #93C54B;
+            height: 2rem;
+            width: 2rem;
+            position: absolute;
+            bottom: 2.5rem;
+            left: calc(50% - 1rem);
+            border-radius: 1rem;
+            box-shadow: 0px 0px 1rem darkslategray
+        }
+
+            .more-button:hover {
+                cursor: pointer;
+                background-color: white;
+                color: #93C54B;
+            }
+
+        .bounce-settings {
+            --fa-bounce-start-scale-x: 1;
+            --fa-bounce-start-scale-y: 1;
+            --fa-bounce-jump-scale-x: 1;
+            --fa-bounce-jump-scale-y: 1;
+            --fa-bounce-land-scale-x: 1;
+            --fa-bounce-land-scale-y: 1;
+            --fa-bounce-rebound: 0;
+            --fa-bounce-height: 0.25rem;
+        }
+
+        div.custom-control-right {
+            padding-right: 24px;
+            padding-left: 0;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+            div.custom-control-right .custom-control-label::after {
+                right: -1.5rem;
+                left: auto;
+            }
+
+            div.custom-control-right .custom-control-label::before {
+                right: -2.35rem;
+                left: auto;
+            }
+    </style>
+
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-12">
+               <br/>
+                <h1>@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfiguration, "Tag configuration") ?? "Tag configuration")</h1>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row pt-1">
+            <!-- TAGGROUPS -->
+            <div class="@(Model.CurrentUser.IsTagManager == true ? "col-xl-3" : "col-xl-2") d-none d-xl-inline-block" style="margin-bottom: 16px">
+                <div class="card" style="height: 100%">
+                    <div class="card-header width-available">
+                        <h3 class="card-title width-available">
+                            <span class="width-available">
+                                @(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationTagGroups, "Tag groups") ?? "Tag groups")
+                                @if (Model.CurrentUser.IsTagManager == true)
+                                {
+                                    <div class="item-count">
+                                        <span id="group-count">0/8</span>
+                                        <i class="nav-icon fas fa-info-circle float-right-icon" style="font-size:xx-small" data-toggle="tooltip" title="@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationMaxNumberOfTagGroups, "Maximum number of tag groups") ?? "Maximum number of tag groups")"></i>
+                                    </div>
+
+                                    <button type="button"
+                                        id="save_tag_groups_button"
+                                        class="btn btn-ezgo btn-sm"
+                                        style="float:right;"
+                                        data-dismiss="modal"
+                                        onclick="saveTagGroups()">
+                                        @(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.BtnSave, "Save") ?? "Save")
+                                    </button>
+                                }
+                            </span>
+                        </h3>
+                    </div>
+
+                    <div class="pt-0 card-body">
+                        <div class="row">
+                            @{
+                                Model.TagGroups.Sort((x, y) =>
+                                {
+                                    if (x.Id > y.Id) return 1;
+                                    else if (y.Id > x.Id) return -1;
+                                    return 0;
+                                });
+                            }
+                            @foreach (var group in Model.TagGroups)
+                            {
+                                <div class="card @(Model.CurrentUser.IsTagManager == true ? "col-sm-6" : "col-sm-12") align-self-start my-1 px-1">
+                                    <button id="btn-@group.Id"
+                                        class="btn group tag-div width-available px-1 py-auto m-0 @(group.IsSelected == true ? "selected" : "")"
+                                        style="background-color: @((!String.IsNullOrEmpty(group.Tags[0].ColorCode) && group.IsSelected == true) ? group.Tags[0].ColorCode : "#B2BEB5"); @(Model.CurrentUser.IsTagManager == true ? "" : "pointer-events: none;")}"
+                                        onclick="toggleGroupSelect(@group.ToJsonFromObject())">
+                                        <i class="nav-icon icon my-auto mx-1 @(!String.IsNullOrEmpty(group.Tags[0].IconStyle) ? "fa-" + group.Tags[0].IconStyle : "fa-solid") @(!String.IsNullOrEmpty(group.Tags[0].IconName) ? "fa-" + group.Tags[0].IconName : "fa-question") fa-bounce"></i>
+                                        <span class="tag-name width-available">@(group.Name)</span> <!-- ADD TRANSLATION -->
+                                        <i class="nav-icon icon fa-solid fa-lock lock-icon" hidden data-toggle="tooltip" title=""> </i>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAGS -->
+            <div class="col-lg-12 @(Model.CurrentUser.IsTagManager == true ? "col-xl-9" : "col-xl-10")" style="margin-bottom: 16px">
+                <div class="card py-0 mb-0" style="height: calc(100vh - 267px);">
+                    <div class="card-header d-flex">
+                        <h3 class="card-title">
+                            <span id="counter">
+                                @(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsMainTitle, "Tags") ?? "Tags")
+                                <div class="item-count">
+                                    <span id="tag-count">0/30</span>
+                                    <i class="nav-icon fas fa-info-circle float-right-icon" style="font-size:xx-small" data-toggle="tooltip" title="@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationMaxNumberOfTags, "Maximum number of tags") ?? "Maximum number of tags")"></i>
+                                </div>
+
+                                @if (Model?.CurrentUser?.IsTagManager == true && Model?.CurrentUser?.Company?.HoldingId > 0)
+                                {
+                                    <div class="item-count">
+                                        <span id="holding-tag-count">H 0/30</span>
+                                        <i class="nav-icon fas fa-info-circle float-right-icon" style="font-size:xx-small" data-toggle="tooltip" title="@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationMaxNumberOfHoldingTags, "Maximum number of holding tags") ?? "Maximum number of holding tags")"></i>
+                                    </div>
+                                }
+                            </span>
+                        </h3>
+
+                        <div class="card-tools"></div>
+                    </div>
+
+                    <div id="tag-groups" class="card-body py-0 tag-table d-flex overflow-auto">
+                        @foreach (var group in Model.TagGroups.Where(x => x.IsSelected == true))
+                        {
+                            <div id="group-@group.Id" class="card card-body group-column py-0 d-flex overflow-hidden">
+                                <div class="group-header-bg width-available">
+                                    <span class="group-header width-available">@(group.Name) @*Add translation*@</span>
+                                </div>
+
+                                <div id="tags-@group.Id" class="tag-in-taggroup py-0 overflow-auto" style="max-height: 100%;">
+                                    @{
+                                        group.Tags.Sort((x, y) =>
+                                        {
+                                            if (x.IsSystemTag == true && y.IsSystemTag == false) return -1;
+                                            else if (y.IsSystemTag == true && x.IsSystemTag == false) return 1;
+                                            else if (x.IsHoldingTag == true && y.IsHoldingTag == false) return -1;
+                                            else if (y.IsHoldingTag == true && x.IsHoldingTag == false) return 1;
+                                            else return x.Name.CompareTo(y.Name);
+                                        });
+                                    }
+
+                                    @foreach (var tag in group.Tags)
+                                    {
+                                        <div class="btn tag-div width-available @(tag.IsHoldingTag == true ? "holding-tag" : (tag.IsSystemTag == true ? "system-tag" : "tag"))"
+                                             style="background-color: @(!String.IsNullOrEmpty(tag.ColorCode) ? tag.ColorCode : "#93c54b")"
+                                             data-toggle="tooltip"
+                                             title="@((tag.IsHoldingTag == true && Model.CurrentUser.IsTagManager == false)  ? (Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationThisIsATagFromTheHolding, "This is a tag from the holding") ?? "This is a tag from the holding") : (tag.IsSystemTag == true && Model.CurrentUser.IsTagManager == false) ? (Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationThisIsAGroupTag, "This is a group tag, that's standard part of the group") ?? "This is a group tag, that's standard part of the group") : "")">
+
+                                            <i class="nav-icon icon @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+
+                                            <span class="tag-name width-available">@(tag.Name)</span>
+
+                                            @if (tag.IsSystemTag == false && (tag.IsHoldingTag == false || Model.CurrentUser.IsTagManager == true))
+                                            {
+                                                <i class="nav-icon fas fa-pen edit-icon" onclick="showEditTag(@tag.ToJsonFromObject(useJsonStringEnumConverter: true))"></i>
+                                            }
+                                            else if (tag.IsSystemTag == true && Model.CurrentUser.IsTagManager == true)
+                                            {
+                                                <i class="nav-icon fas fa-pen edit-icon" onclick="showEditTag(@tag.ToJsonFromObject(useJsonStringEnumConverter: true))"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="nav-icon fa-solid fa-lock" style="margin: auto .3em; display: flex;"></i>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+
+                                @if (Model.Tags.Where(x => x.IsHoldingTag == false && x.IsSystemTag == false).Count() < (Model.ApplicationSettings.TagLimit))
+                                {
+                                    <div class="btn tag-div width-available add-btn mt-1" onclick="showAddTag('@group.Guid', '@group.Name', '@(group.Tags[0].IconStyle + " " + group.Tags[0].IconName)', '@group.Tags[0].ColorCode')">
+                                        <span class="tag-name width-available">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationAddTag, "Add tag") ?? "Add tag")</span>
+                                        <i class="nav-icon fas fa-plus float-right-icon"></i>
+                                    </div>
+                                }
+
+                                <div class="width-available mx-auto tag-div overflow-visible more-button more-div" onclick="scrollDown(@group.Id)">
+                                    <i class="nav-icon icon fa-solid fa-angles-down fa-bounce bounce-settings"></i>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MODAL POPUP-->
+<div class="modal fade" id="modalAddTag" data-backdrop="static" data-keyboard="true" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form id="my-form">
+                    <div class="form-group mb-3 row">
+                        <label for="tag-name-input" class="col-form-label col-sm-2">
+                            @(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationTagName, "Tag name") ?? "Tag name")
+                            <div id="tag-name-length" class="item-count"></div>
+                        </label>
+                        <div class="col-sm-10">
+                            <input class="form-control" id="tag-name-input" type="text" placeholder="@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationTagName, "Tag name") ?? "Tag name")" maxlength="30" required />
+                            <small id="tag-name-help" class="form-text text-muted">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationMaximum30Characters, "A tag can contain a maximum of 30 characters") ?? "A tag can contain a maximum of 30 characters")</small>
+                        </div>
+                    </div>
+
+                    @if (Model.EnableTagGroupTranslation)
+                    {
+                        <div class="form-group mb-3 row" id="translate-control">
+                            <label for="tag-translate-input" class="col-form-label col-sm-2">
+                                @(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationTranslate, "Translate") ?? "Translate")
+                            </label>
+                            <div class="col-sm-10">
+                                <div class="custom-control custom-switch custom-switch-modal">
+                                    <input type="checkbox" class="custom-control-input toggleFilter col" id="tag-translate-input" name="taggableObjectType">
+                                    <label style="font-weight: 400" class="custom-control-label card-text col-9" for="tag-translate-input"></label>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="form-group mb-3 row">
+                        <label for="tag-color" class="col-form-label col-sm-2">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationTagColor, "Tag color") ?? "Tag color")</label>
+                        <div class="col-sm-10">
+                            <input id="tag-color" type="color" class="form-control form-control-color col-sm-2 px-2 py-1" />
+                        </div>
+                    </div>
+
+                    <div id="features" class="form-group mb-3 row">
+                        <label for="features" class="col-form-label col-sm-2">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationFeatures, "Features") ?? "Features")</label>
+                        <div class="col-sm-7 col-lg-5">
+                            @{
+                                List<TagableObjectEnum> activeFeatureList = new();
+
+                                if (Model.ApplicationSettings?.Features?.ActionsEnabled == true) activeFeatureList.Add(TagableObjectEnum.Action);
+                                if (Model.ApplicationSettings?.Features?.AuditsEnabled == true) activeFeatureList.Add(TagableObjectEnum.Audit);
+                                if (Model.ApplicationSettings?.Features?.SkillAssessments == true) activeFeatureList.Add(TagableObjectEnum.Assessment);
+                                if (Model.ApplicationSettings?.Features?.ChecklistsEnabled == true) activeFeatureList.Add(TagableObjectEnum.Checklist);
+                                activeFeatureList.Add(TagableObjectEnum.Comment);
+                                if (Model.ApplicationSettings?.Features?.TasksEnabled == true) activeFeatureList.Add(TagableObjectEnum.Task);
+                                if (Model.ApplicationSettings?.Features?.WorkInstructions == true) activeFeatureList.Add(TagableObjectEnum.WorkInstruction);
+                                
+                                int count = 0;
+                                foreach (TagableObjectEnum objectType in activeFeatureList)
+                                {
+                                    string objectTypeString = objectType.ToString();
+                                            <div class="custom-control custom-switch custom-control-right">
+                                                <input type="checkbox" class="custom-control-input toggleFilter col" id="@objectTypeString-input" name="taggableObjectType" data-object-type="@objectTypeString">
+                                                <label style="font-weight: 400" class="custom-control-label card-text col-9" for="@objectTypeString-input">@featureLabelTranslations[objectType]</label>
+                                            </div>
+                                    count++;
+                                    if (count < activeFeatureList.Count)
+                                    {
+                                                <hr class="mt-0 mb-0" />
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3 row @((Model.CurrentUser?.IsTagManager == true && Model.CurrentUser?.Company?.HoldingId != null) ? "" : "holding-hidden")">
+                        <label for="holding-tag" class="col-form-label col-sm-2">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsHoldingTag, "Holding Tag") ?? "Holding Tag")</label>
+                        <div class="col-sm-10 form-control">
+                            <input type="checkbox"
+                                   class="checkbox"
+                                   id="holdingCheck"
+                                   data-toggle="tooltip"
+                                   data-placement="bottom">
+                            <label class="form-check-label" for="holdingCheck">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationHoldingTagCheckboxText, "Use across all companies as a holding tag") ?? "Use across all companies as a holding tag")</label>
+                        </div>
+
+                        <div id="holdingTagAlert" class="alert alert-danger m-2 width-available" role="alert" hidden>
+                            @(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationSelectionCheckboxInfo, "Selecting this checkbox will make you unable to delete the tag as soon as it is used by one of the companies!") ?? "Selecting this checkbox will make you unable to delete the tag as soon as it is used by one of the companies!")
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="tag_id" id="tag_id" />
+                    <input type="hidden" name="tag_guid" id="tag_guid" />
+                    <input type="hidden" name="tag_icon" id="tag_icon" />
+                    <input type="hidden" name="tag_group_guid" id="tag_group_guid" />
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        id="delete_btn"
+                        class="btn btn-danger btn-sm mr-auto"
+                        data-dismiss="modal"
+                        onclick="deleteTag()"
+                        data-toggle="tooltip"
+                        data-placement="bottom">
+                    @(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationDelete, "Delete") ?? "Delete")
+                </button>
+
+                <button type="button"
+                        id="cancel_btn"
+                        class="btn btn-outline-ezgo btn-sm"
+                        data-dismiss="modal">
+                    @(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.BtnCancel, "Cancel") ?? "Cancel")
+                </button>
+
+                <button type="button"
+                        id="save_tag_button"
+                        class="btn btn-ezgo btn-sm"
+                        data-dismiss="modal"
+                        onclick="saveTag()">
+                    @(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.BtnSave, "Save") ?? "Save")
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+        var hasChanged = false;
+        window.addEventListener("beforeunload", function (e) {
+            if (!hasChanged) {
+                return undefined;
+            }
+            e.preventDefault();
+            var confirmationMessage = 'It looks like you have been editing something.If you leave before saving, your changes will be lost.';
+            (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+            return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+        })
+
+        window.onresize = function () {
+            checkMoreDivs();
+        }
+
+        function initializeTagCounters() {
+            
+            var tagCountDiv = document.getElementById("tag-count");
+            var tagCount = document.getElementsByClassName("tag tag-div").length
+            tagCountDiv.innerHTML = tagCount + "/" + @Model.ApplicationSettings.TagLimit;
+
+            if ('@Model.CurrentUser.IsTagManager' === 'True') { 
+                if ('@Model?.CurrentUser?.Company?.HoldingId' > 0) {
+                    var holdingTagCount = document.getElementById("holding-tag-count");
+                    holdingTagCount.innerHTML = "H " + document.getElementsByClassName("holding-tag tag-div").length + "/" + @Model.ApplicationSettings.TagLimit;
+                }
+                var groupCountDiv = document.getElementById("group-count");
+                var groupCount = document.getElementsByClassName("group selected").length;
+                if(groupCount == null) {
+                    groupCount = 0;
+                }
+                groupCountDiv.innerHTML = groupCount + "/" + @Model.ApplicationSettings.TagGroupLimit;
+                if (groupCount >= @Model.ApplicationSettings.TagGroupLimit || tagCount >= @Model.ApplicationSettings.TagLimit) {
+                    disableUnselectedGroups();
+                }
+                disableGroupsInUse();
+            }
+            checkMoreDivs();
+        }
+
+        function checkMoreDivs() {
+            var taggroups = Array.from(document.getElementsByClassName("tag-in-taggroup"));
+            taggroups.forEach(function (taggroup) {
+                if (isOverflown(taggroup)) {
+                    var morebuttons = Array.from(taggroup.parentElement.getElementsByClassName("more-div"));
+                    morebuttons.forEach(function (button) {
+                        button.classList.remove("overflow-visible");
+                    })
+                } else {
+                    var morebuttons = Array.from(taggroup.parentElement.getElementsByClassName("more-div"));
+                    morebuttons.forEach(function (button) {
+                        button.classList.add("overflow-visible");
+                    })
+                }
+            })
+        }
+
+        function isOverflown(element) {
+            return (element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth || element.scrollHeight === element.scrollTop);
+        }
+
+        function scrollDown(id) {
+            const element = document.getElementById("tags-" + id);
+            element.scrollTop = element.scrollHeight;
+
+            var morebuttons = Array.from(element.parentElement.getElementsByClassName("more-div"));
+            morebuttons.forEach(function (button) {
+                button.classList.add("overflow-visible");
+            })
+        }
+
+        function disableGroupsInUse() {
+            var tagGroupsInUse = JSON.parse('@Html.Raw(Model.TagGroups.Where(x => x.IsInUse == true && x.IsSelected == true).ToJsonFromObject())');
+            tagGroupsInUse.forEach(function (group) {
+                var groupDiv = document.getElementById("btn-" + group.Id);
+                groupDiv.disabled = true;
+                groupDiv.classList.add('disabled-group');
+                var lockIcon = groupDiv.querySelector(".lock-icon");
+                lockIcon.hidden = false;
+                lockIcon.setAttribute("title", ("@(Html.Raw(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationCantDisableGroupsInUse, "can't disable groups that are in use") ?? "can't disable groups that are in use"))"));
+            });
+        }
+
+        function disableUnselectedGroups() {
+            var notSelectedGroups = Array.from(document.querySelectorAll("button.group.tag-div:not(.selected)"));
+            notSelectedGroups.forEach(function (group) {
+                group.disabled = true;
+                group.classList.add('disabled-group');
+                var lockIcon = group.querySelector(".lock-icon");
+                lockIcon.hidden = false;
+                lockIcon.setAttribute("title", "@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationMaximumNumberOfGroupsOrTagsReached, "maximum amount of groups or tags reached") ?? "maximum amount of groups or tags reached")");
+            });
+        }
+
+        function enableUnselectedGroups() {
+            var notSelectedGroups = Array.from(document.querySelectorAll("button.disabled-group.tag-div:not(.selected)"));
+            notSelectedGroups.forEach(function (group) {
+                group.disabled = false;
+                group.classList.remove('disabled-group');
+                var lockIcon = group.querySelector(".lock-icon");
+                lockIcon.hidden = true;
+            });
+        }
+
+        function saveTagGroups() {
+            hasChanged = false;
+            var selectedTagGroupBtns = Array.from(document.getElementsByClassName("group tag-div"));
+            var tagGroups = [];
+            selectedTagGroupBtns.forEach(function (tagGroupBtn) {
+                var id = tagGroupBtn.id.replace(/[^0-9]/g, '');
+                if (tagGroupBtn.classList.contains("selected")) {
+                    tagGroups.push({
+                        Id: id,
+                        IsSelected: true
+                    });
+                } else {
+                    tagGroups.push({
+                        Id: id,
+                        IsSelected: false
+                    });
+                }
+            })
+            $.ajax({
+                type: "POST",
+                url: "/taggroups/change",
+                data: { 'tagGroups': tagGroups },
+            success: function () { reloadTags() }
+            })
+        }
+
+        function toggleGroupSelect(tagGroup) {
+            hasChanged = true;
+            var groupBtn = document.getElementById("btn-" + tagGroup.Id);
+            var tagGroups = document.getElementById("tag-groups");
+            if (groupBtn != null) {
+                if (groupBtn.classList.contains("selected")) {
+                    groupBtn.style.backgroundColor = "#B2BEB5";
+                    groupBtn.classList.remove("selected");
+                    var tagsWithGroup = document.getElementById("group-" + tagGroup.Id);
+                    if (tagsWithGroup != null) {
+                        tagsWithGroup.remove();
+                    }
+
+                    if (document.getElementsByClassName("group selected").length < @Model.ApplicationSettings.TagGroupLimit) {
+                        enableUnselectedGroups();
+                    }
+                }
+                else {
+                    groupBtn.style.backgroundColor = tagGroup.Tags[0].ColorCode;
+                    groupBtn.classList.add("selected");
+
+                    if (tagGroups != null) {
+                        //wrapper
+                        var groupNode = document.createElement("div");
+                        groupNode.id = "group-" + tagGroup.Id;
+                        groupNode.classList.add("card", "card-body", "group-column");
+
+                        //header
+                        var groupHeader = document.createElement("div");
+                        groupHeader.classList.add("group-header-bg", "width-available");
+
+                        var groupHeaderSpan = document.createElement("span");
+                        groupHeaderSpan.classList.add("group-header", "width-available");
+                        groupHeaderSpan.innerHTML = tagGroup.Name;
+
+                        groupHeader.appendChild(groupHeaderSpan);
+                        groupNode.appendChild(groupHeader);
+
+                        //tags
+                        tagGroup.Tags.sort((x, y) => {
+                            if (x.IsSystemTag == true) return -1;
+                            else if (y.IsSystemTag == true) return 1;
+                            else if (x.IsHoldingTag == true) return -1;
+                            else if (y.IsHoldingTag == true) return 1;
+                            return 0;
+                        });
+
+                        if (tagGroup.Tags?.length > 0) {
+                            tagGroup.Tags.forEach(
+                                function (tag) {
+                                    var tagDiv = document.createElement("div");
+                                    tagDiv.classList.add("btn", "tag-div", "width-available");
+                                    if (tag.IsHoldingTag === true) {
+                                        tagDiv.classList.add("holding-tag");
+                                    } else if (tag.IsSystemTag === true) {
+                                        tagDiv.classList.add("system-tag");
+                                    } else {
+                                        tagDiv.classList.add("tag");
+                                    }
+                                    tagDiv.style.backgroundColor = tag.ColorCode;
+
+                                    var tagIcon = document.createElement("i");
+                                    tagIcon.classList.add("nav-icon", "icon", "fa-" + tag.IconName, "fa-" + tag.IconStyle);
+                                    tagDiv.appendChild(tagIcon);
+
+                                    var tagSpan = document.createElement("span");
+                                    tagSpan.classList.add("tag-name", "width-available");
+                                    tagSpan.innerHTML = tag.Name;
+                                    tagDiv.appendChild(tagSpan);
+
+                                    if (@Json.Serialize(Model.CurrentUser.IsTagManager) == true || (tag.IsSystemTag != true && tag.IsHoldingTag != true)) {
+                                        var editIcon = document.createElement("i");
+                                        editIcon.classList.add("nav-icon", "fas", "fa-pen", "edit-icon");
+                                        editIcon.onclick = function () {
+                                            showEditTag(tag);
+                                        }
+                                        tagDiv.appendChild(editIcon);
+                                    }
+                                    groupNode.appendChild(tagDiv);
+                                });
+                        }
+                        tagGroups.appendChild(groupNode);
+                    }
+
+                    var tagCount = document.getElementsByClassName("tag tag-div").length
+                    if (document.getElementsByClassName("group selected").length >= @Model.ApplicationSettings.TagGroupLimit || tagCount >= @Model.ApplicationSettings.TagLimit) {
+                        disableUnselectedGroups();
+                    }
+                }
+            }
+
+            var tagCount = document.getElementById("tag-count");
+            var tagCountLength = document.getElementsByClassName("tag tag-div").length;
+            var tagLimit = @Model.ApplicationSettings.TagLimit;
+            var addBtns = Array.from(document.getElementsByClassName("add-btn"));
+            addBtns.forEach(
+                function (btn) {
+                    btn.remove();
+                }
+            )
+
+            tagCount.innerHTML = tagCountLength + "/" + tagLimit;
+
+            if ('@Model?.CurrentUser?.Company?.HoldingId' > 0) {
+                var holdingTagCount = document.getElementById("holding-tag-count");
+                holdingTagCount.innerHTML = "H " + document.getElementsByClassName("holding-tag tag-div").length + "/" + tagLimit;
+            }
+
+            var groupCount = document.getElementById("group-count");
+            groupCount.innerHTML = document.getElementsByClassName("group selected").length + "/" + @Model.ApplicationSettings.TagGroupLimit;
+        }
+
+        function showAddTag(tagGroup, groupName, tagIcon, tagColor) {
+            $('#modalAddTag').modal('show');
+            document.getElementById("tag-color").value = tagColor;
+            document.getElementById("tag-color").disabled = false;
+            document.getElementById("tag-name-input").value = "";
+            document.getElementById("tag-name-input").disabled = false;
+            document.getElementById("tag_icon").value = tagIcon;
+            document.getElementById("tag_group_guid").value = tagGroup;
+            document.getElementById("holdingCheck").checked = false;
+            if (@Json.Serialize(Model.CurrentUser.IsTagManager) == true && @Json.Serialize(@Model?.CurrentUser?.Company?.HoldingId) >= 0) {
+                var holdingTagCount = document.getElementsByClassName("holding-tag tag-div").length;
+                if (holdingTagCount >= @Model.ApplicationSettings.TagLimit) {
+                    document.getElementById("holdingCheck").disabled = true;
+                } else {
+                    document.getElementById("holdingCheck").disabled = false;
+                }
+            }
+            document.getElementsByName('taggableObjectType').forEach(function (element) {
+                element.checked = true;
+                element.disabled = false;
+            });
+            //FORMATTING FOR SAVE
+            document.getElementById('delete_btn').style.display = "none";
+            document.getElementById('save_tag_button').setAttribute("onclick", "saveTag()");
+            document.getElementById("save_tag_button").disabled = true;
+            document.getElementById("modal-title").innerHTML = "@(Html.Raw(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationAddTagToGroup, "Add tag to group ") ?? "Add tag to group "))" + groupName;
+            var name_length = $('#tag-name-input').val().length;
+            $('#tag-name-length').html(name_length + '/30');
+            document.getElementById('features').style.display = "block";
+        }
+
+        function showEditTag(tag) {
+            $('#modalAddTag').modal('show');
+            document.getElementById("tag-color").value = tag.ColorCode;
+            document.getElementById("tag_icon").value = tag.Icon;
+            document.getElementById("tag_id").value = tag.Id;
+            document.getElementById("tag_guid").value = tag.Guid;
+            document.getElementById("tag_group_guid").value = tag.GroupGuid;
+            document.getElementsByName('taggableObjectType').forEach(function (element) {
+                element.disabled = false;
+                element.nextElementSibling.removeAttribute('title');
+                var objectType = element.getAttribute('data-object-type');
+                element.checked = (tag.AllowedOnObjectTypes != undefined) && (tag.AllowedOnObjectTypes.includes(objectType));
+                if ((objectType != '@TagableObjectEnum.Action.ToString()' && objectType != '@TagableObjectEnum.Comment.ToString()') && element.checked && tag.UsedInTemplateTypes != undefined && tag.UsedInTemplateTypes.includes(objectType)) {
+                    element.disabled = true;
+                    element.nextElementSibling.title = "@(Html.Raw(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationUnableToDisableTag, "Unable to disable tag for ") ?? "Unable to disable tag for "))" + objectType + "@(Html.Raw(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationWhileUsedInTemplate, " while it is being used in a template.") ?? " while it is being used in a template."))";
+                }
+            });
+            //FORMATTING FOR EDIT
+            document.getElementById('delete_btn').style.display = "inline-block";
+            document.getElementById('save_tag_button').setAttribute("onclick", "editTag()");
+            document.getElementById("save_tag_button").disabled = false;
+            document.getElementById("modal-title").innerHTML = "@(Html.Raw(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationEditTagInGroup, "Edit Tag in group ") ?? "Edit Tag in group "))" + tag.GroupName;
+            //NAME CAN'T BE EDITED OF GROUP TAGS
+            document.getElementById("tag-name-input").value = tag.Name;
+            if (tag.IsSystemTag) {
+                document.getElementById("tag-name-input").setAttribute("disabled", true);
+                document.getElementById('delete_btn').style.display = "none";
+                document.getElementById('features').style.display = "none";
+                document.getElementById("tag-color").disabled = true;
+                if (@(Model.EnableTagGroupTranslation.ToJsonFromObject())) {
+                    document.getElementById("tag-translate-input").checked = tag.UseTranslation;
+                    document.getElementById("translate-control").style.display = "";
+                }
+            }
+            else {
+                document.getElementById("tag-name-input").removeAttribute("disabled", true);
+                document.getElementById('delete_btn').style.display = "inline-block";
+                document.getElementById('features').style.display = "block";
+                document.getElementById("tag-color").disabled = false;
+                if (@(Model.EnableTagGroupTranslation.ToJsonFromObject())) {
+                    document.getElementById("translate-control").style.display = "none";
+                }
+            }
+            //EXCEPTIONS FOR HOLDING MANAGER
+            document.getElementById("holdingCheck").checked = (tag.IsHoldingTag || tag.IsSystemTag);
+
+            if (tag.IsHoldingTag || tag.IsSystemTag) {
+                document.getElementById('delete_btn').setAttribute("disabled", true);
+                document.getElementById("delete_btn").setAttribute("title", "@(Html.Raw(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationCantDeleteSharedHoldingTag, "can't delete tag when shared as a holding tag") ?? "can't delete tag when shared as a holding tag"))");
+                document.getElementById('holdingTagAlert').removeAttribute("hidden", true);
+            }
+            else {
+                document.getElementById('delete_btn').removeAttribute("disabled", true);
+                document.getElementById("delete_btn").removeAttribute("title", "");
+                document.getElementById('holdingTagAlert').setAttribute("hidden", true);
+            }
+
+            document.getElementById("holdingCheck").disabled = false;
+            document.getElementById("holdingCheck").setAttribute("title", "");
+            if (tag.IsSystemTag || (tag.IsInUse && tag.IsHoldingTag)) {
+                document.getElementById("holdingCheck").disabled = true;
+                document.getElementById("holdingCheck").setAttribute("title", "@(Html.Raw(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationCantStopSharingWhileTagInUse, "can't stop sharing while the tag is still in use") ?? "can't stop sharing while the tag is still in use"))");
+            }
+            else if (@Json.Serialize(Model.CurrentUser.IsTagManager) == true) {
+                var holdingTagCount = document.getElementsByClassName("holding-tag tag-div").length;
+                var tagCount = document.getElementsByClassName("tag tag-div").length;
+                if ((tag.IsHoldingTag === false && holdingTagCount >= @Model.ApplicationSettings.TagLimit) ||
+                    (tag.IsHoldingTag === true && tagCount >= @Model.ApplicationSettings.TagLimit)) {
+                    document.getElementById("holdingCheck").disabled = true;
+                    document.getElementById("holdingCheck").setAttribute("title", "@(Html.Raw(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationReachedLimit, "You've reached the (holding) tag limit") ?? "You've reached the (holding) tag limit"))");
+                }
+            }
+            //CHARACTER COUNT IN NAME
+            var name_length = $('#tag-name-input').val().length;
+            $('#tag-name-length').html(name_length + '/30');
+            //TAGS CAN'T BE DELETED WHEN STILL IN USE
+            if (tag.IsInUse && !tag.IsHoldingTag) {
+                document.getElementById('delete_btn').setAttribute("disabled", true);
+            document.getElementById("delete_btn").setAttribute("title", "@(Html.Raw(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationCantDeleteTagInUse, "can't delete tag when it's in use in a template") ?? "can't delete tag when it's in use in a template"))");
+            }
+            else if (!tag.IsHoldingTag) {
+                document.getElementById('delete_btn').removeAttribute("disabled", true);
+                document.getElementById("delete_btn").removeAttribute("title", "");
+            }
+        }
+
+        function saveTag() {
+            allowedOnObjectTypes = [];
+
+            document.getElementsByName('taggableObjectType').forEach(function (element) {
+                if (element.checked) {
+                    allowedOnObjectTypes.push(element.getAttribute('data-object-type'));
+                }
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "/tags/add",
+                data: {
+                    Name: document.getElementById("tag-name-input").value,
+                    GroupGuid: document.getElementById("tag_group_guid").value,
+                    ColorCode: document.getElementById("tag-color").value,
+                    Icon: document.getElementById("tag_icon").value,
+                    IsSeachable: true,
+                    IsHoldingTag: document.getElementById("holdingCheck").checked,
+                    AllowedOnObjectTypes: allowedOnObjectTypes,
+                },
+            success: function () { reloadTags() }
+            })
+        }
+
+        function editTag() {
+            allowedOnObjectTypes = [];
+
+            document.getElementsByName('taggableObjectType').forEach(function (element) {
+                if (element.checked) {
+                    allowedOnObjectTypes.push(element.getAttribute('data-object-type'));
+                }
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "/tags/change",
+                data: {
+                    Name: document.getElementById("tag-name-input").value,
+                    GroupGuid: document.getElementById("tag_group_guid").value,
+                    ColorCode: document.getElementById("tag-color").value,
+                    Id: document.getElementById("tag_id").value,
+                    Guid: document.getElementById("tag_guid").value,
+                    IsSeachable: true,
+                    IsHoldingTag: document.getElementById("holdingCheck").checked,
+                    AllowedOnObjectTypes: ($("#features").is(":visible") ? allowedOnObjectTypes : undefined),
+                    UseTranslation: ($("#tag-translate-input").is(":visible") ? document.getElementById("tag-translate-input").checked : undefined)
+                },
+            success: function () { reloadTags() }
+            })
+        }
+
+        function deleteTag() {
+            $.ajax({
+                type: "POST",
+                url: "/tag/delete",
+                data: {
+                    Name: document.getElementById("tag-name-input").value,
+                    GroupGuid: document.getElementById("tag_group_guid").value,
+                    Id: document.getElementById("tag_id").value,
+                    Guid: document.getElementById("tag_guid").value
+                },
+            success: function () { reloadTags() }
+            })
+        }
+
+        function reloadTags() {
+            $.ajax({
+                url: "@Url.Action("Index", "Tags")",
+                type: 'GET',
+                dataType: 'html',
+                success: function (data) {
+                    $('#main-content-area').html(data);
+                },
+                error: function () {
+                    $('#main-content-area').html('<div class="text-danger">An error occurred while loading the content.</div>');
+                }
+            });
+        }
+
+        $('#modalAddTag').keydown(function (event) {
+            if (event.keyCode == 13) {
+                $('#save_tag_button').trigger("click");
+            }
+        })
+
+        $('#modalAddTag').keyup(function (event) {
+            var name_length = $('#tag-name-input').val().length;
+            $('#tag-name-length').html(name_length + '/30');
+            if (name_length > 0) {
+                document.getElementById("save_tag_button").disabled = false;
+            } else {
+                document.getElementById("save_tag_button").disabled = true;
+            }
+        })
+
+        $('#holdingCheck').change(function (event) {
+            var TagGroups = JSON.parse('@Html.Raw(Model.TagGroups.ToJsonFromObject())');
+            var groupGuid = document.getElementById("tag_group_guid").value;
+            var tagId = parseInt(document.getElementById("tag_id").value);
+            var currentGroup = TagGroups.find((x) => x.Guid === groupGuid);
+            var GroupTags = currentGroup.Tags;
+            var currentTag = GroupTags.find((x) => x.Id === tagId);
+
+            if (document.getElementById("holdingCheck").checked) {
+                document.getElementById("delete_btn").setAttribute("disabled", true);
+                document.getElementById("delete_btn").setAttribute("title", "@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationCantDeleteSharedHoldingTag, "can't delete tag when shared as a holding tag") ?? "can't delete tag when shared as a holding tag")");
+                document.getElementById('holdingTagAlert').removeAttribute("hidden", true);
+            }
+            else if (currentTag?.IsInUse === true) {
+                document.getElementById("delete_btn").setAttribute("title", "@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagConfigurationCantDeleteTagInUse, "can't delete tag when it's in use in a template") ?? "can't delete tag when it's in use in a template")");
+            }
+            else {
+                document.getElementById("delete_btn").removeAttribute("disabled", true);
+                document.getElementById("delete_btn").removeAttribute("title", "");
+                document.getElementById('holdingTagAlert').setAttribute("hidden", true);
+            }
+        })
+
+        initializeTagCounters();
+
+        ezgomediafetcher.preloadImagesAndVideos();
+    </script>
+

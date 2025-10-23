@@ -1,0 +1,23 @@
+﻿@model WebApp.ViewModels.CompletedAuditSingleViewModel
+@{
+    var areaPathIds = Model.AreaPathIds != null ? Model.AreaPathIds.Replace(" -> ", ",") : "";
+}
+
+<div class="results" data-pathids="@areaPathIds" data-containertype="resultitem">
+    <a id="completedAudit-@Model.Id" href="#" class="list-group-item list-group-item-action" data-auditid="@Model.Id" onclick="loadTasks(event, @Model.Id)" style="border-radius:0px;">
+        <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">@Model.Name</h5>
+            <small></small>
+        </div>
+
+        @if (Model.Signatures != null && Model.Signatures.Any())
+        {
+            DateTime SignedDate = TimeZoneInfo.ConvertTime(Model.Signatures[0].SignedAt, Model.Timezone);
+            <p class="mb-1">@Model.CompletedTextValue : @Model.Signatures[0].SignedBy</p>
+            <small>@SignedDate.ToLocaleFullDateShortTimeString(Model.Locale)</small>
+        }
+    </a>
+</div>
+
+
+

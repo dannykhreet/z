@@ -1,0 +1,93 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@using EZGO.Api.Models.Basic
+@model TemplateSharingViewModel
+
+<style>
+    .custom-checkbox .custom-control-input:checked ~ .custom-control-label::before,
+    .custom-checkbox .custom-control-input:indeterminate ~ .custom-control-label::before {
+        background-color: #93C54B;
+        border-color: #93c54b1f;
+    }
+</style>
+
+<div class="modal fade" id="template-share-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content p-3">
+            <div class="modal-header">
+                <div class="row w-100 ml-0" style="padding-left: 7.5px;">
+                    <div style="display: flex; flex-direction: row-reverse; align-items: center;">
+                        <i class="fa-solid fa-share" style="font-size: 3em; color: #93C54B;"></i>
+                    </div>
+                    <div class="col-10">
+                        <h4 class="modal-title" id="exampleModalLongTitle" style="color:#93C54B;">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Shared.ShareTemplateButtonTitle, "Share template") ?? "Share template")</h4>
+                        <p class="text-muted mb-0" style="font-size: 17px; font-weight: 300;">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Shared.ChooseCompaniesToShareTo, "Choose the companies to share the template with") ?? "Choose the companies to share the template with")</p>
+                    </div>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" style="display: flex; justify-content: center; flex-wrap: wrap;">
+                @if (Model?.Companies != null)
+                {
+                    if (Model.Companies.Count > 0)
+                    {
+                        <div class="col-12">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="checkbox-share-all" onchange="shareTemplate.toggleAll()">
+                                <label style="overflow-wrap: anywhere;" class="custom-control-label font-weight-bold" for="checkbox-share-all">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Shared.SelectDeselectAll, "Select / deselect all") ?? "Select / deselect all")</label>
+                            </div>
+                        </div>
+                    }
+                    @foreach (var company in Model.Companies)
+                    {
+                        <div class="col-6">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="checkbox-share-company-@company.Id" data-id="@company.Id" onchange="shareTemplate.toggleSelectAllCheckbox()">
+                                <label style="overflow-wrap: anywhere;" class="custom-control-label font-weight-normal" for="checkbox-share-company-@company.Id">@company.Name</label>
+                            </div>
+                        </div>
+                    }
+                    if (Model.Companies.Count % 2 > 0)
+                    {
+                        <div class="col-6"></div>
+                    }
+                }
+            </div>
+
+            <div class="modal-footer justify-content-center">
+                <button id="btn-share-template-cancel" type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Shared.Cancel, "Cancel") ?? "Cancel")</button>
+                <button id="btn-share-template" class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto" onclick="ezgolist.share()"><i class="fa-solid fa-share"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Shared.ShareTemplateButtonTitle, "Share Template") ?? "Share Template")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var shareTemplate = {
+        toggleAll: function () {
+            checkedToggle = document.getElementById('checkbox-share-all').checked;
+            $('[id^=checkbox-share-company]').each(function (index, element) {
+                element.checked = checkedToggle;
+            });
+        },
+
+        toggleSelectAllCheckbox: function () {
+            allCheckbox = $('#checkbox-share-all');
+            checkedCount = $('[id^=checkbox-share-company]:checked').length;
+            totalCount = $('[id^=checkbox-share-company]').length;
+
+            allCheckbox.prop('indeterminate', false);
+            if (checkedCount == totalCount) {
+                allCheckbox.prop('checked', true);
+            } else if (checkedCount == 0) {
+                allCheckbox.prop('checked', false);
+            } else {
+                allCheckbox.prop('indeterminate', true);
+            }
+        }
+    }
+</script>

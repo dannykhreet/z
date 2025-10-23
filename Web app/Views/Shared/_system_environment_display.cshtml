@@ -1,0 +1,24 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@if (Context.Request.Host.Host.Contains("ezgo.accportal.ezfactory.nl"))
+{
+    <div style="position:fixed; right:10px; bottom:2px; color:red;width:120px; height:40px; z-index: 9999999; text-align:right;">
+        <span style="color:red;font-size:20px;font-weight:bolder;transform: rotate(-10deg);display:block;">ACCEPTANCE</span>
+    </div>
+}
+@if (Context.Request.Host.Host.Contains("ezgo.testportal.ezfactory.nl"))
+{
+    <div style="position:fixed; right:10px; bottom:2px; color:orangered;width:120px; height:40px; z-index: 9999999; text-align:right;">
+        <span style="color:orangered;font-size:20px;font-weight:bolder;transform: rotate(-10deg);display:block;">TESTING</span>
+    </div>
+}
+@if (Context.Request.Host.Host.Contains("localhost"))
+{
+    <div style="position:fixed; right:10px; bottom:2px; color:orange;width:120px; height:40px; z-index: 9999999; text-align:right;">
+        <span style="color: orange; font-size: 20px; font-weight: bolder; transform: rotate(-10deg); display: block;">LOCALHOST</span>
+    </div>
+}

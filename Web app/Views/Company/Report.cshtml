@@ -1,0 +1,268 @@
+﻿@model WebApp.ViewModels.CompanyReportViewModel
+@{
+    Layout = "_Layout_template";
+}
+
+<style>
+    .report-content {
+        width: 100%;
+        background-color: white;
+        border-bottom: 1px solid rgba(0,0,0,.125);
+        padding: 0 1.25rem .75rem 1.25rem;
+        position: relative;
+        border-top-left-radius: .25rem;
+        border-top-right-radius: .25rem;
+        box-shadow: 0 0 1px rgb(0 0 0 / 13%), 0 1px 3px rgb(0 0 0 / 20%);
+        margin-bottom: 1rem;
+    }
+
+    .report-table {
+        width: 100%;
+    }
+
+        .report-table thead th {
+            padding: 5px;
+        }
+
+        .report-table thead tr {
+            height: 60px;
+            box-shadow: inset 0 -2px 0 #808080;
+            background: white;
+            position: sticky;
+            top: 0;
+        }
+
+    .report-table-size-content {
+        width: 6%
+    }
+
+    .report-table tbody td {
+        padding: 5px;
+    }
+
+    .report-table tbody tr {
+        height: 60px;
+        border-bottom: 1px solid #4444443d;
+    }
+
+    .report-table-vertical-title {
+        font-weight: bolder;
+        width: 400px !important;
+    }
+
+    .report-table-vertical-id {
+        font-style: italic;
+        width: 50px !important;
+    }
+
+    /* .report-vertical {
+        -ms-writing-mode: tb-rl;
+        -webkit-writing-mode: vertical-rl;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        white-space: nowrap;
+    } */
+
+    .report-bottom {
+        vertical-align: bottom;
+    }
+
+    .report-center {
+        text-align: center;
+    }
+</style>
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <a asp-controller="Company" asp-action="Index"><i class="fa fa-arrow-left"></i>@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BackToCompaniesTitle, "Back to companies") ?? "Back to companies")</a>
+                <h1>@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanyReportingTitle, "Company Reporting") ?? "Company Reporting")</h1>
+            </div>
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                @if (Model.IsAdminCompany)
+                {
+                    <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="companyoverview" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.ManagementOverviewTitle, "Company Management Overview") ?? "Company Management Overview")"><i class="fas fa-download"></i></button>
+                }
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+
+    <div class="container-fluid">
+
+        <div class="card">
+            <div class="card-header">
+                <h3 id="cardHeader" class="card-title d-none d-sm-inline-block">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.HeaderCompanyOverview, "Company overview ") ?? "Company overview ")<span id="counter">&nbsp;</span></h3>
+                <div class="card-tools">
+                    <div class="input-group input-group-sm">
+                        <select class="form-control" id="report_month" name="report_month">
+                            @for (var i = 0; i < 12; i++)
+                            {
+                                @if (i == DateTime.Now.Month - 1)
+                                {
+                                    <option value="@(i + 1)" selected>@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.MonthNames[i]</option>
+                                }
+                                else
+                                {
+                                    <option value="@(i + 1)">@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.MonthNames[i]</option>
+                                }
+                            }
+                        </select>
+                        <select class="form-control" id="report_year" name="report_year">
+                            @for (var i = 2018; i < DateTime.Now.Year + 1; i++)
+                            {
+                                @if (i == DateTime.Now.Year)
+                                {
+                                    <option value="@i" selected>@i</option>
+                                }
+                                else
+                                {
+                                    <option value="@i">@i</option>
+                                }
+                            }
+                        </select>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-default" id="btn_get_data"><i class="fas fa-arrow-alt-circle-down"></i></button>
+                        </div>
+                        &nbsp;
+                        <input type="text" id="companySearchBox" name="companySearchBox" class="form-control float-right" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.SearchPlaceholder, "Search") ?? "Search")" data-boxtype="search">
+
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="report-content" style="height: calc(100vh - 245px);overflow:auto;">
+            <div id="report_container" style="margin:0 5px 5px 5px;">
+
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts{
+
+    <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+    <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+
+    <script>
+        var companyReport = {
+            init: function () {
+                companyReport.initHandlers();
+                setTimeout(() => {
+                    companyReport.retrieve();
+                }, 1000);
+            },
+            initHandlers: function () {
+                $('#btn_get_data').on('click', function () {
+                    companyReport.retrieve();
+                });
+                $('#companySearchBox').on('keydown, keyup', function () {
+                    companyReport.search($(this).val());
+                });
+            },
+            retrieve: async function () {
+                toastr.remove();
+                $('body').toggleClass('loaded');
+
+                let year = $('#report_year').val();
+                let month = $('#report_month').val();
+
+                $.ajax({
+                    type: "POST",
+                    url: '/company/reports/' + year + '/' + month,
+                    success: function (data) {
+                        companyReport.render(JSON.parse(data));
+                        $('body').toggleClass('loaded');
+                        toastr.success('@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.ReportRetrieved, "Report retrieved") ?? "Report retrieved")');
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('body').toggleClass('loaded');
+                        toastr.error(JSON.parse(jqXHR.responseText) + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            render: function (data) {
+
+                $('#report_container').html('');
+
+                var rows = '';
+                var row = '';
+                var rowstart = '';
+                var rowdata = '';
+                var headerdata = '<th class="report-bottom">Id</th><th class="report-bottom">Name</th>';
+
+                if (data != null) {
+                    for (var i = 0; i < data.length; i++) {
+                        let companyData = data[i];
+
+                        rowstart = '';
+                        rowstart = `<tr data-id="${companyData.CompanyId}"><td class="report-table-vertical-id" data-type="companyid">${companyData.CompanyId}</td><td class="report-table-vertical-title" data-type="companyname">${companyData.Name}</td>`;
+
+                        if (companyData != null) {
+                            if (companyData.Statistics != null) {
+                                rowdata = '';
+                                for (var ii = 0; ii < companyData.Statistics.length; ii++) {
+                                    let statistic = companyData.Statistics[ii];
+                                    rowdata = rowdata + `<td data-type="${statistic.Title}" class="report-center">${statistic.Statistic}</td>`
+                                    if (i == 0) {
+                                        headerdata = headerdata + `<th class="report-table-size-content report-vertical report-center" data-type="${statistic.Title}">${statistic.Title}</th>`
+                                    }
+                                }
+                            }
+                        }
+
+                        row = rowstart + rowdata + '</tr>';
+                        rows = rows + row;
+                    }
+                }
+
+                $('#report_container').html(`<table class="report-table" data-type="datatable"><thead><tr>${headerdata}</tr></thead><tbody>${rows}</tbody></table>`);
+
+                if ($('#companySearchBox').val() !== '') {
+                    companyReport.search($('#companySearchBox').val());
+                }
+            },
+            resetSearchUI: function (includeInput) {
+                if (includeInput != undefined && includeInput !== null) {
+                    if (includeInput === true) {
+                        $('#companySearchBox').val('');
+                    }
+                }
+                $('#report_container table tr').show(); //enable all
+            },
+            search: function (searchValue) {
+                let currentValue = searchValue;
+                let foundItems = [];
+
+                companyReport.resetSearchUI();
+
+                if (currentValue != null && currentValue !== '') {
+                    $('[data-type="datatable"] tbody tr').hide(); //hide everything when searching
+                    $('[data-type="datatable"] tbody tr').each(function () {
+                        let searchSuccess = false;
+                        if ($($(this).find('[data-type="companyid"]')[0]).text().toLowerCase().includes(currentValue.toLowerCase())) {
+                            searchSuccess = true;
+                        };
+                        if ($($(this).find('[data-type="companyname"]')[0]).text().toLowerCase().includes(currentValue.toLowerCase())) {
+                            searchSuccess = true;
+                        };
+                        if (searchSuccess) { $(this).show(); }
+                    });
+                }
+            },
+        }
+
+        companyReport.init();
+        ezgomediafetcher.preloadImagesAndVideos();
+    </script>
+
+}

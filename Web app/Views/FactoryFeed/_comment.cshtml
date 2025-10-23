@@ -1,0 +1,236 @@
+﻿@model FactoryFeedItemCommentModel
+@using WebApp.Models.FactoryFeed
+@{
+    var defaultCommentImg = "/assets/img/user-placeholder.jpg";
+    var commentImg = Model.PostUser?.Picture;
+    var commentImgUrl = commentImg.IsNullOrEmpty() || commentImg == "emptyprofile" ? defaultCommentImg : WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, commentImg);
+    string posterName = Model.PostUser != null ? Model.PostUser.FirstName + " " + Model.PostUser.LastName : "Unknown User";
+    string modifiedByName = Model.ModifiedByUser != null ? Model.ModifiedByUser.FirstName + "" + Model.ModifiedByUser.LastName : "Unknown User";
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+}
+    <li class="media mb-4" id="ez-feed-comment-@Model.Id">
+        <img src="/images/media-loading.gif" data-src="@commentImgUrl" class="rounded-circle mr-3 border" alt="..." style="width:50px; height: 50px" >
+        <div class="media-body text-muted text-sm">
+        <h6 class="mt-0 mb-1">@posterName</h6>
+            @if (Model.ModifiedById != 0 && Model.UserId != Model.ModifiedById)
+            {
+                <i>Last modified by @modifiedByName</i>
+            }
+            @{
+                var itemDate = DateTime.SpecifyKind(Model.ItemDate, DateTimeKind.Utc);
+            }
+            <div class="text-sm" style="font-size:10px;">@TimeZoneInfo.ConvertTime(itemDate, timezone).ToString("dd-M-yyyy HH:mm:ss")</div>
+        <div id="ez-feed-comment-content-@Model.Id">@Html.Raw(Html.Encode((Model.Description ?? "").Replace("<a", "<a target='_blank'")))</div>
+
+            <div>
+                @if (Model.Media != null && Model.Media.Any() && Model.Media.FirstOrDefault() != null && !string.IsNullOrEmpty(Model.Media.First().Uri))
+                {
+                    EZGO.Api.Models.Attachment attachment = Model.Media.FirstOrDefault();
+
+                    if (attachment.Uri.ToLower().EndsWith(".mp4") || attachment.Uri.ToLower().EndsWith(".mov"))
+                    {
+                        string videoUrl = "";
+
+                        if (!attachment.Uri.ToLower().StartsWith("https:"))
+                        {
+                            videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, attachment.Uri);
+                        }
+
+                        var thumbnailUri = "";
+                        if(!string.IsNullOrEmpty(attachment.VideoThumbnailUri))
+                        {
+                            thumbnailUri = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, attachment.VideoThumbnailUri);
+                        }
+
+                        attachment = new EZGO.Api.Models.Attachment() {
+                            AttachmentType = Model.Media.First().Uri,
+                            FileExtension = Model.Media.First().FileExtension,
+                            FileName = Model.Media.First().FileName,
+                            FileType = Model.Media.First().FileType,
+                            LastModified = Model.Media.First().LastModified,
+                            Size = Model.Media.First().Size,
+                            Uri = videoUrl,
+                            VideoThumbnailUri = thumbnailUri
+                        };
+
+                        <div id="postCommentVideoContainer-@Model.Id">
+                            <a href="#postCommentVideo-@(Model.Id)" data-fancybox="postCommentsImageFancybox-@Model.Id">
+                            <video controls style="max-width: 100%" src="/images/media-loading.mp4" data-src="@videoUrl" data-attachment="@(attachment.ToJsonFromObject())">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </a>
+
+                            <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postCommentVideo-@(Model.Id)" style="display:none;">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                            </video>
+                        </div>
+                    }
+                    else if(attachment.Uri.ToLower().EndsWith(".pdf"))
+                    {
+                        var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, attachment.Uri);
+                        
+                        attachment = new EZGO.Api.Models.Attachment() {
+                            AttachmentType = Model.Media.First().Uri,
+                            FileExtension = Model.Media.First().FileExtension,
+                            FileName = Model.Media.First().FileName,
+                            FileType = Model.Media.First().FileType,
+                            LastModified = Model.Media.First().LastModified,
+                            Size = Model.Media.First().Size,
+                            Uri = pdfUrl,
+                            VideoThumbnailUri = Model.Media.First().VideoThumbnailUri
+                        };
+
+                        <div id="postCommentPdfContainer-@Model.Id" class="col-6 my-1 p-1">
+                            <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postCommentImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                                <div class="row">
+                                    <div class="col-9 p-0 factoryFeedPdfBGMedium" style="background-color: #E6E6E6"></div>
+                                    <div class="col-3 p-0">
+                                        <div class="pdfTriangleMedium"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 p-0 factoryFeedPdfBGMedium" style="text-align: center">
+                                        <img class="factoryFeedPdfLogoMedium" src="/images/logo-green.png" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 factoryFeedPdfBottomSectionMedium">
+                                        PDF
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, attachment.Uri);
+                        <div id="postCommentImageContainer-@Model.Id">
+                            <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postCommentsImageFancybox-@Model.Id">
+                                <img class="card-img w-100 d-block rounded-0" src="/images/media-loading.gif" data-src="@imageUrl"  />
+                            </a>
+                        </div>
+                    }
+                }
+            </div>
+
+            <div id="ez-feed-comment-edit-container-@Model.Id" style="display: none">
+                <div class="row">
+                    <div class="col-12">
+                        <textarea class="form-control w-100 mb-2" id="ez-feed-comment-edit-@Model.Id"></textarea>
+                    </div>
+
+                    <div class="col-8">
+                        <a class="btn btn-light" href="javascript:void(0);" onclick="ezgofactoryfeed.editCommentSelectImage(this, @Model.Id)">
+                            <i class="far fa-image mr-2"></i>
+                            @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.PictureTitle, "Picture") ?? "Picture")
+                        </a>
+                        <input type="file" style="display:none" accept=".jpg, .jpeg, .png" id="factoryfeedEditCommentImage-@Model.Id" />
+                        <input type="file" style="display:none" accept=".mp4, .mov" id="factoryfeedEditCommentVideo-@Model.Id" />
+                        <input type="file" style="display:none" accept=".pdf" id="factoryfeedEditCommentPdf-@Model.Id" />
+                        <a class="btn btn-light ml-2" href="javascript:void(0);" onclick="ezgofactoryfeed.editCommentSelectVideo(this, @Model.Id)">
+                            <i class="fas fa-video mr-2"></i>
+                            @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.VideoTitle, "Video") ?? "Video")
+                        </a>
+                        <a class="btn btn-light ml-2" href="javascript:void(0);" onclick="ezgofactoryfeed.editCommentSelectPdf(this, @Model.Id)">
+                            <i class="fas fa-file mr-2"></i>
+                            Pdf
+                        </a>
+                    </div>
+                    <!-- editFeedComment: async function (e, commentId, parentId, companyId, feedId) -->
+                    <div class="col-4">
+                        <button id="editFeedComment-@Model.Id" class="btn btn-ezgo ml-2 float-right"
+                                onclick="ezgofactoryfeed.editFeedComment(this, @Model.Id, @Model.ParentId, @Model.CompanyId, @Model.FeedId, @Model.UserId);"
+                                style="color: #fff !important;"
+                                data-feedid="@Model.FeedId"
+                                data-itemtype="@Model.ItemType">
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.SaveButton, "Save") ?? "Save")
+                        </button>
+                        <button type="button" id="cancelEditFeedComment-@Model.Id" class="btn btn-danger float-right" onclick="ezgofactoryfeed.cancelEditComment(@Model.Id)">
+                            <i class="fas fa-ban mr-2"></i>
+                            @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.CancelButton, "Cancel") ?? "Cancel")
+                        </button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="editCommentImageContainer-@Model.Id mt-3 row" style="display: none; position: relative">
+                        <img id="editCommentImage-@Model.Id" src="/images/media-loading.gif" data-src="" style="width: 100%" />
+                        <div class="controls d-print-none" style="position:absolute;bottom:0px;">
+                            <a href="#" data-selector="deletemedia" data-type="template" class="editCommentImageOverlay-@Model.Id">
+                                <div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">
+                                    <i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (Model.CurrentUser.Role.ToLower().Equals("manager") || Model.CurrentUser.Id.Equals(Model.UserId))
+        {
+            <div class="pull-right" style="margin-left: auto" data-itemid="@Model.Id">
+                <a onclick="ezgofactoryfeed.showPostMenu(@Model.Id);"><i class="fas fa-ellipsis-h"></i></a>
+            </div>
+            <div style="position: absolute; right: 1rem; display: none !important; " class="card postMenu" id="postMenu@(Model.Id)">
+                @{
+                    EZGO.Api.Models.Attachment mediaAttachment = null;
+                    if (Model.Media == null || Model.Media.FirstOrDefault() == null || string.IsNullOrEmpty(Model.Media.First().Uri))
+                    {
+                        mediaAttachment = null;
+                    }
+                    else if (Model.Media.First().Uri.ToLower().EndsWith(".mp4") || Model.Media.First().Uri.ToLower().EndsWith(".mov"))
+                    {
+                        if (!Model.Media.First().Uri.StartsWith("https:"))
+                        {
+                            var mediaUri = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Media.First().Uri);
+
+                            var thumbnailUri = "";
+                            
+                            if(!string.IsNullOrEmpty(Model.Media.First().VideoThumbnailUri))
+                            {
+                                thumbnailUri = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Media.First().VideoThumbnailUri);
+                            }
+                            
+                            mediaAttachment = new EZGO.Api.Models.Attachment() {
+                                AttachmentType = Model.Media.First().AttachmentType,
+                                FileExtension = Model.Media.First().FileExtension,
+                                FileName = Model.Media.First().FileName,
+                                FileType = Model.Media.First().FileType,
+                                LastModified = Model.Media.First().LastModified,
+                                Size = Model.Media.First().Size,
+                                Uri = mediaUri,
+                                VideoThumbnailUri = thumbnailUri
+                            };
+                        }
+                        else {
+                            mediaAttachment = Model.Media.FirstOrDefault();
+                        }
+                    }
+                    else
+                    {
+                        var mediaUri = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Media.First().Uri);
+
+                        mediaAttachment = new EZGO.Api.Models.Attachment() {
+                            AttachmentType = Model.Media.First().AttachmentType,
+                            FileExtension = Model.Media.First().FileExtension,
+                            FileName = Model.Media.First().FileName,
+                            FileType = Model.Media.First().FileType,
+                            LastModified = Model.Media.First().LastModified,
+                            Size = Model.Media.First().Size,
+                            Uri = mediaUri,
+                            VideoThumbnailUri = Model.Media.First().VideoThumbnailUri
+                        };
+                    }
+                }
+                <a class="postMenuOption p-1" style="border-radius: 10px 10px 0px 0px" onclick="ezgofactoryfeed.editComment(this, @Model.Id, @(mediaAttachment.ToJsonFromObject()))"><img class="ml-2" src="~/images/factory-feed-edit.png" style="width: 12px; height: 12px" /><div class="pl-2 py-1" style="display: inline-block">@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.EditTitle, "Edit") ?? "Edit")</div></a>
+                <a class="postMenuOption p-1" style="border-radius: 0px 0px 10px 10px" data-parentpostid="@Model.ParentId" onclick="ezgofactoryfeed.deletePost(this, @Model.Id, true)">
+                    <img class="ml-2" src="~/images/factory-feed-delete.png" style="width: 12px; height: 12px" /><div class="pl-2 py-1" style="display: inline-block">@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.DeleteTitle, "Delete") ?? "Delete")</div>
+                </a>
+            </div>
+        }
+
+
+    </li>

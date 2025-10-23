@@ -1,0 +1,143 @@
+﻿@model WebApp.ViewModels.SharedTaskViewModel
+@using System.Text
+@using WebApp.Models.Properties
+@using WebApp.Helpers
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<style>
+    .propertyTile {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid #f4f5f6;
+        color: #fff;
+        width: 80px;
+        height: 80px;
+        min-width: 80px;
+        min-height: 80px;
+    }
+
+        .propertyTile > div {
+            position: absolute;
+            background: inherit;
+            border: inherit;
+            width: inherit;
+            height: inherit;
+            min-width: inherit;
+            min-height: inherit;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .propertyTile > div.opened {
+                width: fit-content;
+                height: fit-content;
+                z-index: 9;
+            }
+
+    .propertyTitle, .propertyDate {
+        font-size: 12px;
+        text-align: center;
+        word-break: break-word;
+    }
+
+    .propertyDate {
+        font-size: 10px;
+    }
+
+    .propertyValue {
+        font-size: 14px;
+        text-align: center;
+        word-break: break-word;
+        font-weight: 600;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+</style>
+
+@{
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+    string color = "";
+
+    for (int i = 0; i < Model.SharedTaskModel.Properties.OrderBy(p => p.Index).Count(); i++)
+    {
+        var templateProperty = Model.SharedTaskModel.Properties[i];
+        var possibePropertyValue = Model.SharedTaskModel.PropertyUserValues.Where(x => x.PropertyId == templateProperty.PropertyId && x.TemplatePropertyId == templateProperty.Id).FirstOrDefault();
+        if (possibePropertyValue != null && possibePropertyValue.Id > 0)
+        {
+            DateTime propertyDate = TimeZoneInfo.ConvertTime(possibePropertyValue.CreatedAt.ToLocalTime(), timezone);
+            
+            if (possibePropertyValue.RegisteredAt != null)
+            {
+                propertyDate = TimeZoneInfo.ConvertTime(possibePropertyValue.RegisteredAt.Value.ToLocalTime(), timezone);
+            }
+            
+            color = WebApp.Helpers.PropertyHelpers.GetStatusColor(templateProperty, possibePropertyValue);
+
+            <div class="propertyTile" style="position: relative; float: left; margin-right: 5px; background: @color" onclick="ClickTile(this)">
+                <div style="top: 0;">
+                    @if (templateProperty.IsRequired == true)
+                    {
+                        if (color == "#ed5454")
+                        {
+                            <i class="fa-solid fa-asterisk m-1" style="color: rgb(100, 104, 107); position: absolute; top: -1px; right: -1px;"></i>
+                        }
+                        else
+                        {
+                            <i class="fa-solid fa-asterisk m-1" style="color: red; position: absolute; top: -1px; right: -1px;"></i>                            
+                        }
+                    }
+
+                    <div class="propertyTitle">
+                        @if (!String.IsNullOrEmpty(templateProperty.TitleDisplay))
+                        {
+                            @templateProperty.TitleDisplay
+                        }
+                        else
+                        {
+                            @templateProperty.Property.ShortName
+                        }
+                    </div>
+
+                    <div class="propertyValue" data-fulltext="@possibePropertyValue.UserValueString">
+                        @possibePropertyValue.UserBoolValue
+                        @possibePropertyValue.UserValueDate
+                        @(possibePropertyValue.UserValueDecimal / 1.000000000000000000000000000000000m)
+                        @possibePropertyValue.UserValueInt
+                        @possibePropertyValue.UserValueString
+                        @possibePropertyValue.UserValueTime
+
+                        @if (!string.IsNullOrEmpty(templateProperty.PropertyValueDisplay))
+                        {
+                            @templateProperty.PropertyValueDisplay;
+                        }
+                        else if (templateProperty.PropertyValue != null)
+                        {
+                            @templateProperty.PropertyValue.ValueSymbol;
+                        }
+                    </div>
+
+                    <div class="propertyDate">
+                        @propertyDate.ToLocaleGeneralDateShortTimeString(Model.Locale)
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
+
+
+<script>
+    var originalWidth = '';
+    var originalHeight = '';
+
+    function ClickTile(tile) {
+        $(tile).find('> div').toggleClass('opened');
+    }
+</script>

@@ -1,0 +1,430 @@
+﻿@model WebApp.ViewModels.CompletedSkillAssessmentSingleViewModel
+@using WebApp.Models.Skills
+@{
+    var colorCalculator = new WebApp.Logic.Services.DefaultScoreColorCalculator();
+    Layout = null;
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+
+    if (Model != null && Model.Tags != null & Model.Tags.Count > 0)
+    {
+        Model.Tags = Model.Tags.OrderBy(t => t.Id).ToList();
+        if (Model.SkillInstructions != null && Model.SkillInstructions.Count > 0)
+        {
+            foreach (var skillInstruction in Model.SkillInstructions)
+            {
+                if (skillInstruction.Tags != null && skillInstruction.Tags.Count > 0)
+                {
+                    skillInstruction.Tags = skillInstruction.Tags.OrderBy(t => t.Id).ToList();
+                }
+            }
+        }
+    }
+    string unknownColor = "#EAF0F6";
+
+    string redColor = "#ED5554";
+    double redMinScore = 0.0d;
+    double redMaxScore = 1.9d;
+
+    string yellowColor = "#FDC02F";
+    double yellowMinScore = 2.0d;
+    double yellowMaxScore = 3.5d;
+
+    string greenColor = "#1CD95E";
+    double greenMinScore = 3.6d;
+    double greenMaxScore = 5.0d;
+
+    //Make sure to round score to 1 digit before using this
+    string GetAssessmentScoreStyle(double score)
+    {
+        if (redMinScore <= score && score <= redMaxScore)
+        {
+            return $"background-color: {redColor}";
+        }
+        else if (yellowMinScore <= score && score <= yellowMaxScore)
+        {
+            return $"background-color: {yellowColor}";
+        }
+        else if (greenMinScore <= score && score <= greenMaxScore)
+        {
+            return $"background-color: {greenColor}";
+        }
+
+        return $"background-color: {unknownColor}";
+    }
+}
+
+<div class="card h-100">
+    <div class="card-header">
+        <div class="row">
+            <div class="col">
+                <h5 style="font-weight: 600">@Model.Name</h5>
+            </div>
+            <div class="col-auto">
+                <a class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto d-print-none" 
+                   onclick="window.open('/pdf/viewer/completedassessment/@(Model.Id)', '_blank', 'toolbar=no,top=10,left=10,width=' + (screen.availWidth-10) + ',height=' + (screen.availHeight-10) + '');">
+                    <i class="fa fa-print"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body p-0" style="height:calc(100vh - 377px);overflow:auto">
+
+        @if (Model.Tags?.Count > 0 && Model.ApplicationSettings?.Features?.TagsEnabled == true)
+        {
+            <div class="row m-1">
+                @foreach (var tag in Model.Tags)
+                {
+                    <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                        <div class="tag-wrapper" style="color:white;">
+                            <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                            <span class="my-1 ml-1 mr-3 tag-span" style="font-size:.78rem;">@tag.Name</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (Model.SkillInstructions != null && Model.SkillInstructions.Count > 0)
+        {
+            <div class="h-100">
+                @foreach (var workinstruction in Model.SkillInstructions)
+                {
+                    <div class="alternatingColors">
+                        <div class="p-2" style="position:relative">
+                            <div class="row">
+                                <div class="col-1">
+                                    <div id="showExtraAssessmentInstructionInfo-@Model.Id-@workinstruction.Id" 
+                                        class="showExtraAssessmentInfo"
+                                         style="position: absolute; width: 40px; left: 20px; top: 0px; vertical-align: middle; text-align: center;cursor: pointer;user-select:none"
+                                        onclick="expandAssessmentInstructionInformation(@Model.Id, @workinstruction.Id)">
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                                <div class="col-8">
+                                    <div class="d-flex align-items-center" style="height: 100%"><h6 class="mb-0" style="font-weight: 600">@workinstruction.Name</h6></div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div style="text-align:right;padding-right: 0.75rem">
+                                                <div class="align-items-center">
+                                                    @{
+                                                        var relevantInstructionItems = workinstruction.InstructionItems?.Where(i => i.IsCompleted.HasValue && i.IsCompleted.Value == true && i.Score != null).ToList();
+                                                        var instructionScore = Math.Round((double)workinstruction.TotalScore.Value / relevantInstructionItems?.Count() ?? 1, 1);
+                                                        bool allInstructionItemsScored = workinstruction.InstructionItems != null && workinstruction.InstructionItems.Count > 0 && relevantInstructionItems.Count == workinstruction.InstructionItems.Count;
+                                                    }
+                                                    @if (allInstructionItemsScored)
+                                                    {
+                                                        <span class="status-circle text-white" style="justify-self: right; @(GetAssessmentScoreStyle(Math.Round(instructionScore, 1)))">
+                                                            <span class="status-icon">@(string.Format("{0:0.0}", Math.Round(instructionScore, 1)))</span>
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="status-circle" style="background-color: #EAF0F6; justify-self: right">
+                                                            <span class="status-icon"></span>
+                                                        </span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                </div>
+                                <div class="col-auto">
+                                    <div id="showExtraAssessmentInstructionInfoText-@Model.Id-@workinstruction.Id" 
+                                    class="pr-2 pt-2" 
+                                    style="color: #93C54B; font-weight: 600; text-align: right;cursor:pointer;user-select:none"
+                                    onclick="expandAssessmentInstructionMetadata(@Model.Id, @workinstruction.Id)">Show more info</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <ul id="extraAssessmentInstructionMetadata-@Model.Id-@workinstruction.Id" class="pb-2" style="padding-left:0px;padding-right: 0px;padding-inline-start: 0px;margin-bottom: 0px;display: none">
+                                        <li class="row m-1 pl-2">
+                                            <div class="col-6">
+                                                @if (workinstruction.Assessors != null && workinstruction.Assessors.Count > 0)
+                                                {
+                                                    <div class="text-light-gray">
+                                                        ASSESSORS
+                                                    </div>
+                                                    <div>
+                                                        @(string.Join(", ", workinstruction.Assessors.Select(a => a.Name)))
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div class="col-3">
+                                                @if (workinstruction.StartDate.HasValue)
+                                                {
+                                                    <div class="text-light-gray">
+                                                        STARTED
+                                                    </div>
+
+                                                    DateTime StartDate = TimeZoneInfo.ConvertTime(workinstruction.StartDate.Value, timezone);
+                                                    <div>
+                                                        @StartDate.ToString("dddd, MMMM d, yyyy, HH:mm")
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div class="col-3">
+                                                <div class="text-light-gray">
+                                                    ENDED
+                                                </div>
+                                                @if (allInstructionItemsScored && workinstruction.EndDate.HasValue)
+                                                {
+                                                    DateTime maxCompletedItemTime = workinstruction.InstructionItems.Select(item => item.CompletedAt.HasValue ? item.CompletedAt.Value : DateTime.MinValue).Max();
+                                                    DateTime trueEndDate = workinstruction.EndDate.Value >= maxCompletedItemTime ? workinstruction.EndDate.Value : maxCompletedItemTime;
+                                                    DateTime EndDate = TimeZoneInfo.ConvertTime(trueEndDate, timezone);
+                                                    <div>
+                                                        @EndDate.ToString("dddd, MMMM d, yyyy, HH:mm")
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div>
+                                                        -
+                                                    </div>
+                                                }
+                                            </div>
+                                        </li>
+                                        @if (workinstruction?.Tags?.Count > 0 && Model.ApplicationSettings?.Features?.TagsEnabled == true)
+                                        {
+                                            <li class="row m-1 pl-2">
+                                                    @foreach (var tag in workinstruction.Tags)
+                                                    {
+                                                        <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                                                            <div class="tag-wrapper" style="color:white;">
+                                                                <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                                <span class="my-1 ml-1 mr-3 tag-span" style="font-size:.78rem;">@tag.Name</span>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                            </li>
+                                        }
+                                        </ul>
+
+                                    <ul id="extraAssessmentInstructionInfo-@Model.Id-@workinstruction.Id" class="pb-2" style="padding-left:0px;padding-right: 0px;margin-bottom: 0px;padding-inline-start: 0px;display: none">
+                                        @if (workinstruction.InstructionItems != null)
+                                        {
+                                            foreach (var item in workinstruction.InstructionItems)
+                                            {
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <li class="d-flex justify-content-between assessmentInstructionItem align-items-center ml-3 my-1" style="padding-right: 1.25rem;">
+                                                            <!-- Media display -->
+                                                            @{
+                                                                var picture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                                                                if (!string.IsNullOrEmpty(item.Picture))
+                                                                {
+                                                                    picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, item.Picture);
+
+                                                                    <a href="/images/media-loading.gif" data-href="@picture" data-fancybox="completedtasks" data-caption="@item.Name">
+                                                                        <img style="object-fit: cover; object-position: center; height: 100px; width: 120px; float: left;border-radius: 10px 0px 0px 10px;" loading="lazy" src="/images/media-loading.gif" data-src="@picture" />
+                                                                    </a>
+                                                                }
+                                                                else if (!string.IsNullOrEmpty(item.VideoThumbnail))
+                                                                {
+                                                                    var thumbnailUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, item.VideoThumbnail);
+                                                                    var videoUrl = item.Video;
+                                                                    if (!videoUrl.StartsWith("https:")) {
+                                                                        videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, item.Video);
+                                                                    }
+
+                                                                    <a href="#itemVideo-@(Model.Id)" data-fancybox="postImageFancybox-@Model.Id">
+                                                                        <img style="object-fit: cover; object-position: center; height: 100px; width: 120px; float: left;border-radius: 10px 0px 0px 10px;" loading="lazy" src="/images/media-loading.gif" data-src="@thumbnailUrl" />
+                                                                    </a>
+
+                                                                    <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="itemVideo-@(Model.Id)" style="display:none;">
+                                                                        @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                                                    </video>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <a href="/images/media-loading.gif" data-href="@picture" data-fancybox="completedtasks" data-caption="@item.Name">
+                                                                        <img style="object-fit: cover; object-position: center; height: 100px; width: 120px; float: left;border-radius: 10px 0px 0px 10px;" loading="lazy" src="/images/media-loading.gif" data-src="@picture" />
+                                                                    </a>
+                                                                }
+                                                            }
+
+                                                            <div class="row" style="width: 100%">
+                                                                <div class="col-12">
+                                                                    <div class="pl-3 pr-3 py-1">
+                                                                        <span style="float:left;clear:left;position:relative;font-weight:600">@item.Name</span>
+                                                                    </div>
+                                                                </div>
+                                                                @if (item.Assessor != null && (item.ModifiedAt.HasValue || item.CompletedAt.HasValue || item.ScoredAt.HasValue) &&
+                                                                     item.Score != null && item.Score != 0)
+                                                                {
+                                                                    DateTime completionDate = item.ModifiedAt.HasValue ? TimeZoneInfo.ConvertTime(item.ModifiedAt.Value, timezone) : DateTime.MinValue;
+                                                                    
+                                                                    var assessorName = "Unknown";
+
+                                                                    if (item.CompletedAt.HasValue) 
+                                                                    {
+                                                                        completionDate = TimeZoneInfo.ConvertTime(item.CompletedAt.Value, timezone);
+                                                                    }
+                                                                    else if (item.ScoredAt.HasValue)
+                                                                    {
+                                                                        completionDate = TimeZoneInfo.ConvertTime(item.ScoredAt.Value, timezone);
+                                                                    }
+                                                                    
+                                                                    if(item.Assessor != null)
+                                                                    {
+                                                                        assessorName = item.Assessor.Name;
+                                                                    }
+
+                                                                    <div class="col-12">
+                                                                        <div class="pl-3 py-1">Assessor: @assessorName, @completionDate.ToString("MMM M, yyyy, HH:mm")</div>
+                                                                    </div>
+                                                                }
+                                                            </div>
+
+                                                            @if(item.Assessor != null)
+                                                            {
+                                                                var assessorPicture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                                                                if (!string.IsNullOrEmpty(item.Assessor.Picture))
+                                                                {
+                                                                    assessorPicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, item.Assessor.Picture);
+                                                                }
+
+                                                                <span class="status-circle mr-3">
+                                                                    <img class="assessorPictureInstructionItem" data-src="@assessorPicture" />
+                                                                </span>
+                                                            }
+                                                            @if (item.Score != null && item.Score != 0)
+                                                            {
+                                                                <span class="status-circle text-white" style="@GetAssessmentScoreStyle(item.Score.Value)">
+                                                                    <span class="status-icon">@item.Score.Value</span>
+                                                                </span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="status-circle" style="background-color: #EAF0F6">
+                                                                    <span class="status-icon"></span>
+                                                                </span>
+                                                            }
+                                                        </li>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    @if(Model.IsCompleted)
+    {
+        <div class="card-footer p-0 pt-1 pb-3 text-center" style="background-color: transparent;">
+            <div class="row mr-2" style="display: flex; align-items: center">
+                <div class="col-8">
+                    @if (Model.Signatures != null && Model.Signatures.Count > 0)
+                    {
+                        <div class="row">
+                            @{
+                                var signatureColClass = Model.Signatures.Count == 1 ? "col-12" : "col-6";
+                                var completedForSignature = Model.Signatures.Where(s => s.SignedById == Model.CompletedForId).FirstOrDefault();
+                                var assessorSignature = Model.Signatures.Except(new List<EZGO.Api.Models.Signature>() { completedForSignature }).FirstOrDefault();
+                            }
+                            @if (assessorSignature != null)
+                            {
+                                var sigpic = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, assessorSignature.SignatureImage);
+
+                                <div class="@signatureColClass float-left pl-3" style="text-align: center">
+                                    <span class="d-inline-block" style="width:100px;">Last assessor</span>
+                                    @if (!string.IsNullOrEmpty(assessorSignature.SignatureImage))
+                                    {
+                                        <img src="/images/media-loading.gif" data-src="@sigpic" style="height:80px;margin: auto" class="d-block" />
+                                    }
+                                    else
+                                    {
+                                        <i class="fa-solid fa-signature d-block" style="font-size:60px;color:#93C54B;margin: auto"></i>
+                                    }
+                                    <span class="d-inline-block" style="width:100px;">@assessorSignature.SignedBy</span>
+                                </div>
+                            }
+                            @if(completedForSignature != null)
+                            {
+                                var sigpic = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, completedForSignature.SignatureImage);
+
+                                <div class="@signatureColClass float-left pl-3" style="text-align: center">
+                                    <span class="d-inline-block" style="width:100px;">Completed for</span>
+                                    @if (!string.IsNullOrEmpty(completedForSignature.SignatureImage))
+                                    {
+                                        <img src="/images/media-loading.gif" data-src="@sigpic" style="height:80px;margin: auto" class="d-block" />
+                                    }
+                                    else
+                                    {
+                                        <i class="fa-solid fa-signature d-block" style="font-size:60px;color:#93C54B;margin: auto"></i>
+                                    }
+                                    <span class="d-inline-block" style="width:100px;">@completedForSignature.SignedBy</span>
+                                </div>
+                            }
+                        </div>
+                        }
+                        else if(Model.IsCompleted) 
+                        {
+                            <i class="fa-solid fa-signature d-block" style="font-size:60px;color:#93C54B;margin: auto"></i>
+                            <span class="d-inline-block" style="width:100px;">@Model.Assessor</span>
+                        }
+                </div>
+                <div class="col-4" style="align-items: center">
+                    <div class="row">
+                        <div class="col" style="display: flex; align-items: center; justify-content: right;max-width: calc(100% - 80px);">
+                            @{
+                                List<double> averages = new List<double>();
+                                foreach (var skillInstruction in Model.SkillInstructions)
+                                {
+                                    averages.Add(((double)skillInstruction.TotalScore.Value / (double)(skillInstruction.InstructionItems?.Count ?? 1)));
+                                }
+
+                                int totalInstructions = 0;
+                                foreach (var skillInstruction in Model.SkillInstructions)
+                                {
+                                    totalInstructions += skillInstruction.InstructionItems?.Count ?? 1;
+                                }
+
+                                var assessmentScore = (Model.TotalScore.HasValue ? Math.Round(((double)Model.TotalScore.Value / totalInstructions), 2) : 1.0d);
+                            }
+                            <div class="mb-0" style="display: inline-block; font-weight: 600; text-align:right">
+                                <div style="text-align: center">Average score of assessment:</div> 
+                            </div>
+                        </div>
+                        <div class="col-auto" style="display: flex;justify-content: right">
+                            <div>
+                            @if (Model.IsCompleted != null && Model.IsCompleted == true)
+                            {
+                                <span class="status-circle-big text-white" style="@(GetAssessmentScoreStyle(Math.Round(assessmentScore, 1)))">
+                                    <span class="status-icon-big">@(string.Format("{0:0.0}", Math.Round(assessmentScore, 1)))</span>
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="status-circle-big" style="background-color: #EAF0F6">
+                                    <span class="status-icon-big"></span>
+                                </span>
+                            }
+                            </div>
+                        </div>
+                    </div>
+                    <span class="float-right m-0" style="text-align: right">
+                    </span>
+                </div>
+            </div>
+        </div>
+    }
+</div>

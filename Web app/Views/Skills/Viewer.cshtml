@@ -1,0 +1,565 @@
+﻿@model WebApp.ViewModels.SkillsViewModel
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = @Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.StatsAssessmentsTitle, "Assessments") ?? "Assessments";
+}
+
+<style>
+    #contentBody .card{
+        @*box-shadow:none;*@
+        border: solid 1px transparent;
+    }
+        #contentBody .card:hover {
+            border: solid 1px #93c54b;
+            box-shadow: 0 .425rem .75rem rgba(0,0,0,.075) !important;
+            color: #93c54b !important;
+        }
+        #contentBody .card a:active, #contentBody .card a:link, #contentBody .card a:visited {
+            @*background-color: aquamarine;*@
+        }
+        #contentBody .card a:hover {
+            color: #93c54b !important;
+        }
+    #contentBody img.img-fluid {
+        border-radius: 5px;
+        border: solid 1px #bfbfbf;
+    }
+
+    .signature-pad {
+        @*position: absolute;
+        left: 0;
+        top: 0;
+        *@ width: 200px;
+        height: 200px;
+        background-color: #fff;
+        border-radius: 3px;
+        border: solid 2px #00529c;
+        opacity: 0.6;
+        display: inline;
+    }
+
+    .btn-sign:not(:disabled):not(.disabled) {
+        background-color: #00529c;
+        width: 230px;
+        height: 70px;
+    }
+
+    .circle-button {
+        width: 48px;
+        height: 48px;
+        color: rgb(26,164,13);
+        border-radius: 50px;
+        display: inline-block;
+        background: transparent;
+        border: 1px solid rgb(210,210,210);
+    }
+
+    .circlebtn {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: inline-block;
+        color: #fff;
+        border: 1px solid rgb(210,210,210);
+    }
+
+    .circlebtn:hover {
+        cursor: pointer;
+        transform: scale(1.15);
+        color: #fff;
+    }
+
+    .circlebtn i {
+        font-size: 22px;
+    }
+
+    .popUp {
+        position: absolute;
+        top: 75px;
+        left: 0px;
+        background-color: #f0f0f0;
+        display: flex;
+        justify-content: space-around;
+        width: 292px;
+        padding: 5px 15px;
+        border-radius: 30px;
+        box-shadow: 10px 10px 26px -12px rgba(0,0,0,0.34);
+        -webkit-box-shadow: 10px 10px 26px -12px rgba(0,0,0,0.34);
+        -moz-box-shadow: 10px 10px 26px -12px rgba(0,0,0,0.34);
+        animation: bounceIn 0.4s;
+        z-index: 10;
+    }
+
+    .popUpThumbs {
+        width: 230px;
+    }
+
+    .btn-green {
+        background-color: green;
+    }
+
+    .btn-red {
+        background-color: rgb(203,0,0);
+        font-size: 22px !important;
+        font-weight: 400;
+    }
+
+    .btn-clear {
+        background-color: #ffffff;
+        font-size: 22px;
+        font-weight: 400;
+    }
+
+    .btn-orangered {
+        background-color: orangered;
+        font-size: 22px;
+        font-weight: 400;
+    }
+
+    .btn-orange {
+        background-color: orange;
+        font-size: 22px;
+        font-weight: 400;
+    }
+
+    .btn-orangegreen {
+        background-color: rgb(141,163,5);
+        font-size: 22px;
+        font-weight: 400;
+    }
+
+    .btn-border-green {
+        border: solid 1px #abd28e;
+        border-radius: 50%;
+        background-color: #fff;
+        font-size: 22px;
+        font-weight: 400;
+    }
+
+    .hidePopUp {
+        display: none;
+    }
+
+    .item {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: 300;
+        color: #fff;
+        border: solid 1px rgb(210,210,210);
+    }
+
+    .itemSelected {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: inline-block;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: 300;
+        color: #fff;
+    }
+
+    .item:hover {
+        cursor: pointer;
+        transform: scale(1.05);
+    }
+
+</style>
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-3">
+                &nbsp;
+                <h1>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OngoingAssessmentsTitle, "Ongoing assessments") ?? "Ongoing assessments")</h1>
+            </div>
+            <div class="col-sm-9 d-flex flex-row-reverse">
+                <div class="form-group" style="width:300px;">
+
+                </div>
+
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+
+<section class="content">
+
+    <div class="container-fluid">
+
+        <div class="row pt-1" style="">
+
+            <div class="col-xl-3 d-none d-xl-inline-block">
+                <div class="card card-filter">
+                    <div class="card-header">
+                        <h3 class="card-title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.InstructionsTitle, "Instructions ") ?? "Instructions")</h3>
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-append">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.CurrentSkillAssessmentTemplate != null)
+                        {
+                            if (Model.CurrentSkillAssessmentTemplate.SkillInstructions != null)
+                            {
+                                int pos = 0;
+                                foreach (var workinstruction in Model.CurrentSkillAssessmentTemplate.SkillInstructions)
+                                {
+                                    <div title="@workinstruction.Description">
+                                        <div style="margin-left:20px;"><input type="checkbox" id="check_workinstruction_@workinstruction.Id" class="form-check-input" onclick="return false;" data-action="check_navigation" data-pos="@pos" /><label for="check_workinstruction_@workinstruction.Id" class="form-check-label">@workinstruction.Name</label></div>
+                                    </div>
+                                    {
+                                        pos = pos + 1;
+                                    }
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12 col-xl-9">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 id="cardHeader" class="card-title d-none d-sm-inline-block" style="text-align:right;">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ExecuteAssessment, "Execute Assessment for") ?? "Execute Assessment for"):</h3>
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm">
+                                <select id="select_assessment_users" name="select_assessment_users" class="form-control">
+                                    @if (Model.Users != null)
+                                    {
+                                        foreach (var user in Model.Users)
+                                        {
+                                            if (Model.SelectedUserId > 0 && Model.SelectedUserId == user.Id)
+                                            {
+                                                <option selected value="@user.Id">@user.LastName, @user.FirstName</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@user.Id">@user.LastName, @user.FirstName</option>
+                                            }
+
+                                        }
+                                    }
+                                </select>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-header collapse" id="collapseExample">
+
+                    </div>
+
+                </div>
+
+                <div id="contentBody" style="">
+                    @if (Model.CurrentSkillAssessmentTemplate != null && Model.CurrentSkillAssessmentTemplate.SkillInstructions != null)
+                    {
+                        int pos = 0;
+                        foreach (var workinstruction in Model.CurrentSkillAssessmentTemplate.SkillInstructions)
+                        {
+                            var workInstructionPicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, workinstruction.Picture);
+                            if (string.IsNullOrEmpty(workinstruction.Picture))
+                            {
+                                workInstructionPicture = @"/assets/img/normal_unavailable_image.png";
+                            }
+
+                            <div data-containertype="workinstruction" data-workinstructionid="@workinstruction.Id" data-containernr="@pos" style="display:none;">
+                                <div class="card">
+                                    <div class="card-header" style="border-bottom:0px;">@workinstruction.Name</div>
+                                </div>
+                                <div style="height: calc(100vh - 350px); overflow: auto;">
+                                    <div data-containertype="workinstructionitems" data-workinstructionid="@workinstruction.Id" class="row card-deck" style="margin-left:0px; margin-right:0px;">
+                                        @if (workinstruction.InstructionItems != null)
+                                        {
+                                            foreach (var item in workinstruction.InstructionItems)
+                                            {
+
+                                                var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, item.Picture);
+                                                if (string.IsNullOrEmpty(workinstruction.Picture))
+                                                {
+                                                    picture = @"/assets/img/normal_unavailable_image.png";
+                                                }
+
+                                                <div data-containertype="workinstructionitem" data-workinstructionid="@workinstruction.Id" data-instructionid="@item.Id" class="col-lg-4 col-md-4 col-sm-12 p-0 pb-4 results">
+                                                    <div class="card" style="min-height:300px;">
+                                                        <div class="card-body">
+                                                            <div style="width:100%;height:200px;background-image: url('@picture'); background-repeat: no-repeat; background-size: cover;">
+                                                                <div style="text-align:right;">
+                                                                    <span style="display:inline-block; margin:10px;">
+                                                                        <button class="circlebtn btn-green" type="button" data-popup="score">5</button>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <div><h4>@item.Name</h4></div>
+                                                            <div class="text-muted">@item.Description</div>
+                                                        </div>
+                                                    </div>
+                                                    <input type="hidden" name="workinstruction_item_value_@(workinstruction.Id)_@(item.Id)" id="workinstruction_item_value_@(workinstruction.Id)_@(item.Id)" data-workinstructionid="@workinstruction.Id" data-instructionid="@item.Id" value="0" data-valuetype="instructionitem" />
+                                                </div>
+
+                                            }
+                                        }
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            {
+                                pos = pos + 1;
+                            }
+                        }
+
+                        <div data-assessmentid="@Model.CurrentSkillAssessmentTemplate.Id" data-containernr="@pos" style="display:none;">
+                            <div class="row">
+                                @if (Model.CurrentSkillAssessmentTemplate.SignatureType == EZGO.Api.Models.Enumerations.RequiredSignatureTypeEnum.OneSignatureRequired || Model.CurrentSkillAssessmentTemplate.SignatureType == EZGO.Api.Models.Enumerations.RequiredSignatureTypeEnum.TwoSignatureRequired)
+                                {
+                                    <div class="col-md-4 results">
+                                        <div class="card">
+                                            <div class="card-header"><h3>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SignatureNumberOneTitle, "Signature 1") ?? "Signature 1")</h3></div>
+                                            <div class="card-body" style="text-align:center;">
+                                                <canvas id="signature-pad-two" class="signature-pad"></canvas>
+
+                                                <select id="signature_one_users" name="signature_one_users" class="form-control">
+                                                    @if (Model.Users != null)
+                                                    {
+                                                        foreach (var user in Model.Users)
+                                                        {
+                                                            @if (Model.SelectedUserId == user.Id)
+                                                            {
+                                                                <option value="@user.Id" selected>@user.LastName, @user.FirstName</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@user.Id">@user.LastName, @user.FirstName</option>
+                                                            }
+
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                @if (Model.CurrentSkillAssessmentTemplate.SignatureType == EZGO.Api.Models.Enumerations.RequiredSignatureTypeEnum.TwoSignatureRequired)
+                                {
+                                    <div class="col-md-4 results">
+                                        <div class="card">
+                                            <div class="card-header"><h3>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SignatureNumberTwoTitle, "Signature 2") ?? "Signature 2")</h3></div>
+                                            <div class="card-body" style="text-align:center;">
+                                                <canvas id="signature-pad-one" class="signature-pad"></canvas>
+
+                                                <select id="signature_two_users" name="signature_one_users" class="form-control">
+                                                    @if (Model.Users != null)
+                                                    {
+                                                        foreach (var user in Model.Users)
+                                                        {
+                                                            @if (Model.LoggedInUserId == user.Id)
+                                                            {
+                                                                <option value="@user.Id" selected>@user.LastName, @user.FirstName</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@user.Id">@user.LastName, @user.FirstName</option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8 results" style="margin-top:10px;">
+                                    <button id="btn_nav_sign" class="btn btn-success" style="width:100%;height:100px;">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnSign, "Sign") ?? "Sign")</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div containertype="navigation" style="text-align:right;">
+                            <div style="margin: 5px;"><button id="btn_nav_prev" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" style="width:200px;">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnPrevious, "Previous") ?? "Previous")</button><button id="btn_nav_next" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" style="width:200px;">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnNext, "Next") ?? "Next")</button></div>
+                        </div>
+                    }
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</section>
+<div class="popUp hidePopUp popUpScore">
+    <div class="arrowUp"></div><div class='item btn-red'>1</div><div class='item btn-orangered'>2</div><div class='item btn-orange'>3</div><div class='item btn-orangegreen'>4</div><div class='item btn-green'>5</div>
+</div>
+<div class="popUp hidePopUp popUpThumbs">
+    <div class="arrowUp"></div><button class='item btn-clear'></button><button class='item btn-orange'><i class="fa fa-exclamation-triangle" style="color: rgb(255,255,255);"></i></button><button class='item btn-red'><i class="fa fa-thumbs-down" style="color: rgb(255,255,255);"></i></button><button class='item btn-green'><i class="fa fa-thumbs-up" style="color: rgb(255,255,255);"></i></button>
+</div>
+
+@section Scripts{
+    <script>
+        var viewer = {
+            _maxstepnr: 1, //max steps including sign
+            _currentstepnr: 0,
+            init: function (maxsteps) {
+                if (maxsteps != null) {
+                    viewer._maxstepnr = maxsteps;
+                }
+                viewer.setWizard();
+                viewer.initHandlers();
+            },
+            initHandlers: function () {
+                $('#btn_nav_prev').on('click', function () {
+                    viewer.setNaviation('prev');
+                });
+                $('#btn_nav_next').on('click', function () {
+                    viewer.setNaviation('next');
+                });
+                $('#btn_nav_sign').on('click', function () {
+                    viewer.sign();
+                });
+            },
+            setNavLoader: function () {
+                toastr.remove();
+                $('body').toggleClass('loaded');
+
+                setTimeout(function () {
+                    $('body').toggleClass('loaded');
+                }, 1000);
+            },
+            setWizard: function () {
+                if (this._currentstepnr == 0) {
+                    $('#btn_nav_prev').hide();
+                    $('#btn_nav_sign').hide();
+                    $('[data-containernr=0]').show();
+                    for (var i = 1; i < viewer._maxstepnr; i++) {
+                        $('[data-containernr=' + i + ']').hide();
+                    }
+                }
+            },
+            setNaviation: function (direction) {
+                viewer.setNavLoader();
+
+                if (direction == 'prev') {
+                    viewer._currentstepnr = viewer._currentstepnr - 1;
+                    viewer.showWizardStep();
+                }
+
+                if (direction == 'next') {
+                    viewer._currentstepnr = viewer._currentstepnr + 1;
+                    viewer.showWizardStep();
+                }
+
+                if (this._currentstepnr == 0) {
+                    $('#btn_nav_prev').hide();
+                    $('#btn_nav_sign').hide();
+                }
+
+                if (this._currentstepnr > 0) {
+                    $('#btn_nav_prev').show();
+                    $('#btn_nav_sign').hide();
+                }
+
+                if (this._currentstepnr == this._maxstepnr) {
+                    $('#btn_nav_prev').hide();
+                    $('#btn_nav_next').hide();
+                    $('#btn_nav_sign').show();
+                }
+                viewer.setWorkItemDoneDisplay();
+            },
+            setWorkItemDoneDisplay: function () {
+                for (var i = 0; i < viewer._maxstepnr; i++) {
+                    if (i < this._currentstepnr) {
+                        //TODO add value check
+
+                        $('[data-action="check_navigation"][data-pos="' + i + '"]').attr('checked', true);
+                    }
+                }
+            },
+            showWizardStep: function () {
+                for (var i = 0; i < viewer._maxstepnr; i++) {
+                    $('[data-containernr=' + i + ']').hide();
+                }
+                $('[data-containernr=' + viewer._currentstepnr + ']').show();
+            },
+            sign: function () {
+                viewer.setNavLoader();
+                document.location.href = '/skillassessments'
+            }
+        }
+
+        viewer.init(@(Model.CurrentSkillAssessmentTemplate != null && Model.CurrentSkillAssessmentTemplate.SkillInstructions != null ? Model.CurrentSkillAssessmentTemplate.SkillInstructions.Count : 0));
+
+        const btns = document.querySelectorAll('.circlebtn');
+        const popUpScore = document.querySelector('.popUpScore');
+        const popUpThumbs = document.querySelector('.popUpThumbs');
+        const items = document.querySelectorAll('.item');
+
+        var activeBtn = null;
+
+         const setValue = (e) => {
+            activeBtn.innerHTML = e.target.innerHTML;
+            activeBtn.className = 'circlebtn';
+            activeBtn.classList.add('itemSelected');
+            activeBtn.classList.add(e.target.classList[1]);
+            activeBtn.style.backgoundColor = e.target.style.backgroundColor;
+            activeBtn = null;
+        }
+
+        const togglePopUp = (e) => {
+            var popup;
+            var x;
+            var y;
+
+            e.stopPropagation();
+
+            if (e.pageX || e.pageY) {
+                x = e.pageX;
+                y = e.pageY;
+            }
+            else {
+                x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+                y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+            }
+            activeBtn = e.target;
+
+            switch (activeBtn.getAttribute('data-popup')) {
+                case 'score':
+                    popup = popUpScore;
+                    break;
+                case 'thumbs':
+                    popup = popUpThumbs;
+                    break;
+            }
+            
+            popup.classList.toggle('hidePopUp')
+            popup.style.left = x - 40 + 'px';
+            popup.style.top = (y + 40) + 'px';
+        }
+
+        items.forEach((item) => {
+            item.addEventListener('click', setValue);
+        })
+
+        btns.forEach((btn) => {
+            btn.addEventListener('click', togglePopUp)
+        });
+
+
+        document.addEventListener('click', (e) => {
+            e.stopPropagation();
+            popUpScore.classList.add('hidePopUp')
+            popUpThumbs.classList.add('hidePopUp')
+        })
+    </script>
+}

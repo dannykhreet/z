@@ -1,0 +1,251 @@
+﻿@model WebApp.ViewModels.FilterViewModel
+@using WebApp.ViewModels
+@{
+    Dictionary<string, string> CmsLanguage = Model?.CmsLanguage ?? new Dictionary<string, string>();
+}
+<div class="container">
+    <div class="row">
+
+        @if (Model.Module == FilterViewModel.ApplicationModules.TASKS)
+        {
+            <div class="col-sm">
+                <div class="form-group">
+                    <select id="recurrenceFilterInline" data-role="recurrenceFilterInline" class="form-control selectpicker" multiple data-live-search="false" title="@(CmsLanguage?.GetValue(LanguageKeys.Filters.RecurrenceTitle, "Recurrence") ?? "Recurrence")">
+                        <option value="no recurrency">@(CmsLanguage?.GetValue(LanguageKeys.Filters.OptionOnlyOnce, "Only once") ?? "Only once")</option>
+                        <option value="shifts">@(CmsLanguage?.GetValue(LanguageKeys.Filters.OptionCertainShifts, "Certain shifts") ?? "Certain shifts")</option>
+                        <option value="week">@(CmsLanguage?.GetValue(LanguageKeys.Filters.OptionDailyWeekly, "Daily / weekly") ?? "Daily / weekly")</option>
+                        <option value="month">@(CmsLanguage?.GetValue(LanguageKeys.Filters.OptionMonthly, "Monthly") ?? "Monthly")</option>
+                        <option value="periodday">@(CmsLanguage?.GetValue(LanguageKeys.Filters.OptionDailyInterval, "Daily Interval") ?? "Daily Interval")</option>
+                        <option value="dynamicday">@(CmsLanguage?.GetValue(LanguageKeys.Filters.OptionDynamicDailyInterval, "Dynamic Daily Interval") ?? "Dynamic Daily Interval")</option>
+                    </select>
+                </div>
+            </div>
+        }        
+        @if (Model.Module != FilterViewModel.ApplicationModules.SKILLASSESSMENTS && Model.Module != FilterViewModel.ApplicationModules.REPORTSKILLASSESSMENTS && Model.Module != FilterViewModel.ApplicationModules.SKILLSMATRIX && Model.Module != FilterViewModel.ApplicationModules.REPORT && Model.Module != FilterViewModel.ApplicationModules.ACTIONS && Model.Module != FilterViewModel.ApplicationModules.TASKINDICES && Model.Module != FilterViewModel.ApplicationModules.COMPLETEDTASKS)
+        {
+            <div class="col-sm">
+                <select id="roleFilterInline" data-role="roleFilterInline" data-type="inline" class="form-control selectpicker" multiple data-live-search="false" title="@(CmsLanguage?.GetValue(LanguageKeys.Filters.RoleTitle, "Roles") ?? "Roles")">
+                    <option value="basic">@(Model?.CmsLanguage.GetValue(LanguageKeys.Filters.RoleBasic, "Basic user") ?? "Basic user")</option>
+                    <option value="shift_leader">@(Model?.CmsLanguage.GetValue(LanguageKeys.Filters.RoleShiftleader, "Shift leader") ?? "Shift leader")</option>
+                    <option value="manager">@(Model?.CmsLanguage.GetValue(LanguageKeys.Filters.RoleManager, "Manager") ?? "Manager")</option>
+                </select>
+            </div>
+        }
+
+        @if (Model.Module != FilterViewModel.ApplicationModules.SKILLASSESSMENTS && Model.Module != FilterViewModel.ApplicationModules.REPORTSKILLASSESSMENTS && Model.Module != FilterViewModel.ApplicationModules.SKILLSMATRIX && Model.Module != FilterViewModel.ApplicationModules.USERS && Model.Module != FilterViewModel.ApplicationModules.ACTIONS && Model.Module != FilterViewModel.ApplicationModules.REPORT && Model.Module != FilterViewModel.ApplicationModules.TASKINDICES && Model.Module != FilterViewModel.ApplicationModules.COMPLETEDTASKS)
+        {
+            <div class="col-sm">
+                <select id="instructionFilterInline" data-role="instructionFilterInline" data-type="inline" class="form-control selectpicker" data-live-search="false" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Filters.InstructionsTitle, "Instructions") ?? "Instructions")">
+                    <option value=""></option>
+                    <option value="true">@(Model?.CmsLanguage.GetValue(LanguageKeys.Filters.OptionYes, "Yes") ?? "Yes")</option>
+                    <option value="false">@(Model?.CmsLanguage.GetValue(LanguageKeys.Filters.OptionNo, "No") ?? "No")</option>
+                </select>
+            </div>
+        }
+
+        @if (Model.Module != FilterViewModel.ApplicationModules.SKILLASSESSMENTS && Model.Module != FilterViewModel.ApplicationModules.REPORTSKILLASSESSMENTS && Model.Module != FilterViewModel.ApplicationModules.SKILLSMATRIX && Model.Module != FilterViewModel.ApplicationModules.USERS && Model.Module != FilterViewModel.ApplicationModules.REPORT && Model.Module != FilterViewModel.ApplicationModules.ACTIONS && Model.Module != FilterViewModel.ApplicationModules.TASKINDICES && Model.Module != FilterViewModel.ApplicationModules.COMPLETEDTASKS)
+        {
+            <div class="col-sm">
+                <select id="imageFilterInline" data-role="imageFilterInline" data-type="inline" class="form-control selectpicker" data-live-search="false" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Shared.PhotosTitle, "Photos") ?? "Photos")">
+                    <option value=""></option>
+                    <option value="true">@(Model?.CmsLanguage.GetValue(LanguageKeys.Filters.OptionYes, "Yes") ?? "Yes")</option>
+                    <option value="false">@(Model?.CmsLanguage.GetValue(LanguageKeys.Filters.OptionNo, "No") ?? "No")</option>
+                </select>
+            </div>
+        }
+
+        @if (Model.Module == FilterViewModel.ApplicationModules.ACTIONS)
+        {
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label class="pl-2">@(CmsLanguage?.GetValue(LanguageKeys.Filters.ActionType, "Type") ?? "Type")</label>
+
+                            <select id="actionTypeFilterInline" data-role="actionTypeFilterInline" class="form-control selectpicker" data-live-search="false" title="@(CmsLanguage?.GetValue(LanguageKeys.Filters.ActionType, "Type") ?? "Type")" data-filtergroup="actioninvolved">
+                                <option value="action" selected>@(CmsLanguage?.GetValue(LanguageKeys.Filters.ActionTypeAction, "Actions") ?? "Actions")</option>
+                                <option value="comment">@(CmsLanguage?.GetValue(LanguageKeys.Filters.ActionTypeComment, "Comments") ?? "Comments")</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm">
+                <div class="form-group">
+                    <select id="involvementFilterInline" data-role="involvementFilterInline" class="form-control selectpicker tdfilter" data-dropup--auto="false" data-live-search="false" title="@(CmsLanguage?.GetValue(LanguageKeys.Filters.ActionInvolvementTitle, "Involvement") ?? "Involvement")" data-filtergroup="actioninvolved">
+                        <option value="all" selected>@(CmsLanguage?.GetValue(LanguageKeys.Filters.InvolvementOptionAllActions, "All actions") ?? "All actions")</option>
+                        <option value="started">@(CmsLanguage?.GetValue(LanguageKeys.Filters.ActionsStartByMe, "Started by me") ?? "Started by me")</option>
+                        <option value="involved">@(CmsLanguage?.GetValue(LanguageKeys.Filters.InvolvementOptionIamInvolvedIn, "In which I am involved") ?? "In which I am involved")</option>
+                        <option value="my">@(CmsLanguage?.GetValue(LanguageKeys.Filters.InvolvementOptionMyActions, "My actions") ?? "My actions")</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <select id="statusFilterInline" data-role="statusFilterInline" class="form-control selectpicker tdfilter" multiple data-dropup--auto="false" data-live-search="false" title="@(CmsLanguage?.GetValue(LanguageKeys.Filters.ActionStatusTitle, "Status") ?? "Status")" data-filtergroup="actionstatus">
+                                <option value="overdue">@(CmsLanguage?.GetValue(LanguageKeys.Filters.StatusOptionOverdue, "Overdue") ?? "Overdue")</option>
+                                <option value="unresolved">@(CmsLanguage?.GetValue(LanguageKeys.Filters.StatusOptionUnresolved, "Unresolved") ?? "Unresolved")</option>
+                                <option value="resolved">@(CmsLanguage?.GetValue(LanguageKeys.Filters.StatusOptionResolved, "Completed") ?? "Completed")</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-group">
+                            <select id="unviewedCommentsFilterInline" class="form-control selectpicker tdfilter" data-role="unviewedCommentsFilterInline" data-filtergroup="unviewedcomments">
+                                <option value="">@(CmsLanguage?.GetValue(LanguageKeys.Filters.AllComments, "All comments") ?? "All comments")</option>
+                                <option value="unviewed">@(CmsLanguage?.GetValue(LanguageKeys.Filters.FilterHasUnviewedComments, "Has unviewed comments") ?? "Has unviewed comments") </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-sm">
+                        <div class="form-group">
+                            @{
+                                var itemCounter = 0;
+                            }
+                            <select id="resourceFilterInline" data-role="resourceFilterInline" data-type="block" class="form-control selectpicker tdfilter" multiple data-live-search="true" title="Resources" data-dropup--auto="false" data-size="20" data-filtergroup="actionresources">
+                                @if (Model.ActionUsers != null)
+                                {
+                                    foreach (var user in Model.ActionUsers)
+                                    {
+                                        var userString = $"{user.FirstName}, {user.LastName}";
+                                        if (userString.Length > 30)
+                                        {
+                                            userString = userString.Substring(0, 30) + "...";
+                                        }
+                                        itemCounter++;
+                                        <option value="user@(user.Id)" title="@user.FirstName, @user.LastName" data-bs-select="bs-select-6-@itemCounter"><strong>User: </strong>@userString</option>
+                                    }
+                                }
+
+                                @if (Model.ActionAreas != null)
+                                {
+                                    foreach (var area in Model.ActionAreas)
+                                    {
+                                        var areaString = $"{area.Name}";
+                                        if (areaString.Length > 30)
+                                        {
+                                            areaString = areaString.Substring(0, 30) + "...";
+                                        }
+                                        itemCounter++;
+                                        <option value="area@(area.Id)" title="@area.Name" data-bs-select="bs-select-6-@itemCounter"><strong>Area: </strong>@areaString</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                #creationDateFilterInline {
+                    background-color: #f8f9fa;
+                    padding-left: 0.75rem;
+                    border: 0px solid #FFFFFF;
+                    cursor: pointer;
+                }
+
+                    #creationDateFilterInline:hover {
+                        background-color: #e9ecef;
+                    }
+
+                #resolutionDateFilterInline {
+                    background-color: #f8f9fa;
+                    padding-left: 0.75rem;
+                    border: 0px solid #FFFFFF;
+                    cursor: pointer;
+                }
+
+                    #resolutionDateFilterInline:hover {
+                        background-color: #e9ecef;
+                    }
+
+                #dueDateFilterInline {
+                    background-color: #f8f9fa;
+                    padding-left: 0.75rem;
+                    border: 0px solid #FFFFFF;
+                    cursor: pointer;
+                }
+
+                    #dueDateFilterInline:hover {
+                        background-color: #e9ecef;
+                    }
+
+                .input-icon {
+                    position: absolute;
+                    right: 0.75rem;
+                    /* Vertically center the icon in the input */
+                    top: calc(50% - 0.5em);
+                    pointer-events: none;
+                    color: #999;
+                }
+
+                .custom-wrapper {
+                    position: relative;
+                }
+            </style>
+
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-sm">
+                        <div class="form-group input-container">
+                            <div class="custom-wrapper">
+                                <input type="text" id="creationDateFilterInline" class="form-control form-control-sm" autocomplete="off" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.CreationDate, "Creation Date") ?? "Creation Date")" />
+                                <i class="fas fa-calendar input-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm">
+                        <div class="form-group input-container">
+                            <div class="custom-wrapper">
+                                <input type="text" id="resolutionDateFilterInline" class="form-control form-control-sm" autocomplete="off" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResolutionDate, "Resolution Date") ?? "Resolution Date")" />
+                                <i class="fas fa-calendar input-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm">
+                        <div class="form-group input-container">
+                            <div class="custom-wrapper">
+                                <input type="text" id="dueDateFilterInline" class="form-control form-control-sm" autocomplete="off" placeholder="Due Date" />
+                                <i class="fas fa-calendar input-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (Model.Module == FilterViewModel.ApplicationModules.TASKS)
+        {
+            <div class="col-sm">
+                <div class="form-group">
+                    <select id="videoFilterInline" data-role="videoFilterInline" data-type="block" class="form-control selectpicker" data-live-search="false" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Shared.VideosTitle, "Videos") ?? "Videos")">
+                        <option value=""></option>
+                        <option value="true">@(CmsLanguage?.GetValue(LanguageKeys.Filters.OptionYes, "Yes") ?? "Yes")</option>
+                        <option value="false">@(CmsLanguage?.GetValue(LanguageKeys.Filters.OptionNo, "No") ?? "No")</option>
+                    </select>
+                </div>
+            </div>
+        }
+
+        @if (Model.Module == FilterViewModel.ApplicationModules.WORKINSTRUCTIONS)
+        {
+            <div class="col-sm @(Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null && Model.ApplicationSettings.Features.SkillAssessments.HasValue && Model.ApplicationSettings.Features.SkillAssessments.Value ? "" : "d-none")">
+                <div class="form-group">
+                    <select id="workinstructionTypeFilterInline" data-role="workinstructionTypeFilterInline" data-type="block" class="form-control selectpicker" data-live-search="false" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Filters.TypeTitle, "Type") ?? "Type")">
+                        <option value=""></option>
+                        <option value="0">@(Model?.CmsLanguage.GetValue(LanguageKeys.Filters.OptionBasicInstruction, "Basic instruction") ?? "Basic instruction")</option>
+                        <option value="1">@(Model?.CmsLanguage.GetValue(LanguageKeys.Filters.OptionAssessmentInstruction, "Assessment instruction") ?? "Assessment instruction")</option>
+                    </select>
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,5 @@
+﻿@model WebApp.ViewModels.SkillsViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = @Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatrixOverViewTitle, "Skills Matrix") ?? "Skills Matrix";
+}

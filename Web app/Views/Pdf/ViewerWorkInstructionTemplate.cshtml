@@ -1,0 +1,331 @@
+﻿@model PdfWorkInstructionTemplateViewModel
+@using WebApp.Helpers
+@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>@(Model?.CmsLanguage.GetValue(LanguageKeys.PdfWorkInstructionTemplate.WorkInstruction, "Work instruction template") ?? "Work instruction template") @Model.WorkInstructionTemplate.Name</title>
+    <link rel="stylesheet" href="/css/pdf.css" />
+    <partial name="_pdfCss" /> @*above link doesnt work on docker for some reason*@
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/plugins/fontawesome-pro-6.5.2-web/css/all.min.css" />
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1337.0.min.js"></script>
+    <script src="/js/ezgomediafetcher.js"></script>
+    <style>
+        table {
+            table-layout: fixed;
+            border-collapse: separate;
+            border-spacing: 0px;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        td {
+            color: #3d3c41;
+            background-size: 100% 100%;
+            background-position-x: 0;
+            background-position-y: 0;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+
+        .overviewtext {
+            font-size: 18px;
+            padding-left: 2rem;
+            padding-top: 0.3rem;
+            padding-bottom: 0.3rem;
+            vertical-align: top;
+        }
+
+        .stepstext {
+        }
+
+        .informationtext {
+            vertical-align: top;
+            padding-left: 1rem;
+        }
+
+        .overlaytop {
+            position: absolute;
+            padding: 0px;
+            margin: 0px;
+            top: 0;
+            left: 0;
+            width: 3em;
+            height: 3em;
+            line-height: 3em;
+            vertical-align: middle;
+            text-align: center;
+            background: #FF0000;
+            color: white;
+        }
+
+        .overlaybottom {
+            position: absolute;
+            padding: 0px;
+            margin: 0px;
+            left: 0;
+            bottom: 0;
+            width: 2em;
+            height: 2em;
+            line-height: 2em;
+            vertical-align: middle;
+            text-align: center;
+            background: black;
+            color: white;
+        }
+
+        .fancyshadow {
+            box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+        }
+
+        tr:nth-child(even).alternatingcolors {
+            background: #FFF
+        }
+
+        tr:nth-child(odd).alternatingcolors {
+            background: #f7f6fb
+        }
+
+        .autosize {
+            width: 1%;
+            white-space: nowrap !important;
+        }
+
+        <!-- Tags -->
+        .card {
+            position: relative;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: #ffffff;
+            background-clip: border-box;
+            border: 0 solid rgba(0, 0, 0, 0.125);
+            border-radius: 0.25rem;
+        }
+
+        .tag-card {
+            display: inline-block;
+            width: 9em;
+            color: white;
+            align-content: center;
+            align-items: center;
+        }
+
+        .tag-wrapper {
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+            display: flex;
+            height: 2.6em;
+            line-height: 1.1;
+        }
+
+        .tag-span {
+            text-align: center;
+            align-self: center;
+            display: inline-block;
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+        }
+
+        .nav-icon {
+            float: left;
+            display: inline-block;
+        }
+
+        .card {
+            box-shadow: none;
+            border-radius: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <partial name="_header.cshtml" model="@("WORK INSTRUCTION TEMPLATE")" />
+    <!-- Root div -->
+    <div style="padding: 1rem">
+        <!-- Overview section -->
+        <table style="width: 100%; height: auto; margin-bottom: 1rem; page-break-inside: avoid;">
+            @{
+                var pictureUrl = Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(Model.WorkInstructionTemplate.Picture))
+                {
+                    pictureUrl = MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.WorkInstructionTemplate.Picture);
+                }
+                <!-- Overview image and title -->
+                <tr style="width: 100%">
+                    <td rowspan=6 colspan=2 style="vertical-align: top; padding-top: 1rem">
+                        <div class="imageWrapper">
+                            <img data-src="@pictureUrl" @*style="width: 100%; object-fit: cover; object-position: center; max-height: 300px"*@ />
+                        </div>
+                    </td>
+                    <td colspan=2 class="overviewtext" style="text-transform: uppercase; font-size: 27px; padding-top: 2rem; padding-bottom: 1rem; padding-left: 2rem"><strong style="color: #FF0000">@Model.WorkInstructionTemplate.Name</strong></td>
+                </tr>
+            }
+            <!-- Overview ID -->
+            <tr>
+                <td class="overviewtext"><strong>@(Model?.CmsLanguage.GetValue(LanguageKeys.PdfWorkInstructionTemplate.WorkInstructionTemplateId, "Workinstruction template ID:") ?? "Workinstruction template ID:") </strong></td>
+                <td style="font-size: 18px; vertical-align: top">@Model.WorkInstructionTemplate.Id</td>
+            </tr>
+            <!-- Overview Role -->
+            <tr>
+                <td class="overviewtext"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditTemplate.Role, "Role") ?? "Role"): </strong></td>
+                @if (Model.WorkInstructionTemplate.Role.ToString().ToLower().Equals("basic"))
+                {
+                    <td style="font-size: 18px; vertical-align: top">@(Model?.CmsLanguage?.GetValue(LanguageKeys.User.Basic, "Basic user") ?? "Basic user")</td>
+                }
+                else if (Model.WorkInstructionTemplate.Role.ToString().ToLower().Equals("shift_leader"))
+                {
+                    <td style="font-size: 18px; vertical-align: top">@(Model?.CmsLanguage?.GetValue(LanguageKeys.User.ShiftLeader, "Shift leader") ?? "Shift leader")</td>
+                }
+                else if (Model.WorkInstructionTemplate.Role.ToString().ToLower().Equals("manager"))
+                {
+                    <td style="font-size: 18px; vertical-align: top">@(Model?.CmsLanguage?.GetValue(LanguageKeys.User.Manager, "Manager") ?? "Manager")</td>
+                }
+            </tr>
+            <!-- Overview workinstruction type -->
+            <tr>
+                <td class="overviewtext"><strong>@(Model?.CmsLanguage.GetValue(LanguageKeys.PdfWorkInstructionTemplate.InstrucitonType, "Instruction type:") ?? "Instruction type:") </strong></td>
+                @if (Model.WorkInstructionTemplate.WorkInstructionType.ToString().ToLower().Equals("basicinstruction"))
+                {
+                    <td style="font-size: 18px; vertical-align: top">@(Model?.CmsLanguage.GetValue(LanguageKeys.PdfWorkInstructionTemplate.WorkInstruction, "Work instruction") ?? "Work instruction")</td>
+                }
+                else if (Model.WorkInstructionTemplate.WorkInstructionType.ToString().ToLower().Equals("skillinstruction"))
+                {
+                    <td style="font-size: 18px; vertical-align: top">@(Model?.CmsLanguage.GetValue(LanguageKeys.PdfWorkInstructionTemplate.AssessmentInstruction, "Assessment instruction") ?? "Assessment instruction")</td>
+                }
+            </tr>
+
+            <!-- Overview areas -->
+            <tr>
+                <td class="overviewtext" style="vertical-align: top !important"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditTemplate.Areas, "Areas") ?? "Areas"): </strong></td>
+                <td style="font-size: 18px; vertical-align: top !important">@Model.WorkInstructionTemplateArea.FullDisplayName</td>
+            </tr>
+        </table>
+        <!-- Tags section -->
+        @if (Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null &&
+             Model.ApplicationSettings.Features.TagsEnabled.HasValue && Model.ApplicationSettings.Features.TagsEnabled.Value &&
+             Model.WorkInstructionTemplate.Tags != null)
+        {
+            foreach (var tag in Model.WorkInstructionTemplate.Tags)
+            {
+                <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; margin: 0.25rem">
+                    <div class="tag-wrapper" style="">
+                        <i style="margin-top: auto; margin-bottom: auto; margin-left: 0.5rem; margin-right: 0px" class="nav-icon my-auto ml-2 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                        <span style="margin-top: auto; margin-bottom: auto; margin-right: 0.5rem" class="my-auto mr-2 tag-span">@tag.Name</span>
+                    </div>
+                </div>
+            }
+        }
+
+        <!-- Items section -->
+        @if (Model?.WorkInstructionTemplate.InstructionItems != null)
+        {
+            @foreach (var instructionItem in Model.WorkInstructionTemplate.InstructionItems)
+            {
+                <!-- Root items table -->
+                <!-- Removing "page-break-inside: avoid" from this table would reintroduce the white space bug, so dont remove this css style! -->
+                <div style="page-break-inside: avoid; padding-top: 1rem;">
+                    <div style="display:table; width: 100%; height: 100%; margin-right: 1rem;" class="fancyshadow">
+                        @{
+                            string mediaImageUrl = Constants.General.ImageUnavailableUrl;
+                            if (!string.IsNullOrEmpty(instructionItem.Picture))
+                            {
+                                mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, instructionItem.Picture);
+                            }
+                            <!-- Items table -->
+                            <div style="width: 100%; height: 100%; padding: 1rem 0rem 1rem 1rem; page-break-inside: avoid">
+                                <div style="display: table-row;">
+                                    <!-- Item image and number overlay-->
+                                    <div rowspan=4 style="display: table-cell; position: relative; width: 28%; background: #F7F7F7; vertical-align: top;">
+                                        <div class="imageWrapper">
+                                            <img class="background-image" data-src="@mediaImageUrl" @*style="width: 100%; object-fit: cover; object-position: center; max-height: 200px"*@ />
+                                        </div>
+                                        <div class="overlaytop"><h1 style="margin: 0; padding: 0">@(Model.WorkInstructionTemplate.InstructionItems.IndexOf(instructionItem) + 1)</h1></div>
+                                    </div>
+                                    <div style="display: table-cell;">
+                                        <div style="display: table-row;">
+                                            <!-- Item title-->
+                                            <div colspan=2 class="stepstext" style="display: table-cell; font-size: 20px; padding-left: 1rem; padding-right: 1rem; padding-bottom: 1rem"><strong style="color: #FF0000">@instructionItem.Name</strong></div>
+                                        </div>
+                                        <div style="display: table-row;">
+                                            <!-- Item description -->
+                                            <div rowspan=2 colspan=2 class="stepstext" style="display: table-cell; font-size: 15px; padding-left: 1rem; padding-right: 1rem; padding-bottom: 1rem; text-overflow: ellipsis"> @instructionItem.Description</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+    <partial name="_footer.cshtml" model="@("#ff0000")" />
+
+    <script>
+        var workInstructionImgs = document.images,
+            workInstructionImgsLength = workInstructionImgs.length,
+            workInstructionImgsCounter = 0,
+            workInstructionImgsLoaded = false,
+            workInstructionImgsCheckerInterval = null;
+
+        $(workInstructionImgs).each(function(index, img) {
+            if (img.complete && $(img).attr('src') != undefined && ($(img).attr('src').includes('normal_unavailable_image.png') || $(img).attr('src').startsWith('blob:')))
+            {
+                incrementCounter();
+            }
+            else
+            {
+                console.log(img);
+                console.log(img.complete);
+                img.addEventListener('load', incrementCounter, false);
+            }
+        })
+
+        function incrementCounter() {
+            workInstructionImgsCounter++;
+            if (workInstructionImgsCounter === workInstructionImgsLength) {
+                workInstructionImgsLoaded = true
+            }
+        }
+
+        function checkWorkInstructionImgsLoaded() {
+            if (!workInstructionImgsLoaded) {
+                //do nothing
+                console.log("waiting for images to load");
+            }
+            else {
+                clearInterval(workInstructionImgsCheckerInterval);
+                setTimeout(() => {
+                    window.print();
+                });
+                setTimeout(function () { window.close(); }, 2000);
+            }
+        }
+
+        checkWorkInstructionImgsLoaded();
+        window.onload = function () {
+            workInstructionImgsCheckerInterval = setInterval(() => {
+                checkWorkInstructionImgsLoaded();
+
+            }, 1000);
+        }
+
+        ezgomediafetcher.preloadImagesAndVideos();
+    </script>
+</body>
+</html>

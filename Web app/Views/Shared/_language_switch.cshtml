@@ -1,0 +1,12 @@
+﻿
+@if (Statics.AvailableLanguages != null)
+{
+    <div>
+        <select>
+            @foreach (var item in Statics.AvailableLanguages)
+            {
+                <option value="@item">@item</option>
+            }
+        </select>
+    </div>
+}

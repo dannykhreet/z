@@ -1,0 +1,13 @@
+﻿@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = Model?.CmsLanguage.GetValue(LanguageKeys.Shared.Reports, "Reports") ?? "Reports";
+}
+
+<div class="container">
+
+<h1>@ViewData["Title"]</h1>
+
+<p>@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.UseThisToManagePage, "Use this page to manage your reports.") ?? "Use this page to manage your reports.")</p>
+
+</div>
+

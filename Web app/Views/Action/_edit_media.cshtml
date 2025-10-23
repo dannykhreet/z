@@ -1,0 +1,161 @@
+﻿@model ActionEditViewModel
+@{
+    Dictionary<string, string> CmsLanguage = Model?.CmsLanguage ?? new Dictionary<string, string>();
+}
+
+<style>
+    .controls {
+        position: absolute;
+        bottom: 0px;
+        margin: 15px;
+    }
+
+    .main-image-pencil {
+        background: #93c54b;
+        width: 35px;
+        height: 35px;
+        margin: 10px;
+        opacity: 0.8;
+        z-index: 1;
+        color: #fff;
+        border: solid 1px #333333 !important;
+        cursor: pointer;
+    }
+
+        .main-image-pencil i {
+            width: 35px;
+            height: 33px;
+            position: relative;
+            display: flex;
+        }
+
+        .main-image-pencil:hover {
+            border: solid 1px #fff !important;
+        }
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsMediaTitle, "Media") ?? "Media")</h3>
+            </div>
+
+            <div class="card-body">
+                <div class="row media-list">
+                    <input type="file" id="File" name="File" onchange="preview(this);" multiple="multiple" class="d-none myfiles" accept="video/*,image/*" />
+
+                    @foreach (var (img, index) in Model.Images.Select((value, i) => (value, i)))
+                    {
+                        var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, img);
+                        <div class="col-12 col-md-2 media item actionAttachment">
+                            <div class="card mb-0 w-100">
+                                <div class="card-body p-0">
+                                    <a class="card-link" href="/images/media-loading.gif" data-href="@picture" data-fancybox="action" data-caption="@Model.Comment">
+                                        <input asp-for="Images[index]" type="hidden" />
+                                        <img loading="lazy" style="object-fit: cover; width: 100%;  height: 160px; border-radius: .25rem;" src="/images/media-loading.gif" data-src="@picture" >
+
+                                        <div class="controls d-print-none" style="position:absolute;top:0px;right:0px">
+                                            <a href="#" data-selector="deletemedia" class="deleteActionMediaOverlay" onclick="deleteMedia(this)">
+                                                <div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">
+                                                    <i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.VideoThumbNails.Count == Model.Videos.Count)
+                    {
+                        @foreach (var (thumb, index) in Model.VideoThumbNails.Select((value, i) => (value, i)))
+                        {
+                            var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, thumb);
+                            picture = picture.Replace("/media/media", "/media"); //fix for incorrect data in db
+                            var video = Model.Videos[index];
+                            var videourl = AppUrlsResolver.Video(video);
+                            <div class="col-12 col-md-2 video item actionAttachment">
+                                <div class="card mb-0 w-100">
+                                    <div class="card-body p-0 text-center">
+                                        <a class="card-link" href="#video@(index)" data-fancybox="action" data-caption="@Model.Comment">
+                                            <input asp-for="VideoThumbNails[index]" type="hidden" />
+                                            <input asp-for="Videos[index]" type="hidden" />
+                                            <img loading="lazy" src="/images/media-loading.gif" data-src="@picture" style="object-fit: cover; width: 100%;  height: 160px; border-radius: .25rem;" />
+                                            
+                                            <video src="/images/media-loading.mp4" data-src="@videourl" controls id="video@(index)" style="display:none;">
+                                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? " Your browser doesn't support HTML5 video tag.")
+                                            </video>
+
+                                            <div class="controls d-print-none" style="position:absolute;top:0px;right:0px">
+                                                <a href="#" data-selector="deletemedia" class="deleteActionMediaOverlay" onclick="deleteMedia(this)">
+                                                    <div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">
+                                                        <i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                    @if (Model.CanAddMedia)
+                    {
+                        <div class="col-12 col-md-2">
+                            <div class="card h-100 shadow-sm file-dropzone w-100">
+                                <div class="h-100 justify-content-center d-flex flex-column" style="min-height: 145px;">
+                                    <div class="addclip text-ezgo">
+                                        <i class="fa fa-plus-circle fa-2x"></i>
+                                        <div>@(CmsLanguage?.GetValue(LanguageKeys.Media.AddMedia, "Add media") ?? "Add media")</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<template id="mediatemplate">
+    <div class="col-12 col-md-2 media item new actionAttachment">
+        <div class="card mb-0 w-100">
+            <div class="card-body p-0">
+                <input type="hidden" />
+                <img class="blob" style="object-fit: cover; width: 100%;  height: 160px; border-radius: .25rem;" />
+                <div class="controls d-print-none" style="position:absolute;top:0px;right:0px">
+                    <a href="#" data-selector="deletemedia" class="deleteActionMediaOverlay" onclick="deleteMedia(this)">
+                        <div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">
+                            <i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="videotemplate">
+    <div class="col-12 col-md-2 video item new actionAttachment">
+        <div class="card mb-0 w-100">
+            <div class="card-body p-0">
+                <a class="card-link" data-fancybox="action">
+                    <input type="hidden" data-target="thumbnail" />
+                    <input type="hidden" data-target="video" />
+                    <img class="blob" style="object-fit: cover; width: 100%;  height: 160px; border-radius: .25rem;" />
+                    <div class="controls d-print-none" style="position:absolute;top:0px;right:0px">
+                        <a href="#" data-selector="deletemedia" class="deleteActionMediaOverlay" onclick="deleteMedia(this)">
+                            <div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">
+                                <i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>
+                            </div>
+                        </a>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</template>

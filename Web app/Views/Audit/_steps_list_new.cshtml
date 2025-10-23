@@ -1,0 +1,111 @@
+﻿@model WebApp.ViewModels.AuditViewModel
+@{
+    Layout = null;
+}
+
+<div class="modal-header">
+    <h4 class="modal-title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.ItemTitle, "Audit item") ?? "Audit item") (0/0)</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+</div>
+
+<div class="modal-body">
+    <div id="fileSizeAlert-instruction" class="alert alert-danger d-none">
+        @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.FileSizeTooBig, "File size for this media file is too big!") ?? "File size for this media file is too big!")
+        <button type="button" class="close" onclick="$(this).closest('div.alert').hide()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div class="row">
+        <div id="itemDropZone" style="height: 253px" data-drop="true" class="col-auto col-sm-12 col-md-12 col-lg-4 pb-2">
+            <div style="width: 100%;height:245px;display:flex;">
+                <a href="" data-fancybox="steps" data-caption="" class="d-flex">
+                    <img id="dialogImg" class="img-fluid main-img" style="width:100%;object-fit: cover; object-position: center; border-radius: 5px;"  />
+                </a>
+
+                <div class="controls" style="position:absolute;bottom:0px;">
+                    <input class="d-none" type="file" id="uploaderItem" accept="video/*,image/*" name="photo" onchange="ezgolist.previewFileEx(this);" onclick="this.value=null" data-preview="#dialogImg" data-templateid="0" data-type="item" required>
+                    <a href="#" onclick="$('#uploaderItem').trigger('click'); return false;">
+                        <div class="border rounded-circle float-right d-lg-flex justify-content-lg-center shadow main-image-pencil">
+                            <i class="fa fa-paperclip d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>
+                        </div>
+                    </a>
+
+                    <a href="#" data-selector="deletemedia" data-type="item">
+                        <div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">
+                            <i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>
+                        </div>
+                    </a>
+
+                    <video id="dialogVideo" controls style="display:none;">
+                    </video>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-12 col-md-12 col-lg-8">
+            @if (Model != null && Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null && Model.ApplicationSettings.Features.RequiredProof.Value)
+            {
+                <div class="row">
+                    <div class="col-12 p-0">
+                        <div class="custom-control custom-control-right custom-switch float-right pr-5">
+                            <input type="checkbox" class="custom-control-input" id="enablePictureProof">
+                            <label style="font-weight: 400" class="custom-control-label card-text text-muted" for="enablePictureProof">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.PictureProofTitle, "Picture Proof") ?? "Picture Proof")</label>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="form-group w-100">
+                <textarea id="txtItemName" maxlength="240" class="form-control-sm form-control" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.ItemTitlePlaceholder, "Enter a title for the audit item...") ?? "Enter a title for the audit item...")"></textarea>
+            </div>
+
+            <div class="form-group w-100">
+                <textarea id="txtItemDesc" class="form-control-sm form-control" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.ItemDescriptionPlaceholder, "Enter a description for the audit item...") ?? "Enter a description for the audit item...")"></textarea>
+            </div>
+
+            <div class="form-inline w-100">
+                <div class="form-group mb-2">
+                    <label class="mr-3 text-muted" style="font-weight:normal;">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.QuestionWeightTitle, "Question weight") ?? "Question weight")</label>
+                    <input type="number" id="txtWeight" class="form-control form-control-sm" min="1" value="1.00" />
+                </div>
+            </div>
+
+            <div class="row px-2 py-1">
+                <div class="col-md-12 p-0">
+                    <ul id="valueProps"></ul>
+                    <partial name="~/Views/Shared/_value_properties.cshtml" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.ApplicationSettings?.Features?.TagsEnabled == true)
+    {
+        <div class="row">
+            <div class="col-12 pt-2">
+                <h5>@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsMainTitle, "Tags") ?? "Tags")</h5>
+            </div>
+
+            <div class="col-12 p-2">
+                <partial name="_item_tags_block" model="Model.Tags" />
+            </div>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-12 pt-2">
+            <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.InstructionDialogTitle, "Instructions") ?? "Instructions")</h5>
+        </div>
+
+        <div class="col-12 p-2">
+            <ul id="instructionlist" class="list-inline card-group pt3 itemlist"></ul>
+        </div>
+    </div>
+</div>
+
+<div data-id="itemdialogfooter" class="modal-footer" data-templateid="0">
+    <input type="hidden" id="currentTemplateItemId" />
+    <button id="btnDeleteItem" class="btn btn-danger btn-sm mr-auto" data-templateid="0" type="button" onclick="ezgolist.deleteItem()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.DialogDelete, "Delete") ?? "Delete")</button>
+    <button id="btnPreviousTemplate" class="btn btn-light" type="button" onclick="ezgolist.previousTemplate()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.DialogPrevItem, "previous item") ?? "previous item")</button>
+    <button class="btn btn-ezgo btn-sm" type="button" data-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.DialogClose, "Close") ?? "Close")</button>
+    <button id="btnNextTemplate" class="btn btn-light" type="button" onclick="ezgolist.nextTemplate()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.DialogNextItem, "next item") ?? "next item")</button>
+</div>

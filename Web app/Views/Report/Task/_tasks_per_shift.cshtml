@@ -1,0 +1,21 @@
+﻿@model TasksPerPeriodViewModel
+@using WebApp.Models.Task
+
+@foreach (var kvp in @Model.TaskStatisticsPerPeriod)
+{
+    <div class="card mb-0">
+        @*function loadTasks(e, filterType, referenceDate, areaId) {*@
+        <a href="#" class="list-group-item list-group-item-action completedTaskStatisticsCard" data-filtertype="previousshifts" data-from="@kvp.Key.From.ToString("yyyy-MM-ddTHH:mm:ssZ")" data-to="@kvp.Key.To.ToString("yyyy-MM-ddTHH:mm:ssZ")" onclick="loadTasks(event, 'previousshifts', '@kvp.Key.From.ToString("yyyy-MM-ddTHH:mm:ssZ")', '@kvp.Key.To.ToString("yyyy-MM-ddTHH:mm:ssZ")', areaid)">
+            <h5>Shift starting at @kvp.Key.From.ToLocaleGeneralDateShortTimeString(Model.Locale)</h5>
+            <p class="mb-0">Total: @kvp.Value.Sum(t => t.Count)</p>
+            <small>@(kvp.Key.CmsLanguage?.GetValue(LanguageKeys.Dashboard.ToDo, "To do: ") ?? "To do:") @(kvp.Value.Where(task => task.Status == "todo").FirstOrDefault()?.Count ?? 0)</small>
+            @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.ToDo, "To do:") ?? "To do:")*@
+            <small>@(kvp.Key.CmsLanguage?.GetValue(LanguageKeys.Dashboard.Ok, "Ok: ") ?? "Ok:") @(kvp.Value.Where(task => task.Status == "ok").FirstOrDefault()?.Count ?? 0)</small>
+            @*@(Model?.CmsLanugage.GetValue(LanguageKeys.Dashboard.Ok, "Ok:") ?? "Ok:")*@
+            <small>@(kvp.Key.CmsLanguage?.GetValue(LanguageKeys.Dashboard.NotOk, "Not ok: ") ?? "Not ok:") @(kvp.Value.Where(task => task.Status == "not ok").FirstOrDefault()?.Count ?? 0)</small>
+            @*@(Model?.CmsLanugage.GetValue(LanguageKeys.Dashboard.NotOk, "Not ok:") ?? "Not ok:")*@
+            <small>@(kvp.Key.CmsLanguage?.GetValue(LanguageKeys.Dashboard.Skipped, "Skipped: ") ?? "Skipped:") @(kvp.Value.Where(task => task.Status == "skipped").FirstOrDefault()?.Count ?? 0)</small>
+            @*@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.Skipped, "Skipped:") ?? "Skipped:")*@
+        </a>
+    </div>
+}

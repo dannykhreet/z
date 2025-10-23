@@ -1,0 +1,776 @@
+﻿@model WebApp.ViewModels.ChecklistViewModel
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.ChecklistTitle, "Checklists") ?? "Checklists";
+}
+
+@section CSS{
+    <style>
+        #contentBody .card.results {
+            border: solid 1px transparent;
+            transition: transform .2s; /* Animation */
+        }
+
+            #contentBody .card.results:hover {
+                border: solid 1px #93c54b;
+                box-shadow: 0 .425rem .75rem rgba(0,0,0,.075) !important;
+                color: #93c54b !important;
+                transform: scale(1.010);
+                margin-left: 5px;
+                left: 5px;
+            }
+
+            #contentBody .card.results a:hover {
+                color: #93c54b !important;
+            }
+
+        #contentBody img.img-fluid {
+            border-radius: 5px;
+            border: solid 1px #bfbfbf;
+        }
+
+        .list-group-area-filter-inline {
+            padding-right: 0px;
+            height: 230px;
+            padding-left: 0px;
+            overflow: auto;
+        }
+
+        #inlineAreaTree .list-group-area-filter-inline {
+            border: none;
+            height: unset;
+        }
+
+        #inlineAreaTree a {
+            color: slategrey;
+            cursor: pointer;
+        }
+
+            #inlineAreaTree a:hover {
+                text-decoration: none;
+            }
+    </style>
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-3">
+                &nbsp;
+                <h1>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.OverviewTitle, "Checklist overview") ?? "Checklist overview")</h1>
+            </div>
+            <div class="col-sm-3 align-self-end">
+                <span style="margin-left:10px;">
+                    <a href="/report/checklist/completed" target="_top" data-tracking="enabled" data-tracking-name="completed checklists" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsChecklistCompletedTitle, "Completed checklists") ?? "Completed checklists")">
+                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsChecklistCompletedTitle, "Completed checklists") ?? "Completed checklists")
+                    </a>
+                </span>
+            </div>
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                <a asp-controller="checklist" asp-action="details" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.OverviewListTitle, "Add new checklist") ?? "Add new checklist")</a>
+                @if (Model?.ApplicationSettings?.Features != null)
+                {
+                    @if (Model.ApplicationSettings.Features.ExportAdvancedEnabled.HasValue || Model.ApplicationSettings.Features.ExportEnabled.HasValue)
+                    {
+                        @if (Model.ApplicationSettings.Features.ExportTaskProperties != null && Model.ApplicationSettings.Features.ExportTaskProperties.Value && Model.ApplicationSettings.Features.ChecklistsPropertyValueRegistrationEnabled != null && Model.ApplicationSettings.Features.ChecklistsPropertyValueRegistrationEnabled.Value)
+                        {
+                            <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="checklisttaskproperties" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.DownloadDataTitle, "Download value registration data") ?? "Download value registration data")"><i class="far fa-object-group"></i></button>
+                        }
+
+                        @if (Model.ApplicationSettings.Features.ExportEnabled != null && Model.ApplicationSettings.Features.ExportEnabled.Value && Model.ApplicationSettings.Features.ChecklistsEnabled != null && Model.ApplicationSettings.Features.ChecklistsEnabled.Value)
+                        {
+                            <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="checklists" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.ExportTitle, "Export") ?? "Export")"><i class="fas fa-download"></i></button>
+                        }
+
+                        @if (Model.ApplicationSettings.Features.ExportAdvancedEnabled != null && Model.ApplicationSettings.Features.ExportAdvancedEnabled.Value && Model.ApplicationSettings.Features.ChecklistsEnabled != null && Model.ApplicationSettings.Features.ChecklistsEnabled.Value)
+                        {
+                            <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="checklisttemplates" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.ExportTemplates, "Export checklist templates") ?? "Export checklist templates")"><i class="fa fa-file-excel"></i></button>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row pt-1" style="height:calc(100vh - 165px);">
+            <div class="col-xl-3 d-none d-xl-inline-block" style="padding-right: 15px">
+                <div class="card card-filter h-100">
+                    <div class="card-header pb-0 d-flex" style="border-bottom: none;width:100%">
+                        <h3 class="card-title d-flex" style="width:100%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.CardTitle, "Filters") ?? "Filters")</h3>
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn" onclick="areaFilter_v2.reset('block'); ezgoChecklistTemplatesOverview.resetFilters();" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body card-filter pt-0">
+                        <partial name="_filters_block" model="Model.Filter" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12 col-xl-9" style="padding-left: 7.5px">
+                <div class="card template-searchbar" style="margin-left: 0px">
+                    <div class="card-header d-flex" style="margin-left:-11px; height: 55px">
+                        <div style="display: flex; height: 100%; width: 100%; align-items: center">
+                            <h3 id="cardHeader" class="card-title d-sm-inline-block" style="min-width: 200px">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.OverviewHeader, "Checklist templates") ?? "Checklist templates") (<span id="totalCounter">total</span>)
+                            </h3>
+                        </div>
+                        <div class="d-xl-none" style="width: 100%;text-align: right; padding-right: 10px">
+                            <div class="collapseFilter collapse">
+                                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" style="width: 80px" onclick="ezgoChecklistTemplatesOverview.showInlineTagFilterModal()">Filter tags</button>
+                                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" style="width: 80px" onclick="ezgoChecklistTemplatesOverview.showInlineAreaFilterModal()">Filter area</button>
+                            </div>
+                        </div>
+                        <div style="width: auto; text-align: right">
+                            <div class="card-tools" style="width: 236px; display: inline-block">
+                                <div class="input-group input-group-sm" style="">
+                                    <input type="text" id="templatesSearchBox" name="templatesSearchBox" class="form-control float-right" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.Search, "Search") ?? "Search")" data-boxtype="search">
+
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                        <button type="button" class="btn btn-default d-block d-xl-none" data-toggle="collapse" data-target=".collapseFilter"><i class="fas fa-filter"></i></button>
+                                        <button type="button" class="btn btn-default d-xl-none" onclick="areaFilter_v2.reset('block'); ezgoChecklistTemplatesOverview.resetFilters();" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-xl-none" style="padding-left: 5px; padding-right: 5px">
+                        <div class="card-header collapse collapseFilter px-0">
+                            <partial name="_filters_inline" model="Model.Filter" />
+                        </div>
+                    </div>
+                </div>
+                <div id="contentBody" class="pr-3" style="height: calc(100vh - 252px);overflow:auto; padding-left: 0px">
+
+                    <div class="row no-gutters" id="contentCol">
+                        <partial name="_overview" model="@Model" />
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: center">
+                        <img id="checklistTemplatesOverviewLoader" style="width: 100px; height: 100px" src="/images/feed-loading.gif" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<a id="back-to-top" href="#" class="btn btn-ezgo btn-lg back-to-top shadow" role="button"><i class="fas fa-chevron-up"></i></a>
+
+<!-- Modal tags filter -->
+<div class="modal fade" id="modalTagsFilter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLongTitle">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagsFiltering, "Tags filtering") ?? "Tags filtering")</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" style="display: flex; justify-content: center">
+                <div id="tagsModalBody" style="overflow-x: scroll">
+                    <div class="col-12 p-0 pb-3" data-item="steps-view">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsMainTitle, "Tags") ?? "Tags")</h3> 
+                            </div>
+                            <div class="card-body px-3 pb-3 pt-0">
+                                <partial name="_tags_filtering_block" model="Model.Filter" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal inline area filter -->
+<div class="modal fade" id="modalInlineAreaFilter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content" style="overflow-y: scroll">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLongTitle">Filter area</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" style="display: flex; justify-content: center">
+                <div style="width: 80%">
+                    <div class="col-12 p-0 pb-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 style="font-weight: 700" class="card-title">@(Model.CmsLanguage?.GetValue(LanguageKeys.Filters.AreaTitle, "Area") ?? "Area")</h3>
+                            </div>
+                            <div class="card-body pb-3 pt-0">
+                                <div id="inlineAreaTree" style="overflow-y: hidden"></div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script src="/js/areafilter_v2.js"></script>
+    @if (Model.ApplicationSettings?.Features?.ExportAdvancedEnabled == true || Model.ApplicationSettings?.Features?.ExportEnabled == true)
+    {
+        <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+        <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+    }
+
+    @if (Model.ApplicationSettings?.Features?.AnalyticsEnabled == true)
+    {
+        <script src="~/js/analytics.js"></script>
+        <script>ezgoAnalytics.init('checklist');</script>
+    }
+
+    <script>
+
+        var analyticsEnabled = @(Json.Serialize(Model.ApplicationSettings.Features.ExportAdvancedEnabled.Value || Model.ApplicationSettings.Features.ExportEnabled.Value));
+        areaFilter_v2.init('/config/getareatree', 'checklist');
+
+        var ezgoChecklistTemplatesOverview = {
+            filters: {
+                listtype: 'checklist',
+                limit: 20,
+                offset: 0,
+                filterText: "",
+                areaid: null,
+                tagids: [],
+                roles: [],
+                instructionsAttached: null,
+                photosAttached: null
+            },
+            loadingMore: false,
+            checklistTemplatesLoaded: false,
+            mostRecentRequest: null,
+            mostRecentCountsRequest: null,
+            @if(Model.ApplicationSettings.Features.TagsEnabled.HasValue && Model.ApplicationSettings.Features.TagsEnabled.Value)
+            {
+            <text>
+            showInlineTagFilterModal: function() {
+                $('#modalTagsFilter').modal('show');
+            },
+            </text>
+            }
+            saveFilters: function() {
+                localStorage.setItem('checklist_filters', JSON.stringify(ezgoChecklistTemplatesOverview.filters));
+            },
+            showInlineAreaFilterModal: function() {
+                $('#modalInlineAreaFilter').modal('show');
+            },
+            resetFilters: function () {
+                ezgoChecklistTemplatesOverview.filters = {
+                    limit: 20,
+                    offset: 0,
+                    filterText: "",
+                    areaid: null,
+                    tagids: [],
+                    roles: [],
+                    instructionsAttached: null,
+                    photosAttached: null
+                };
+
+                $('#templatesSearchBox').val('');
+
+                ezgoChecklistTemplatesOverview.checklistTemplatesLoaded = false;
+                //clear results
+                ezgoChecklistTemplatesOverview.filters.offset = 0;
+                $('#contentCol').html('');
+                //retrieve
+                ezgoChecklistTemplatesOverview.retrieve();
+                ezgoChecklistTemplatesOverview.retrieveCounts();
+                ezgoChecklistTemplatesOverview.saveFilters();
+            },
+            retrieveCounts: function () {
+                var loadChecklistTemplateCountsRequestURL = "";
+                var url = '/checklist/getchecklistcounts';
+                var urlParams = [];
+
+                if (ezgoChecklistTemplatesOverview.filters.areaid != "" && ezgoChecklistTemplatesOverview.filters.areaid != null) {
+                    urlParams.push("areaid=" + ezgoChecklistTemplatesOverview.filters.areaid);
+                }
+
+                if (ezgoChecklistTemplatesOverview.filters.filterText.length > 0) {
+                    urlParams.push("filterText=" + encodeURIComponent(ezgoChecklistTemplatesOverview.filters.filterText));
+                }
+
+                if (ezgoChecklistTemplatesOverview.filters.instructionsAttached != null) {
+                    urlParams.push("instructionsadded=" + ezgoChecklistTemplatesOverview.filters.instructionsAttached);
+                }
+
+                if (ezgoChecklistTemplatesOverview.filters.photosAttached != null) {
+                    urlParams.push("photosadded=" + ezgoChecklistTemplatesOverview.filters.photosAttached);
+                }
+
+                if (ezgoChecklistTemplatesOverview.filters.roles != null && ezgoChecklistTemplatesOverview.filters.roles.length > 0) {
+                    urlParams.push("roles=" + ezgoChecklistTemplatesOverview.filters.roles.join(","));
+                }
+
+                if (ezgoChecklistTemplatesOverview.filters.tagids != null && ezgoChecklistTemplatesOverview.filters.tagids.length > 0) {
+                    urlParams.push("tagids=" + ezgoChecklistTemplatesOverview.filters.tagids.join(","));
+                }
+
+                if (urlParams.length > 0) {
+                    loadChecklistTemplateCountsRequestURL = url + '?' + urlParams.join('&');
+                }
+                else {
+                    loadChecklistTemplateCountsRequestURL = url;
+                }
+
+                if (ezgoChecklistTemplatesOverview.mostRecentCountsRequest != null) {
+                    ezgoChecklistTemplatesOverview.mostRecentCountsRequest.abort();
+                }
+                $('#totalCounter').html('Loading...');
+                ezgoChecklistTemplatesOverview.mostRecentCountsRequest = $.ajax({
+                    type: "GET",
+                    url: loadChecklistTemplateCountsRequestURL,
+                    success: function (data) {
+                        //set total 
+                        $('#totalCounter').html(data);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.statusText == "abort") {
+                            return;
+                        }
+                        else { 
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        }
+                        $('#actionOverviewLoader').hide();
+                    }
+                });
+            },
+            retrieve: function () {
+                var loadChecklistTemplatesRequestURL = "";
+                var url = '/checklist/getchecklists';
+                var urlParams = [];
+                if (ezgoChecklistTemplatesOverview.checklistTemplatesLoaded) {
+                    return;
+                }
+                //show loader
+                $('#checklistTemplatesOverviewLoader').show();
+
+                if (ezgoChecklistTemplatesOverview.filters.areaid != "" && ezgoChecklistTemplatesOverview.filters.areaid != null) {
+                    urlParams.push("areaid=" + ezgoChecklistTemplatesOverview.filters.areaid);
+                }
+
+                if (ezgoChecklistTemplatesOverview.filters.filterText.length > 0) {
+                    urlParams.push("filterText=" + encodeURIComponent(ezgoChecklistTemplatesOverview.filters.filterText));
+                }
+
+                if (ezgoChecklistTemplatesOverview.filters.instructionsAttached != null) {
+                    urlParams.push("instructionsadded=" + ezgoChecklistTemplatesOverview.filters.instructionsAttached);
+                }
+
+                if (ezgoChecklistTemplatesOverview.filters.photosAttached != null) {
+                    urlParams.push("photosadded=" + ezgoChecklistTemplatesOverview.filters.photosAttached);
+                }
+
+                if (ezgoChecklistTemplatesOverview.filters.roles != null && ezgoChecklistTemplatesOverview.filters.roles.length > 0) {
+                    urlParams.push("roles=" + ezgoChecklistTemplatesOverview.filters.roles.join(","));
+                }
+
+                if (ezgoChecklistTemplatesOverview.filters.tagids != null && ezgoChecklistTemplatesOverview.filters.tagids.length > 0) {
+                    urlParams.push("tagids=" + ezgoChecklistTemplatesOverview.filters.tagids.join(","));
+                }
+
+                if (ezgoChecklistTemplatesOverview.filters.limit > 0) {
+                    urlParams.push("limit=" + ezgoChecklistTemplatesOverview.filters.limit);
+                }
+
+                if (ezgoChecklistTemplatesOverview.filters.offset > 0) {
+                    urlParams.push("offset=" + ezgoChecklistTemplatesOverview.filters.offset);
+                }
+
+                if (urlParams.length > 0) {
+                    loadChecklistTemplatesRequestURL = url + '?' + urlParams.join('&');
+                }
+                else {
+                    loadChecklistTemplatesRequestURL = url;
+                }
+
+                if (ezgoChecklistTemplatesOverview.mostRecentRequest != null) {
+                    ezgoChecklistTemplatesOverview.mostRecentRequest.abort();
+                }
+
+                ezgoChecklistTemplatesOverview.mostRecentRequest = $.ajax({
+                    type: "GET",
+                    url: loadChecklistTemplatesRequestURL,
+                    success: function (data) {
+                        $('#checklistTemplatesOverviewLoader').hide();
+                        $('#contentCol').append(data);
+
+                        var amountOfChecklistTemplates = $('#checklistTemplatesCounter').val();
+                        if (amountOfChecklistTemplates == 0 && ezgoChecklistTemplatesOverview.filters.offset == 0) {
+                            $('#noChecklistTemplatesFound').show();
+                            ezgoChecklistTemplatesOverview.checklistTemplatesLoaded = true;
+                        }
+                        else if (amountOfChecklistTemplates < 20) {
+                            ezgoChecklistTemplatesOverview.checklistTemplatesLoaded = true;
+                        }
+                        $('#checklistTemplatesCounter').remove();
+                        
+                        ezgoChecklistTemplatesOverview.loadingMore = false;
+
+                        ezgoChecklistTemplatesOverview.filters.offset += 20;
+
+                        ezgomediafetcher.preloadVisibleImagesAndVideos();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.statusText == "abort") {
+                            return;
+                        }
+                        else { 
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        }
+                        $('#actionOverviewLoader').hide();
+                    }
+                });
+            },
+            initHandlers: function () {
+                //event handlers for filters
+                $('#areatree').on('click', 'a', function () {
+                    var areaDeselected = +$(this).data('id') != areaid;
+
+                    if (areaDeselected) {
+                        ezgoChecklistTemplatesOverview.filters.areaid = null;
+                    }
+                    else {
+                        ezgoChecklistTemplatesOverview.filters.areaid = $(this).data('id');
+                    }
+                    ezgoChecklistTemplatesOverview.checklistTemplatesLoaded = false;
+                    //clear results
+                    ezgoChecklistTemplatesOverview.filters.offset = 0;
+                    $('#contentCol').html('');
+                    //retrieve
+                    ezgoChecklistTemplatesOverview.retrieve();
+                    ezgoChecklistTemplatesOverview.retrieveCounts();
+                    ezgoChecklistTemplatesOverview.saveFilters();
+                });
+                
+                $('#inlineAreaTree').on('click', 'a', function () {
+                    var areaDeselected = +$(this).data('id') != areaid;
+
+                    if (areaDeselected) {
+                        ezgoChecklistTemplatesOverview.filters.areaid = null;
+                    }
+                    else {
+                        ezgoChecklistTemplatesOverview.filters.areaid = $(this).data('id');
+                    }
+                    ezgoChecklistTemplatesOverview.checklistTemplatesLoaded = false;
+                    //clear results
+                    ezgoChecklistTemplatesOverview.filters.offset = 0;
+                    $('#contentCol').html('');
+                    //retrieve
+                    ezgoChecklistTemplatesOverview.retrieve();
+                    ezgoChecklistTemplatesOverview.retrieveCounts();
+                    ezgoChecklistTemplatesOverview.saveFilters();
+                });
+
+                $('#contentBody').scroll(function () {
+                    //if at bottom, load more actions
+                    if ($('#contentBody').scrollTop() + $('#contentBody')[0].offsetHeight + 50 >= $('#contentBody')[0].scrollHeight && !ezgoChecklistTemplatesOverview.loadingMore && !ezgoChecklistTemplatesOverview.checklistTemplatesLoaded) {
+                        ezgoChecklistTemplatesOverview.loadingMore = true;
+
+                        ezgoChecklistTemplatesOverview.retrieve();
+                    }
+                    else { 
+                        ezgomediafetcher.preloadVisibleImagesAndVideos();
+                    }
+                });
+
+                $('#back-to-top').click(function () {
+                    $('#contentBody').animate({
+                        scrollTop: 0
+                    }, 400);
+                    return false;
+                });
+
+                $("#templatesSearchBox").on("keyup", function () {
+                    var value = $(this).val().toLowerCase().trim();
+                    ezgoChecklistTemplatesOverview.filters.filterText = value;
+
+                    ezgoChecklistTemplatesOverview.checklistTemplatesLoaded = false;
+                    //clear results
+                    ezgoChecklistTemplatesOverview.filters.offset = 0;
+                    $('#contentCol').html('');
+                    //retrieve
+                    ezgoChecklistTemplatesOverview.retrieve();
+                    ezgoChecklistTemplatesOverview.retrieveCounts();
+                    ezgoChecklistTemplatesOverview.saveFilters();
+                });
+
+                @if(Model.ApplicationSettings.Features.TagsEnabled.HasValue && Model.ApplicationSettings.Features.TagsEnabled.Value)
+                {
+                    <text>
+                        $('.btn-tagsfilter').on('click', function() {
+                            $('#modalTagsFilter').modal('show');
+                        });
+
+                        $('.modal-filter-tag').on('click', function(e) {
+                            var tagId = $(this).data('id');
+                            if($($(this).children()[0]).hasClass('selected-tag'))
+                            {
+                                $(`#filter-tag-${tagId}`).css('display', 'flex');
+                            }
+                            else {
+                                $(`#filter-tag-${tagId}`).css('display', 'none');
+                            }
+                        
+                            ezgoChecklistTemplatesOverview.filters.tagids = [];
+                            $('[id^="filter-tag-"]').each(function (index, elem) {
+                                var tagSelected = $(this).css('display') == 'flex';
+                                var tagSelectedId = $(this).data('tag');
+                                if (tagSelected) {
+                                    ezgoChecklistTemplatesOverview.filters.tagids.push(+tagSelectedId)
+                                }
+                            });
+
+                            ezgoChecklistTemplatesOverview.checklistTemplatesLoaded = false;
+                            //clear results
+                            ezgoChecklistTemplatesOverview.filters.offset = 0;
+                            $('#contentCol').html('');
+                            //retrieve
+                            ezgoChecklistTemplatesOverview.retrieve();
+                            ezgoChecklistTemplatesOverview.retrieveCounts();
+                            ezgoChecklistTemplatesOverview.saveFilters();
+                        });
+
+                    </text>
+    
+                }
+
+                $('#roleFilter').on('change', function () {
+                    var roleFilterValue = $(this).val();
+                    ezgoChecklistTemplatesOverview.filters.roles = roleFilterValue;
+
+                    ezgoChecklistTemplatesOverview.checklistTemplatesLoaded = false;
+                    //clear results
+                    ezgoChecklistTemplatesOverview.filters.offset = 0;
+                    $('#contentCol').html('');
+                    //retrieve
+                    ezgoChecklistTemplatesOverview.retrieve();
+                    ezgoChecklistTemplatesOverview.retrieveCounts();
+                    ezgoChecklistTemplatesOverview.saveFilters();
+                });
+
+                $('#roleFilterInline').on('change', function (e) {
+                    $('#roleFilter').selectpicker('val', $('#roleFilterInline').val());
+                    $('#roleFilter').selectpicker('refresh');
+                    $('#roleFilter').trigger('change');
+                });
+
+                $('#instructionFilter').on('change', function () {
+                    var instructionFilterValue = $(this).val();
+                    if (instructionFilterValue == '') {
+                        ezgoChecklistTemplatesOverview.filters.instructionsAttached = null;
+                    }
+                    else if(instructionFilterValue == 'true') {
+                        ezgoChecklistTemplatesOverview.filters.instructionsAttached = true;
+                    }
+                    else if(instructionFilterValue == 'false') {
+                        ezgoChecklistTemplatesOverview.filters.instructionsAttached = false;
+                    }
+
+                    ezgoChecklistTemplatesOverview.checklistTemplatesLoaded = false;
+                    //clear results
+                    ezgoChecklistTemplatesOverview.filters.offset = 0;
+                    $('#contentCol').html('');
+                    //retrieve
+                    ezgoChecklistTemplatesOverview.retrieve();
+                    ezgoChecklistTemplatesOverview.retrieveCounts();
+                    ezgoChecklistTemplatesOverview.saveFilters();
+                });
+
+                $('#instructionFilterInline').on('change', function (e) {
+                    $('#instructionFilter').selectpicker('val', $('#instructionFilterInline').val());
+                    $('#instructionFilter').selectpicker('refresh');
+                    $('#instructionFilter').trigger('change');
+                });
+
+                $('#imageFilter').on('change', function () {
+                    var imageFilterValue = $(this).val();
+                    if (imageFilterValue == '') {
+                        ezgoChecklistTemplatesOverview.filters.photosAttached = null;
+                    }
+                    else if(imageFilterValue == 'true') {
+                        ezgoChecklistTemplatesOverview.filters.photosAttached = true;
+                    }
+                    else if(imageFilterValue == 'false') {
+                        ezgoChecklistTemplatesOverview.filters.photosAttached = false;
+                    }
+
+                    ezgoChecklistTemplatesOverview.checklistTemplatesLoaded = false;
+                    //clear results
+                    ezgoChecklistTemplatesOverview.filters.offset = 0;
+                    $('#contentCol').html('');
+                    //retrieve
+                    ezgoChecklistTemplatesOverview.retrieve();
+                    ezgoChecklistTemplatesOverview.retrieveCounts();
+                    ezgoChecklistTemplatesOverview.saveFilters();
+                });
+
+                $('#imageFilterInline').on('change', function (e) {
+                    $('#imageFilter').selectpicker('val', $('#imageFilterInline').val());
+                    $('#imageFilter').selectpicker('refresh');
+                    $('#imageFilter').trigger('change');
+                });
+            }
+
+        };
+
+        $(document).ready(function () {
+            //clear no templates found message
+            $('#contentCol').html('');
+
+            $('#back-to-top').fadeOut();
+
+            @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+            {
+                <text>
+                        $("#templatesSearchBox").on("focusout", function () {
+                            var value = $(this).val().toLowerCase();
+
+                            if (value.length > 0) {
+                                ezgoAnalytics.customLog("Search", "Search used", "checklist", "search value:" + value);
+                            }
+                        });
+                </text>
+            }
+
+            ezgoChecklistTemplatesOverview.initHandlers();
+
+            
+            var filters = localStorage.getItem('checklist_filters');
+
+            if (filters !== null) {
+                var filtersJson = JSON.parse(filters);
+                var filterObj = filtersJson;
+
+                if (filtersJson.hasOwnProperty('areaid') &&
+                    filtersJson.hasOwnProperty('filterText') &&
+                    filtersJson.hasOwnProperty('instructionsAttached') &&
+                    filtersJson.hasOwnProperty('limit') &&
+                    filtersJson.hasOwnProperty('offset') &&
+                    filtersJson.hasOwnProperty('photosAttached') &&
+                    filtersJson.hasOwnProperty('roles') &&
+                    filtersJson.hasOwnProperty('tagids')) {
+
+                    ezgoChecklistTemplatesOverview.filters = filtersJson;
+                    ezgoChecklistTemplatesOverview.filters.offset = 0;
+                    ezgoChecklistTemplatesOverview.filters.limit = 20;
+
+                    areaid = ezgoChecklistTemplatesOverview.filters.areaid;
+
+                    //filterText init
+                    $('#templatesSearchBox').val(ezgoChecklistTemplatesOverview.filters.filterText);
+
+                    //areafilter init
+                    if (areaid != undefined && areaid !== 0) {
+                        //open area tree sections
+                        var level = $('#areatree li a[data-id="' + filterObj.areaid + '"]').parent('li').data('level') === undefined ? 0 : $('#areatree li a[data-id="' + filterObj.areaid + '"]').parent('li').data('level');
+                        var pid = $('#areatree a[data-id="' + filterObj.areaid + '"]');
+                        areaFilter_v2.selectAreaNode(pid[0]);
+                        for (i = 0; i < level; i++) {
+                            pid = areaFilter_v2.nextSibling(pid);
+                        }
+                        //make areatree parent li's child anchors bold
+                        var areaElem = $('#areatree a[data-id="' + filterObj.areaid + '"]');
+                        var areaElemParentLi = areaElem.closest('ul').closest('li');
+                        while (areaElemParentLi.length) {
+                            $(areaElemParentLi.children('a')[0]).css("font-weight", "700");
+                            areaElemParentLi = areaElemParentLi.closest('ul').closest('li');
+                        }
+
+                        //open inline area tree sections
+                        var inlineLevel = $('#inlineAreaTree li a[data-id="' + filterObj.areaid + '"]').parent('li').data('level') === undefined ? 0 : $('#inlineAreaTree li a[data-id="' + filterObj.areaid + '"]').parent('li').data('level');
+                        var inlinePid = $('#inlineAreaTree a[data-id="' + filterObj.areaid + '"]');
+
+                        areaFilter_v2.selectAreaNode(inlinePid[0]);
+                        for (i = 0; i < inlineLevel; i++) {
+                            inlinePid = areaFilter_v2.nextSibling(inlinePid);
+                        }
+
+                        //make inline area tree parent li's child anchors bold
+                        var inlineAreaElem = $('#inlineAreaTree a[data-id="' + filterObj.areaid + '"]');
+                        var inlineAreaElemParentLi = inlineAreaElem.closest('ul').closest('li');
+                        while (inlineAreaElemParentLi.length) {
+                            $(inlineAreaElemParentLi.children('a')[0]).css("font-weight", "700");
+                            inlineAreaElemParentLi = inlineAreaElemParentLi.closest('ul').closest('li');
+                        }
+                    }
+
+                    //tagsfilter init
+                    if ($("#tagsfilter")[0] != null && ezgoChecklistTemplatesOverview.filters.tagids != null && ezgoChecklistTemplatesOverview.filters.tagids.length) {
+                        $('[id^="filter-tag-"]').each(function (index, elem) {
+                            if (ezgoChecklistTemplatesOverview.filters.tagids.includes(+$(elem).data('tag'))) {
+                                $(elem).show();
+                                toggleStyle(+$(elem).data('tag'));
+                            }
+                        });
+                    }
+
+                    //rolesfilter init
+                    if ($('#roleFilter')[0] != null) {
+                        if (ezgoChecklistTemplatesOverview.filters.roles != null && Object.prototype.toString.call(ezgoChecklistTemplatesOverview.filters.roles) === "[object String]") {
+                            $('#roleFilter').selectpicker('val', ezgoChecklistTemplatesOverview.filters.roles.split(','));
+                            $('#roleFilterInline').selectpicker('val', ezgoChecklistTemplatesOverview.filters.roles.split(','));
+                        }
+                        else if (ezgoChecklistTemplatesOverview.filters.roles != null && Array.isArray(ezgoChecklistTemplatesOverview.filters.roles)) {
+                            $('#roleFilter').selectpicker('val', ezgoChecklistTemplatesOverview.filters.roles);
+                            $('#roleFilterInline').selectpicker('val', ezgoChecklistTemplatesOverview.filters.roles);
+                        }
+                    }
+
+                    //instructions attached init
+                    if ($("#instructionFilter")[0] != null && ezgoChecklistTemplatesOverview.filters.instructionsAttached != null) {
+                        $("#instructionFilter").val(ezgoChecklistTemplatesOverview.filters.instructionsAttached.toString()).selectpicker("refresh");
+                        $("#instructionFilterInline").val(ezgoChecklistTemplatesOverview.filters.instructionsAttached.toString()).selectpicker("refresh");
+                    }
+
+                    //photo attached
+                    if ($("#imageFilter")[0] != null && ezgoChecklistTemplatesOverview.filters.photosAttached != null) {
+                        $("#imageFilter").val(ezgoChecklistTemplatesOverview.filters.photosAttached.toString()).selectpicker("refresh");
+                        $("#imageFilterInline").val(ezgoChecklistTemplatesOverview.filters.photosAttached.toString()).selectpicker("refresh");
+                    }
+                }
+            }
+            else {
+                localStorage.removeItem('checklist_filters');
+                ezgoChecklistTemplatesOverview.filters.offset = 0;
+                ezgoChecklistTemplatesOverview.filters.limit = 20;
+            }
+
+            ezgomediafetcher.preloadVisibleImagesAndVideos();
+            ezgoChecklistTemplatesOverview.retrieve();
+            ezgoChecklistTemplatesOverview.retrieveCounts();
+            ezgoChecklistTemplatesOverview.saveFilters();
+        });
+        
+        
+
+    </script>
+}

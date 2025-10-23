@@ -1,0 +1,914 @@
+﻿@{
+    string NavHeaderBarMargin = "";
+    string DialogRowFormGroupMargin = "";
+    string DateFieldContainerMargin = "";
+    string NavBarLanguageMargin = "";
+}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+        <title>@(((BaseViewModel)Model)?.CmsLanguage.GetValue(LanguageKeys.Shared.MyEZGOTitle, "My EZ-GO") ?? "My EZ-GO") | @ViewData["Title"]</title>
+        <!-- Tell the browser to be responsive to screen width -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!--Bootstrap Toggle-->
+        <link rel="stylesheet" href="/plugins/bootstrap-toggle/css/bootstrap-toggle.min.css" />
+        <!--DataTable-->
+        <link href="~/library/datatables/datatables.css" rel="stylesheet" />
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="/plugins/fontawesome-pro-6.5.2-web/css/all.min.css" />
+        <!--TreeView-->
+        <link rel="stylesheet" href="~/dist/css/bootstrap-treeview.css" />
+        <!-- Theme style -->
+        <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+        <!-- overlayScrollbars -->
+        <link rel="stylesheet" href="/plugins/overlayScrollbars/css/OverlayScrollbars.min.css" />
+        <!-- Daterange picker -->
+        <link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css" />
+        <!-- Toastr -->
+        <link rel="stylesheet" href="/plugins/toastr/toastr.min.css" />
+        <!-- Google Font: Source Sans Pro -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" />
+        <!-- Bootstrap multiselect dropdown -->
+        <link rel="stylesheet" href="/plugins/bootstrap-select/css/bootstrap-select.min.css" />
+        <!--Fancybox-->
+        <link rel="stylesheet" href="/dist/css/fancybox/jquery.fancybox.css" />
+        <!--Rangeslider-->
+        <link href="~/css/ion.rangeSlider.css" rel="stylesheet" />
+        <!--EZ-GO-->
+        <link rel="stylesheet" href="~/css/ezgo.css" />    
+        <!-- ezgomediafetcher -->
+        <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1337.0.min.js"></script>
+        <script src="~/js/ezgomediafetcher.js"></script>
+
+        <!--RTL-->
+        <script>
+            if (document.cookie.search(/logged_in/i) == -1) { document.location.href='/logout' }
+            function pageShown(evt){
+                if (evt.persisted) {
+                    if (document.cookie.search(/logged_in/i) == -1) { document.location.href='/logout' }
+                }
+            }
+            window.addEventListener("pageshow", pageShown, false);
+          
+
+            var isRtl = false;
+            const arabicLanguageRegEx = /language=['"]*ar[a-zA-Z-azA-Z]*['"]*/i;
+            const arabicLanguageFound = document.cookie.match(arabicLanguageRegEx);
+            if (arabicLanguageFound != null) {
+                isRtl = true;
+                    @{
+                        NavHeaderBarMargin = "margin-left: 0px!important";
+                        DialogRowFormGroupMargin = "margin-right: 0px!important;margin-left: 0px!important";
+                        DateFieldContainerMargin = "margin-right: 1rem";
+                        NavBarLanguageMargin = "margin-right: 10px";
+                    }
+
+                    // Add dir and lang attributes to html class
+                    const htmlClass = document.querySelector("html");
+                    htmlClass.setAttribute("dir", "rtl");
+                htmlClass.setAttribute("lang", "ar-eg");
+
+                // Add rtl css link if it's an rtl language
+                var rtlLink = document.createElement('link');
+                rtlLink.setAttribute("rel", 'stylesheet');
+                rtlLink.setAttribute("href", 'https://cdn.rtlcss.com/bootstrap/v4.5.3/css/bootstrap.min.css');
+                document.head.appendChild(rtlLink);
+
+                    // align navbar
+                    window.onload = function () {
+                        const bodyClass = document.querySelector("body");
+                        if (bodyClass != null) {
+                            bodyClass.setAttribute("direction", "rtl");
+                        }
+
+                        const asideClass = document.querySelector("aside");
+                        if (asideClass != null) {
+                            asideClass.setAttribute("style", "right:0px;");
+                        }
+
+                        const navBarClass = document.querySelector("navbar");
+                        if (navBarClass != null) {
+                            navBarClass.addClass("fixed-right");
+                        }
+
+                        var RtlStyles = `
+                            .nav-legacy.nav-sidebar>.nav-item>.nav-link.active {
+                                border-right: 3px solid transparent;
+                                border-left: 0px;
+                            }
+
+                            .ezgo-tooltip .tooltiptext::after {
+                                content: " ";
+                                position: absolute;
+                                top: 50%;
+                                right: unset;
+                                left: 100%;
+                                margin-top: -5px;
+                                border-width: 5px;
+                                border-style: solid;
+                                border-color: transparent transparent transparent grey;
+                            }
+
+                            .ezgo-tooltip .tooltiptext {
+                                visibility: hidden;
+                                min-width: 150px;
+                                background-color: gray;
+                                color: #fff;
+                                text-align: center;
+                                padding: 5px;
+                                border-radius: 6px;
+                                /* Position the tooltip text - see examples below! */
+                                position: absolute;
+                                z-index: 1;
+                                top: -26px;
+                                right: 50px;
+                                left: unset;
+                            }
+
+                            /*override rtl styles to be the original*/
+                            .card {
+                                border: 0 solid rgba(0,0,0,.125);
+                            }
+
+                            /*override rtl styles to be the original*/
+                            .card-header {
+                                background-color: transparent;
+                            }
+
+                            /*override rtl styles to be the original*/
+                            .col, .col-1, .col-10, .col-11, .col-12, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-auto, .col-lg, .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-auto, .col-md, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-auto, .col-sm, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-auto, .col-xl, .col-xl-1, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-auto {
+                                position: relative;
+                                width: 100%;
+                                padding-right: 7.5px;
+                                padding-left: 7.5px;
+                            }
+
+                            .nav-sidebar>.nav-item .nav-icon {
+                                margin-left: .2rem !important;
+                                margin-right: .75rem !important;
+                            }
+
+                            .ezgo-tooltip:has(#nav_language_choice) {
+                                margin-right: 10px;
+                            }
+
+                            a:hover {
+                                text-decoration: none;
+                            }
+
+                            .card-title {
+                                margin-bottom: unset;
+                            }
+
+                            .template-searchbar {
+                                margin-bottom: 5px;
+                                margin-right: 12px;
+                                margin-left: unset;
+                            }
+
+                            .user-panel .image {
+                                display: inline-block;
+                                padding-right: 0.8rem;
+                                padding-left: unset;
+                            }
+
+                            .sidebar-collapse .main-sidebar, .sidebar-collapse .main-sidebar::before {
+                                margin-right: -250px;
+                            }
+
+                            /*resonsive side menu when rtl*/
+                            @@media (min-width: 992px){
+                                body:not(.sidebar-mini-md) .content-wrapper, body:not(.sidebar-mini-md) .main-footer, body:not(.sidebar-mini-md) .main-header {
+                                    transition: margin-right .3s ease-in-out;
+                                    margin-right: 250px !important;
+                                    margin-left: unset;
+                                }
+
+                                .sidebar-mini.sidebar-collapse .content-wrapper, .sidebar-mini.sidebar-collapse .main-footer, .sidebar-mini.sidebar-collapse .main-header {
+                                margin-right: 4.6rem !important;
+                                margin-left: 1rem !important;
+                                }
+
+                                .sidebar-mini.sidebar-collapse .main-sidebar, .sidebar-mini.sidebar-collapse .main-sidebar::before {
+                                    margin-right: 0;
+                                    width: 4.6rem;
+                                }
+
+                                /*override for rtl because ltr css is still active at the same time*/
+                                .sidebar-mini.sidebar-collapse .main-footer, .sidebar-mini.sidebar-collapse .main-header {
+                                    margin-left: 0 !important;
+                                }
+                            }
+                        `;
+
+                        var styleSheet = document.createElement("style")
+                        styleSheet.innerText = RtlStyles
+                        document.head.appendChild(styleSheet)
+
+                        const navItem = document.querySelector('.nav-item.fg-success');
+                        if (navItem != null) {
+                            navItem.setAttribute("data-placement", "left");
+                        }
+                    };
+                }
+            else {
+                    @{
+                        NavHeaderBarMargin = "margin-left: auto!important";
+                        DialogRowFormGroupMargin = "margin-right: 0px!important;margin-left: 0px!important";
+                        NavBarLanguageMargin = "margin-left: 10px";
+                    }
+                }
+        </script>
+
+        @RenderSection("CSS", required: false)
+
+        <style>
+            @@media (min-width: 576px) {
+                .absolute-sm-centered {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    -webkit-transform: translate3d(-50%,-50%,0);
+                    transform: translate3d(-50%,-50%,0);
+                }
+            }
+
+            @@media (min-width: 576px) {
+                .h-sm-100 {
+                    height: 100% !important;
+                }
+            }
+
+            @@media (min-width: 576px) {
+                .w-sm-100 {
+                    width: 100% !important;
+                }
+            }
+
+            .btn-ezgo, .btn-ezgo:hover, .btn-ezgo:active, .btn-ezgo:visited {
+                background-color: #93C54B !important;
+                color: #fff !important;
+            }
+
+            .btn-outline-ezgo, .btn-outline-ezgo:hover {
+                background-color: white;
+                color: #93C54B !important;
+                border: 1px solid #93C54B;
+            }
+
+            .btn-ezgo:hover, .btn-outline-ezgo:hover {
+                filter: brightness(.95);
+            }
+
+            .content-wrapper > .content {
+                padding: 0 .5rem;
+            }
+
+        body {
+            margin: 0px;
+            padding: 0px;
+            width: 100%;
+            height: 100%;
+        }
+
+        h5{
+            width:100%;
+        }
+
+            .primary-bg-color {
+                background-color: #fff !important;
+            }
+
+            .secondary-bg-color {
+                background-color: #93C54B !important;
+                color: #fff !important;
+            }
+
+            .main-bg-color {
+                background-color: #f1f3f1 !important;
+            }
+
+            .primary-color {
+                color: #93C54B;
+            }
+
+            .brand-link {
+                border-bottom: none !important;
+            }
+
+            .rounded {
+                border-radius: .25rem !important;
+            }
+
+            .fit-cover {
+                -o-object-fit: cover;
+                object-fit: cover;
+            }
+
+            .rounded {
+                border-radius: .25rem !important;
+            }
+
+            .img-fluid {
+                max-width: 100%;
+                height: auto;
+            }
+
+            img {
+                vertical-align: middle;
+                border-style: none;
+            }
+
+            .card{
+                box-shadow: none;
+                border-radius: 10px;
+            }
+
+            .card .card-header{
+                border-bottom: none;
+            }
+
+            .wrapper .content-wrapper {
+                min-height: 0px !important;
+            }
+
+            .badge-primary {
+                color: #fff;
+                background-color: #93C54B;
+            }
+
+            #mainSidebar .nav-link {
+                color: gray;
+            }
+
+            a {
+                color: #93C54B;
+            }
+
+                a:hover {
+                    color: #578611;
+                }
+
+            .back-to-top {
+                bottom: 2.50rem;
+                position: fixed;
+                right: 1.25rem;
+                z-index: 1032;
+            }
+
+            .panel-wrap {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                right: 0;
+                width: 40em;
+                transform: translateX(100%);
+                transition: .3s ease-out;
+                z-index: 1040;
+            }
+
+            .panel {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: #333;
+                color: #eee;
+                overflow: auto;
+                padding: 1em;
+            }
+
+            .profile-pic {
+                width: 50px;
+                height: 50px;
+                background-repeat: no-repeat;
+                background-size: cover;
+                background-position-x: center;
+            }
+
+            .main-footer {
+                position: sticky;
+                z-index: 1034;
+                background: #ffffff;
+                border-top: none;
+                color: #869099;
+                padding: 1rem;
+                max-height: 45px;
+            }
+
+            .card-filter {
+                max-height: calc(100vh - 189px);
+                overflow: auto;
+            }
+
+            .stepitems {
+                min-height: 90px;
+            }
+
+            .list-group {
+                padding-right: 0px;
+                height: 230px;
+                overflow: auto;
+            }
+
+                .list-group:first-child {
+                    border-left: 0px;
+                }
+
+            .list-group-item {
+                margin-bottom: 0px;
+                border-left: 0px;
+                border-right: 0px;
+            }
+
+                .list-group-item:first-child {
+                    border-top: 0px;
+                }
+
+            ::-webkit-scrollbar {
+                -webkit-appearance: none;
+                width: 10px;
+                height: 1px;
+            }
+
+            #areasScrollDiv::-webkit-scrollbar {
+                -webkit-appearance: none;
+                width: 10px;
+                height: 10px !important;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background-color: rgba(211, 213, 211, .6);
+                box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+            }
+
+            .list-group-item.active {
+                z-index: 2;
+                color: #fff;
+                background-color: #93C54B;
+                border-color: #93c54b1f;
+            }
+
+            .list-group-item:first-child {
+                border-top-left-radius: 0rem;
+                border-top-right-radius: 0rem;
+            }
+
+            .sidebar-dark-teal .nav-sidebar.nav-legacy > .nav-item > .nav-link.active, .sidebar-light-teal .nav-sidebar.nav-legacy > .nav-item > .nav-link.active {
+                border-color: #93C54B;
+            }
+
+            .bg-ripple-container {
+                background-color: #93C54B;
+                min-height: 50px;
+                text-align: center;
+                position: relative;
+            }
+
+            a.nav-link.active > i.nav-icon {
+                color: #93C54B;
+            }
+
+            .jumbotron{
+                background: none;
+            }
+
+            .bootstrap-select button .filter-option {
+                display: flex !important;
+            }
+
+        #editOpenFieldModalContent .form-group {
+            @DialogRowFormGroupMargin
+        }
+
+        #AddNewMatrixModal .form-group{
+            @DialogRowFormGroupMargin
+        }
+
+        .datefieldcontainer label {
+            margin-right: 1rem;
+        }
+        </style>
+
+        <style>
+            @*progress overlay*@
+            #loader-wrapper {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 10000;
+            }
+
+            #loader {
+                display: block;
+                position: relative;
+                left: 50%;
+                top: 50%;
+                width: 150px;
+                height: 150px;
+                margin: -75px 0 0 -75px;
+                border-radius: 50%;
+                border: 3px solid transparent;
+                border-top-color: #fff;
+                -webkit-animation: spin 2s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
+                animation: spin 2s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
+                z-index: 10001;
+            }
+        
+        #loader:before {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: #fff;
+
+            -webkit-animation: spin 3s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
+            animation: spin 3s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
+        }
+
+        #loader:after {
+            content: "";
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: #fff;
+
+            -webkit-animation: spin 1.5s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
+              animation: spin 1.5s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
+        }
+
+        @@-webkit-keyframes spin {
+            0%   {
+                -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+                -ms-transform: rotate(0deg);  /* IE 9 */
+                transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
+            }
+            100% {
+                -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+                -ms-transform: rotate(360deg);  /* IE 9 */
+                transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
+            }
+        }
+
+        @@keyframes spin {
+            0%   {
+                -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+                -ms-transform: rotate(0deg);  /* IE 9 */
+                transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
+            }
+            100% {
+                -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+                -ms-transform: rotate(360deg);  /* IE 9 */
+                transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
+            }
+        }
+
+            #loader-wrapper .loader-section {
+                position: fixed;
+                top: 0;
+                width: 50%;
+                height: 100%;
+                background: #93C54B;
+                z-index: 10000;
+                opacity: 0.8;
+            }
+
+        #loader-wrapper .loader-section.section-left {
+            left: 0;
+        }
+
+        #loader-wrapper .loader-section.section-right {
+            right: 0;
+        }
+
+        /* Loaded styles */
+        .loaded #loader-wrapper .loader-section.section-left {
+            -webkit-transform: translateX(-100%);  /* Chrome, Opera 15+, Safari 3.1+ */
+                -ms-transform: translateX(-100%);  /* IE 9 */
+                    transform: translateX(-100%);  /* Firefox 16+, IE 10+, Opera */
+
+            -webkit-transition: all 0.3s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);  /* Android 2.1+, Chrome 1-25, iOS 3.2-6.1, Safari 3.2-6  */
+                    transition: all 0.3s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);  /* Chrome 26, Firefox 16+, iOS 7+, IE 10+, Opera, Safari 6.1+  */
+        }
+
+        .loaded #loader-wrapper .loader-section.section-right {
+            -webkit-transform: translateX(100%);  /* Chrome, Opera 15+, Safari 3.1+ */
+                -ms-transform: translateX(100%);  /* IE 9 */
+                    transform: translateX(100%);  /* Firefox 16+, IE 10+, Opera */
+
+            -webkit-transition: all 0.3s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);  /* Android 2.1+, Chrome 1-25, iOS 3.2-6.1, Safari 3.2-6  */
+                    transition: all 0.3s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);  /* Chrome 26, Firefox 16+, iOS 7+, IE 10+, Opera, Safari 6.1+  */
+        }
+
+        .loaded #loader {
+            opacity: 0;
+
+            -webkit-transition: all 0.3s ease-out;  /* Android 2.1+, Chrome 1-25, iOS 3.2-6.1, Safari 3.2-6  */
+                    transition: all 0.3s ease-out;  /* Chrome 26, Firefox 16+, iOS 7+, IE 10+, Opera, Safari 6.1+  */
+
+        }
+
+        .loaded #loader-wrapper {
+            visibility: hidden;
+
+            -webkit-transform: translateY(-100%);  /* Chrome, Opera 15+, Safari 3.1+ */
+                -ms-transform: translateY(-100%);  /* IE 9 */
+                    transform: translateY(-100%);  /* Firefox 16+, IE 10+, Opera */
+
+            -webkit-transition: all 0.3s 1s ease-out;  /* Android 2.1+, Chrome 1-25, iOS 3.2-6.1, Safari 3.2-6  */
+                    transition: all 0.3s 1s ease-out;  /* Chrome 26, Firefox 16+, iOS 7+, IE 10+, Opera, Safari 6.1+  */
+        }
+            .loaded #divElement {
+                visibility: hidden;
+                opacity: 0;
+                transition: opacity 0.5s, visibility 0.5s;
+            }
+
+            #divElement {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                margin-top: -50px;
+                margin-left: -50px;
+                width: 100px;
+                height: 100px;
+                z-index: 10001;
+            }
+            #divElement img{
+                width: 62px;
+                margin: 20px;
+            }
+
+            .ml-auto, .mx-auto{
+                @NavHeaderBarMargin
+            }
+                        
+            .ezgo-tooltip:has(#nav_language_choice) {
+                @NavBarLanguageMargin
+            }
+
+            #areatree .list-group {
+                border: none;
+                height: unset;
+            }
+
+            #areatree a {
+                color: slategrey;
+                cursor: pointer;
+            }
+
+                #areatree a:hover {
+                    text-decoration: none;
+                }
+
+            .tooltip-inner {
+                max-width: 200px;
+                padding: 3px 8px;
+                color: #fff;
+                text-align: center;
+                background-color: gray;
+                border-radius: .25rem;
+            }
+
+            .tooltip.bs-tooltip-auto[x-placement^=right] .arrow::before, .tooltip.bs-tooltip-right .arrow::before {
+                border-right-color: gray;
+            }
+
+            .bootstrap-select.show-tick .dropdown-menu li a span.text{
+                margin-right: 0px;
+            }
+
+            .template-searchbar {
+                margin-bottom: 5px;
+                margin-left: 12px;
+            }
+        </style>
+    </head>
+
+    <body class="hold-transition sidebar-mini sidebar-collapse layout-fixed text-sm primary-bg-color loaded" style="overflow:hidden;">
+        <div id="fade-wrapper"></div>
+
+        <div id="loader-wrapper">
+            <div id="divElement">
+                <img src="/assets/img/favicon_white.png" />
+            </div>
+
+            <div id="loader"></div>
+            <div class="loader-section section-left"></div>
+            <div class="loader-section section-right"></div>
+        </div>
+
+        <div class="wrapper">
+            <!-- Navbar -->
+            <partial name="_topmenu" />
+
+            <!-- Main Sidebar Container -->
+            <aside id="main-sidebar" class="main-sidebar sidebar-light-teal sidebar-no-expand primary-bg-color">
+                <!-- Brand Logo -->
+                <partial name="_sidemenu" />
+            </aside>
+
+            <!-- Content Wrapper. Contains page content -->
+            <div class="content-wrapper main-bg-color pl-4 pr-4 mr-3" style="border-radius: 10px; margin-bottom: 0px !important; margin-top: 0px !important;">
+                <!-- Content Header (Page header) -->
+                @RenderBody()
+            </div>
+
+            <footer class="main-footer primary-bg-color" style="font-size:9pt;">
+                <partial name="_footer" />
+            </footer>
+
+            <!-- Control Sidebar -->
+            <aside class="control-sidebar control-sidebar-dark border-top-0">
+                <!-- Control sidebar content goes here -->
+            </aside>
+        </div>
+
+        <!-- jQuery -->
+        <script src="/plugins/jquery/jquery.min.js"></script>    
+        <!-- jQuery UI 1.11.4 -->
+        <script src="/plugins/jquery-ui/jquery-ui.min.js"></script>
+        <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+        <script>$.widget.bridge('uibutton', $.ui.button)</script>
+        <!-- Bootstrap 4 -->
+        <script src="/plugins/bootstrap4/bootstrap.bundle.min.js"></script>
+        <!-- popper.js -->
+        <script src="/plugins/popper/umd/popper.min.js"></script>
+        <!-- jQuery Knob Chart -->
+        <script src="/plugins/jquery-knob/jquery.knob.min.js"></script>
+        <!-- daterangepicker -->
+        <script src="/plugins/moment/moment.min.js"></script>
+        <!-- daterangepicker -->
+        <script src="/plugins/daterangepicker/daterangepicker.js"></script>
+        <!-- overlayScrollbars -->
+        <script src="/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script> 
+        <!-- AdminLTE App -->
+        <script src="/dist/js/adminlte.js"></script>
+        <!-- Toastr -->
+        <script src="/plugins/toastr/toastr.min.js"></script>
+        <!--Bootstrap select-->
+        <script src="/plugins/bootstrap-select/js/bootstrap-select.min.js"></script>
+        <!-- Org Chart -->
+        <script src="/dist/js/orgchart/orgchart.js"></script>
+        <!--Bootstrap toggle-->
+        <script src="/plugins/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
+        <!--ion range slider-->
+        <script src="~/js/ion.rangeSlider.js"></script>
+        <!--Data tables-->
+        <script src="~/library/datatables/datatables.min.js"></script>
+        <!--Fancybox-->
+        <script src="~/dist/js/fancybox/jquery.fancybox.min.js"></script>
+        <!--TreeView-->
+        <script src="~/dist/js/bootstrap-treeview.js"></script>
+        <!--Balloon.js-->
+        <script src="~/dist/js/balloon/balloon.js"></script>
+        <!--Browser image compression-->
+        <script src="~/plugins/browser-image-compression/browser-image-compression.js"></script>
+        <script src="/js/parsers.js"></script>
+
+        @if(Model?.ApplicationSettings?.Features?.FirebaseLoggingCMSEnabled == true)
+        {
+            <!-- The core Firebase JS SDK is always required and must be listed first -->
+            <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-app.js"></script>
+
+            <!-- TODO: Add SDKs for Firebase products that you want to use
+                    https://firebase.google.com/docs/web/setup#available-libraries -->
+            <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-analytics.js"></script>
+            <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-performance.js"></script>
+
+            <script>
+                // Your web app's Firebase configuration
+                // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+                var firebaseConfig = {
+                    apiKey: "AIzaSyBrGjl5vuldQHOQR0SNqOqukO_7pfKPqiY",
+                    authDomain: "ezgo-cms.firebaseapp.com",
+                    projectId: "ezgo-cms",
+                    storageBucket: "ezgo-cms.appspot.com",
+                    messagingSenderId: "1065675964396",
+                    appId: "1:1065675964396:web:1d1ac25e4cec3a910e8ac9",
+                    measurementId: "G-9345ZS03RX"
+                };
+
+                // Initialize Firebase
+                firebase.initializeApp(firebaseConfig);
+                const analytics = firebase.analytics();
+
+                (function (sa, fbc) {
+                    function load(f, c) {
+                        var a = document.createElement('script');
+                        a.async = 1; a.src = f; var s = document.getElementsByTagName('script')[0];
+                        s.parentNode.insertBefore(a, s);
+                    } load(sa);
+                    window.addEventListener('load', function () { firebase.initializeApp(fbc).performance() });
+                })('https://www.gstatic.com/firebasejs/8.2.6/firebase-performance-standalone.js', firebaseConfig);
+
+                const perf = firebase.performance();
+            </script>
+        }
+
+        <script>
+            $(document).on('show.bs.modal', '.modal', function (event) {
+                var zIndex = 1040 + (10 * $('.modal:visible').length);
+                $(this).css('z-index', zIndex);
+                setTimeout(function () {
+                    $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+                }, 0);
+            });
+
+            $(document).ready(function (event) {
+                $('.bootstrap-select button .filter-option').addClass('d-flex');
+                setTimeout(() => {
+                    $('#mainSidebar .os-viewport').on('scroll', function () {
+                        $('.tooltiptext').each(function (index, elem) {
+                            $(elem).css('top', -26 - $('#mainSidebar .os-viewport').scrollTop());
+                        })
+                    });
+                }, 1000);
+            });
+
+            function getAreas(el) {
+                var id = $(el).data('id');
+                var level = $(el).data('level') + 1;
+                $('#areas ul').slice(level - 1).find('li').removeClass('active');
+                $(el).addClass('active');
+
+                $.get('/config/areas/' + id, function (data, status) {
+                    if ($('#areas ul').length >= level) {
+                        $('#areas ul').slice(level).remove();
+                    }
+                    $("#areas").append(data);
+                });
+            }
+        </script>
+
+        @RenderSection("Scripts", required: false)
+    
+        <script src="/js/language.js"></script>
+         <script src="/js/announcements.js"></script>
+        <partial name="_widget_freshworks" />
+        <partial name="_system_environment_display" />
+
+        <div class="modal fade" id="modalSessionExpired" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="z-index:99991">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header" style="text-align:center;">
+                        <h5 class="modal-title" style="text-align:center;">@(((BaseViewModel)Model)?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.SessionExpiredTitle, "Your session has expired.") ?? "Your session has expired.")</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        @(((BaseViewModel)Model)?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.SessionExpiredMessage, "Your current session has expired. Please login again.") ?? "Your current session has expired. Please login again.")
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" id="modal_expired_button" class="btn btn-outline btn-sm" onclick="doActivityExtraCheck(true);"> @(((BaseViewModel)Model)?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.SessionExpiredButtonTitle, "Login") ?? "Login")</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+         <div class="modal fade" id="modalLanguageChoice" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">@(((BaseViewModel)Model)?.CmsLanguage.GetValue(LanguageKeys.FrameWork.ChooseLanguageTitle, "Choose language") ?? "Choose language")</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                          @foreach (var item in ((BaseViewModel)Model)?.ApplicationSettings?.AvailableLanguages.OrderBy(x => x))
+                            {
+                                //displaying flag and native name (as used within that country) based on the .net culture. 
+                                var cltr = System.Globalization.CultureInfo.GetCultureInfo(item);
+                                var flagImage = string.Format("/assets/img/flags/{0}.png", item.ToString().ToLower());
+
+                                <div style="width:157px;height:140px;text-align:center;display:inline-block;float:left;margin-top:10px;" data-action="language_choice" data-language="@item.ToString().ToLower()" onclick="language.switch('@item.ToString().ToLower()')"> 
+                                    <div style="height:100px;"><img src="@flagImage" class="img-fluid nav-icon" style="max-width:130px;max-height:100px;cursor:pointer" onerror="" /></div>
+                                    <div><span>@cltr.NativeName</span></div>
+                                </div>
+        
+                            }
+                    </div>
+
+                    <div class="modal-footer">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

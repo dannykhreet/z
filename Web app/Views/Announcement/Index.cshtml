@@ -1,0 +1,299 @@
+﻿@model WebApp.ViewModels.AnnouncementViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout_template";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                &nbsp;
+                <h1 class="m-0 text-dark">@(Model?.CmsLanguage.GetValue(LanguageKeys.Announcement.AnnouncementsTitle, "Announcements") ?? "Announcements")</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                <a id="new_announcement_btn" data-actiontype="new" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto">@(Model?.CmsLanguage.GetValue(LanguageKeys.Announcement.BtnNewAnnouncement, "Add new announcement") ?? "Add new announcement" )</a>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+
+
+<div class="modal fade" id="modalAnnouncement" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_addchange_title">@(Model?.CmsLanguage.GetValue(LanguageKeys.Announcement.Title, "Announcement") ?? "Announcement")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <!--
+                            ReleaseNotes = 1, //mix of CMS and API release notes based on version number of CMS
+                            CMSReleaseNotes = 2, //CMS only
+                            WebClientReleaseNotes = 3, //WebClient only
+                            XamarinReleaseNotes = 4, //Xamarin release notes (all platforms)
+                            XamarinIosReleaseNotes = 5, //Xamarin IOS only release notes
+                            XamarinAndroidReleaseNotes = 6, //Xamarin IOS only release notes
+                            DashboardReleaseNotes = 7,  //Dashboard release notes.
+                            PlatformMessage = 999
+                        -->
+                        <label for="announcement_type">@(Model.CmsLanguage.GetValue(LanguageKeys.Announcement.AnnouncementType, "Release announcement type") ?? "Release announcement type")</label>
+                        <select name="announcement_type" id="announcement_type" class="form-control">
+                            <option value="1" title="Release notes mix of CMS and API. Based on version number of CMS.">Release notes</option>
+                            <option value="2" title="CMS release notes. Based on version number of CMS.">CMS release notes</option>
+                            <option value="3" title="Web client release notes. Based on web client version number">Web client release notes</option>
+                            <option value="4" title="Xamarin release notes. Based on Xamarin app version. General release notes for all Xamarin applications.">Xamarin release notes</option>
+                            <option value="5" title="Xamarin IOS release notes. Based on Xamarin IOS app version.">Xamarin IOS release notes</option>
+                            <option value="6" title="Xamarin Android release notes. Based on Xamarin Android app version.">Xamarin Android release notes</option>
+                            <option value="7" title="Dashboard release notes.">Dashboard app release notes</option>
+                            <option value="999" title="Platform messages. General message.">Platform message</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="announcement_title">@(Model?.CmsLanguage.GetValue(LanguageKeys.Announcement.AnnouncementTitle, "Title") ?? "Title" )</label>
+                        <input type="text" class="form-control" name="announcement_title" id="announcement_title" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Announcement.TitlePlaceholder, "Announcement title") ?? "Announcement title")" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="announcement_description">@(Model.CmsLanguage.GetValue(LanguageKeys.Announcement.AnnouncementDescription, "Description") ?? "Description")</label>
+                        <textarea class="form-control" name="announcement_description" id="announcement_description" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Announcement.DescriptionPlaceholder, "Announcement description") ?? "Announcement description")" rows="10"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="announcement_date">@(Model.CmsLanguage.GetValue(LanguageKeys.Announcement.AnnouncementDate, "Date") ?? "Date")</label>
+                        <input type="datetime-local" class="form-control" name="announcement_date" id="announcement_date" data-selector="input" placeholder="">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancek_announcement_btn" class="btn btn-outline btn-sm" data-dismiss="modal">@(Model.CmsLanguage.GetValue(LanguageKeys.Announcement.BtnCancel, "Cancel") ?? "Cancel")</button>
+                <button id="save_announcement_btn" type="button" class="btn btn-ezgo btn-sm" data-actiontype="save">@(Model.CmsLanguage.GetValue(LanguageKeys.Announcement.BtnSave, "Save") ?? "Save")</button>
+            </div>
+            <input type="hidden" name="announcement_id" id="announcement_id" />
+        </div>
+    </div>
+</div>
+
+
+<section class="content">
+
+    <div class="container-fluid">
+
+        <div class="row pt-1" style="height:calc(100vh - 175px);overflow:auto;">
+
+            <div class="col-lg-12 col-xl-12">
+                <div id="contentBody" style="height: calc(100vh - 245px);overflow:auto;">
+
+                    <div class="row no-gutters" id="contentCol">
+
+                        @if (Model.Announcements != null && Model.Announcements.Count != 0)
+                        {
+                            @foreach (var announcement in Model.Announcements)
+                            {
+
+                                <div class="card w-100 results" data-id="@announcement.Id">
+
+                                    <div class="card-body p-0">
+                                        <div class="col-12 p-1">
+                                            <div class="p-1">
+                                                <div class="row" data-id="@announcement.Id">
+                                                    <div class="col-sm-1 col-md-1 col-lg-1 col-xl-1">
+                                                        <p class="fs--1 mb-2 mb-md-2"><span class="badge badge-secondary">@announcement.Date.ToString("dd-MM-yyyy HH:mm")</span></p>
+                                                        <div><small>@(Model?.CmsLanguage.GetValue(LanguageKeys.Announcement.IdText, "Id: ") ?? "Id: ")<strong>@announcement.Id</strong></small></div>
+                                                        <div><small>@(Model?.CmsLanguage.GetValue(LanguageKeys.Announcement.TypeText, "Type: ") ?? "Type: ")<strong>@announcement.AnnouncementType</strong></small></div>
+                                                    </div>
+                                                    <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <h5 class="mt-3 mt-sm-0">@announcement.Title</h5>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-lg-12 d-flex justify-content-between flex-column">
+                                                                <div class="row">
+                                                                    <div class="col-md-12 col-lg-12 text-muted"><small>@(Model?.CmsLanguage.GetValue(LanguageKeys.Announcement.DescriptionTitle, "Description: ") ?? "Description: ")<br /><strong>@Html.Raw(announcement.Description.Replace(System.Environment.NewLine, "<br />").Replace("\n\r", "<br />").Replace("\n", "<br />").Replace("\r", "<br />"))</strong></small></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-1 col-md-1 col-lg-1 col-xl-1" style="text-align: right;">
+                                                        <a id="edit_announcement_btn_@announcement.Id" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" data-id="@announcement.Id" data-actiontype="edit"><i class="fas fa-edit"></i></a>
+                                                        <a id="remove_announcement_btn_@announcement.Id" class="btn btn-danger btn-sm mr-2 shadow-sm mt-auto" style="color:white;" data-id="@announcement.Id" data-actiontype="delete"><i class="far fa-trash-alt"></i></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <textarea id="description_@announcement.Id" style="display:none;" data-storage="description">@announcement.Description</textarea>
+                                    <input type="hidden" id="title_@announcement.Id" value="@announcement.Title" data-storage="title" />
+                                    <input type="hidden" id="datetime_@announcement.Id" value="@announcement.Date.ToString("yyyy-MM-ddTHH:mm")" data-storage="datetime" />
+                                    <input type="hidden" id="type_@announcement.Id" value="@Convert.ToInt32(announcement.AnnouncementType)" data-storage="type" />
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <partial name="~/Views/Shared/_no_templates_message.cshtml" model="@Model" />
+                        }
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts{
+
+    <script src="/js/ezgoUtils.js"></script>
+    <script>
+
+        $(document).ready(function () {
+            ezgomediafetcher.preloadImagesAndVideos();
+            announcement.init();
+
+        });
+
+        var announcement = {
+            clear: function () {
+                $('#announcement_title, #announcement_description, #announcement_date, #announcement_id').val('');
+            },
+            create: function () {
+                var announcement = {
+                    Title: $('#announcement_title').val(),
+                    Description: $('#announcement_description').val(),
+                    Date: $('#announcement_date').val(),
+                    AnnouncementType: parseInt($('#announcement_type').val()),
+                    Id: $('#announcement_id').val() != null && $('#announcement_id').val() != '' ? parseInt($('#announcement_id').val()) : 0
+                }
+                return announcement;
+            },
+            init: function () {
+                announcement.setHandlers();
+            },
+            setDefaults: function (forceClear) {
+                let possibleTitle = '';
+                let possibleDescription = 'NEW FEATURES AND IMPROVEMENTS' + '\n\r';
+                switch ($('#announcement_type').val()) {
+                    case '1': possibleTitle = 'Release EZ-GO CMS | Version 1.0.';break;
+                    case '2': possibleTitle = 'Release EZ-GO CMS | Version 1.0.'; break;
+                    case '3': possibleTitle = 'Release EZ-GO WEB | Version 1.0.'; break;
+                    case '4': possibleTitle = 'Release EZ-GO APP | Version 1.0.'; break;
+                    case '5': possibleTitle = 'Release EZ-GO APP | Version 1.0.'; break;
+                    case '6': possibleTitle = 'Release EZ-GO APP | Version 1.0.'; break;
+                    case '7': possibleTitle = 'Release EZ DASHBOARD | Version 1.0.'; break;
+                    default:
+                    // code block
+                }
+                if (forceClear || $('#announcement_title').val() === '') {
+                    $('#announcement_title').val(possibleTitle);
+                }
+                if ($('#announcement_description').val() === '') {
+                    $('#announcement_description').val(possibleDescription);
+                }
+            },
+            remove: function (o) {
+                //console.log('something');
+                //console.log('@(Model?.CmsLanguage.GetValue(LanguageKeys.Announcement.RemoveIsDisabled, "remove is disabled.") ?? "remove is disabled.")');
+                var elem = o;
+                $.fn.dialogue({
+                    content: $("<p />").text("Are you sure you want to delete the announcement?"),
+                    closeIcon: true,
+                    buttons: [
+                        {
+                            text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.Action.OptionYes, "Yes") ?? "Yes")", id: $.utils.createUUID(), click: function ($modal) {
+                                $('body').toggleClass('loaded');
+                                $.ajax({
+                                    type: "POST",
+                                    url: '/announcement/delete/' + $(elem).data("id"),
+                                    success: function (data) {
+                                        window.location.reload();
+                                    },
+                                    error: function (jqXHR, textStatus, errorThrown) {
+                                        $modal.dismiss();
+                                        toastr.error("error deleting announcement");
+                                    },
+                                    contentType: "application/json; charset=utf-8"
+                                });
+                                //refresh
+                            }
+                        },
+                        {
+                            text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.Action.OptionNo, "No") ?? "No")", id: $.utils.createUUID(), click: function ($modal) {
+                                //dont delete skills matrix
+                                $modal.dismiss();
+                            }
+                        }
+                    ]
+                });
+            },
+            save: function () {
+                $('body').toggleClass('loaded');
+                $('#modalAnnouncement').modal('hide');
+
+                var item = announcement.create();
+
+                $.ajax({
+                    type: "POST",
+                    url: '/announcement/save',
+                    data: JSON.stringify(item),
+                    success: function (data) {
+                        $('body').toggleClass('loaded');
+
+                        toastr.success('@(Model?.CmsLanguage.GetValue(LanguageKeys.Announcement.AnnouncementSaved, "Announcement saved..reloading") ?? "Announcement saved..reloading")');
+
+                        setTimeout(() => {
+                            location.href = '/announcement';
+                        }, 1000)
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('body').toggleClass('loaded');
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            setValues: function (id) {
+                $('#announcement_title').val($('#title_' + id).val());
+                $('#announcement_description').val($('#description_' + id).val());
+                $('#announcement_date').val($('#datetime_' + id).val());
+                $('#announcement_type').val($('#type_' + id).val());
+                $('#announcement_id').val(id);
+            },
+            setHandlers: function () {
+                $('[data-actiontype="new"]').on('click', function () {
+                    announcement.clear();
+                    $('#modalAnnouncement').modal('show');
+                    announcement.setDefaults(false);
+                });
+                $('[data-actiontype="edit"]').on('click', function () {
+                    announcement.clear();
+                    announcement.setValues($(this).attr('data-id'));
+                    $('#modalAnnouncement').modal('show');
+                });
+                $('[data-actiontype="delete"]').on('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    announcement.remove(this);
+                });
+                $('#save_announcement_btn').on('click', function () {
+                    announcement.save();
+                });
+                $('#announcement_type').on('change', function () { announcement.setDefaults(true); });
+            }
+        };
+
+
+    </script>
+
+}

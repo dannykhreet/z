@@ -1,0 +1,23 @@
+﻿@model WebApp.ViewModels.CompletedChecklistViewModel
+@using WebApp.Models.Checklist
+
+@if (Model.CompletedChecklists != null && Model.CompletedChecklists.Count > 0)
+{
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+    var single = new WebApp.ViewModels.CompletedChecklistSingleViewModel();
+
+    @foreach (CompletedChecklistModel completedChecklist in Model.CompletedChecklists)
+    {
+        {
+            single = ViewModelConverters.ConvertToViewModel(completedChecklist);
+            single.CompletedTextValue = "Ended"; //TODO TRANSLATE
+            single.ModifiedTextValue = "Last modified at"; //TODO TRANSLATE
+            single.OngoingTextValue = Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.OngoingLabel, "ONGOING") ?? "ONGOING";
+            single.ApplicationSettings = Model.ApplicationSettings;
+            single.Timezone = timezone;
+            single.Locale = Model?.Locale;
+        }
+        <partial name="~/Views/Report/Checklist/_completed_checklist.cshtml" model="single" />
+    }
+}

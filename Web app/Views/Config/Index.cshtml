@@ -1,0 +1,1055 @@
+﻿@model WebApp.ViewModels.ConfigViewModel
+@{
+    Dictionary<string, string> CmsLanguage = Model?.CmsLanguage;
+    Layout = "_Layout_template";
+    ViewData["Title"] = Model?.CmsLanguage.GetValue(LanguageKeys.Config.Title, "Configuration") ?? "Configuration";
+}
+@using WebApp.ViewModels;
+
+@section CSS {
+    <style>
+        #orgchart {
+            width: 100%;
+            height: calc(100vh - 186px);
+            position: relative;
+        }
+
+        .config-nav-button {
+            background-color: #93C54B !important; /* Unselected color */
+            color: #fff !important;
+            border: none !important;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            height: 45px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .config-nav-button.active {
+                background-color: #668F2A !important; /* Selected color */
+                color: #fff !important;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+        /* Right Content Area Styling */
+        .right-column {
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #orgchart .edit-wrapper {
+            opacity: 1 !important;
+        }
+
+        #orgchart .bg-toolbar-container svg {
+            border: none !important;
+        }
+
+        .modal .table {
+            font-size: 0.9rem;
+        }
+
+            .modal .table th,
+            .table td {
+                padding: 0;
+                padding-bottom: 10px;
+            }
+
+
+        .flex-row {
+            display: flex;
+            height: calc(100vh - 167px); /* Adjust based on your header/footer height */
+            overflow: auto;
+        }
+
+        .left-column {
+            flex: 0 0 20%;
+            max-width: 20%;
+            height: 100%;
+        }
+
+        .right-column {
+            flex: 0 0 80%;
+            max-width: 80%;
+            height: 100%;
+        }
+
+        .full-height {
+            height: calc(100vh - 180px);
+        }
+
+        .right-card-body {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .main-content-area {
+            flex: 0 0 100%;
+            height: calc(100vh - 180px);
+            overflow: hidden;
+            background-color: #f1f3f1;
+            justify-items: stretch;
+        }
+
+        .additional-content {
+            flex: 0 0 20%;
+        }
+
+        #orgchart div::-webkit-scrollbar
+        {
+            height: 10px;
+        }
+
+        #orgchart div::-webkit-scrollbar-corner {
+            color: white;
+            border: 1px solid white;
+            width: 10px;
+            height: 10px;
+        }
+
+        #orgchart .bg-toolbar-container {
+            width: initial !important;
+        }
+    </style>
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0 align-items-center">
+            <div class="col-sm-6">
+                <h1>@(CmsLanguage?.GetValue(LanguageKeys.Config.Title, "Configuration") ?? "Configuration")</h1>
+            </div>
+            <div class="col-sm-6 text-right">
+                <div id="exportButtonContainer">
+                    @if (Model.ApplicationSettings.Features.ExportAdvancedEnabled == true)
+                    {
+                        <button class="btn btn-secondary btn-sm btn-outline shadow-sm"
+                                data-export="companyareas"
+                                title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.CompanyAreasTitle, "Areas") ?? "Export areas")">
+                            <i class="fa fa-file-excel"></i>
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@{
+    var enableModificationOwnCompanySettingsAssessment = (Model?.ApplicationSettings?.Features?.EnableModificationOwnCompanySettingsAssessment == true && Model?.ApplicationSettings?.Features?.SkillAssessments == true);
+    var enableModificationOwnCompanySettingsWorkInstruction = (Model?.ApplicationSettings?.Features?.EnableModificationOwnCompanySettingsWorkInstruction == true && Model?.ApplicationSettings?.Features?.WorkInstructions == true);
+    var enableModificationOwnCompanySettingsMatrix = (Model?.ApplicationSettings?.Features?.EnableModificationOwnCompanySettingsMatrix == true && Model?.ApplicationSettings?.Features?.SkillMatrix == true);
+}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row flex-row">
+            <!-- Left Column -->
+            <div class="col-2 left-column">
+                <div class="card full-height">
+                    <div class="card-body d-flex flex-column">
+                        <!-- Vertical buttons on the left side -->
+                        <button type="button" class="btn btn-ezgo btn-sm mb-2 shadow-sm btn-block config-nav-button" data-url="@Url.Action("CompanyArea", "Config")">
+                            <i class="nav-icon fas fa-sitemap"></i> &nbsp; @(Model?.CmsLanguage?.GetValue(LanguageKeys.Config.CompanyAreaTitle, "Company Areas") ?? "Company Areas")
+                        </button>
+                        
+                        @if (enableModificationOwnCompanySettingsAssessment || enableModificationOwnCompanySettingsWorkInstruction || enableModificationOwnCompanySettingsMatrix)
+                        {
+                            <button type="button" class="btn btn-ezgo btn-sm mb-2 shadow-sm btn-block config-nav-button" data-url="/CompanySettings">
+                                <i class="nav-icon fa-solid fa-gear"></i> &nbsp; @(Model?.CmsLanguage.GetValue(LanguageKeys.Config.SettingBTN, "Setting") ?? "Setting")
+                            </button>
+                        }
+
+                        @if (Model.ApplicationSettings?.Features?.MarketEnabled == true)
+                        {
+                            <button type="button" class="btn btn-ezgo btn-sm mb-2 shadow-sm btn-block config-nav-button" data-url="/marketplace">
+                                <i class="nav-icon fa-solid fa-store"></i> &nbsp; @(Model?.CmsLanguage.GetValue(LanguageKeys.Config.MarketplaceTitle, "Marketplace") ?? "Marketplace")
+                            </button>
+                        }
+
+                        @if (Model.ApplicationSettings?.Features?.TasksEnabled == true)
+                        {
+                            <button type="button" class="btn btn-ezgo btn-sm mb-2 shadow-sm btn-block config-nav-button" data-url="@Url.Action("Shifts", "config")">
+                                <i class="nav-icon fas fa-clock"></i> &nbsp; @(CmsLanguage?.GetValue(LanguageKeys.Config.ButtonShifts, "Days, times and shifts") ?? "Days, times and shifts")
+                            </button>
+                        }
+
+                        @if (Model.ApplicationSettings?.Features?.AuditTrailDetailsEnabled == true)
+                        {
+                            <button type="button" class="btn btn-ezgo btn-sm mb-2 shadow-sm btn-block config-nav-button" data-url="/auditing">
+                                <i class="nav-icon fas fa-archive"></i> &nbsp; @(Model?.CmsLanguage.GetValue(LanguageKeys.Auditing.AuditingTitle, "Audit trail") ?? "Audit trail")
+                            </button>
+                        }
+
+                        @if (Model.ApplicationSettings?.Features?.TaskGenerationOptions == true)
+                        {
+                            <button type="button" class="btn btn-ezgo btn-sm mb-2 shadow-sm btn-block config-nav-button" data-url="/taskgenerationmanagement">
+                                <i class="nav-icon fas fa-clipboard-check"></i> &nbsp;@(Model?.CmsLanguage.GetValue(LanguageKeys.Task.TaskGenerationTitle, "Task generation") ?? "Task generation")  
+                            </button>
+                        }
+
+                        @if (Model.ApplicationSettings?.Features?.TagsEnabled == true)
+                        {
+                            <button type="button" class="btn btn-ezgo btn-sm mb-2 shadow-sm btn-block config-nav-button" data-url="@Url.Action("Index", "Tags")">
+                                <i class="nav-icon fas fa-tags"></i> @(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagManagement, "Tag management") ?? "Tag management")
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="modalSetRoleNames" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">@(CmsLanguage?.GetValue(LanguageKeys.Config.ButtonSetRoleNames, "Set role names") ?? "Set role names")</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body p-0 pt-1 pl-4 pr-4 text-muted">
+                            <p>@(CmsLanguage?.GetValue(LanguageKeys.Config.CompanyRoleNamesText, "Here you can configure role names for your company.") ?? "Here you can configure role names for your company.")</p>
+                            <ul class="list-unstyled">
+                                <li class="media">
+                                    <i class="fas fa-user-tie fa-2x mr-2 ml-2" style="width:32px;"></i>
+                                    <div class="media-body">
+                                        <h5 class="mt-0 mb-1">@(CmsLanguage?.GetValue(LanguageKeys.User.Manager, "Manager") ?? "Manager")</h5>
+                                        @(CmsLanguage?.GetValue(LanguageKeys.Config.AccesToAllText, "Has access to all data of the company and all settings configuration.") ?? "Has access to all data of the company and all settings configuration.")
+                                        <div class="form-group">
+                                            <input type="text" class="form-control form-control-sm" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.ManagerPlaceholder, "Manager") ?? "Manager")" id="txt_manager_display" value="@(Model.CompanyRoles != null ? Model.CompanyRoles.ManagerDisplayName : "")" />
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="media text-muted">
+                                    <i class="fas fa-users fa-2x mr-3" style="width:32px;"></i>
+                                    <div class="media-body">
+                                        <h5 class="mt-0 mb-1">@(CmsLanguage?.GetValue(LanguageKeys.User.ShiftLeader, "Shift leader") ?? "Shift leader")</h5>
+                                        @(CmsLanguage?.GetValue(LanguageKeys.Config.AccesToSelectedText, "Has access to selected areas within the company and can only configure those areas. Has access to the app. Can view reports in the app.") ?? "Has access to selected areas within the company and can only configure those areas. Has access to the app. Can view reports in the app.")
+                                        <div class="form-group">
+                                            <input type="text" class="form-control form-control-sm" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.ShiftLeaderPlaceholder, "Shift leader") ?? "Shift leader")" id="txt_shiftleader_display" value="@(Model.CompanyRoles != null ? Model.CompanyRoles.ShiftLeaderDisplayName : "")" />
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="media text-muted">
+                                    <i class="fas fa-user-cog fa-2x mr-3" style="width:32px;"></i>
+                                    <div class="media-body pb-0">
+                                        <h5 class="mt-0 mb-1">@(CmsLanguage?.GetValue(LanguageKeys.User.Basic, "Basic user") ?? "Basic user")</h5>
+                                        @(CmsLanguage?.GetValue(LanguageKeys.Config.AccesToAreaBasic, "Has access to selected areas within the company can only perform tasks, checklists, audits. Only app access (no CMS access). Can view reports.") ?? "Has access to selected areas within the company can only perform tasks, checklists, audits. Only app access (no CMS access). Can view reports.")
+                                        <div class="form-group">
+                                            <input type="text" class="form-control form-control-sm" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.BasicUserPlaceholder, "Basic user") ?? "Basic user")" id="txt_basic_display" value="@(Model.CompanyRoles != null ? Model.CompanyRoles.BasicDisplayName : "")" />
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary d-none" data-dismiss="modal">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonCancel, "Close") ?? "Close")</button>
+                            <button type="button" class="btn btn-ezgo" id="btn_save_roles" onclick="areaChart.saveRoles();">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonSave, "Save") ?? "Save")</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="modalAddChangeArea" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal_addchange_title">@(CmsLanguage?.GetValue(LanguageKeys.Config.AreaModalTitleText, "Area") ?? "Area")</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="form-group" style="text-align:center;align-content:center;">
+                                    <div style="text-align: center; align-content: center;">
+                                        <div style="width: 200px; height: 150px; display: inline-flex; position: relative; align-self: center; background-image: url('/assets/img/normal_unavailable_image.png'); background-repeat: no-repeat; background-position: center; background-size: 200px 150px;">
+                                            <img src="/assets/img/normal_unavailable_image.png" id="area_image" style="width:200px;" />
+                                            <div class="controls d-print-none" style="position:absolute;bottom:0px;">
+                                                <input class="d-none" type="file" id="uploaderTemplate" accept="image/*" name="photo" onchange="areaChart.previewFile(this);" data-preview="#area_image" data-type="image" required="">
+                                                <a href="#" onclick="$('#uploaderTemplate').trigger('click'); return false;">
+                                                    <div class="border rounded-circle float-right d-lg-flex justify-content-lg-center shadow main-image-pencil" style="background-color:#FFFFFF;margin:4px; height:20px; width:20px;">
+                                                        <i class="fa fa-paperclip d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 14px;"></i>
+                                                    </div>
+                                                </a>
+                                                <a href="#" data-selector="deletemedia" data-type="template" onclick="areaChart.removeFile(this);" data-preview="#area_image">
+                                                    <div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil" style="background-color:#FFFFFF;margin:4px; height:20px; width:20px;">
+                                                        <i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 14px;"></i>
+                                                    </div>
+                                                </a>
+                                                <video id="dialogVideo" controls="" style="display:none;">
+                                                </video>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="area_name">@(CmsLanguage?.GetValue(LanguageKeys.Config.AreaModalNameTitle, "Name") ?? "Name")</label>
+                                    <input type="text" class="form-control" name="area_name" id="area_name" placeholder="@(CmsLanguage?.GetValue(LanguageKeys.Config.AreaModalNamePlaceHolder, "Area name") ?? "Area name")" required>
+                                </div>
+                                <div class="form-group d-none">
+                                    <label for="area_description">@(CmsLanguage?.GetValue(LanguageKeys.Config.AreaModalDescriptionTitle, "Description") ?? "Description")</label>
+                                    <input type="text" class="form-control" name="area_description" id="area_description" placeholder="@(CmsLanguage?.GetValue(LanguageKeys.Config.AreaModalDescriptionPlaceHolder, "Area description") ?? "Area description")">
+                                </div>
+                                
+                                @if (Model?.ApplicationSettings?.Features?.MarketSapEnabled == true)
+                                {
+                                    <div class="form-group row">
+                                        <div class="col-10">
+                                            <div><button id="modal_addchange_area_choose_functional_location" type="button" class="btn btn-ezgo btn-sm @(Model.DisableMutateArea ? "disabled" : "")" onclick="$('#modalSelectFunctionalLocation').modal('show');">Select functional location</button></div>
+                                        </div>
+                                        <div class="col-2">
+                                            <div style="text-align: right"><i style="cursor: pointer" id="modal_addchange_area_reset_functional_location" onclick="functionalLocationPicker.resetSelectedFunctionalLocationId()" class="fa-solid fa-x"></i></div>
+                                        </div>
+                                    </div>
+                                    <h6 id="selectedFunctionalLocationHeader" style="display: none">Selected functional location:</h6>
+                                    <div id="selectedFunctionalLocationContent"></div>
+                                }
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="modal_addchange_area_cancel_button" class="btn btn-outline btn-sm" data-dismiss="modal">@(CmsLanguage?.GetValue(LanguageKeys.Config.AreaModalCancelButton, "Cancel") ?? "Cancel")</button>
+                            <button id="modal_addchange_area_save_button" type="button" class="btn btn-ezgo btn-sm @(Model.DisableMutateArea ? "disabled" : "")" data-actiontype="change">@(CmsLanguage?.GetValue(LanguageKeys.Config.AreaModalSaveButton, "Save") ?? "Save")</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model?.ApplicationSettings?.Features?.MarketSapEnabled == true)
+            {
+                SapPmFunctionalLocationPickerViewModel sapLocVM = new SapPmFunctionalLocationPickerViewModel() { SapPmLocations = Model.SapPmFunctionalLocations, ApplicationSettings = Model.ApplicationSettings, DisableMutateArea= Model.DisableMutateArea };
+                <partial name="~/Views/Shared/SapFunctionalLocations/_sap_pm_functional_location_picker.cshtml" , model="@sapLocVM" />
+            }
+
+            <div class="modal fade" id="modalDetailsArea" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal_details_title">@(CmsLanguage?.GetValue(LanguageKeys.Config.AreaDetailsModalTitle, "Details") ?? "Details")</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body container">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div style="width: 100%;display:flex;">
+                                        <a href="/assets/img/normal_unavailable_image.png" id="modal_details_image_popout" data-fancybox="steps" data-caption="" class="d-flex">
+                                            <!-- todo fix upload -->
+                                            <img src="/assets/img/normal_unavailable_image.png" id="modal_details_image" class="img-fluid main-img" style="width:100%;object-fit: cover; object-position: center; border-radius: 5px; border: 1px solid #dcdcdc" @*onerror="this.onerror = null; this.src = '/assets/img/normal_unavailable_image.jpg'; document.getElementById('modal_details_image_popout').href=this.src"*@ />
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <div><label>@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.FormGroupName, "Name") ?? "Name")</label></div>
+                                        <div id="modal_details_name"></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div><label>@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.FormGroupLocation, "Location") ?? "Location")</label></div>
+                                        <div id="modal_details_location" class="badge badge-primary"></div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <div><label>@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.FormGroupConnectedItems, "Directly connected active items") ?? "Directly connected active items")</label></div>
+                                        <div>
+                                            <ul id="modal_details_relations">
+                                                <li title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.NumberOfActiveTaskTemplatesTitle, "Number of active task templates directly under this area") ?? "Number of active task templates directly under this area")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.TaskTemplatesText, "Task templates") ?? "Task templates") - (<span id="modal_details_active_tasktemplates_nr"></span>)</li>
+                                                <li title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.NumberOfActiveChecklistTemplatesTitle, "Number of active checklist templates directly under this area") ?? "Number of active checklist templates directly under this area")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.ChecklistTemplatesText, "Checklist templates") ?? "Checklist templates") - (<span id="modal_details_active_checklisttemplates_nr"></span>)</li>
+                                                <li title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.NumberOfActiveAuditTemplatesTitle, "Number of active audit templates directly under this area") ?? "Number of active audit templates directly under this area")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.AuditTemplatesText, "Audit templates") ?? "Audit templates") - (<span id="modal_details_active_audittemplates_nr"></span>)</li>
+                                                <li title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.NumberOfShiftsConnectedTitle, "Number of shifts connected to this area (specific shift area)") ?? "Number of shifts connected to this area (specific shift area)")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.ShiftText, "Shifts") ?? "Shifts") - (<span id="modal_details_active_shifts_nr"></span>)</li>
+                                                <li title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.NumberOfActionsConnectedTitle, "Number of actions connected to this area") ?? "Number of actions connected to this area")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.ActionsText, "Actions") ?? "Actions") - (<span id="modal_details_active_actions_nr"></span>)</li>
+                                                <li title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.NumberOfActiveAreasTitle, "Number of active areas under this area") ?? "Number of active areas under this area")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.AreasText, "Areas") ?? "Areas") - (<span id="modal_details_active_children_nr"></span>)</li>
+                                                <li title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.NumberOfActiveWorkInstructions, "Number of active work instructions under this area") ?? "Number of active work instructions under this area")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.WorkInstructionsText, "Work instructions") ?? "Work instructions") - (<span id="modal_details_active_workinstruction_nr"></span>)</li>
+                                                <li title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.NumberOfActiveAssessmentTemplates, "Number of active assessment templates under this area") ?? "Number of active assessment templates under this area")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.AssessmentTemplatesText, "Assessment templates") ?? "Assessment templates") - (<span id="modal_details_active_assessmenttemplate_nr"></span>)</li>
+                                                <li title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.NumberOfActiveSkillsMatrices, "Number of active skills matrices under this area") ?? "Number of active skills matrices under this area")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.SkillsMatricesText, "Skills matrices") ?? "Skills matrices") - (<span id="modal_details_active_matrices_nr"></span>)</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="modalRemoveArea" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal_remove_title">@(CmsLanguage?.GetValue(LanguageKeys.Config.AreaModalTitleText, "Area") ?? "Area")</</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="modal-body">
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" id="modal_remove_area_cancel_button" class="btn btn-outline btn-sm" data-dismiss="modal">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonCancel, "Cancel") ?? "Cancel")</button>
+                            <button id="modal_remove_area_button" type="button" class="btn btn-danger btn-sm @(Model.DisableMutateArea ? "disabled" : "")" data-actiontype="delete">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonRemove, "Remove") ?? "Remove")</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column (Main Content Area) -->
+            <div class="col-10 right-column full-height">
+
+                <div id="main-content-area" class="main-content-area">
+                    @await Html.PartialAsync("_workingareas_chart")
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="/js/ezgoUtils.js"></script>
+    <script src="/js/sapfunctionallocationpicker.js"></script>
+    
+    @if (Model.DisableMutateArea)
+    {
+        <script>
+            setTimeout(function () {
+                toastr.warning('@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.SavingAreasDisabled, "Saving areas is currently disabled.") ?? "Saving areas is currently disabled.")');
+            }, 1000);
+        </script>
+    }
+    @if (Model.ApplicationSettings?.Features?.ExportAdvancedEnabled == true || Model.ApplicationSettings?.Features?.ExportEnabled == true)
+    {
+        <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+        <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+    }
+    <script>
+        var chart = null; // Global variable to hold the OrgChart instance
+
+        functionalLocationPicker.init();
+        $('#modalSelectFunctionalLocation').on('hidden.bs.modal', function() {
+            if (functionalLocationPicker.savedFunctionalLocationInfo){
+                $('#selectedFunctionalLocationHeader').show();
+                $('#selectedFunctionalLocationContent').html(`${functionalLocationPicker.savedFunctionalLocationInfo.functionalLocation} (${functionalLocationPicker.savedFunctionalLocationInfo.functionalLocationName})`);
+            } else {
+                functionalLocationPicker.resetSelectedFunctionalLocation();
+                $('#selectedFunctionalLocationHeader').hide();
+                $('#selectedFunctionalLocationContent').html('');
+            }
+        });
+
+        // Icons used in the OrgChart menu
+        var clockIcon = '<svg width="1.2em" height="1.2em" viewBox="0 0 16 16" class="bi bi-clock" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm8-7A8 8 0 1 1 0 8a8 8 0 0 1 16 0z" /><path fill-rule="evenodd" d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z" /></svg>';
+        var calendarIcon = '<svg width="1.2em" height="1.2em" viewBox="0 0 16 16" class="bi bi-calendar4-week" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v1h14V3a1 1 0 0 0-1-1H2zm13 3H1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5z"/><path d="M11 7.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-2 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/></svg>';
+        var rolesIcon = '<svg width="1.2em" height="1.2em" viewBox="0 0 16 16" class="bi bi-person-badge" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M2 2.5A2.5 2.5 0 0 1 4.5 0h7A2.5 2.5 0 0 1 14 2.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2.5zM4.5 1A1.5 1.5 0 0 0 3 2.5v10.795a4.2 4.2 0 0 1 .776-.492C4.608 12.387 5.937 12 8 12s3.392.387 4.224.803a4.2 4.2 0 0 1 .776.492V2.5A1.5 1.5 0 0 0 11.5 1h-7z"/><path fill-rule="evenodd" d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5z"/></svg>';
+        var trashIcon = '<svg width="1.2em" height="1.2em" viewBox="0 0 16 16" class="bi bi-trash" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>';
+        var chartIcon = '<svg width="1.2em" height="1.2em" viewBox="0 0 16 16" class="bi bi-diagram-3" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5v-1zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1z"/></svg>';
+        var pencilIcon = '<svg width="1.2em" height="1.2em" viewBox="0 0 16 16" class="bi bi-pencil" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5L13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175l-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/></svg>';
+        var detailIcon = '<svg width="1.2em" height="1.2em" viewBox="0 0 16 16" class="bi bi-file-richtext" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 0h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H4z"/><path fill-rule="evenodd" d="M4.5 11.5A.5.5 0 0 1 5 11h3a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zm0-2A.5.5 0 0 1 5 9h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zm1.639-3.708l1.33.886 1.854-1.855a.25.25 0 0 1 .289-.047l1.888.974V7.5a.5.5 0 0 1-.5.5H5a.5.5 0 0 1-.5-.5V7s1.54-1.274 1.639-1.208zM6.25 5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5z"/></svg>';
+
+        // OrgChart template customization
+        OrgChart.templates.ula.node = '<rect x="0" y="0" height="{h}" width="{w}" fill="#ffffff" stroke-width="1" stroke="#aeaeae"></rect><line x1="0" y1="0" x2="250" y2="0" stroke-width="3" stroke="#93C54B"></line>';
+        OrgChart.templates.ula.field_0 = '<text width="145" style="font-size: 18px;" fill="#93C54B" x="100" y="55">{val}</text>';
+
+        // Adjust for Right-to-Left languages if necessary
+        if (isRtl) {
+            OrgChart.templates.ula.field_0 = '<text width="130" style="font-size: 18px;" fill="#93C54B" x="225" y="55">{val}</text>';
+            OrgChart.templates.ula.field_1 = '<text width="130" text-overflow="multiline" style="font-size: 14px;" fill="#afafaf" x="225" y="76">{val}</text>';
+        }
+
+        // areaChart object definition
+        var areaChart = {
+            _mediaarray: [],
+            _mediapath: '@(string.IsNullOrEmpty(Model.ApplicationSettings?.MediaLocations?.ImageMediaBaseUri) ? Constants.General.MediaUrl : Model.ApplicationSettings?.MediaLocations?.ImageMediaBaseUri)',
+            defaultImage: '/assets/img/normal_unavailable_image.png',
+            tempImage: null,
+            tempImageType: null,
+            createNode: function (id, pid, name, location, funcLocationId, funcLocation, funcLocationName, img) {
+                var newNode = {
+                    id: id,
+                    pid: pid,
+                    area: name,
+                    location: location,
+                    funcLocationId: funcLocationId,
+                    funcLocation: funcLocation,
+                    funcLocationName: funcLocationName,
+                    img: img === undefined || img == null ? areaChart.defaultImage : img
+                };
+                return newNode;
+            },
+            fixImage: function (imageUrl) {
+                let imageout = '';
+                if (imageUrl.includes('unavailable')) {
+                    return imageout;
+                } else {
+                    imageout = imageUrl.replace(areaChart._mediapath, '');
+                    return imageout;
+                }
+            },
+            handleRemove: function (nodeId) {
+                var currentNode = chart.get(nodeId);
+                $.fn.dialogue({
+                    content: $("<p />").html('@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.AreYouSureDelete, "Are you sure you want to delete") ?? "Are you sure you want to delete") [' + currentNode.area + ']. @(Model?.CmsLanguage.GetValue(LanguageKeys.Config.ActionCanNotBeUndone, "This action can not be undone.") ?? "This action can not be undone.")'),
+                    closeIcon: true,
+                    buttons: [
+                        {
+                            text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.OptionYes, "Yes") ?? "Yes")", id: 'delete_yes', class: 'btn-danger', click: function ($modal) {
+                                if (isNaN(currentNode.id)) {
+                                    $('body').toggleClass('loaded');
+                                    chart.removeNode(currentNode.id);
+                                    $modal.dismiss();
+                                    //not an number, only display not yet saved s oremove only
+                                    $('body').toggleClass('loaded');
+                                } else {
+                                    var area = {
+                                        Id: currentNode.id
+                                    };
+                                    $('body').toggleClass('loaded');
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '/config/removearea',
+                                        data: JSON.stringify(area),
+                                        success: function (data) {
+                                            chart.removeNode(area.Id);
+                                            $modal.dismiss();
+                                            $('body').toggleClass('loaded');
+                                            toastr.success('Area deleted..reloading');
+
+                                        },
+                                        error: function (jqXHR, textStatus, errorThrown) {
+                                            $('body').toggleClass('loaded');
+                                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                                            $modal.dismiss();
+                                        },
+                                        contentType: "application/json; charset=utf-8"
+                                    });
+                                }
+                            }
+                        },
+                        { text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.OptionNo, "No") ?? "No")", id: 'delete_no', click: function ($modal) { $modal.dismiss(); } }
+                    ]
+                });
+            },
+            openRoleNamesModal: function (nodeId) {
+                $('#modalSetRoleNames').modal('show');
+            },
+            openDetailsModal: function (nodeId) {
+                // Reset modal
+                areaChart.resetDetailsModal();
+
+                let currentNode = chart.get(nodeId);
+                $('#modal_details_name').text(currentNode.area);
+                $('#modal_details_location').text(currentNode.location);
+
+                if (currentNode.img != null && currentNode.img !== '') {
+                    //retrieve already loaded blob
+                    var possibleBlobUri = (document.querySelector('[data-src="' + currentNode.img + '"]') != null ? document.querySelector('[data-src="' + currentNode.img + '"]').getAttribute('xlink:href') : '');
+                    if(possibleBlobUri != null && possibleBlobUri != '') {
+                        //push blob as relevant image
+                        $('#modal_details_image').attr('src', possibleBlobUri);
+                        $('#modal_details_image_popout').attr('href', possibleBlobUri);
+                    } else {
+                        $('#modal_details_image').attr('src','/assets/img/normal_unavailable_image.png');
+                        $('#modal_details_image_popout').attr('href','/assets/img/normal_unavailable_image.png');
+                    };
+                    
+                }
+                // Load directly connected statistic information
+                $.ajax({
+                    type: "GET",
+                    url: '/config/arearelationnumbers/' + nodeId,
+                    success: function (data) {
+                        let item = JSON.parse(data);
+                        if (item != null) {
+                            $('#modal_details_active_tasktemplates_nr').text(item.NrActiveTaskTemplates !== null ? item.NrActiveTaskTemplates : 'unknown');
+                            $('#modal_details_active_checklisttemplates_nr').text(item.NrActiveChecklistTemplates !== null ? item.NrActiveChecklistTemplates : 'unknown');
+                            $('#modal_details_active_audittemplates_nr').text(item.NrActiveAuditTemplates !== null ? item.NrActiveAuditTemplates : 'unknown');
+                            $('#modal_details_active_shifts_nr').text(item.NrActiveShifts !== null ? item.NrActiveShifts : 'unknown');
+                            $('#modal_details_active_actions_nr').text(item.NrActiveActions !== null ? item.NrActiveActions : 'unknown');
+                            $('#modal_details_active_children_nr').text(item.NrActiveChildren !== null ? item.NrActiveChildren : 'unknown');
+                            $('#modal_details_active_workinstruction_nr').text(item.NrActivWorkinstructions !== null ? item.NrActivWorkinstructions : 'unknown');
+                            $('#modal_details_active_assessmenttemplate_nr').text(item.NrActiveAssessmentTemplates !== null ? item.NrActiveAssessmentTemplates : 'unknown');
+                            $('#modal_details_active_matrices_nr').text(item.NrActiveMatrices !== null ? item.NrActiveMatrices : 'unknown');
+                        } else {
+                            $('#modal_details_active_tasktemplates_nr, #modal_details_active_checklisttemplates_nr, #modal_details_active_audittemplates_nr, #modal_details_active_shifts_nr, #modal_details_active_actions_nr, #modal_details_active_children_nr, #modal_details_active_workinstruction_nr, #modal_details_active_assessmenttemplate_nr, #modal_details_active_matrices_nr').text('-');
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+
+                $('#modalDetailsArea').modal('show');
+            },
+            previewFile: async function (input) {
+                var maxSizeMB = 0.3;
+
+                const options = {
+                    maxWidthOrHeight: 480,
+                    useWebWorker: true,
+                    maxIteration: 1
+                };
+
+                var previewElement = $(input).data('preview');
+                var compressedFile = event.target.files[0];
+
+                if (compressedFile != undefined && compressedFile !== null) {
+                    // First resize image
+                    compressedFile = await imageCompression(compressedFile, options);
+
+                    // Then compress image if necessary
+                    while (compressedFile.size / 1024 / 1024 > maxSizeMB) {
+                        options.maxSizeMB = maxSizeMB;
+                        compressedFile = await imageCompression(compressedFile, options);
+                    }
+
+                    var ext = compressedFile.name.split('.').pop();
+                    var fileReader = new FileReader();
+                    fileReader.onload = function () {
+                        var url = URL.createObjectURL(compressedFile, { oneTimeOnly: true });
+                        areaChart.tempImage = url;
+                        areaChart.tempImageType = ext;
+                        $(previewElement).attr("src", url).parent('a').attr('href', url);
+                    };
+                    fileReader.readAsDataURL(compressedFile);
+                }
+            },
+            removeFile: function (rmbutton) {
+                var previewElement = $(rmbutton).attr('data-preview');
+                areaChart.tempImage = null;
+                areaChart.tempImageType = null;
+                $(previewElement).attr('src', areaChart.defaultImage);
+                $('#uploaderTemplate').prop('value', '');
+            },
+            resetDetailsModal: function () {
+                $('#modal_details_name').text('');
+                $('#modal_details_location').text('');
+                $('#modal_details_image').attr('src', '/assets/img/normal_unavailable_image.png');
+                $('#modal_details_image_popout').attr('href', '/assets/img/normal_unavailable_image.png');
+                $('#modal_details_active_tasktemplates_nr').text('-');
+                $('#modal_details_active_checklisttemplates_nr').text('-');
+                $('#modal_details_active_audittemplates_nr').text('-');
+                $('#modal_details_active_shifts_nr').text('-');
+                $('#modal_details_active_actions_nr').text('-');
+                $('#modal_details_active_children_nr').text('-');
+                $('#modal_details_active_workinstruction_nr').text('-');
+                $('#modal_details_active_assessmenttemplate_nr').text('-');
+                $('#modal_details_active_matrices_nr').text('-');
+            },
+            resetEditModal: function () {
+                // Remove any previously added file
+                this.removeFile();
+                $('#area_image').attr('src', '/assets/img/normal_unavailable_image.png');
+                $('#area_name').val('');
+                $('#area_description').val('');
+            },
+            saveMedia: async function () {
+                let output = null;
+                if (areaChart.tempImage != null) {
+                    if (String(areaChart.tempImage).startsWith('blob:') || String(areaChart.tempImage).startsWith('data:')) {
+                        var url = areaChart.tempImage;
+                        var ext = '.' + areaChart.tempImageType;
+                        areaChart._mediaarray.push({ type: 'area', url: url, ext: ext, delay: 1000, kind: 'pic' });
+                    }
+
+                    if (areaChart._mediaarray != null && areaChart._mediaarray.length > 0) {
+                        // Uploading media
+                        const tasks = areaChart._mediaarray.map(areaChart.uploadMedia);
+                        const results = await Promise.all(tasks);
+                        results.forEach(x => output = x);
+                        areaChart._mediaarray = [];
+                    }
+                }
+                return output;
+            },
+            save: async function (area, node) {
+                toastr.remove();
+                $('body').toggleClass('loaded');
+
+                var mediaOut = await areaChart.saveMedia();
+                var newImage = $('#area_image').attr('src');
+
+                if (area.Picture != undefined && area.Picture.startsWith("blob:")) {
+                    area.Picture = $('#area_image').data('src');
+                }
+                area.Picture = mediaOut == null ? areaChart.fixImage(area.Picture) : areaChart.fixImage(newImage);
+
+                area.SapPmFunctionalLocationId = functionalLocationPicker?.savedFunctionalLocationInfo?.functionalLocationId;
+
+                $.ajax({
+                    type: "POST",
+                    url: '/config/addchangearea',
+                    data: JSON.stringify(area),
+                    success: function (data) {
+                        var apiNode = JSON.parse(data);
+                        var chartNode = areaChart.createNode(
+                            apiNode.Id,
+                            apiNode.ParentId,
+                            apiNode.Name,
+                            apiNode.FullDisplayName,
+                            apiNode.SapPmLocation?.Id,
+                            apiNode.SapPmLocation?.FunctionalLocation,
+                            apiNode.SapPmLocation?.FunctionalLocationName,
+                            apiNode.Picture != null && apiNode.Picture !== undefined ? areaChart._mediapath + apiNode.Picture : areaChart.defaultImage
+                        );
+                        if (chartNode.pid == 0 || chartNode.pid == undefined) {
+                            chartNode.pid = 1;
+                        }
+
+                        let currentNode = node;
+                        if (isNaN(currentNode.id)) {
+                            chart.removeNode(currentNode.id);
+                            chart.addNode(chartNode);
+                            chart.draw();
+                        } else {
+                            chart.updateNode(chartNode);
+                            chart.draw();
+                        }
+                        toastr.success('Area saved.');
+                        $('body').toggleClass('loaded');
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        $('body').toggleClass('loaded');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            saveRoles: function () {
+                if (areaChart.validateRoles()) {
+                    toastr.remove();
+                    $('body').toggleClass('loaded');
+
+                    let basicDisplay = $('#txt_basic_display').val();
+                    let shiftleaderDisplay = $('#txt_shiftleader_display').val();
+                    let managerDisplay = $('#txt_manager_display').val();
+
+                    let display = [];
+                    display.push(basicDisplay);
+                    display.push(shiftleaderDisplay);
+                    display.push(managerDisplay);
+
+                    $.ajax({
+                        type: "POST",
+                        url: '/config/change/roles',
+                        data: JSON.stringify(display),
+                        success: function (data) {
+                            toastr.success('@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.RolesSaved, "Roles saved.") ?? "Roles saved.")');
+                            $('body').toggleClass('loaded');
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                            $('body').toggleClass('loaded');
+                        },
+                        contentType: "application/json; charset=utf-8"
+                    });
+
+                    $('#modalSetRoleNames').modal('hide');
+                }
+            },
+            uploadMedia: async function (spec) {
+                let blob = await fetch(spec.url).then(r => r.blob());
+                var file = new File([blob], $.utils.createUUID() + spec.ext);
+                var formData = new FormData();
+                formData.append("file", file);
+                formData.append("filekind", spec.kind);
+                formData.append("itemtype", spec.type);
+
+                return fetch('/config/areas/upload', {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then(response => (response.text()))
+                    .then(path => {
+                        var returnedPath = String(path).replaceAll('"', '');
+                        $('#area_image').attr('src', areaChart._mediapath + returnedPath);
+                    })
+                    .then(text => `Fetched ${spec.url}, and got back ${text}`);
+            },
+            validateArea: function (areaName) {
+                if (areaName != null && areaName !== '') {
+                    return true;
+                } else {
+                    return false;
+                }
+            },
+            validateRoles: function () {
+                let val = true;
+
+                if ($('#txt_basic_display').val() === '' || $('#txt_basic_display').val() === null) {
+                    toastr.error('@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.BasicMustFilled, "Basic user display must be filled.") ?? "Basic user display must be filled.")');
+                    val = false;
+                }
+
+                if ($('#txt_shiftleader_display').val() === '' || $('#txt_shiftleader_display').val() === null) {
+                    toastr.error('@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.ShiftLeaderMustFilled, "Shift leader display must be filled.") ?? "Shift leader display must be filled.")');
+                    val = false;
+                }
+
+                if ($('#txt_manager_display').val() === '' || $('#txt_manager_display').val() === null) {
+                    toastr.error('@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.ManagerMustFilled, "Manager display must be filled.") ?? "Manager display must be filled.")');
+                    val = false;
+                }
+                return val;
+            }
+        };
+
+        // editForm prototype definition
+        var editForm = function () {
+            this.nodeId = null;
+        };
+
+        editForm.prototype.init = function (obj) {
+            // Reset modal
+            areaChart.resetEditModal();
+
+            var that = this;
+            this.obj = obj;
+            this.editForm = document.getElementById("modalAddChangeArea");
+            this.nameInput = document.getElementById("area_name");
+            this.imageSource = document.getElementById('area_image');
+            this.descriptionInput = document.getElementById("area_description");
+            this.cancelButton = document.getElementById("modal_addchange_area_cancel_button");
+            this.saveButton = document.getElementById("modal_addchange_area_save_button");
+
+            this.cancelButton.addEventListener("click", function () {
+                that.hide();
+            });
+
+            this.saveButton.addEventListener("click", function () {
+                var node = chart.get(that.nodeId);
+                node.name = that.nameInput.value;
+                node.img = that.imageSource.src;
+                node.description = that.descriptionInput.value;
+
+                if (!areaChart.validateArea(node.name)) return;
+
+                var area = {
+                    Id: isNaN(node.id) ? 0 : node.id,
+                    Name: node.name,
+                    Picture: areaChart.fixImage(that.imageSource.src),
+                    Description: node.description,
+                    ParentId: node.pid
+                };
+                
+                areaChart.save(area, node);
+
+                that.hide();
+            });
+
+            $('#modalAddChangeArea').on('hidden.bs.modal', function () {
+                if (isNaN(that.nodeId)) {
+                    var node = chart.get(that.nodeId);
+                    if (node != null && node !== undefined) {
+                        chart.remove(that.nodeId);
+                        chart.draw();
+                    }
+                }
+            });
+        };
+
+        editForm.prototype.show = function (nodeId) {
+            areaChart.resetEditModal();
+
+            this.hide();
+            this.nodeId = nodeId;
+
+            if (isNaN(nodeId)) {
+                document.getElementById('modal_addchange_title').innerText = '@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.AddNewArea, "Add new area") ?? "Add new area")';
+            } else {
+                document.getElementById('modal_addchange_title').innerText = '@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.EditArea, "Edit area") ?? "Edit area")';
+            }
+            var node = chart.get(nodeId);
+            this.nameInput.value = node.area == null || node.area === 'undefined' ? '' : node.area;
+            if (node.img != null && node.img !== 'undefined' && node.img !== '') {
+                this.imageSource.src = node.img;
+                $('#area_image').data('src', node.img);
+                $('#area_image').attr('src', node.img);
+            }
+
+            if(node.hasOwnProperty("funcLocationId") && node.funcLocationId != null && node.funcLocation != null && node.funcLocationName != null) {
+                functionalLocationPicker.selectedFunctionalLocationId = node.funcLocationId;
+                functionalLocationPicker.savedFunctionalLocationInfo = {
+                    functionalLocationName: node.funcLocationName,
+                    functionalLocation: node.funcLocation,
+                    functionalLocationId: node.funcLocationId
+                }
+                //show header etc
+                $('#selectedFunctionalLocationHeader').show();
+                $('#selectedFunctionalLocationContent').html(`${node.funcLocation} (${node.funcLocationName})`);
+            }
+            else {
+                // $('#area_functional_location').val('');
+                functionalLocationPicker.resetSelectedFunctionalLocation();
+                functionalLocationPicker.savedFunctionalLocationInfo = null;
+                $('#selectedFunctionalLocationHeader').hide();
+                $('#selectedFunctionalLocationContent').html('');
+            }
+
+            $('#modalAddChangeArea').modal('show');
+            ezgomediafetcher.preloadImagesAndVideos();
+        };
+
+        editForm.prototype.hide = function (showldUpdateTheNode) {
+            $('#modalAddChangeArea').modal('hide');
+        };
+
+        // Initialize the chart
+        var chartOrientation = OrgChart.orientation.left;
+        if (isRtl) {
+            chartOrientation = OrgChart.orientation.right;
+        }
+
+        function initializeOrgChart() {
+            var orgchartElement = document.getElementById("orgchart");
+            if (orgchartElement) {
+                if (!chart) {
+                    // Initialize the chart only if it hasn't been initialized
+                    var chartOrientation = OrgChart.orientation.left;
+                    if (isRtl) {
+                        chartOrientation = OrgChart.orientation.right;
+                    }
+
+                    chart = new OrgChart(orgchartElement, {
+                        template: "ula",
+                        scaleInitial: 0.8,
+                        enableDragDrop: false,
+                        mouseScrool: OrgChart.action.scroll,
+                        showYScroll: OrgChart.scroll.visible,
+                        showXScroll: OrgChart.scroll.visible,
+                        toolbar: {
+                            layout: false,
+                            zoom: true,
+                            fit: false,
+                            collapseAll: true,
+                            expandAll: false,
+                            fullScreen: true
+                        },
+                        nodeMouseClick: OrgChart.action.expandCollapse,
+                        collapse: {
+                            level: 2,
+                            allChildren: true
+                        },
+                        tags: {
+                            rootMenu: {
+                                nodeMenu: {
+                                    add: { text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.AddNewArea, "Add new area") ?? "Add new area")", icon: chartIcon },
+                                    callRoles: {
+                                        icon: rolesIcon,
+                                        text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.ButtonSetRoleNames, "Set role names") ?? "Set role names")",
+                                        onClick: areaChart.openRoleNamesModal
+                                    }
+                                }
+                            }
+                        },
+                        nodeMenu: {
+                            details: { text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.AreaDetailsText, "Area details") ?? "Area details")", icon: detailIcon, onClick: areaChart.openDetailsModal },
+                            edit: { text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.EditArea, "Edit area") ?? "Edit area")", icon: pencilIcon },
+                            add: { text: "@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.AddNewSubarea, "Add new subarea") ?? "Add new subarea")", icon: chartIcon },
+                            remove: { text: "Remove", icon: trashIcon, onClick: areaChart.handleRemove }
+                        },
+                        editUI: new editForm(),
+                        orientation: chartOrientation,
+                        enableSearch: false,
+                        nodeBinding: {
+                            field_0: "area",
+                            field_1: "location_shortened",
+                            img_0: "img"
+                        }
+                    });
+
+                    // Load the chart data
+                    $.get('@Url.Action("Read", "Config")').done(function (response) {
+                        chart.load(response.nodes);
+                    });
+                    // Event when a node is added
+                    chart.on('added', function (sender, id) {
+                        if (isNaN(id)) {
+                            var node = chart.get(id);
+                            if (node != null && node !== undefined) {
+                                if (isNaN(node.pid)) {
+                                    chart.remove(id);
+                                    chart.draw();
+                                    alert('@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.PleaseCompleteAdding, "Please complete the current area before adding a new sub area") ?? "Please complete the current area before adding a new sub area")');
+                                    return false;
+                                } else {
+                                    chart.editUI.show(id);
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    // Re-attach the chart to the new container
+                    chart.container = orgchartElement;
+                    chart.draw();
+                }
+            } else {
+                // Dispose of the chart instance if not on the Company Areas page
+                if (chart) {
+                    chart.destroy();
+                    chart = null;
+                }
+            }
+        }
+        function isCompanyAreasPage() {
+            return $('#orgchart').length > 0;
+        }
+
+        $(document).ready(function () {
+
+            // Function to load content based on the provided URL and handle active button states
+            function loadContent(button) {
+                // Remove 'active' class from all buttons
+                $('.config-nav-button').removeClass('active');
+
+                // Add 'active' class to the clicked button
+                button.addClass('active');
+
+                // Load new content for the selected button
+                var url = button.data('url');
+
+                $('#main-content-area').html('<div class="text-center mt-5"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    dataType: 'html',
+                    success: function (data) {
+                        $('#main-content-area').html(data);
+
+                        // Re-initialize the chart if on Company Areas page
+                        if (chart) {
+                            chart.destroy();
+                            chart = null;
+                        }
+                        if (isCompanyAreasPage()) {
+                            $('#exportButtonContainer').show();
+                            initializeOrgChart();
+                        } else {
+                            $('#exportButtonContainer').hide();
+                        }
+                    },
+                    error: function () {
+                        $('#main-content-area').html('<div class="text-danger">An error occurred while loading the content.</div>');
+                    }
+                });
+            }
+
+            // Set the first button as active and load its content on page load
+            var firstButton = $('.config-nav-button').first();
+            if (firstButton.length > 0) {
+                loadContent(firstButton);
+            }
+
+            // Navigation button click handlers
+            $('.config-nav-button').on('click', function (e) {
+                e.preventDefault();
+                loadContent($(this));
+            });
+        });
+
+        ezgomediafetcher.preloadImagesAndVideos();
+        setInterval(function () { ezgomediafetcher.preloadAreaChartSvgImages(); }, 2000);
+
+    </script>
+}

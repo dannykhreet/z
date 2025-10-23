@@ -1,0 +1,95 @@
+﻿@model LanguageViewModel
+@{
+    Layout = "_Layout_template";
+}
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                &nbsp;
+                <h1 class="m-0 text-dark">Language Overview</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="languages" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Language.ExportTitle, "Export") ?? "Export")"><i class="fas fa-download"></i></button>
+                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="languagesimport" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Language.ExportUpdateTitle, "Export update queries") ?? "Export update queries")"><i class="fas fa-cloud-download-alt"></i></button>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+<section class="content">
+
+    <div class="row pt-1" style="height:calc(100vh - 175px);">
+
+        <div class="col-lg-12 col-xl-12">
+            <div id="contentBody" style="height: calc(100vh - 245px);overflow:auto;">
+                @foreach(var language in Model.Languages.OrderBy(x => x.LanguageEnglishName))
+                {
+                    var flagImage = string.Format("/assets/img/flags/{0}.png", language.LanguageCulture.ToString().ToLower());
+
+                    <div class="card w-100 results" data-id="@language.LanguageCulture" data-containertype="company_container" style="height:170px;cursor:pointer;" onclick="document.location.href='/languages/@language.LanguageCulture'">
+                        <div class="card-body p-0">
+                            <div class="col-12 p-1">
+                                <div class="p-1">
+                                    <div class="row" data-id="@language.LanguageCulture">
+                                        <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                                            <div style="text-align:center;">
+
+                                                <img src="@flagImage" class="img-fluid" style="max-width:150px;max-height:100px;margin: 5px;"  />
+                                            </div>
+                                            <div style="text-align:center;"><small><strong>@language.LanguageCulture</strong></small></div>
+                                        </div>
+                                        <div class="col-sm-9 col-md-9 col-lg-9 col-xl-9">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <h5 class="mt-3 mt-sm-0">@language.LanguageEnglishName (@language.Language.Trim())</h5>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-4 d-flex justify-content-between flex-column">
+                                                    <div class="row">
+                                                        <div class="col-md-12 col-lg-12 text-muted">
+                                                            <small>@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.DescriptionText, "Description: ") ?? "Description: ")<br /><strong>@language.Language</strong></small><br />
+                                                            <small>ISO Code: <br /><strong>@language.LanguageIso</strong></small><br />
+                                                            <small>Culture Code: <br /><strong>@language.LanguageCulture</strong></small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-8 d-flex justify-content-between flex-column">
+                                                    <div class="col-md-12 col-lg-12 text-muted">
+                                                        <small>
+                                                            Total number of filled resource items:
+                                                        </small><br />
+                                                        <strong>@Model.Stats?.Where(x => x.Title == language.LanguageCulture.ToLower().Replace("-", "_"))?.FirstOrDefault()?.Statistic</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1 col-md-1 col-lg-1 col-xl-1" style="text-align: right;">
+                                            <a id="edit_setting_btn_@language.LanguageCulture" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" data-id="@language.LanguageCulture" data-actiontype="edit" onclick="document.location.href='/languages/@language.LanguageCulture'"><i class="fas fa-edit"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+           </<div>
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+
+    <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+
+}
+

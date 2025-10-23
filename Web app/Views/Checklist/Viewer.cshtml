@@ -1,0 +1,258 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "~/Views/Shared/_layout_viewer.cshtml";
+}
+<style>
+    body {
+        height: 100%;
+        margin: 0;
+    }
+
+    .bgr {
+        background: url("factory1.jpg") center / contain no-repeat;
+        width: 100%;
+        height: 100vh;
+    }
+
+    .btn:not(:disabled):not(.disabled) {
+        background-color: #00529c;
+        width: 230px;
+        height: 70px;
+    }
+    video {
+        object-fit: cover;
+    }
+    h2{
+        color: #fff;
+    }
+    h4{
+        color: #fff;
+    }
+    .signature-pad {
+        @*position: absolute;
+        left: 0;
+        top: 0;*@
+        width: 450px;
+        height: 300px;
+        background-color: #fff;
+        border-radius: 3px;
+        border: solid 2px #00529c;
+        opacity: 0.6;
+        display: inline;
+    }
+    #controls{
+        @*height: 85%*@
+    }
+    .wrapper1 {
+        position: absolute;
+        bottom: 8%;
+        z-index: 5;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        width: 100%;
+        text-align: center;
+        display: none;
+        margin-right: 20px;
+    }
+    .round-button {
+        width: 80px;
+        height: 80px;
+        float: left;
+        line-height: 88px;
+        text-align: center;
+        vertical-align: bottom;
+        margin-right: 20px;
+    }
+    .round-button:hover{
+        background-color: gray;
+    }
+    .thumbup {
+        border: solid 2px green;
+        color: green;
+    }
+        .thumbup:hover {
+            border: solid 2px green;
+            background-color: rgba(8,159,13,0.4);
+        }
+    .thumbdown {
+        border: solid 2px red;
+        color: red;
+    }
+    .thumbdown:hover {
+        border: solid 2px red;
+        background-color: rgba(201,19,12,0.4);
+    }
+    .action{
+        border: solid 2px orange;
+        color: orange;
+    }
+        .action:hover {
+            border: solid 2px orange;
+            background-color: rgba(248,178,57,0.4);
+        }
+</style>
+<body>
+    <div id="placeholder" class="text-center pt-5 d-none">
+        <span class="text-muted"><h3>@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.ScanNewQrCodeTitle, "Scan new QR Code") ?? "Scan new QR Code")</h3></span>
+        <img src="/assets/img/qr.png" />
+    </div>
+    <div id="bgr" class="d-flex align-items-end bgr">
+        <video id="video" autoplay style="width:100%;height:100vh;z-index:0;position:absolute;"></video>
+        <iframe id="pdf" style="width:100%;height:100vh;z-index:0;position:absolute;"></iframe>
+        <div id="controls" class="d-flex justify-content-end" style="width: 100%;padding: 25px;border-bottom: 10px solid rgb(225,29,40);padding-right: 45px;background: rgba(42,41,41,0.69);z-index:3;">
+            <div class="mr-auto w-75" id="title"></div>
+            <button id="btnReportAction" class="btn btn-primary btn-lg" type="button" data-toggle="modal" data-target="#actionModal" onclick="clearInterval(viewer._timer);">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnReportAction , "Report action") ?? "Report action")</button>
+            <button id="btnNextItem" class="btn btn-primary btn-lg" type="button" style="margin-left: 29px;width: 230px;" onclick="viewer.nextItem()">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnNextItem, "Next item") ?? "Next item") </button>
+            <button id="btnDone" class="btn btn-primary btn-lg d-none" type="button" style="margin-left: 29px;width: 230px;" onclick="$('#bgr').attr('style', 'display: none !important'); $('#placeholder').removeClass('d-none');">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnDone, "Continue") ?? "Continue") </button>
+        </div>
+        <div class="wrapper1">
+            <canvas id="signature-pad1" class="signature-pad" width=450 height=300></canvas>
+            <canvas id="signature-pad2" class="signature-pad" width=450 height=300></canvas>
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="actionModal" data-backdrop="static" tabindex="-1" aria-labelledby="actionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.ReportActionTitle, "Report action") ?? "Report action") </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <textarea id="action" style="width:100%" class="form-control" rows="8"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="$('#action').val('');viewer.setSlideshowInterval();">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnReportNow, "Report now") ?? "Report now") </button>
+                    @*<button type="button" class="btn btn-primary">Save changes</button>*@
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+@section Scripts{
+
+    <script>
+
+    var viewer = {
+
+        _template: undefined,
+        _currentItemId: 0,
+        _currentStepId: -1,
+        _mediaUrl: '@(string.IsNullOrEmpty(Model.ApplicationSettings?.MediaLocations?.ImageMediaBaseUri) ? Constants.General.MediaUrl : Model.ApplicationSettings?.MediaLocations?.ImageMediaBaseUri)',
+        _timer: undefined,
+
+        init: function (checklistId) {
+            $.get('/checklist/gettemplate/' + checklistId, function (template) {
+                viewer._template = JSON.parse(template);
+                viewer.render(viewer._currentItemId, viewer._currentStepId);
+                $('#signature-pad1').hide()
+                $('#signature-pad2').hide()
+                viewer.setSlideshowInterval();
+            });
+        },
+
+        setSlideshowInterval: function () {
+            viewer._timer = setInterval(function () {
+                $('#btnNextItem').trigger('click');
+            }, 3000);
+        },
+
+        render: function (tidx, sidx) {
+            $('#video').attr('src', '');
+            $('#pdf').attr('src', '').hide();
+            var tmpl = viewer._template.TaskTemplates[tidx];
+            if (!tmpl) {
+
+                @*$("#controls").animate({
+                    height: "52%",
+                }, 750);*@
+                setTimeout(function () {
+                    @*$('.wrapper1').show(300);
+                    $('#signature-pad1').show();*@
+                    clearInterval(viewer._timer);
+                    $('#btnDone').removeClass('d-none');
+                    $('#btnNextItem').hide();
+                    $('#btnReportAction').hide();
+                    $('#title').html('<h2>@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.InstrucitonsFinished, "Instructions finished") ?? "Instructions finished")</h2>');
+
+
+                    @*var signaturePad = new SignaturePad(document.getElementById('signature-pad1'), {
+                        backgroundColor: 'rgba(255, 255, 255, 0)',
+                        penColor: '#00529c'
+                    });
+
+                    if (viewer._template.IsDoubleSignatureRequired) {
+                        $('#signature-pad2').show();
+                        var signaturePad = new SignaturePad(document.getElementById('signature-pad2'), {
+                            backgroundColor: 'rgba(255, 255, 255, 0)',
+                            penColor: '#00529c'
+                        });
+                    }*@
+                }, 500)
+
+                return;
+            }
+            var step = tmpl.Steps[sidx];
+            var img = tmpl.Picture ? viewer._mediaUrl + tmpl.Picture :
+                    (tmpl && tmpl.Video) ? tmpl.Video : '';
+
+            if (tmpl.Steps.length > sidx && sidx > -1) {
+                img = step.Picture ? viewer._mediaUrl + step.Picture : '';
+                viewer._currentStepId++;
+            }
+            else {
+                viewer._currentStepId++;
+            }
+
+            @*if (tmpl.DescriptionFile) {
+                img = viewer._mediaUrl + 'media/' + tmpl.DescriptionFile;
+                $('#pdf').attr('src', img);
+            }*@
+
+            if (tmpl.Steps.length === sidx + 1) {
+                viewer._currentStepId = -1;
+                viewer._currentItemId++;
+            }
+
+            $('#bgr').css('background', 'url(' + img + ') center / cover no-repeat');
+
+            if (step) {
+                $('#title').html('<h2>' + tmpl.Name + '</h2><h4>' + (step.Description ? step.Description : '') + '</h4>');
+                if (step.Video) {
+                    $('#video').attr('src', step.Video);
+                }
+            }
+            else {
+                $('#title').html('<h2>' + tmpl.Name + '</h2><h4>' + (tmpl.Description ? tmpl.Description : '') + '</h4>');
+                if (tmpl.Video) {
+                    $('#video').attr('src', tmpl.Video);
+                }
+            }
+
+        },
+
+        nextItem: function () {
+            viewer.render(viewer._currentItemId, viewer._currentStepId);
+        }
+
+    }
+
+    viewer.init(@ViewBag.Id);
+
+
+
+
+
+    </script>
+
+}

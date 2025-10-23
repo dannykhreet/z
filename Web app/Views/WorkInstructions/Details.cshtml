@@ -1,0 +1,1396 @@
+﻿@model WebApp.ViewModels.WorkInstructionsViewModel
+@using WebApp.Logic
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.WorkInsctructionDetailsTitle, "Work instructions details") ?? "Work instructions details";
+}
+
+@section CSS {
+    <style>
+        #instructions {
+            top: 0px;
+            position: absolute;
+            z-index: 3;
+        }
+
+        .card {
+            margin-bottom: 0px !important;
+        }
+
+        .customArrow {
+            width: 100%;
+            position: absolute;
+            height: 0px;
+            width: 0px;
+            display: block;
+            transition: top 200ms;
+            border-bottom: 20px #93C54B solid;
+            border-left: 20px transparent solid;
+            border-right: 20px transparent solid;
+            margin-top: -21px;
+        }
+
+        .pencil-action {
+            height: 45px;
+            width: 45px;
+            margin-top: 15px;
+            margin-right: 15px;
+            font-size: 25px;
+            color: #364c59;
+            cursor: pointer;
+        }
+
+            .pencil-action svg {
+                margin-top: 3px;
+                margin-left: 11px;
+            }
+
+        .modal {
+            padding: 0 !important;
+        }
+
+        .value-placeholder {
+            height: 70px;
+            border: 1px dashed #fff;
+            width: 115px;
+            margin: 10px 15px 0px 0px;
+            cursor: pointer;
+        }
+
+            .value-placeholder span {
+                font-weight: 700;
+                font-size: 1.2rem;
+            }
+
+            .value-placeholder.active {
+                border: solid 1px silver;
+                background-color: lightgray;
+            }
+
+        .paperclip {
+            height: 160px;
+            background-color: #8ea968;
+            text-align: center;
+            color: #fff;
+        }
+
+            .paperclip i {
+                margin-top: 25px;
+            }
+
+                .paperclip i::after {
+                    display: block;
+                    font-size: 26px;
+                    font-style: normal;
+                    font-weight: 600;
+                }
+
+        .addclip {
+            height: 130px;
+            text-align: center;
+            color: #93C54B;
+            cursor: pointer;
+        }
+
+            .addclip:hover {
+                border: dashed 1px #93C54B;
+                background-color: #93c54b1f;
+            }
+
+            .addclip i {
+                margin-top: 39px;
+            }
+
+                .addclip i::after {
+                    display: block;
+                    font-size: 26px;
+                    font-style: normal;
+                    font-weight: 600;
+                }
+
+        .addvalue {
+            height: 70px;
+            text-align: center;
+            color: #93C54B;
+            cursor: pointer;
+            width: 115px;
+        }
+
+            .addvalue i {
+                margin-top: 20px;
+            }
+
+                .addvalue i::after {
+                    display: block;
+                    font-size: 26px;
+                    font-style: normal;
+                    font-weight: 600;
+                }
+
+        .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+            color: #fff;
+            background-color: #93C54B;
+        }
+
+        .nav-pills .nav-link:not(.active):hover {
+            color: #93C54B;
+        }
+    </style>
+
+    <style>
+        .itemlist .card {
+            width: 12rem;
+        }
+
+            .itemlist .card .card-body {
+                font-size: 9.5pt;
+                color: #6c757d !important;
+            }
+
+                .itemlist .card .card-body p {
+                    padding-bottom: 0px;
+                }
+
+            .itemlist .card:hover {
+                box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+            }
+
+        v.list-inline-item {
+            padding: 5px;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 0px;
+            margin: 15px;
+        }
+
+        .main-image-pencil {
+            background: #93c54b;
+            width: 35px;
+            height: 35px;
+            margin: 10px;
+            opacity: 0.8;
+            z-index: 1;
+            color: #fff;
+            border: solid 1px #333333 !important;
+            cursor: pointer;
+        }
+
+            .main-image-pencil i {
+                width: 35px;
+                height: 33px;
+                position: relative;
+                display: flex;
+            }
+
+            .main-image-pencil:hover {
+                border: solid 1px #fff !important;
+            }
+
+        .itemlist .pencil {
+            background: #333333;
+            width: 35px;
+            height: 35px;
+            margin: 10px;
+            opacity: 0.8;
+            z-index: 1;
+            position: absolute;
+            left: 70px;
+            top: 105px;
+            color: #fff;
+            border: solid 1px #333333 !important;
+            cursor: pointer;
+        }
+
+        .pencil i {
+            width: 35px;
+            height: 33px;
+            display: flex;
+            position: absolute;
+        }
+
+        .itemlist .pencil:hover {
+            border: solid 1px #fff !important;
+        }
+
+        .itemlist .ui-state-highlight {
+            height: 210px;
+            line-height: 1.2em;
+            width: 12rem;
+            margin-right: 12px;
+            background-color: rgba(241,241,241,0.52) !important;
+            border: dashed 1px rgb(191,191,191);
+            margin-top: 0px;
+        }
+
+        .itemlist .valuePropHolder {
+            width: 100px;
+            height: 60px;
+            border-radius: 6px;
+            float: left;
+            margin-right: 18px;
+            border: 1px solid rgb(214,214,214);
+        }
+
+        .itemlist .card-link {
+            position: relative;
+            display: flex;
+            height: 160px;
+            margin: -1px;
+            border: solid 1px rgba(0,0,0,0);
+        }
+
+            .itemlist .card-link img {
+                object-fit: cover;
+                width: 100%;
+                height: 160px;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+            }
+
+        #editStepModalContent img.main-img {
+            border-radius: 5px;
+            border: solid 1px #ced4da;
+        }
+
+        .btn-light:not(:disabled):not(.disabled).active, .btn-light:not(:disabled):not(.disabled):active, .show > .btn-light.dropdown-toggle {
+            color: #fff !important;
+            background-color: #93C54B;
+            border-color: #d3d9df;
+        }
+
+        .tpl {
+            display: none;
+        }
+
+        .list-group-item:last-child {
+            margin-bottom: 0;
+            border-bottom-right-radius: 0rem;
+            border-bottom-left-radius: 0rem;
+        }
+
+        @@media print {
+            .pagebreak {
+                page-break-after: always !important;
+                break-after: always !important;
+            }
+
+            #mainCol {
+                display: block !important;
+                position: relative !important;
+                width: auto !important;
+                height: auto !important;
+                overflow: visible !important;
+                margin-left: 0 !important;
+            }
+
+            .content-wrapper {
+                background-color: #fff !important;
+            }
+        }
+    </style>
+
+    <style>
+        .dropdown-item.active, .dropdown-item:active {
+            color: #fff;
+            text-decoration: none;
+            background-color: #93C54B;
+        }
+
+        .form-group {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+            color: #fff;
+            background-color: #93C54B;
+        }
+
+        /* Instruction pdf's */
+        #workInstructionItemAttachmentsPreviewContainer .pencil {
+            background: #333333;
+            width: 35px;
+            height: 35px;
+            margin: 10px;
+            opacity: 0.8;
+            z-index: 1;
+            position: absolute;
+            left: 70px;
+            top: 105px;
+            color: #fff;
+            border: solid 1px #333333 !important;
+            cursor: pointer;
+        }
+
+        #workInstructionItemAttachmentsPreviewContainer .itemlist .pencil i {
+            width: 35px;
+            height: 33px;
+            position: relative;
+            display: flex;
+        }
+
+        #workInstructionItemAttachmentsPreviewContainer .itemlist .pencil:hover {
+            border: solid 1px #fff !important;
+        }
+
+        #workInstructionItemAttachmentsPreviewContainer .itemlist .ui-state-highlight {
+            height: 240px;
+            line-height: 1.2em;
+            width: 12rem;
+            margin-right: 22px;
+            background-color: rgba(241,241,241,0.52) !important;
+            border: dashed 1px rgb(191,191,191);
+            margin-top: 6px;
+        }
+    </style>
+
+    <style>
+        .custom-control-input:checked ~ .custom-control-label::before,
+        .custom-control-input:indeterminate ~ .custom-control-label::before {
+            background-color: #93C54B;
+            border-color: #93c54b1f;
+        }
+
+        .custom-control-input:checked ~ .custom-control-label::before {
+            color: #fff;
+            border-color: #93c54b1f;
+            background-color: #93C54B;
+            box-shadow: none;
+        }
+
+        div.custom-control-right {
+            padding-right: 24px;
+            padding-left: 0;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+            div.custom-control-right .custom-control-label::after {
+                right: -1.5rem;
+                left: auto;
+            }
+
+            div.custom-control-right .custom-control-label::before {
+                right: -2.35rem;
+                left: auto;
+            }
+    </style>
+
+    <style>
+        .WIChangesTable {
+            border: 1px solid #5FD878;
+            border-radius: calc(1rem + 1px);
+            border-collapse: separate;
+            border-spacing: 0px;
+            table-layout: fixed;
+            word-wrap: break-word;
+            width: 100%;
+            max-width: 100%;
+        }
+
+            .WIChangesTable td {
+                border: 1px solid #5FD878;
+                padding: .5rem;
+                vertical-align: top;
+            }
+
+            .WIChangesTable tr:first-child td:first-child {
+                border-radius: 1rem 0 0 0;
+            }
+
+            .WIChangesTable tr:first-child td:last-child {
+                border-radius: 0 1rem 0 0;
+            }
+
+            .WIChangesTable tr:last-child td:last-child {
+                border-radius: 0 0 1rem 0;
+            }
+
+            .WIChangesTable tr:last-child td:first-child {
+                border-radius: 0 0 0 1rem;
+            }
+
+            .WIChangesTable tr:first-child td {
+                background-color: #EFFCF3;
+            }
+
+            .WIChangesTable tr td:first-child {
+                background-color: #EFFCF3;
+            }
+
+
+        .tag-card-change {
+            display: inline-block;
+            width: 9em;
+            color: white;
+            align-content: center;
+            align-items: center;
+        }
+
+        .tag-wrapper-change {
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+            display: flex;
+            height: 2.6em;
+            line-height: 1.1;
+        }
+
+
+        .nav-icon {
+            float: left;
+            display: inline-block;
+            align-self: center;
+        }
+
+        .tag-span-change {
+            text-align: center;
+            align-self: center;
+            display: inline-block;
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+        }
+
+    </style>
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                @if (Model.SharedTemplateId > 0)
+                {
+                    <a asp-controller="inbox" asp-action="index"><i class="fa fa-arrow-left"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Shared.NavBackToInboxTitle, "Back to inbox") ?? "Back to inbox")</a>
+                }
+                else
+                {
+                    <a asp-controller="workinstructions" asp-action="index"><i class="fa fa-arrow-left"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.NavBackTitle, "Back to work instructions overview") ?? "Back to work instructions overview")</a>
+                }
+                <h1>@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.OverViewTitleDetails, "Work instruction details") ?? "Work instruction details")</h1>
+            </div>
+
+            <div class="col-sm-6 d-flex flex-row-reverse">
+
+                @if (Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null && Model.ApplicationSettings.Features.WorkInstructionsChangedNotificationsEnabled.HasValue && Model.ApplicationSettings.Features.WorkInstructionsChangedNotificationsEnabled.Value == true)
+                {
+                    <button id="btnSave" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" onclick="ezgolist._isNewTemplate ? ezgoWorkInstruction.save() : ezgoWorkInstruction.showNotificationModal();" data-tracking="enabled" data-tracking-name="save">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.BtnSave, "Save") ?? "Save")</button>
+                }
+                else
+                {
+                    <button id="btnSave" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" onclick="ezgolist.save();" data-tracking="enabled" data-tracking-name="save">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.BtnSave, "Save") ?? "Save")</button>
+                }
+                @if (Model.CurrentWorkInstructionTemplate != null && Model.CurrentWorkInstructionTemplate.Id > 0)
+                {
+                    <form id="frmDelete" method="post" action='/workinstruction/delete/@Model?.CurrentWorkInstructionTemplate?.Id' class="mt-auto">
+                        <button type="button" id="btnDelete" class="btn btn-danger btn-sm mr-2 shadow-sm mt-auto" onclick="ezgolist.delete()" data-tracking="enabled" data-tracking-name="delete">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.BtnDelete, "Delete") ?? "Delete")</button>
+                    </form>
+
+                    <form id="frmDuplicate" method="post" action='/workinstruction/duplicate/@Model?.CurrentWorkInstructionTemplate?.Id' class="mt-auto">
+                        <button type="button" id="btnDuplicate" class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto btn-disabled-during-changes" onclick="ezgolist.duplicate()" data-tracking="enabled" data-tracking-name="duplicate">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.BtnDuplicate, "Duplicate") ?? "Duplicate")</button>
+                    </form>
+
+                    @if (Model.ApplicationSettings?.Features?.TemplateSharingEnabled == true)
+                    {
+                        <button id="btnShareTemplate" data-type="task" data-templateid="@Model.CurrentWorkInstructionTemplate.Id" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto btn-disabled-during-changes" onclick="$('#template-share-modal').modal('show')">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Shared.ShareButtonTitle, "Share") ?? "Share")</button>
+                    }
+                }
+
+                @if (Model.SharedTemplateId > 0)
+                {
+                    <button class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto" disabled="disabled"><i class="fa fa-print"></i></button>
+                }
+                else
+                {
+                    <button class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto btn-disabled-during-changes" @(Model.CurrentWorkInstructionTemplate.Id == 0 ? "disabled=\"disabled\"" : "") onclick="window.open('/pdf/viewer/workinstructiontemplate/@(Model.CurrentWorkInstructionTemplate.Id)', '_blank', 'toolbar=no,top=10,left=10,width=' + (screen.availWidth-10) + ',height=' + (screen.availHeight-10) + '');" data-tracking="enabled" data-tracking-name="create pdf"><i class="fa fa-print"></i></button>
+                }
+
+                @if (Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null && Model.ApplicationSettings.Features.QRCode.Value)
+                {
+                    <button id="btnGenerateQRCode" disabled="disabled" data-areaid="@Model.CurrentWorkInstructionTemplate.AreaId" data-type="instruction" data-templateid="@Model.CurrentWorkInstructionTemplate.Id" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" onclick="generateQRCode(this)">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Shared.GenerateQRCode, "Generate QR Code") ?? "Generate QR Code")</button>
+                }
+
+                @if (Model.EnableJsonExtraction) //enable json extraction, for now
+                {
+                    <partial name="~/Views/Shared/_extraction_data.cshtml" model="Model.ExtractionData" />
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="contentDiv" class="content">
+    <div class="container-fluid">
+        <div id="mainCol" class="row pt-1" style="height:calc(100vh - 175px);overflow:auto;">
+            <div class="col-md-12">
+                <div class="col-12 p-0 pb-3">
+                    <div id="fileSizeAlert-template" class="alert alert-danger d-none">
+                        @(Model?.CmsLanguage.GetValue(LanguageKeys.WorkInsctruction.FileSizeAlert, "File size for this media file is too big!") ?? "File size for this media file is too big!")
+                        <button type="button" class="close" onclick="$(this).closest('div.alert').hide()" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="row card-group">
+                        <div class="col-sm-4 col-md-5">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div id="templateDropZone" data-drop="true" class="card h-100" style="width:100%;height:238px;display:flex;border-radius: 5px;">
+                                        <a href="" data-fancybox="items" data-caption="">
+                                            <img id="TemplateImage" src="" style="width:100%;object-fit: cover; object-position: center; height:24.5rem;border-radius: 5px;" class="img-fluid" alt="...">
+                                        </a>
+
+                                        <div class="controls d-print-none" style="position:absolute;bottom:0px;">
+                                            <input class="d-none" type="file" id="uploaderTemplate" accept="image/*" name="photo" onchange="ezgolist.previewFileEx(this);" onclick="this.value=null" data-preview="#TemplateImage" data-templateid="0" data-type="template" required>
+                                            <a href="#" onclick="$('#uploaderTemplate').trigger('click'); return false;">
+                                                <div class="border rounded-circle float-right d-lg-flex justify-content-lg-center shadow main-image-pencil">
+                                                    <i class="fa fa-paperclip d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>
+                                                </div>
+                                            </a>
+
+                                            <a href="#" data-selector="deletemedia" data-type="template">
+                                                <div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">
+                                                    <i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-8 col-md-7">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <small data-type="cid" class="card-subtitle mb-2 text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.WorkInctructionId, "Work instruction id:") ?? "Work instruction id:"): </small>
+                                    <div style="float:right">
+                                        <small id="changedOn" class="card-text text-muted">
+                                            @if (Model.CurrentWorkInstructionTemplate != null && Model.CurrentWorkInstructionTemplate.ModifiedAt != null)
+                                            {
+                                                @((Model?.CmsLanguage?.GetValue(LanguageKeys.Auditing.LastModifiedAt, "Last modified at") ?? "Last modified at") + Model.CurrentWorkInstructionTemplate.ModifiedAt)
+                                            }
+                                        </small>
+                                    </div>
+                                    <input type="text" class="form-control form-control-sm" maxlength="240" id="txtTemplateName" name="txtTemplateName" onblur="ezgolist.setDetails(this)" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.TitlePlaceholder, "Enter a title for this work instruction") ?? "Enter a title for this work instruction")" />
+                                    <textarea id="txtTemplateDescription" name="txtTemplateDescription" class="form-control form-control-sm mt-2" onblur="ezgolist.setDetails(this)" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.DescriptionPlaceholder, "Enter a description for this work instruction") ?? "Enter a description for this work instruction")"></textarea>
+
+                                    <div class="row pt-3 @(Model.ApplicationSettings.Features.SkillAssessments.HasValue && Model.ApplicationSettings.Features.SkillAssessments.Value ? "" : "d-none")">
+                                        <div class="col-md-12 col-lg-12">
+                                            <span id="selectTypeTitle" class="card-text text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.SelectTypeTitle, "Select a type for this instruction") ?? "Select a type for this instruction")</span>
+                                            <div class="btn-group btn-group-sm btn-group-toggle pt-1" data-toggle="buttons" style="display:flex;">
+                                                <label class="btn btn-light text-muted" style="flex:1;">
+                                                    <input type="radio" name="workinstructiontype" id="workinstruction" value="0" onclick="ezgolist.setDetails(this); $('#roleSelector').show(); $('#availableForAllAreasToggle').show();"> @(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.OptionWorkinstruction, "Work instruction") ?? "Work instruction")
+                                                </label>
+                                                @if (Model.ApplicationSettings.Features.SkillAssessments.HasValue && Model.ApplicationSettings.Features.SkillAssessments.Value)
+                                                {
+                                                    <label class="btn btn-light text-muted" style="flex:1;">
+                                                        <input type="radio" name="workinstructiontype" id="skillinstruction" value="1" onclick="ezgolist.setDetails(this); $('#roleSelector').hide(); $('#availableForAllAreasToggle').hide();"> @(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.OptionAssessmentinstruction, "Assessment instruction") ?? "Assessment instruction")
+                                                    </label>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-3" id="roleSelector">
+                                        <div class="col-md-12 col-lg-12">
+                                            <span class="card-text text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.SelectRoleTitle, "Select a role for this work instruction") ?? "Select a role for this work instruction")</span>
+                                            <div class="btn-group btn-group-sm btn-group-toggle pt-1" data-toggle="buttons" style="display:flex;">
+                                                <label class="btn btn-light text-muted" style="flex:1;">
+                                                    <input type="radio" name="role" id="role1" value="basic" onclick="ezgolist.setDetails(this)"> @(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.OptionBasic, "Basic user") ?? "Basic user")
+                                                </label>
+
+                                                <label class="btn btn-light text-muted" style="flex:1;">
+                                                    <input type="radio" name="role" id="role2" value="shift_leader" onclick="ezgolist.setDetails(this)"> @(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.OptionShiftLeader, "Shift leader") ?? "Shift leader")
+                                                </label>
+
+                                                <label class="btn btn-light text-muted" style="flex:1;">
+                                                    <input type="radio" name="role" id="role3" value="manager" onclick="ezgolist.setDetails(this)"> @(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.OptionManager, "Manager") ?? "Manager")
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-3 d-none">
+                                        <div class="col-md-12 col-lg-12">
+                                            <span class="card-text text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.SelectSignatureTitle, "How many signatures are required at the end?") ?? "How many signatures are required at the end?")</span>
+                                            <div class="btn-group btn-group-sm btn-group-toggle pt-1" data-toggle="buttons" style="display:flex;">
+                                                <label class="btn btn-light text-muted" style="flex:1;">
+                                                    <input type="radio" name="signature" id="signature1" value="none" onclick="ezgolist.setDetails(this)"> @(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.OptionNone, "None") ?? "None")
+                                                </label>
+
+                                                <label class="btn btn-light text-muted" style="flex:1;">
+                                                    <input type="radio" name="signature" id="signature2" value="single" onclick="ezgolist.setDetails(this)"> @(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.OptionOneSignature, "One signature") ?? "One signature")
+                                                </label>
+
+                                                <label class="btn btn-light text-muted" style="flex:1;">
+                                                    <input type="radio" name="signature" id="signature3" value="double" onclick="ezgolist.setDetails(this)"> @(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.OptionTwoSignature, "Two signatures") ?? "Two signatures")
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-3 d-none">
+                                        <div class="col-md-12 col-lg-12">
+                                            <span id="scoringTitle" class="card-text text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.ScoringTitle, "Scoring System") ?? "Scoring System")</span>
+                                            <div id="scoringControls" class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons" style="display:flex;">
+                                                <label class="btn btn-light text-muted" style="flex:1;">
+                                                    <input type="radio" name="score" id="score1" value="thumbs" onclick="$('#scoreRangeSliderCon').addClass('d-none');ezgolist.setDetails(this)"> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.ScoringThumbsTitle, "Thumbs") ?? "Thumbs")
+                                                </label>
+
+                                                <label class="btn btn-light text-muted" style="flex:1;">
+                                                    <input type="radio" name="score" id="score2" value="score" checked onclick="$('#scoreRangeSliderCon').removeClass('d-none');ezgolist.setDetails(this)">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.ScoringCustomTitle, "Custom scoring") ?? "Custom scoring")
+                                                </label>
+                                            </div>
+
+                                            <div id="scoreRangeSliderCon" class="mt-2 d-none">
+                                                <input type="text" data-disabled="true" class="js-range-slider" id="ScoreRangeSlider" name="my_range" value="" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAGS -->
+                @if (Model.ApplicationSettings?.Features?.TagsEnabled == true)
+                {
+                    <div class="col-12 p-0 pb-3" data-item="steps-view">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsMainTitle, "Tags") ?? "Tags")</h3>
+                            </div>
+
+                            <div class="card-body px-3 pb-3 pt-0">
+                                <partial name="_tags_block" model="Model.Tags" />
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- WORK INSTRUCTION STEPS -->
+                <div class="col-12 p-0 pb-3" data-item="steps-view">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.StepsTitle, "Work instruction steps") ?? "Work instruction steps")</h3>
+                        </div>
+
+                        <div class="card-body p-3">
+                            <ul id="itemlist" class="list-inline card-group pt3 itemlist"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AREAS -->
+                <div class="col-12 p-0 pb-3">
+                    <div class="card">
+                        <div class="card-header">
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.AreaTitle, "Areas") ?? "Areas")
+                            <span id="areaprintlist"></span>
+                            @if (Model.ShowAvailableForAllAreasToggle)
+                            {
+                                <div class="custom-control-right custom-switch float-right mr-3" id="availableForAllAreasToggle">
+                                    <input type="checkbox" class="custom-control-input" id="availableForAllAreas" @(Model.CurrentWorkInstructionTemplate.IsAvailableForAllAreas == true || !Model.CurrentWorkInstructionTemplate.IsAvailableForAllAreas.HasValue ? "checked" : "")>
+                                    <label style="font-weight: 400" class="custom-control-label card-text text-muted" for="availableForAllAreas">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.AvailableForAllAreas, "Available for all areas") ?? "Available for all areas")</label>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="card-body p-0 d-print-none" style="overflow-x:auto;" id="areasScrollDiv">
+                            <div id="areascard" class="d-flex clearfix" style="height:231px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<partial name="~/Views/Shared/_auditing_history.cshtml" model="@(new AuditingLogViewModel { ItemType="workinstructions",TemplateId=Model.CurrentWorkInstructionTemplate.Id, EnablingAuditing = Model.EnablingAuditing})" />
+
+<!-- Modal items list -->
+<div role="dialog" tabindex="-1" class="modal fade h-100" data-backdrop="static" id="editTemplateStepModal">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable h-100" role="document">
+        <div class="modal-content" id="editStepModalContent">
+            <partial name="_steps_list_new.cshtml" model="Model" />
+        </div>
+    </div>
+</div>
+
+<!-- Modal QR Code -->
+<div class="modal fade" id="QRCodeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLongTitle">QR Code</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" style="display: flex; justify-content: center">
+                <div id="QRCodeModalBody">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <a class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto" onclick="printQRCode()"><i class="fa fa-print"></i></a>
+                <button class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto" onclick="downloadQRCode()"><i class="fas fa-download"></i></button>
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal add WI change notification -->
+@if (Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null && Model.ApplicationSettings.Features.WorkInstructionsChangedNotificationsEnabled.HasValue && Model.ApplicationSettings.Features.WorkInstructionsChangedNotificationsEnabled.Value == true)
+{
+    <div class="modal fade" id="WIChangesModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered " role="document">
+            <div class="modal-content">
+                <div class="modal-header p-0" style="border-bottom:0px">
+                    <div class="row m-0" style="width: 100%">
+                        <div class="col-6 p-4">
+                            <h4 class="modal-title" id="exampleModalLongTitle">Work instructions</h4>
+                        </div>
+                        <div class="col-6 p-4" style="background-color: #EBEBEB;border-top-right-radius: calc(.3rem - 2px);">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-body p-0" style="display: flex; justify-content: center; border-bottom: 0px">
+                    <div class="row" style="width: 100%">
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="col-12 px-4">
+                                    <h4 id="wiChangesNotificationChangeDateTime" style="color: #5FD878"></h4>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div id="WIChangesTableContainer" class="col-12 px-4">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 px-4 pb-4 pt-0" style="background-color: #EBEBEB">
+                            <div class="row">
+                                <div class="col-12">
+                                    <h4>Do you want to notify the end user about the changes made?</h4>
+                                </div>
+                            </div>
+                            <div class="row pb-4">
+                                <div class="col-12">
+                                    <span>You can add a note to these changes.</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 pt-4">
+                                    <textarea id="workInstructionChangesNotificationComment" class="p-4" style="width: 100%; height: 25rem; border: 0px; border-radius: 0.3rem; resize: none" placeholder="Enter WI Changes..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer p-0" style="border-top: 0px">
+                    <div class="row m-0" style="width: 100%">
+                        <div class="col-6 p-4">
+                        </div>
+                        <div class="col-6 p-4" style="text-align: right; background-color: #EBEBEB">
+                            <button type="button" class="btn btn-secondary btn-sm mr-2" data-dismiss="modal" data-action="close">Cancel</button>
+                            <button class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto" onclick="ezgoWorkInstruction.save()">Save</button>
+                            <button type="button" class="btn btn-ezgo btn-sm btn-outline shadow-sm mt-auto" onclick="ezgoWorkInstruction.saveWithNotification()">Save & notify</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Modal add link to WI item -->
+<div class="modal" id="AddWorkInstructionItemLinkAttachmentModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ItemAddLinkModalTitle, "Add link to work instruction item") ?? "Add link to work instruction item")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <p>@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ItemAddLinkModalInsertLinkHere, "Insert link here: ") ?? "Insert link here: ")</p>
+                <input id="AddWorkInstructionItemLinkAttachmentInput" class="form-control form-control-sm" type="url" placeholder="https://www.ezfactory.nl/" required />
+                <div id="WILinkAttachmentInvalidError" style="display: none">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ItemAddLinkModalValidationError, "The URL that you entered is invalid.") ?? "The URL that you entered is invalid.")</div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ezgo" onclick="ezgoWorkInstruction.addLinkAttachmentToItem()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ItemAddLinkModalSaveChanges, "Save changes") ?? "Save changes")</button>
+                <button type="button" class="btn btn-light" data-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ItemAddLinkModalClose, "Close") ?? "Close")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.ApplicationSettings?.Features?.TemplateSharingEnabled == true)
+{
+    <partial name="~/Views/Shared/_template_sharing_modal.cshtml" model="@(new TemplateSharingViewModel{ CmsLanguage = Model.CmsLanguage, Companies = Model.CompaniesInHolding })" />
+}
+
+@section Scripts {
+
+    <script src="/js/ezgolist.js"></script>
+    <script src="/js/ezgoprops.js"></script>
+    <script src="/js/ezgoUtils.js"></script>
+
+    @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+    {
+        <script src="~/js/analytics.js"></script>
+        <script>ezgoAnalytics.init('workinstruction');</script>
+    }
+
+    <script>
+        ezgolist.initDataObject = @(Html.Raw(Model.CurrentWorkInstructionTemplate.ToJsonFromObject())); //set init object
+        ezgolist.sharedTemplateId = @(Model.SharedTemplateId);
+        ezgolist._isNewTemplate = @(Json.Serialize(Model.IsNewTemplate));
+        ezgolist.placeholderImageUrl = '@(Constants.General.ImageUnavailableUrl)';
+        ezgolist.mediaUrl = '@(string.IsNullOrEmpty(Model.ApplicationSettings?.MediaLocations?.ImageMediaBaseUri) ? Constants.General.MediaUrl : Model.ApplicationSettings?.MediaLocations?.ImageMediaBaseUri)';
+        ezgolist.language = {
+            listtype: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.InstructionItem, "Work instruction item") ?? "Work instruction item")))',
+            listtypeId: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.InstructionId, "Work instruction ID") ?? "Work instruction ID")))',
+            addItem: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.InstructionAddItem, "Add work instruction item") ?? "Add work instruction item")))',
+            addItemLower: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.InstructionAddItemLower, "add item") ?? "add item")))',
+            nextItem: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.InstructionNextItem, "next item") ?? "next item")))',
+            addpdf: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ItemAddPdf, "Add PDF") ?? "Add PDF")))',
+            addlink: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ItemAddLink, "Add link") ?? "Add link")))',
+            assignButton: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.AssignButton, "Assign") ?? "Assign")))',
+            addinstruction: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.AddInstruction, "Add instruction") ?? "Add instruction")))',
+            addStep: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.DialogAddStep, "add step") ?? "add step")))',
+            nextStep: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.DialogNextStep, "next step") ?? "next step")))',
+            scoringsystem: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ScoringSystem, "Scoring system") ?? "Scoring system")))',
+            scoringdisabled: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ScoringDisabledTitle, "disabled, has completed audits") ?? "disabled, has completed audits")))',
+            confirmationleavemessage: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ConfirmationLeaveMessage, "It looks like you have been editing something.If you leave before saving, your changes will be lost.") ?? "It looks like you have been editing something.If you leave before saving, your changes will be lost.")))',
+            sharingSuccess: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.Shared.SharingSuccess, "picture proof for all items?") ?? "picture proof for all items?")))',
+            sharingFailed: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.Shared.SharingFailed, "picture proof for all items?") ?? "picture proof for all items?")))',
+
+            optionYes: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage.GetValue(LanguageKeys.Action.OptionYes, "Yes") ?? "Yes")))',
+            optionNo: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage.GetValue(LanguageKeys.Action.OptionNo, "No") ?? "No")))',
+
+            deleteAuditItem: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.EzgoList.DeleteAuditItem, "Delete audit item?") ?? "Delete audit item?")))',
+            deleteChecklistItem: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.EzgoList.DeleteChecklistItem, "Delete checklist item?") ?? "Delete checklist item?")))',
+            deleteWorkInstructionItem: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.EzgoList.DeleteWorkInstructionItem, "Delete workinstruction item?") ?? "Delete workinstruction item?")))',
+
+            deleteAuditInstruction: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.EzgoList.DeleteAuditItemInstruction, "Delete instruction from this audit item?") ?? "Delete instruction from this audit item?")))',
+            deleteChecklistInstruction: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.EzgoList.DeleteChecklistItemInstruction, "Delete instruction from this checklist item?") ?? "Delete instruction from this checklist item?")))',
+            deleteTaskInstruction: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.EzgoList.DeleteTaskInstruction, "Delete instruction from this task?") ?? "Delete instruction from this task?")))',
+
+            deleteAuditTemplate: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.EzgoList.DeleteAuditTemplate, "Delete this audit template?") ?? "Delete this audit template?")))',
+            deleteChecklistTemplate: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.EzgoList.DeleteChecklistTemplate, "Delete this checklist template?") ?? "Delete this checklist template?")))',
+            deleteSkillAssessmentTemplate: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.EzgoList.DeleteSkillAssessmentTemplate, "Delete this skillassessment template?") ?? "Delete this skillassessment template?")))',
+            deleteTaskTemplate: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.EzgoList.DeleteTaskTemplate, "Delete this task template?") ?? "Delete this task template?")))',
+            deleteWorkInstructionTemplate: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript(Model?.CmsLanguage?.GetValue(LanguageKeys.EzgoList.DeleteWorkInstructionTemplate, "Delete this workinstruction template?") ?? "Delete this workinstruction template?")))',  
+            
+            selectTypeTitle: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript((Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.SelectTypeTitle,"Select a type for this instruction") ?? "Select a type for this instruction"))))',
+            selectTypeDisabled: '@(Html.Raw(EZGO.CMS.LIB.Utils.StringParsers.EscapeForJavaScript((Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.SelectTypeDisabled, "disabled, is part of an assessment") ?? "disabled, is part of an assessment"))))',
+
+        };
+
+        ezgolist.init(
+        @Model.CurrentWorkInstructionTemplate.Id,
+        @Model.CurrentWorkInstructionTemplate.CompanyId,
+            'workinstruction'
+        );
+        $('body').on('ezgolistChanged', function (e) {
+            if (ezgolist._hasChanged) {
+                $('.btn-disabled-during-changes').attr('disabled', 'disabled')
+            }
+            else {
+                $('.btn-disabled-during-changes').removeAttr('disabled');
+            }
+        });
+
+        var ezgoWorkInstruction = {
+            pdfItemAttachments: {},
+            linkItemAttachments: {},
+            init: function () {
+                $('#workInstructionItemAttachmentPdf').on('input', async function (e) {
+                    var currentItemId = $('#currentTemplateItemId').val();
+                    var ext = ".pdf";
+                    if (e.target.files.length == 0 || !currentItemId) {
+                        return;
+                    }
+
+                    if (ezgoWorkInstruction.pdfItemAttachments[currentItemId] == null || !ezgoWorkInstruction.pdfItemAttachments[currentItemId].length) {
+                        ezgoWorkInstruction.pdfItemAttachments[currentItemId] = [];
+                    }
+
+                    if (!(ezgoWorkInstruction.pdfItemAttachments[currentItemId].length < 2)) {
+                        toastr.error('You can only add one attachment!');
+                        return;
+                    }
+
+                    var file = e.target.files[0];
+
+                    if (!file.name.toLowerCase().endsWith('.pdf')) {
+                        toastr.error('Attachment is not of type pdf! Attachment not added.');
+                        return;
+                    }
+
+                    ezgoWorkInstruction.pdfItemAttachments[currentItemId] = [e.target.files[0]];
+
+                    const objectURL = URL.createObjectURL(ezgoWorkInstruction.pdfItemAttachments[currentItemId][ezgoWorkInstruction.pdfItemAttachments[currentItemId].length - 1]);
+                    var newAttachment = workInstructionItemAttachmentTemplatePdf
+                        .replaceAll('{{url}}', objectURL)
+                        .replaceAll('{{itemid}}', currentItemId)
+                        .replaceAll('{{filename}}', e.target.files[0].name)
+                        .replaceAll('{{fancy}}', "workInstruction-" + currentItemId);
+
+                    $('#workInstructionItemAttachmentsPreviewContainer').html(newAttachment);
+                    $('#workInstructionItemAttachmentsPreviewContainer').show();
+
+                    $('#workInstructionItemAttachmentsSelectionContainer').hide();
+
+                    var template = ezgolist.tmpl.TaskTemplates.filter(obj => {
+                        return obj.Id === +currentItemId;
+                    })[0];
+
+                    if (template.Attachments == null) {
+                        template.Attachments = [];
+                    }
+                    var lastModified = new Date().toISOString();
+                    if (event.target.files[0].lastModifiedDate == undefined) {
+                        if (event.target.files[0].lastModified != undefined) {
+                            lastModified = new Date(event.target.files[0].lastModified).toISOString();
+                        }
+                    }
+                    else {
+                        lastModified = event.target.files[0].lastModifiedDate.toISOString();
+                    }
+                    var newAttachment = {
+                        AttachmentType: "Pdf",
+                        FileExtension: ".pdf",
+                        FileName: event.target.files[0].name,
+                        FileType: "application/pdf",
+                        LastModified: lastModified,
+                        Size: event.target.files[0].size,
+                        Uri: objectURL
+                    };
+
+                    template.Attachments[0] = newAttachment;
+
+                    this.value = null;
+
+                    ezgomediafetcher.preloadImagesAndVideos();
+                    ezgomediafetcher.preloadFancyboxAnchorsExceptVideos();
+                });
+
+                $('#workInstructionItemAttachmentsPreviewContainer').on('click', '[id^="deleteWIAttachmentPdf-"]', ezgoWorkInstruction.deleteWIAttachmentPdf);
+
+                $('#workInstructionItemAttachmentsPreviewContainer').on('click', '[id^="deleteWIAttachmentLink-"]', ezgoWorkInstruction.deleteWIAttachmentLink);
+
+                $('#AddWorkInstructionItemLinkAttachmentInput').on('input', function (e) {
+                    $('#WILinkAttachmentInvalidError').hide();
+                });
+            },
+            showNotificationModal: function() {
+                var comparisonData =
+                {
+                    OldTemplate: ezgolist.initialTmpl,
+                    NewTemplate: ezgolist.tmpl
+                };
+                $('#btnSave').attr('disabled', 'disabled');
+                $.ajax({
+                    type: "POST",
+                    url: "/workinstruction/getchangesnotificationtable",
+                    contentType: 'application/json',
+                    data: JSON.stringify(comparisonData),
+                    success: function (data) {
+                        if(data.length > 0)
+                        {
+                            $('#btnSave').removeAttr('disabled');
+                            $('#WIChangesTableContainer').html(data);
+                            let tempdate = Date.now();
+                            let currentDateTime = new Date(tempdate);
+                            $('#wiChangesNotificationChangeDateTime').html('Change: ' + currentDateTime.getDate() + ' ' +
+                                                                                        currentDateTime.toLocaleString('default', { month: 'short' }) + ', ' +
+                                                                                        currentDateTime.getFullYear() + ', ' +
+                                                                                        currentDateTime.getHours() + ':' + currentDateTime.getMinutes());
+                            $('#WIChangesModal').modal('show');
+
+                            ezgomediafetcher.preloadImagesAndVideos();
+                            ezgomediafetcher.preloadFancyboxAnchorsExceptVideos();
+                        }
+                        else {
+                            ezgoWorkInstruction.save();
+                        }
+
+                        if($('#btnSave').attr('disabled'))
+                        {
+                            $('#btnSave').removeAttr('disabled');
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.statusText == "abort") {
+                            return;
+                        }
+                        else {
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        }
+                        $('#btnSave').removeAttr('disabled');
+                    }
+                });
+            },
+            save: function () {
+                ezgolist.sendWiChangeNotification = false;
+                ezgolist.save();
+            },
+            saveWithNotification: function() {
+                ezgolist.sendWiChangeNotification = true;
+                ezgolist.save();
+            },
+            deleteWIAttachmentPdf: function () {
+                var itemId = $('#currentTemplateItemId').val();
+
+                ezgoWorkInstruction.pdfItemAttachments[itemId] = [];
+
+                var template = ezgolist.tmpl.TaskTemplates.filter(obj => {
+                    return obj.Id === +itemId;
+                })[0];
+
+                template.Attachments = [];
+
+                $(this).closest('li').remove();
+
+                $('#workInstructionItemAttachmentsSelectionContainer').show();
+            },
+            deleteWIAttachmentLink: function () {
+                var itemId = $('#currentTemplateItemId').val();
+
+                ezgoWorkInstruction.linkItemAttachments[itemId] = [];
+
+                var template = ezgolist.tmpl.TaskTemplates.filter(obj => {
+                    return obj.Id === +itemId;
+                })[0];
+
+                template.Attachments = [];
+
+                $(this).closest('li').remove();
+
+                $('#workInstructionItemAttachmentsSelectionContainer').show();
+            },
+            addPdfAttachmentToItem: function () {
+                $('#workInstructionItemAttachmentPdf').click();
+            },
+            addLinkAttachmentToItem: function () {
+                //TODO Add Link
+                var currentItemId = $('#currentTemplateItemId').val();
+                var link = $('#AddWorkInstructionItemLinkAttachmentInput').val();
+
+                if (ezgoWorkInstruction.linkItemAttachments[currentItemId] == null || !ezgoWorkInstruction.linkItemAttachments[currentItemId].length) {
+                    ezgoWorkInstruction.linkItemAttachments[currentItemId] = [];
+                }
+
+                if ($('#AddWorkInstructionItemLinkAttachmentInput').is(":valid")) {
+                    ezgoWorkInstruction.linkItemAttachments[currentItemId] = [$('#AddWorkInstructionItemLinkAttachmentInput').val()];
+
+                    //make newattachment html display for link
+
+                    var template = ezgolist.tmpl.TaskTemplates.filter(obj => {
+                        return obj.Id === +currentItemId;
+                    })[0];
+
+                    if (template.Attachments == null) {
+                        template.Attachments = [];
+                    }
+
+                    var newAttachment = workInstructionItemAttachmentTemplateLink
+                        .replaceAll('{{url}}', link)
+                        .replaceAll('{{encodedUrl}}', encodeURIComponent(link))
+                        .replaceAll('{{itemid}}', template.Id);
+
+                    $('#workInstructionItemAttachmentsPreviewContainer').html(newAttachment);
+                    $('#workInstructionItemAttachmentsPreviewContainer').show();
+                    $('#workInstructionItemAttachmentsSelectionContainer').hide();
+
+                    var lastModified = new Date().toISOString();
+
+                    var newAttachment = {
+                        AttachmentType: "Link",
+                        FileExtension: "",
+                        FileName: "",
+                        FileType: "",
+                        LastModified: lastModified,
+                        Size: 0,
+                        Uri: link
+                    };
+
+                    template.Attachments[0] = newAttachment;
+
+                    $('#AddWorkInstructionItemLinkAttachmentModal').modal('hide');
+                }
+                else {
+                    $('#WILinkAttachmentInvalidError').show();
+                }
+            },
+            showAddLinkModal: function () {
+                $('#AddWorkInstructionItemLinkAttachmentInput').val('');
+                $('#AddWorkInstructionItemLinkAttachmentModal').modal('show');
+            },
+            uploadMediaEx: async function (spec) {
+                let blob = await fetch(spec.url).then(
+                    r => r.blob()
+                );
+                var file = new File([blob], $.utils.createUUID() + spec.ext);
+                var formData = new FormData();
+                formData.append("file", file);
+                formData.append("filekind", spec.kind);
+                formData.append("itemtype", spec.type);
+
+                return fetch('/' + ezgolist.listType + '/upload', {
+                    method: 'POST',
+                    body: formData,
+                }).then(function (response) {
+                    if (!response.ok) {
+                        throw Error(response.statusText);
+                    }
+                    return response.text();
+                }).catch(function (error) {
+                });
+            }
+        };
+
+        ezgoWorkInstruction.init();
+
+        function showWIChanges() {
+            $("#WIChangesModal").modal('show');
+        }
+
+        function printWorkInstructions() {
+            var t = $('#itemlist li').eq(15).append('<div style="height:170px;page-break-after: always !important;page-break: always !important;" class="pagebreak"></div>');
+            var result = $('ul.list-group li.active').map(function (i, opt) {
+                return $(opt).text();
+            }).toArray().join(' -> ');
+
+            $("#mainCol").animate({ scrollTop: $('#mainCol').prop("scrollHeight") }, 1000);
+            $('#areaprintlist').text(': ' + result);
+            $('#mainCol').css('height', 'auto !important');
+            $('.content-wrapper').removeClass('main-bg-color');
+            $('.main-footer').hide();
+
+            setTimeout(function () {
+                window.print();
+                t.remove();
+                $('.content-wrapper').addClass('main-bg-color');
+                $('#mainCol').css('height', 'height:calc(100vh - 175px)');
+                $('#areaprintlist').text('');
+                $('#mainCol').scrollTop(0);
+            }, 1000);
+        }
+
+        function downloadQRCode() {
+            let downloadLink = document.createElement('a');
+            downloadLink.setAttribute('target', '_blank');
+            downloadLink.setAttribute('download', 'QRCode.png');
+            let canvas = $('#QRCodeModalBody').find('canvas')[0];
+            canvas.toBlob(function (blob) {
+                let url = URL.createObjectURL(blob);
+                downloadLink.setAttribute('href', url);
+                downloadLink.click();
+            });
+        }
+
+        function printQRCode() {
+            var canvas = $('#QRCodeModalBody').find('canvas')[0];
+
+            canvas.toBlob(function (blob) {
+                var mywindow = window.open('', 'PRINT', 'height=400,width=600');
+                mywindow.document.write('<html><head><title>' + document.title + '</title>');
+                mywindow.document.write('</head><body >');
+                mywindow.document.write(document.getElementById('QRCodeModalBody').innerHTML);
+                mywindow.document.write(`<iframe src="${URL.createObjectURL(blob)}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:400px; height:400px;" ></iframe>`);
+                mywindow.document.write('<div>EZ-GO QR-code for Work Instruction Template @(Model.CurrentWorkInstructionTemplate.Name) with ID @(Model.CurrentWorkInstructionTemplate.Id)</div>');
+                mywindow.document.write('<div>Powered by www.ezfactory.nl</div>');
+                mywindow.document.write('</body></html>');
+
+                mywindow.document.close(); // necessary for IE >= 10
+                mywindow.focus(); // necessary for IE >= 10*/
+
+                mywindow.print();
+                mywindow.close();
+            });
+            return true;
+        }
+
+        $("#itemlist").sortable({
+            placeholder: "ui-state-highlight",
+            cancel: ".add-button",
+            delay: 250,
+            opacity: 0.6,
+            tolerance: "pointer",
+            forcePlaceholderSize: true,
+            start: function (e, ui) {
+                // creates a temporary attribute on the element with the old index //
+                $(this).attr('data-previndex', ui.item.index());
+            },
+            stop: function (ev, ui) {
+                var prevItem = $(ui.item.prev()[0]);
+                if (prevItem.hasClass("add-button"))
+                    $(this).sortable("cancel");
+            },
+            update: function (e, ui) {
+                // gets the new and old index then removes the temporary attribute //
+                var newIndex = ui.item.index();
+                var oldIndex = $(this).attr('data-previndex');
+                $.utils.arrayMove(ezgolist.tmpl.TaskTemplates, oldIndex, newIndex);
+                $(this).removeAttr('data-previndex');
+            }
+        });
+
+        function downloadPdf(id) {
+            if (id == 0) {
+                id = ezgolist.tmpl.Id;
+                if (id == 0) {
+                    toastr.warning('Something went wrong. Please reload the template and try again.');
+                    return;
+                }
+            }
+        @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+        {
+            @:dataEntry = ezgoAnalytics.dataSpanStart("generate pdf", "workinstruction");
+        }
+
+            var newtab = window.open('/pdf/render/5/'+id, "_blank");//, "noopener noreferrer")
+
+        @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+        {
+            @:newtab.addEventListener("unload", function () { ezgoAnalytics.dataSpanEnd(dataEntry); });
+        }
+                                                                                                }
+    </script>
+
+    <script type="text/javascript" src="/js/qr-code-styling.js"></script>
+    <script>
+        function generateQRCode(e) {
+            $('#QRCodeModalBody').html('');
+            $.ajax({
+                type: "POST",
+                url: '/bookmark/createorretrieve/1/29/' + ezgolist.tmpl.Id,
+                data: '',
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    const qrCode = new QRCodeStyling({
+                        "width": 400,
+                        "height": 400,
+                        "data": `{"guid":"${data.guid.replaceAll('-', '')}", "bookmarkDate":"${data.bookmarkDate}"}`,
+                        "margin": 10,
+                        "type": "canvas",
+                        "qrOptions": {
+                            "typeNumber": "0",
+                            "mode": "Byte",
+                            "errorCorrectionLevel": "H"
+                        },
+                        "imageOptions": {
+                            "hideBackgroundDots": false,
+                            "imageSize": 0.6,
+                            "margin": 0
+                        },
+                        "dotsOptions": {
+                            "type": "classy",
+                            "color": "#000000",
+                            "gradient": {
+                                "type": "linear",
+                                "rotation": 0,
+                                "colorStops": [{
+                                    "offset": 0,
+                                    "color": "#0e3152"
+                                }, {
+                                    "offset": 1,
+                                    "color": "#144e70"
+                                }
+                                ]
+                            }
+                        },
+                        "backgroundOptions": {
+                            "color": "#ffffff"
+                        },
+                        "image": "/assets/img/QRCodeLogo.png",
+                        "dotsOptionsHelper": {
+                            "colorType": {
+                                "single": true,
+                                "gradient": false
+                            },
+                            "gradient": {
+                                "linear": true,
+                                "radial": false,
+                                "color1": "#6a1a4c",
+                                "color2": "#6a1a4c",
+                                "rotation": "0"
+                            }
+                        },
+                        "cornersSquareOptions": {
+                            "type": "dot",
+                            "color": "#103a5b"
+                        },
+                        "cornersSquareOptionsHelper": {
+                            "colorType": {
+                                "single": true,
+                                "gradient": false
+                            },
+                            "gradient": {
+                                "linear": true,
+                                "radial": false,
+                                "color1": "#000000",
+                                "color2": "#000000",
+                                "rotation": "0"
+                            }
+                        },
+                        "cornersDotOptions": {
+                            "type": "dot",
+                            "color": "#103a5b",
+                            "gradient": null
+                        },
+                        "cornersDotOptionsHelper": {
+                            "colorType": {
+                                "single": true,
+                                "gradient": false
+                            },
+                            "gradient": {
+                                "linear": true,
+                                "radial": false,
+                                "color1": "#000000",
+                                "color2": "#000000",
+                                "rotation": "0"
+                            }
+                        },
+                        "backgroundOptionsHelper": {
+                            "colorType": {
+                                "single": true,
+                                "gradient": false
+                            },
+                            "gradient": {
+                                "linear": true,
+                                "radial": false,
+                                "color1": "#ffffff",
+                                "color2": "#ffffff",
+                                "rotation": "0"
+                            }
+                        }
+                    });
+
+                    qrCode.append(document.getElementById("QRCodeModalBody"));
+
+                    $('#QRCodeModal').modal('show');
+
+                },
+                error: function (ex) {
+
+                }
+            });
+        }
+    </script>
+}

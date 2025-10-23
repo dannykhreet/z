@@ -1,0 +1,198 @@
+﻿@model WebApp.ViewModels.DatawarehouseToolsViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout_template";
+}
+
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <a href="/datawarehouse/tools">Back to datawarehouse tools</a>
+                <h1 class="m-0 text-dark">Datawarehouse Tools</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6 d-flex flex-row-reverse">
+
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+
+<section class="content">
+
+    <div class="container-fluid">
+
+        <div class="card">
+            <div class="card-header">
+                <h3 id="cardHeader" class="card-title d-none d-sm-inline-block">Statistics overview<span id="counter">&nbsp;</span></h3>
+                <div class="card-tools">
+                    <div class="input-group input-group-sm">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">View statistics from the datawarehouse</div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <select class="form-control" id="tools_holding" name="tools_holding">
+                        <option value="0" title="">No specific holding</option>
+                        @foreach (var holding in Model.Holdings)
+                        {
+                            <option value="@holding.Id">@holding.Name (@holding.Id)</option>
+
+                        }
+                    </select>
+                    <select class="form-control" id="tools_company" name="tools_company">
+                        <option value="0" title="">No specific company</option>
+                        @foreach (var company in Model.Companies)
+                        {
+                            if (company.Id == 136) {
+                                <option value="@company.Id" selected>@company.Name (@company.Id)</option>
+                            } else
+                            {
+                                <option value="@company.Id">@company.Name (@company.Id)</option>
+                            }
+
+                        }
+                    </select>
+                    <select class="form-control" id="tools_statistic" name="tools_statistic">
+                        <option value="action,area,assessment,audit,checklist,comment,company,pictureproof,shift,tag,task" title="">All</option>
+                        <option value="action" title="">Action</option>
+                        <option value="area" title="">Area</option>
+                        <option value="assessment" title="">Assessment</option>
+                        <option value="audit" title="">Audit</option>
+                        <option value="checklist" title="">Checklist</option>
+                        <option value="comment" title="">Comment</option>
+                        <option value="company" title="">Company</option>
+                        <option value="pictureproof" title="">PictureProof</option>
+                        <option value="shift" title="">Shift</option>
+                        <option value="tag" title="">Tag</option>
+                        <option value="task" title="">Task</option>
+                    </select>
+                    <button id="retrieve_statistics" name="retrieve_statistics">Start retrieving</button><button id="stop_retrieve_statistics" name="stop_retrieve_statistics">Stop retrieving</button>&nbsp;&nbsp;&nbsp;&nbsp;<span id="run_message_active" style="color:green;font-weight:bolder;"></span>
+                    <textarea style="height: 300px;" class="form-control" id="tools_output_result" name="tools_output_result"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="row pt-1" style="height:calc(100vh - 175px);overflow:auto;">
+            <div class="col-lg-12 col-xl-12">
+                <div id="contentBody" style="height: calc(100vh - 245px);overflow:auto;">
+    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+@section Scripts{
+    <script>
+        const timer = ms => new Promise(res => setTimeout(res, ms))
+
+        async function StartRun() {
+            $('#run_message_active').text('RUNNING');
+            dwToolsStatistics.timeout = 60000;
+            dwToolsStatistics.is_running = true;
+
+            while (true) {
+                if(!dwToolsStatistics.is_running) break;
+                dwToolsStatistics.company_id = $('#tools_company').val();
+                dwToolsStatistics.holding_id = $('#tools_holding').val();
+                dwToolsStatistics.start_reference = $('#tools_statistic').val();
+
+                dwToolsStatistics.retrieveStatistics(dwToolsStatistics.company_id, dwToolsStatistics.holding_id, dwToolsStatistics.start_reference);
+                await timer(parseInt(dwToolsStatistics.timeout));
+            }
+
+             $('#run_message_active').text('DONE');
+        }
+
+        var dwToolsStatistics = {
+            run: false,
+            company_id: null,
+            holding_id: null,
+            start_reference: null,
+            is_running: false,
+            timeout: null,
+            init: function() {
+                dwToolsStatistics.initHandlers();
+            },
+            initHandlers: function() {
+                $('#retrieve_statistics').on('click', function () {
+                    if(!dwToolsStatistics.is_running) StartRun();
+                });
+                $('#stop_retrieve_statistics').on('click', function () {
+                    dwToolsStatistics.is_running = false;
+                    $('#run_message_active').text('STOPPING');
+                });
+            },
+            generateGuid: function() {
+                $.ajax({
+                    type: "GET",
+                    url: '/company/holding/generateguid',
+                    success: function (data) {
+                        if (data != null) {
+                            $('#user_appid').val(JSON.parse(data));
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            retrieveStatistics: function (companyid, holdingid, statsreference) {
+                toastr.remove();
+
+                console.log(companyid, holdingid, statsreference);//push to log for validations
+
+                $.ajax({
+                    type: "GET",
+                    url: '/datawarehouse/statistics/' + holdingid + '/' + companyid + '/' + statsreference,
+                    success: function (data) {
+                        toastr.success('run ended.');
+                        console.log(data);//push to log for validations
+                        $('#tools_output_result').val('\r\n' + dwToolsStatistics.generateDisplayTable(data,statsreference) + $('#tools_output_result').val());
+                        //toastr.remove();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            generateDisplayTable(data, statsreference) {
+                let references = statsreference.split(',');
+                let output = '';
+                for(let k = 0; k < data.length; k++) {
+                    let item = data[k];
+                    output = output + references[k] + '\r\n-------------------\r\n';
+                    for(let i = 0; i < item.columns.length; i++) {
+                        output = output + item.columns[i] + '\t\t';
+                    }
+                    output = output + '\r\n';
+                    for(let i = 0; i < data[k].data[0].length; i++) {
+                        output = output + data[k].data[0][i] + '\t\t';
+                    }
+                    output = output + '\r\n\r\n';
+                }
+                return output;
+            }
+        }
+
+        dwToolsStatistics.init();
+        ezgomediafetcher.preloadImagesAndVideos();
+    </script>
+}

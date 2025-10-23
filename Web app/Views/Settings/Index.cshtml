@@ -1,0 +1,682 @@
+﻿@model WebApp.ViewModels.SettingsViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout_template";
+    var companyChoiceSettings = new[] {
+        "FEATURE_CHECKLISTS",
+        "FEATURE_TASKS",
+        "FEATURE_ACTIONS",
+        "FEATURE_ACTIONONTHESPOT",
+        "FEATURE_COMMENT",
+        "FEATURE_REQUIREPROOF",
+        "FEATURE_RUNNING_ASSESSMENTS_CMS",
+        "FEATURE_FACTORY_FEED",
+        "FEATURE_TASKTEMPLATEPROPERTIES_CHECKLISTS",
+        "FEATURE_AUDITS",
+        "FEATURE_TASKTEMPLATEPROPERTIES_AUDITS",
+        "FEATURE_CHECKLISTTEMPLATEPROPERTIES",
+        "FEATURE_AUDITTEMPLATEPROPERTIES",
+        "FEATURE_TASKTEMPLATEPROPERTIES",
+        "TECH_DBLOGGING_REQUESTRESPONSE",
+        "FEATURE_TIER_ADVANCED",
+        "FEATURE_TIER_ESSENTIALS",
+        "FEATURE_TIER_PREMIUM",
+        "FEATURE_EXPORTS",
+        "FEATURE_EXPORTS_ADVANCED",
+        "FEATURE_MARKET",
+        "MARKET_SAP",
+        "MARKET_SOLVACE",
+        "MARKET_ULTIMO",
+        "TECH_FIREBASELOGGING_CMS",
+        "FEATURE_EXPORTS_TASKPROPERTIES",
+        "TECH_TASKGENERATION",
+        "TECH_DATAWAREHOUSE",
+        "FEATURE_REPORTING",
+        "FEATURE_SKILLSMATRIX",
+        "FEATURE_SKILLSMATRIX_MANDATORYSKILLS",
+        "FEATURE_SKILLSMATRIX_OPERATIONALSKILLS",
+        "FEATURE_SKILLSMATRIX_OPERATIONALBEHAVIOUR",
+        "FEATURE_SKILLASSESSMENTS",
+        "FEATURE_WORKINSTRUCTIONS",
+        "FEATURE_ORDER_TASKS",
+        "FEATURE_ORDER_CHECKLISTS",
+        "FEATURE_ORDER_AUDITS",
+        "TECH_USE_STATIC_CHECKLIST_STORAGE",
+        "TECH_USE_STATIC_AUDIT_STORAGE",
+        "TECH_SUPPORT_CHAT",
+        "APP_DASHBOARD",
+        "APP_WEB",
+        "APP_XAMMACOS",
+        "APP_XAMWINDOWS",
+        "APP_XAMANDROID",
+        "APP_XAMIOS",
+        "APP_MYEZGO",
+        "APP_POSTMAN",
+        "APP_EZWORKINSTRUCTION",
+        "APP_EZASSESSMENT",
+        "APP_EZTASK",
+        "APP_EZCHECKLIST",
+        "APP_EZAUDIT",
+        "APP_EZGO_REALWEAR",
+        "FEATURE_ADVANCEDSEARCH",
+        "FEATURE_QRCODE",
+        "FEATURE_ANALYTICS",
+        "FEATURE_TASKGENERATION_PERIODDAY",
+        "FEATURE_TASKGENERATION_DYNAMICDAY",
+        "FEATURE_TASKGENERATION_GENERATION_OPTIONS",
+        "FEATURE_TASK_MULTISKIP",
+        "FEATURE_TAGS",
+        "FEATURE_WORKINSTRUCTION_ITEM_ATTACHMENT_PDF",
+        "FEATURE_WORKINSTRUCTION_ITEM_ATTACHMENT_LINK",
+        "FEATURE_TEMPLATE_SHARING",
+        "FEATURE_AUDIT_TRAIL_DETAILS",
+        "FEATURE_TRANSFERABLE_CHECKLISTS",
+        "TECH_FLATTEN_DATA",
+        "TECH_FLATTEN_DATA_FALLBACK",
+        "TECH_FLATTEN_DATA_SEARCH",
+        "FEATURE_EXTENDED_USER_DETAILS",
+        "FEATURE_WORK_INSTRUCTIONS_CHANGED_NOTIFICATIONS",
+        "FEATURE_CHECKLIST_STAGES",
+        "TECH_TRAFFICSHAPING_LIMITS",
+        "TECH_TRAFFICSHAPING_COMPANIES",
+        "FEATURE_MODIFY_OWN_COMPANY_SETTINGS_WORKINSTRUCTION",
+        "FEATURE_MODIFY_OWN_COMPANY_SETTINGS_ASSESSMENT",
+        "FEATURE_MODIFY_OWN_COMPANY_SETTINGS_MATRIX",
+        "FEATURE_MATRIX_CHANGED_SCORE_ROUNDDOWN",
+        "FEATURE_MATRIX_CHANGED_SCORE_ROUNDDEFAULT",
+        "FEATURE_EXPORT_MATRIX_SKILL_USER",
+        "FEATURE_SYSTEMROLE_MANAGEMENT",
+        "TECH_HOLDING_USER_PROVISIONING",
+        "TECH_COMPANY_USER_PROVISIONING",
+        "TECH_ATOSS_PROVISIONING",
+        "FEATURE_MATRIX_CHANGED_SCORE_STANDARD",
+        "TECH_FLATTEN_DATA_AUTOMATED",
+        "TECH_PROCESSOR",
+        "TECH_TRAFFICSHAPING_TASKS",
+        "TECH_TRAFFICSHAPING_COMMENTS",
+        "TECH_TRAFFICSHAPING_ACTIONS",
+        "TECH_TRAFFICSHAPING_CHECKLISTS",
+        "TECH_TRAFFICSHAPING_AUDITS",
+        "FEATURE_VIRTUAL_TEAM_LEAD",
+        "FEATURE_TRANSLATE_AUTO",
+        "FEATURE_IP_RESTRICTION"
+    };
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                &nbsp;
+                <h1 class="m-0 text-dark">@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.SettingsTitle, "Settings") ?? "Settings")</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6 d-flex flex-row-reverse">
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+
+
+<div class="modal fade" id="modalSettings" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_addchange_title">@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.SettingTitle, "Setting") ?? "Setting")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="settings_value" id="settings_key_title">@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.SettingsValue, "Value") ?? "Value")</label>
+                        <input type="text" class="form-control" name="settings_value" id="settings_value" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.SettingsValuePlaceholder, "Settingsvalue") ?? "Settingsvalue")">
+                    </div>
+                    <div style="text-align:right;">
+                        <button id="addchange_company_btn" type="button" class="btn btn-ezgo btn-sm" data-actiontype="addchangecompanies">@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.BtnAddOrChangeCompany, "Add/Change Company") ?? "Add/Change Company")</button>
+                        <div data-containertype="addchangecompany" style="margin-top:5px; margin-bottom: 5px;">
+                            <a data-actiontype="deselectallcompanies" style="text-decoration: underline; cursor: pointer;font-size:10px;">@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.DeselectAllCompanies, "deselect all") ?? "deselect all")</a><br />
+                            <div style="height:500px;overflow: auto; text-align: left;">
+                                <div style="margin: 5px;">
+                                    <div><input type="checkbox" value="ALL" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.AllTitle, "All") ?? "All")" id="company_all" name="company_all" data-actiontype="selectcompany" />&nbsp;<label for="company_all" style="font-weight:bolder;" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.SelectAllCompaniesTitle, "Select all companies") ?? "Select all companies")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.SelectAllCompanies, "All companies") ?? "All companies")</label></div>
+                                    @if (Model.Companies != null)
+                                    {
+                                        @foreach (var company in Model.Companies)
+                                        {
+                                            <div><input type="checkbox" value="@company.Id" title="@company.Name" id="company_@company.Id" name="company_@company.Id" data-actiontype="selectcompany" />&nbsp;<label for="company_@company.Id">@company.Name (@company.Id)</label></div>
+                                        }
+
+
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <p id="settings_validation_warning_message" style="color:red"></p>
+                <button type="button" id="cancel_settings_btn" class="btn btn-outline btn-sm" data-dismiss="modal">@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.BtnCancel, "Cancel") ?? "Cancel")</button>
+                <button id="save_settings_btn" type="button" class="btn btn-ezgo btn-sm" data-actiontype="save">@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.BtnSave, "Save") ?? "Save")</button>
+            </div>
+            <input type="hidden" name="settings_id" id="settings_id" />
+        </div>
+    </div>
+</div>
+
+
+
+<section class="content">
+
+    <div class="container-fluid">
+
+        <div class="card">
+            <div class="card-header">
+                <h3 id="cardHeader" class="card-title d-none d-sm-inline-block">@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.HeaderSettingsOverview, "Settings overview") ?? "Settings overview")<span id="counter">&nbsp;</span></h3>
+                <div class="card-tools">
+                    <div class="input-group input-group-sm">
+                        <input type="text" id="settingsSearchBox" name="settingsSearchBox" class="form-control float-right" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.SearchPlaceholder, "Search") ?? "Search")" data-boxtype="search">
+
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div style="text-align: right; margin-bottom:5px;">
+            <i class="@EZGO.Api.Models.Enumerations.SettingResourceSettingsTypeEnum.Company.GetDisplayIconForEnum()" style="cursor:pointer; margin:5px; font-size: 16px; color:#808080" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.CompanyTitle, "Company") ?? "Company")" data-filter-resourcetype="Company"></i>
+            <i class="@EZGO.Api.Models.Enumerations.SettingResourceSettingsTypeEnum.Feature.GetDisplayIconForEnum()" style="cursor: pointer; margin: 5px; font-size: 16px; color: #808080 " title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.FeatureTitle, "Feature") ?? "Feature")" data-filter-resourcetype="Feature"></i>
+            <i class="@EZGO.Api.Models.Enumerations.SettingResourceSettingsTypeEnum.General.GetDisplayIconForEnum()" style="cursor: pointer; margin: 5px; font-size: 16px; color: #808080 " title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.GeneralTitle, "General") ?? "General")" data-filter-resourcetype="General"></i>
+            <i class="@EZGO.Api.Models.Enumerations.SettingResourceSettingsTypeEnum.MarketPlace.GetDisplayIconForEnum()" style="cursor: pointer; margin: 5px; font-size: 16px; color: #808080 " title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.MarketplaceTitle, "MarketPlace") ?? "MarketPlace")" data-filter-resourcetype="MarketPlace"></i>
+            <i class="@EZGO.Api.Models.Enumerations.SettingResourceSettingsTypeEnum.Technical.GetDisplayIconForEnum()" style="cursor: pointer; margin: 5px; font-size: 16px; color: #808080 " title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.TechnicalTitle, "Technical") ?? "Technical")" data-filter-resourcetype="Technical"></i>
+            <i class="@EZGO.Api.Models.Enumerations.SettingResourceSettingsTypeEnum.User.GetDisplayIconForEnum()" style="cursor: pointer; margin: 5px; font-size: 16px; color: #808080 " title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.UserTitle, "User") ?? "User")" data-filter-resourcetype="User"></i>
+            <i class="@EZGO.Api.Models.Enumerations.SettingResourceSettingsTypeEnum.Application.GetDisplayIconForEnum()" style="cursor: pointer; margin: 5px; font-size: 16px; color: #808080 " title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.ApplicationTitle, "Application") ?? "Application")" data-filter-resourcetype="Application"></i>
+        </div>
+
+        <div class="row pt-1" style="height:calc(100vh - 270px);overflow:auto;">
+
+            <div class="col-lg-12 col-xl-12">
+                <div id="contentBody" style="height: calc(100vh - 260px);">
+
+                    <div class="row no-gutters" id="contentCol">
+
+                        @if (Model.Settings != null && Model.Settings.Count != 0)
+                        {
+                            @foreach (var setting in Model.Settings)
+                            {
+                                var icon = setting.SettingResourceType.GetDisplayIconForEnum();
+                                <div class="card w-100 results" data-id="@setting.Id" data-setting-name="@setting.Name" data-setting-key="@setting.SettingsKey" data-containertype="setting_container" data-resourcetype="@setting.SettingResourceType" @(setting.SettingsKey == "FEATURE_TIER_ESSENTIALS" || setting.SettingsKey == "FEATURE_TIER_ADVANCED" || setting.SettingsKey == "FEATURE_TIER_PREMIUM" ? Html.Raw(" style=\"background-color:#93c54b1f\"") : Html.Raw(""))>
+
+                                    <div class="card-body p-0">
+                                        <div class="col-12 p-1">
+                                            <div class="p-1">
+                                                <div class="row" data-id="@setting.Id">
+                                                    <div class="col-sm-1 col-md-1 col-lg-1 col-xl-1">
+                                                        <div><small>Id: <strong>@setting.Id</strong></small></div>
+                                                        <div style="height:60px;vertical-align:middle; text-align:center;" title="">
+                                                            @if (string.IsNullOrEmpty(icon))
+                                                            {
+                                                                <small>@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.Type, "Type:") ?? "Type:") <strong>@setting.SettingResourceType</strong></small>
+                                                            }
+                                                            else
+                                                            {
+                                                                <i class="@icon" style="margin-top:25px; font-size: 40px;color:#808080" title="@setting.SettingResourceType"></i>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <h5 class="mt-3 mt-sm-0">@setting.Name (@setting.SettingsKey)</h5>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-lg-12 d-flex justify-content-between flex-column">
+                                                                <div class="row">
+                                                                    <div class="col-md-12 col-lg-12 text-muted"><small>@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.DescriptionText, "Description: ") ?? "Description: ")<br /><strong>@setting.Description</strong></small></div>
+                                                                    <div class="col-md-12 col-lg-12 text-muted">
+                                                                        <small>
+                                                                            @(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.ValuesText, "Values: ") ?? "Values: ")<br />
+                                                                            @if (companyChoiceSettings.Contains(setting.SettingsKey)) //specific company setting
+                                                                            {
+                                                                                <strong data-containertype="setting_company_name">
+                                                                                    @WebApp.Helpers.CompanyDisplayHelpers.CompanyDisplayList(companyIds: setting.Value, divider: ",", companies: Model.Companies)
+                                                                                </strong>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <strong>@setting.Value</strong>
+                                                                            }
+                                                                        </small>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-1 col-md-1 col-lg-1 col-xl-1" style="text-align: right;">
+                                                        <a id="edit_setting_btn_@setting.Id" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" data-id="@setting.Id" data-actiontype="edit" data-settingkey="@setting.SettingsKey" date-settingname="@setting.Name"><i class="fas fa-edit"></i></a>
+                                                        <a id="remove_setting_btn_@setting.Id" class="btn btn-danger btn-sm mr-2 shadow-sm mt-auto disabled" style="color:white;" data-id="@setting.Id" data-actiontype="delete" date-settingname="@setting.Name" data-settingkey="@setting.SettingsKey"><i class="far fa-trash-alt"></i></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="settingkey_@setting.Id" value="@setting.SettingsKey" data-storage="settingkey" />
+                                    <input type="hidden" id="value_@setting.Id" value="@setting.Value" data-storage="value" />
+                                    <input type="hidden" id="name_@setting.Id" value="@setting.Name" data-storage="name" />
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <partial name="~/Views/Shared/_no_templates_message.cshtml" model="@Model" />
+                        }
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+
+    <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+    <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+
+    <script>
+
+        $(document).ready(function () {
+            ezgomediafetcher.preloadImagesAndVideos();
+            setting.init();
+
+        });
+
+        var setting = {
+            _companyChoiceSettings: [
+                'FEATURE_CHECKLISTS',
+                'FEATURE_TASKS',
+                'FEATURE_ACTIONS',
+                'FEATURE_ACTIONONTHESPOT',
+                'FEATURE_COMMENT',
+                'FEATURE_REQUIREPROOF',
+                'FEATURE_RUNNING_ASSESSMENTS_CMS',
+                'FEATURE_FACTORY_FEED',
+                'FEATURE_TASKTEMPLATEPROPERTIES_CHECKLISTS',
+                'FEATURE_AUDITS',
+                'FEATURE_TASKTEMPLATEPROPERTIES_AUDITS',
+                'FEATURE_CHECKLISTTEMPLATEPROPERTIES',
+                'FEATURE_AUDITTEMPLATEPROPERTIES',
+                'FEATURE_TASKTEMPLATEPROPERTIES',
+                'TECH_DBLOGGING_REQUESTRESPONSE',
+                'FEATURE_TIER_ADVANCED',
+                'FEATURE_TIER_ESSENTIALS',
+                'FEATURE_TIER_PREMIUM',
+                'FEATURE_EXPORTS',
+                'FEATURE_EXPORTS_ADVANCED',
+                'FEATURE_MARKET',
+                'MARKET_SAP',
+                'MARKET_SOLVACE',
+                'MARKET_ULTIMO',
+                'TECH_FIREBASELOGGING_CMS',
+                'FEATURE_EXPORTS_TASKPROPERTIES',
+                'TECH_TASKGENERATION',
+                'TECH_DATAWAREHOUSE',
+                'FEATURE_REPORTING',
+                'FEATURE_SKILLSMATRIX',
+                'FEATURE_SKILLSMATRIX_MANDATORYSKILLS',
+                'FEATURE_SKILLSMATRIX_OPERATIONALSKILLS',
+                'FEATURE_SKILLSMATRIX_OPERATIONALBEHAVIOUR',
+                'FEATURE_SKILLASSESSMENTS',
+                'FEATURE_WORKINSTRUCTIONS',
+                'FEATURE_ORDER_TASKS',
+                'FEATURE_ORDER_CHECKLISTS',
+                'FEATURE_ORDER_AUDITS',
+                'TECH_USE_STATIC_CHECKLIST_STORAGE',
+                'TECH_USE_STATIC_AUDIT_STORAGE',
+                'TECH_SUPPORT_CHAT',
+                "APP_DASHBOARD",
+                'APP_WEB',
+                'APP_XAMMACOS',
+                'APP_XAMWINDOWS',
+                'APP_XAMANDROID',
+                'APP_XAMIOS',
+                'APP_MYEZGO',
+                'APP_POSTMAN',
+                'APP_EZWORKINSTRUCTION',
+                'APP_EZASSESSMENT',
+                'APP_EZTASK',
+                'APP_EZCHECKLIST',
+                'APP_EZAUDIT',
+                'APP_EZGO_REALWEAR',
+                'FEATURE_ADVANCEDSEARCH',
+                'FEATURE_QRCODE',
+                'FEATURE_ANALYTICS',
+                'FEATURE_TASKGENERATION_PERIODDAY',
+                'FEATURE_TASKGENERATION_DYNAMICDAY',
+                'FEATURE_TASKGENERATION_GENERATION_OPTIONS',
+                'FEATURE_TASK_MULTISKIP',
+                'FEATURE_TAGS',
+                'FEATURE_WORKINSTRUCTION_ITEM_ATTACHMENT_PDF',
+                'FEATURE_WORKINSTRUCTION_ITEM_ATTACHMENT_LINK',
+                'FEATURE_TEMPLATE_SHARING',
+                'FEATURE_AUDIT_TRAIL_DETAILS',
+                'FEATURE_MODIFY_OWN_COMPANY_SETTINGS_WORKINSTRUCTION',
+                'FEATURE_MODIFY_OWN_COMPANY_SETTINGS_ASSESSMENT',
+                'FEATURE_MODIFY_OWN_COMPANY_SETTINGS_MATRIX',
+                "FEATURE_MATRIX_CHANGED_SCORE_ROUNDDEFAULT",
+                "FEATURE_MATRIX_CHANGED_SCORE_ROUNDDOWN",
+                'FEATURE_TRANSFERABLE_CHECKLISTS',
+                'TECH_FLATTEN_DATA',
+                'TECH_FLATTEN_DATA_FALLBACK',
+                'TECH_FLATTEN_DATA_SEARCH',
+                'TECH_TRAFFICSHAPING_COMPANIES',
+                'TECH_TRAFFICSHAPING_LIMITS',
+                'FEATURE_EXTENDED_USER_DETAILS',
+                'FEATURE_WORK_INSTRUCTIONS_CHANGED_NOTIFICATIONS',
+                'FEATURE_CHECKLIST_STAGES',
+                'FEATURE_EXPORT_MATRIX_SKILL_USER',
+                'FEATURE_SYSTEMROLE_MANAGEMENT',
+                'TECH_COMPANY_USER_PROVISIONING',
+                'TECH_ATOSS_PROVISIONING',
+                'FEATURE_MATRIX_CHANGED_SCORE_STANDARD',
+                'TECH_FLATTEN_DATA_AUTOMATED',
+                'TECH_TRAFFICSHAPING_TASKS',
+                'TECH_TRAFFICSHAPING_COMMENTS',
+                'TECH_TRAFFICSHAPING_ACTIONS',
+                'TECH_TRAFFICSHAPING_CHECKLISTS',
+                'TECH_TRAFFICSHAPING_AUDITS',
+                'FEATURE_VIRTUAL_TEAM_LEAD',
+                'FEATURE_TRANSLATE_AUTO',
+                'FEATURE_IP_RESTRICTION'
+            ],
+            _saveSettings: [
+                'TECH_TASKGENERATION_MINUTES',
+                'TECH_TASKGENERATION_HOURS',
+                'TECH_TASKGENERATION_RUNTYPE',
+                'TECH_ENABLED_LANGUAGES',
+                'GENERAL_TAG_LIMIT',
+                'GENERAL_TAGGROUP_LIMIT',
+                'TECH_TRAFFICSHAPING',
+                'TECH_TASK_RETRIEVAL_V2',
+                'TECH_HOLDING_USER_PROVISIONING',
+                'TECH_PROCESSOR'
+            ],
+            _mutuallyExclusiveSettings: [
+                [19,20] //ultimo, sap
+            ],
+            _activeFilter: '',
+            clear: function () {
+                $('#settings_value').val('').trigger('input');
+                $('#settings_id').val('');
+                $('[data-containertype="addchangecompany"]').hide();
+                $('[data-actiontype="selectcompany"]').prop('checked', false);
+                $('[data-actiontype="selectcompany"]').prop('disabled', false);
+                $('#settings_validation_warning_message').html('');
+                $('#settings_validation_warning_message').hide();
+                $('#save_settings_btn').prop('disabled', false);
+            },
+            create: function () {
+                var settingObj = {
+                    Value: $('#settings_value').val(),
+                    Id: $('#settings_id').val() != null && $('#settings_id').val() != '' ? parseInt($('#settings_id').val()) : 0
+                }
+                return settingObj;
+            },
+            deselect: function () {
+                $('[data-actiontype="selectcompany"]').prop('checked', false);
+                $('#settings_value').val('').trigger('input');
+            },
+            handleAddChangeCompany: function () {
+                $('[data-containertype="addchangecompany"]').show();
+            },
+            init: function () {
+                setting.setHandlers();
+                setting.clear();
+                setting.initSearch();
+            },
+            initSearch: function () {
+                if (localStorage.getItem('ezgo.filters.settings.resourcetype') != null || localStorage.getItem('ezgo.filters.settings.search') != null) {
+                    if (localStorage.getItem('ezgo.filters.settings.search') != null) {
+                        $('#settingsSearchBox').val(localStorage.getItem('ezgo.filters.settings.search'));
+                        setting.search(localStorage.getItem('ezgo.filters.settings.search'));
+                    };
+                    if (localStorage.getItem('ezgo.filters.settings.resourcetype') != null) {
+                        setting.searchFilter(localStorage.getItem('ezgo.filters.settings.resourcetype'));
+                    };
+                }
+            },
+            initEditModal: function (id, settingkey) {
+                setting.clear();
+                setting.setValues(id);
+                $('#modalSettings').modal('show');
+                if (setting._companyChoiceSettings.indexOf(settingkey) > -1) {
+                    $('[data-actiontype="addchangecompanies"]').show();
+                    let value = $('#value_' + id).val();
+                    if (value != null && value !== '') {
+                        if (value === 'ALL') {
+                            $('[data-actiontype="selectcompany"]').prop('checked', true);
+                        } else {
+                            values = value.split(',');
+                            for (var i = 0; i < values.length; i++) {
+                                $('[data-actiontype="selectcompany"][value="' + values[i] + '"]').prop('checked', true);
+                            }
+                        }
+                    }
+                    setting.disableCompanyChoiceForMutuallyExclusiveSettings(id);
+                    $('#save_settings_btn').show();
+                } else if (setting._saveSettings.indexOf(settingkey) > -1) {
+                    $('[data-actiontype="addchangecompanies"]').hide();
+                    $('#save_settings_btn').show();
+                }
+                else {
+                    $('[data-actiontype="addchangecompanies"]').hide();
+                    $('#save_settings_btn').hide();
+                }
+
+            },
+            remove: function () {
+                console.log('remove is disabled');
+            },
+            resetFilterColor: function () {
+                $('[data-filter-resourcetype]').css('color', '#808080');
+            },
+            save: function () {
+                $('body').toggleClass('loaded');
+                $('#modalSettings').modal('hide');
+
+                var settingToPost = setting.create();
+                //console.log(settingToPost);
+                if (settingToPost.Id > 0) {
+
+                    $.ajax({
+                        type: "POST",
+                        url: '/settings/save',
+                        data: JSON.stringify(settingToPost),
+                        success: function (data) {
+
+                            toastr.success('@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.SettingSaved, "Setting saved..reloading") ?? "Setting saved..reloading")');
+
+                            setTimeout(() => {
+                                $('body').toggleClass('loaded');
+                                location.href = '/settings';
+                            }, 1000);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            $('body').toggleClass('loaded');
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        },
+                        contentType: "application/json; charset=utf-8"
+                    });
+                } else {
+                    $('body').toggleClass('loaded');
+
+                    toastr.error('@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.SettingNotSaved, "Setting not saved.") ?? "Setting not saved.")');
+                }
+            },
+            search: function (searchText) {
+                setting.resetFilterColor();
+                localStorage.setItem('ezgo.filters.settings.search', searchText);
+                if (searchText != null && searchText != '') {
+                    $('[data-containertype="setting_container"]').hide();
+
+                    $('[data-setting-name*=\'' + searchText + '\' i]').show();
+                    $('[data-setting-key*=\'' + searchText + '\' i]').show();
+                    $('[data-id*=\'' + searchText + '\' i]').show();
+                    $($('[data-containertype="setting_company_name"]:icontains(' + searchText + ')')).parents('[data-containertype="setting_container"]').show();
+                    localStorage.removeItem('ezgo.filters.settings.resourcetype');
+
+                } else {
+                    $('[data-containertype="setting_container"]').show();
+                }
+            },
+            searchFilter: function (filter) {
+                setting.resetFilterColor();
+                localStorage.setItem('ezgo.filters.settings.resourcetype', filter);
+                if (filter == setting._activeFilter) {
+                    $('[data-containertype="setting_container"]').show();
+                    setting._activeFilter = '';
+                } else {
+                    $('[data-filter-resourcetype="' + filter + '"]').css('color', '#93C54B');
+                    $('[data-containertype="setting_container"]').hide();
+                    $('[data-resourcetype*=\'' + filter + '\']').show();
+                    setting._activeFilter = filter;
+                    $('#settingsSearchBox').val('');
+                    localStorage.removeItem('ezgo.filters.settings.search');
+                }
+
+            },
+            setValues: function (id) {
+                $('#settings_value').val($('#value_' + id).val()).trigger('input');
+                $('#settings_key_title').text($('#name_' + id).val() + ' - ' + $('#settingkey_' + id).val());
+                $('#settings_id').val(id);
+            },
+            setHandlers: function () {
+                $('[data-actiontype="edit"]').on('click', function () {
+                    setting.initEditModal($(this).attr('data-id'), $(this).attr('data-settingkey'));
+                });
+                $('[data-actiontype="addchangecompanies"]').on('click', function () {
+                    setting.handleAddChangeCompany();
+                });
+                $('[data-actiontype="selectcompany"]').on('click', function () {
+                    setting.updateValues(this);
+                });
+                $('#remove_settings_btn').on('click', function () {
+                    setting.remove();
+                });
+                $('#save_settings_btn').on('click', function () {
+                    setting.save();
+                });
+                $('[data-actiontype="deselectallcompanies"]').on('click', function () {
+                    //console.log('test');
+                    setting.deselect();
+                });
+                $('#settingsSearchBox').on('keyup', function () {
+                    setting.search($(this).val());
+                });
+                $('[data-filter-resourcetype]').on('click', function () {
+                    let val = $(this).attr('data-filter-resourcetype');
+                    setting.searchFilter(val);
+                });
+                $('#settings_value').on('input', function () {
+                    let settingToVerify = setting.create();
+                    setting.checkForMutualExclusivity(settingToVerify);
+                });
+            },
+            updateValues: function (trigger) {
+                if ($(trigger).val() === 'ALL' && $(trigger).is(':checked')) {
+                    $('[data-actiontype="selectcompany"]').each(function () { $(this).prop('checked', true) });
+                    $('#settings_value').val($(trigger).val()).trigger('input');
+                } else {
+                    $('[data-actiontype="selectcompany"][value="ALL"]').prop('checked', false);
+                    let selectedItems = $('[data-actiontype="selectcompany"]:checked');
+                    let values = [];
+                    selectedItems.each(function () {
+                        if ($(this).val() !== 'ALL') {
+                            values.push($(this).val());
+                        }
+                    });
+                    $('#settings_value').val(values.join(',')).trigger('input');
+                }
+            },
+            disableCompanyChoiceForMutuallyExclusiveSettings: function(id) {
+                let settingId = id ? parseInt(id) : 0;
+                for (const mutualExclusives of setting._mutuallyExclusiveSettings) {
+                    if (mutualExclusives.indexOf(settingId) > -1) {
+                        for (const mutualExclusiveId of mutualExclusives) {
+                            if (mutualExclusiveId != settingId) {
+                                otherSettingEnabled = $('#value_' + mutualExclusiveId).val();
+                                if (otherSettingEnabled != null && otherSettingEnabled !== '') {
+                                    if (otherSettingEnabled === 'ALL') {
+                                        let shouldDisable = !$('[data-actiontype="selectcompany"]').prop('checked');
+                                        $('[data-actiontype="selectcompany"]').prop('disabled', shouldDisable);
+                                    } else {
+                                        let enabledCompanies = otherSettingEnabled.split(',');
+                                        for (var i = 0; i < enabledCompanies.length; i++) {
+                                            let shouldDisable = !$('[data-actiontype="selectcompany"][value="' + enabledCompanies[i] + '"]').prop('checked');
+                                            $('[data-actiontype="selectcompany"][value="' + enabledCompanies[i] + '"]').prop('disabled', shouldDisable);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            checkForMutualExclusivity: function (settingObj) {
+                let mutuallyExclusiveEnabledFor = [];
+                for (const mutualExclusives of setting._mutuallyExclusiveSettings) {
+                    if (mutualExclusives.indexOf(settingObj.Id) > -1) {
+                        for (const mutualExclusiveId of mutualExclusives) {
+                            if (mutualExclusiveId != settingObj.Id) {
+                                otherSettingEnabled = $('#value_' + mutualExclusiveId).val();
+                                if (otherSettingEnabled != null && otherSettingEnabled !== '') {
+                                    if (otherSettingEnabled === 'ALL') {
+                                        mutuallyExclusiveEnabledFor = settingObj.Value.split(',');
+                                    } else {
+                                        let enabledCompanies = otherSettingEnabled.split(',');
+                                        for (var i = 0; i < enabledCompanies.length; i++) {
+                                            mutuallyExclusiveEnabledFor.push(enabledCompanies[i]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                const overlappingCompanyIds = mutuallyExclusiveEnabledFor.filter(x => settingObj.Value.split(',').includes(x));
+
+                if (overlappingCompanyIds.length > 0) {
+
+                    $('#settings_validation_warning_message').html('<i class="fa-solid fa-triangle-exclamation"></i> Companies have mutually exclusive settings enabled: ' + overlappingCompanyIds + ' <i class="fa-solid fa-triangle-exclamation"></i>');
+                    $('#settings_validation_warning_message').show();
+                    $('#save_settings_btn').prop('disabled', true);
+                } else {
+                    $('#settings_validation_warning_message').html('');
+                    $('#settings_validation_warning_message').hide();
+                    $('#save_settings_btn').prop('disabled', false);
+                }
+            }
+        };
+
+        jQuery.expr[":"].icontains = jQuery.expr.createPseudo(function (arg) {
+            return function (elem) {
+                return jQuery(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+            };
+        });
+
+    </script>
+
+}
+<!--
+@Model.ConnectionIP
+-->

@@ -1,0 +1,44 @@
+﻿@model FactoryFeedItemModel
+@using WebApp.Models.FactoryFeed
+@{
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+    var mediaUrl = "";
+    if (Model.Media != null && Model.Media.Any() && Model.Media.FirstOrDefault() != null && !string.IsNullOrEmpty(Model.Media.First().Uri))
+    {
+        if (Model.Media.FirstOrDefault().Uri.ToLower().EndsWith(".mp4") || Model.Media.FirstOrDefault().Uri.ToLower().EndsWith(".mov"))
+        {
+            mediaUrl = Model.Media.FirstOrDefault().Uri;
+
+            if (!Model.Media.FirstOrDefault().Uri.ToLower().StartsWith("https:"))
+            {
+                mediaUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Media.FirstOrDefault().Uri);
+            }
+        }
+        else
+        {
+            mediaUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Media.FirstOrDefault().Uri);
+        }
+    }
+
+    var username = User.Identity.Name;
+
+    var defaultProfileImg = "/assets/img/user-placeholder.jpg";
+    var profileImg = Model.PostUser?.Picture;
+    var profileImgUrl = profileImg.IsNullOrEmpty() || profileImg == "emptyprofile" ? defaultProfileImg : WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, profileImg);
+
+    string posterName = Model.PostUser != null ? Model.PostUser.FirstName + " " + Model.PostUser.LastName : "Unknown User";
+    
+    var itemDate = DateTime.SpecifyKind(Model.ItemDate, DateTimeKind.Utc);
+    
+    <div class="row" id="factoryUpdate-@Model.Id">
+        <div class="col-12 py-2" style="padding-left: 27px; cursor: pointer" onclick="ezgofactoryfeed.showFactoryUpdateDetail(this, @Model.Id, '@Html.Encode(Model.Title)', '@Html.Encode((Model.Description ?? "").Replace("\n", "<br />"))', '@TimeZoneInfo.ConvertTime(itemDate, timezone).ToString("dd-M-yyyy HH:mm:ss")', @(Model?.Media?.FirstOrDefault()?.ToJsonFromObject() ?? "''"), '@posterName', '@profileImgUrl', @Model.Id, @Model.CompanyId, @Json.Serialize(Model.IsSticky))" id="factoryUpdateMessage-@Model.Id">
+            <div class="pb-2 mb-0" style="display: flex">
+                <div style="text-overflow: ellipsis; height: 1.5em; overflow: hidden; white-space: nowrap; display: block; color: black; font-weight: bold">@Model.Title</div>
+                @if (Model.IsSticky)
+                {<i style="margin-left: auto; margin-right: 5px" class="fas fa-thumbtack"></i>}
+            </div>
+            <div style="color: #787878; font-size: 12px; display: flex">@TimeZoneInfo.ConvertTime(itemDate, timezone).ToString("dd-M-yyyy HH:mm:ss")</div>
+        </div>
+    </div>
+}

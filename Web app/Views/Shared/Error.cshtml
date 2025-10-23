@@ -1,0 +1,41 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+    //Model?.CmsLanguage.GetValue(LanguageKeys.Shared.ErrorTitle, "Error") ?? "Error";
+}   
+
+<h1 class="text-danger">Error.</h1>
+@*@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.Error, "Error.") ?? "Error.")*@
+<h2 class="text-danger">An error occurred while processing your request.</h2>
+@*@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.AnErrorOccured, "An error occurred while processing your request.") ?? "An error occurred while processing your request.")*@
+
+@if (Model.ShowRequestId)
+{
+    <p>
+        <strong>Request ID:</strong> <code>@Model.RequestId</code>
+        @*(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.RequestId, "Request ID:") ?? "Request ID:")*@
+    </p>
+}
+
+<h3>Development Mode</h3>
+@*@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.DevelopmentMode, "Development Mode") ?? "Development Mode")*@
+<p>
+    Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.
+    @*@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.SwappingTo, "Swapping to") ?? "Swapping to")
+    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.Development, "Development") ?? "Development")
+    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.EnviromentWillDisplayMore, "environment will display more detailed information about the error that occurred.") ?? "environment will display more detailed information about the error that occurred.")*@
+</p>
+<p>
+    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
+    It can result in displaying sensitive information from exceptions to end users.
+    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
+    and restarting the app.
+    @*@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.DevelopmentShouldntBeEnabled, "The Development environment shouldn't be enabled for deployed applications.") ?? "The Development environment shouldn't be enabled for deployed applications.")
+    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.ItCanResult, "It can result in displaying sensitive information from exceptions to end users.") ?? "It can result in displaying sensitive information from exceptions to end users.")
+    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.LocalDebugging, "For local debugging, enable the") ?? "For local debugging, enable the")
+    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.Development, "Development") ?? "Development")
+    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.EnviromentSetting, "environment by setting the") ?? "environment by setting the")
+    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.EnviromentVariable, "environment variable to") ?? "environment variable to")
+    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.Development, "Development") ?? "Development")
+    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.RestartingApp, "and restarting the app.") ?? "and restarting the app.")*@
+</p>

@@ -1,0 +1,319 @@
+﻿@model WebApp.Models.FactoryFeed.FactoryFeedItemModel
+@using WebApp.Models.FactoryFeed
+
+@using System.Security.Claims
+@using WebApp.Models.User
+@using System.Globalization
+@{
+    var defaultProfileImg = "/assets/img/user-placeholder.jpg";
+    var username = User.Identity.Name;
+    var profileImg = Model.PostUser?.Picture;
+    var profileImgUrl = profileImg.IsNullOrEmpty() || profileImg == "emptyprofile" ? defaultProfileImg : WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, profileImg);
+    string posterName = Model.PostUser != null ? Model.PostUser.FirstName + " " + Model.PostUser.LastName : "Unknown User";
+    string modifiedByName = Model.ModifiedByUser != null ? Model.ModifiedByUser.FirstName + " " + Model.ModifiedByUser.LastName : "Unknown User";
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+}
+<div class="card mb-3 shadow-0" id="ez-feed-message-@Model.Id">
+    <div class="card-header" style="display: flex;">
+        <div class="pull-left border-dark"><img id="ez-feed-message-postuserimage-@Model.Id" class="rounded-circle border" src="/images/media-loading.gif" data-src="@profileImgUrl" style="width: 50px; height: 50px"  /></div>
+        <div class="pull-left info" style="margin-left: 10px;">
+            <p id="ez-feed-message-postusername-@Model.Id" style="height: 7px;">@posterName</p>
+            @{ 
+                var dateUtc = DateTime.SpecifyKind(Model.ItemDate, DateTimeKind.Utc);
+            }
+            <div id="ez-feed-message-postdatetime-@Model.Id" class="text-sm" style="font-size:10px;">@TimeZoneInfo.ConvertTime(dateUtc, timezone).ToString("dd-M-yyyy HH:mm:ss")</div>
+        </div>
+        <div class="pull-right" style="margin-left: auto; max-width: 50%">
+            @if (Model.ModifiedById != 0 && Model.UserId != Model.ModifiedById)
+            {
+                <i>@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.LastModifiedBy, "Last modified by") ?? "Last modified by") @modifiedByName</i>
+            }
+        </div>
+        @if (Model.CurrentUser.Role.ToLower().Equals("manager") || Model.CurrentUser.Id.Equals(Model.UserId))
+        {
+            <div class="pull-right" style="margin-left: auto" data-itemid="@Model.Id">
+                <a onclick="ezgofactoryfeed.showPostMenu(@Model.Id);"><i class="fas fa-ellipsis-h"></i></a>
+            </div>
+            <div style="position: absolute; right: 1rem; display: none !important; " class="card postMenu" id="postMenu@(Model.Id)">
+                @{
+                    var mediaAttachments = new List<EZGO.Api.Models.Attachment>();
+                    if (Model?.Media != null)
+                    {
+                        for (int i = 0; i < Model.Media.Count; i++)
+                        {
+                            if (Model.Media[i] == null || string.IsNullOrEmpty(Model.Media[i].Uri))
+                            {
+                                continue;
+                            }
+                            else if (Model.Media[i].Uri.ToLower().EndsWith(".mp4") || Model.Media[i].Uri.ToLower().EndsWith(".mov"))
+                            {
+                                if (!Model.Media[i].Uri.ToLower().StartsWith("https:"))
+                                {
+                                    var mediaUri = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Media[i].Uri);
+
+                                    var thumbnailUri = "";
+                                    if (!string.IsNullOrEmpty(Model.Media[i].VideoThumbnailUri))
+                                    {
+                                        thumbnailUri = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Media[i].VideoThumbnailUri);
+                                    }
+
+                                    var mediaAttachment = new EZGO.Api.Models.Attachment() {
+                                        AttachmentType = Model.Media[i].AttachmentType,
+                                        FileExtension = Model.Media[i].FileExtension,
+                                        FileName = Model.Media[i].FileName,
+                                        FileType = Model.Media[i].FileType,
+                                        LastModified = Model.Media[i].LastModified,
+                                        Size = Model.Media[i].Size,
+                                        Uri = mediaUri,
+                                        VideoThumbnailUri = thumbnailUri
+                                    };
+
+                                    mediaAttachments.Add(mediaAttachment);
+                                }
+                                else
+                                {
+                                    mediaAttachments.Add(Model.Media[i]);
+                                }
+                            }
+                            else
+                            {
+                                var mediaUri = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Media[i].Uri);
+
+                                var mediaAttachment = new EZGO.Api.Models.Attachment() {
+                                    AttachmentType = Model.Media[i].AttachmentType,
+                                    FileExtension = Model.Media[i].FileExtension,
+                                    FileName = Model.Media[i].FileName,
+                                    FileType = Model.Media[i].FileType,
+                                    LastModified = Model.Media[i].LastModified,
+                                    Size = Model.Media[i].Size,
+                                    Uri = mediaUri,
+                                    VideoThumbnailUri = Model.Media[i].VideoThumbnailUri
+                                };
+
+                                mediaAttachments.Add(mediaAttachment);
+                            }
+                        }
+                    }
+                }
+                <a class="postMenuOption p-1" style="border-radius: 10px 10px 0px 0px" onclick="ezgofactoryfeed.editPost(@Model.Id, @mediaAttachments.ToJsonFromObject())"><img class="ml-2" src="~/images/factory-feed-edit.png" style="width: 12px; height: 12px" /><div class="pl-2 py-1" style="display: inline-block">@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.EditTitle, "Edit") ?? "Edit")</div></a>
+                <a class="postMenuOption p-1" style="border-radius: 0px 0px 10px 10px" onclick="ezgofactoryfeed.deletePost(this, @Model.Id, false)"><img class="ml-2" src="~/images/factory-feed-delete.png" style="width: 12px; height: 12px" /><div class="pl-2 py-1" style="display: inline-block">@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.DeleteTitle, "Delete") ?? "Delete")</div></a>
+            </div>
+        }
+    </div>
+    <div class="card-body">
+        <p class="mb-0" id="ez-feed-message-content-@Model.Id">@Html.Raw(Model.Description?.Replace("\n", "<br />"))</p>
+        
+        <partial name="_postimages" model="Model" />
+
+        <div id="ez-feed-message-edit-container-@Model.Id" style="display: none">
+            <div class="row">
+                <div class="col-12">
+                    <textarea class="form-control w-100 mb-2" id="ez-feed-message-edit-@Model.Id"></textarea>
+                </div>
+                <div class="col-6">
+                    <a class="btn btn-light" href="javascript:void(0);" onclick="ezgofactoryfeed.editSelectImage(this, @Model.Id)">
+                        <i class="far fa-image mr-2"></i>
+                        @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.PictureTitle, "Picture") ?? "Picture")
+                    </a>
+                    <input type="file" style="display:none" accept=".jpg, .jpeg, .png" id="factoryfeedEditImage-@Model.Id" />
+                    <input type="file" style="display:none" accept=".mp4, .mov" id="factoryfeedEditVideo-@Model.Id" />
+                    <input type="file" style="display:none" accept=".pdf" id="factoryfeedEditPdf-@Model.Id" />
+                    <a class="btn btn-light ml-2" href="javascript:void(0);" onclick="ezgofactoryfeed.editSelectVideo(this, @Model.Id)">
+                        <i class="fas fa-video mr-2"></i>
+                        @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.VideoTitle, "Video") ?? "Video")
+                    </a>
+                    <a class="btn btn-light ml-2" href="javascript:void(0);" onclick="ezgofactoryfeed.editSelectPdf(this, @Model.Id)">
+                        <i class="fas fa-file mr-2"></i>
+                        Pdf
+                    </a>
+                </div>
+                <div class="col-6">
+                    <button id="editFeedMessage-@Model.Id"
+                            class="btn btn-ezgo ml-2 float-right"
+                            onclick="ezgofactoryfeed.editFeedMessage(this, @Model.Id, @Model.CompanyId, @Model.FeedId, @Model.CurrentUser.Id, @Model.UserId);"
+                            style="color: #fff !important;"
+                            data-feedid="@Model.FeedId"
+                            data-itemtype="@Model.ItemType">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.SaveButton, "Save") ?? "Save")
+                    </button>
+                    <button type="button" id="cancelEditFeedMessage-@Model.Id" class="btn btn-danger float-right" onclick="ezgofactoryfeed.cancelEditPost(@Model.Id)">
+                        <i class="fas fa-ban mr-2"></i>
+                        @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.CancelButton, "Cancel") ?? "Cancel")
+                    </button>
+                </div>
+            </div>
+            <div class="editPostImageContainer-@Model.Id mt-3 row" style="display: none; position: relative">
+                
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card-footer p-1">
+        <div class="border-bottom-1" style="border-width: 1px; border-color: rgb(218,218,218); border-bottom-style: solid; padding-bottom: 5px; margin-bottom: 4px; margin-left: 7px; margin-right: 7px;">
+            <a class="btn btn-sm text-muted"
+               role="button"
+               data-toggle="collapse"
+               data-target="likesContainer-@Model.Id"
+               style="font-size: 12px;padding-right: 0px;padding-left: 0px;"
+               onclick="ezgofactoryfeed.showLikes(@Model.Id)">
+                <i class="fa fa-thumbs-up border rounded-circle" style="background: rgba(151, 193, 49, 0.82); padding: 4px; color: #fff; font-size: 11px;"></i>
+                <div style="display:inline;" id="likesAmount-@Model.Id">@(Model.LikesUserIds.Count)</div>
+            </a>
+            <div id="likesContainer-@Model.Id" style="display: none">
+            </div>
+            <a class="btn btn-sm text-muted"
+               role="button"
+               style="font-size: 12px; padding-left: 0px; float: right"
+               onclick="ezgofactoryfeed.loadComments(@Model.FeedId, @Model.Id)">
+                <i class="fas fa-comments border rounded-circle" style="background: rgba(151, 193, 49, 0.82); padding: 4px; color: #fff; font-size: 11px;"></i>
+                <div id="comment-counter-@Model.Id" style="display: inline-block">@Model.CommentCount</div>
+            </a>
+        </div>
+        @{
+            var toLike = !Model.LikesUserIds.Contains(Model.CurrentUser.Id);
+            var border = "background: rgba(151, 193, 49, 0.82);color: #fff";
+            if (toLike)
+            {
+                border = "";
+            }
+            <button class="btn btn-light btn-sm" type="button" style="margin-left: 4px; @border" data-id="@Model.Id" data-to-like="@toLike.ToString().ToLower()" onclick="ezgofactoryfeed.setItemLiked(this)">
+                <i class="fa fa-thumbs-o-up"></i>
+                @(Model.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.BtnGoodJob, "Good job") ?? "Good job")
+            </button>
+        }
+        <button class="btn btn-light btn-sm pull-right" type="button" style="margin-right: 4px;" onclick="ezgofactoryfeed.loadComments(@Model.FeedId, @Model.Id)" >
+            <i class="fa fa-commenting-o"></i>
+            @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.BtnComment, "Comment") ?? "Comment")
+        </button>
+    </div>
+
+    <div class="card-body pb-0" id="add-comments-@Model.Id" style="display: none">
+        <div class="form-group row pl-2 pr-2">
+            <div class="col-10 p-1">
+                <textarea row="3" class="form-control" id="add-comment-textarea-@Model.Id"></textarea>
+            </div>
+            <div class="col-2 p-1">
+                <button id="postComment-@Model.Id" type="button"
+                        class="btn btn-sm btn-dark btn-block"
+                        data-userimageurl="@(WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.CurrentUser.Picture))"
+                        data-userlastname="@(Model.CurrentUser.LastName)"
+                        data-userfirstname="@(Model.CurrentUser.FirstName)"
+                        data-companyid="@(Model.CompanyId)"
+                        data-feedid="@(Model.FeedId)"
+                        onclick="ezgofactoryfeed.addComment(this, @Model.Id, @Model.CompanyId, @Model.FeedId)" disabled="disabled">
+                    @(Model.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.BtnPlace, "Post") ?? "Post")
+                </button>
+            </div>
+        </div>
+        <div class="row pb-2 pl-2 pr-2">
+            <a class="btn btn-light" href="javascript:void(0);" onclick="ezgofactoryfeed.selectCommentImage(this, @Model.Id)">
+                <i class="far fa-image mr-2"></i>
+                @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.PictureTitle, "Picture") ?? "Picture")
+            </a>
+            <input type="file" style="display:none" accept=".jpg, .jpeg, .png" id="factoryfeedCommentImage-@Model.Id" />
+            <input type="file" style="display:none" accept=".mp4, .mov" id="factoryfeedCommentVideo-@Model.Id" />
+            <input type="file" style="display:none" accept=".pdf" id="factoryfeedCommentPdf-@Model.Id" />
+            <a class="btn btn-light ml-2" href="javascript:void(0);" onclick="ezgofactoryfeed.selectCommentVideo(this, @Model.Id)">
+                <i class="fas fa-video mr-2"></i>
+                @(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.VideoTitle, "Video") ?? "Video")
+            </a>
+            <a class="btn btn-light ml-2" href="javascript:void(0);" onclick="ezgofactoryfeed.selectCommentPdf(this, @Model.Id)">
+                <i class="fas fa-file mr-2"></i>
+                Pdf
+            </a>
+            <br />
+
+        </div>
+        <div class="row" style="position: relative">
+            <div class="postCommentImageContainer-@Model.Id mt-3" style="display: none">
+                <img id="postCommentImage-@Model.Id" src="" style="width: 100%"  />
+                <div class="controls d-print-none" style="position:absolute;bottom:0px;">
+                    <a href="#" data-selector="deletemedia" data-type="template" class="postCommentImageOverlay-@Model.Id">
+                        <div class="border rounded-circle float-left d-lg-flex justify-content-lg-center shadow main-image-pencil">
+                            <i class="fa fa-trash d-lg-flex justify-content-center align-items-center align-content-center" style="font-size: 20px;"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body" id="collapse-comments-@Model.Id" style="display: none">
+
+        <ul class="list-unstyled" id="commentsContainer-@Model.Id">
+            @if (Model.Comments != null)
+            {
+                @foreach (FactoryFeedItemCommentModel comment in Model.Comments)
+                {
+                    <partial name="_comment" />
+                }
+            }
+        </ul>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="LikesUsersModal-@Model.Id" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="FactoryUpdatesModalTitle">Likes</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="LikesUsersModalBody-@Model.Id">
+                @{
+                    var currentUser = Model.CurrentUser;
+                    var currentUserImg = currentUser.Picture;
+                    var currentUserImgUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, currentUserImg);
+                    if (currentUserImg == null || string.IsNullOrEmpty(currentUserImg) || currentUserImg == "emptyprofile")
+                    {
+                        currentUserImgUrl = defaultProfileImg;
+                    }
+
+                    var displayNone = "display: none; ";
+                    if (Model.LikesUserIds.Contains(currentUser.Id))
+                    {
+                        displayNone = "";
+                    }
+                }
+                <div class="row my-2" id="like-@Model.Id-@currentUser.Id">
+                    <div class="col-2">
+                        <img id="likeImage-@Model.Id-@currentUser.Id" class="rounded-circle" src="/images/media-loading.gif" data-src="@currentUserImgUrl" style="width: 50px; height: 50px; @displayNone"  />
+                    </div>
+                    <div class="col-10 d-flex align-items-center">
+                        <p id="likeUsername-@Model.Id-@currentUser.Id" style="@displayNone" class="m-0">@currentUser.FirstName @currentUser.LastName</p>
+                    </div>
+                </div>
+                @foreach (var likesUserId in Model.LikesUserIds)
+                {
+                    //don't do it for current user as it is already added
+                    var user = Model.LikesUsers.Where(u => u.Id == likesUserId && u.Id != currentUser.Id).FirstOrDefault();
+                    if (user != null)
+                    {
+                        var likeImg = user.Picture;
+                        var likeImgUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, likeImg);
+                        var defaultLikeImg = "/assets/img/user-placeholder.jpg";
+                        if (likeImg == null || string.IsNullOrEmpty(likeImg) || likeImg == "emptyprofile")
+                        {
+                            likeImgUrl = defaultLikeImg;
+                        }
+                        <div class="row my-2" id="like-@Model.Id-@user.Id">
+                            <div class="col-2">
+                                <img id="likeImage-@Model.Id-@user.Id" class="rounded-circle" src="/images/media-loading.gif" data-src="@likeImgUrl" style="width: 50px; height: 50px"  />
+                            </div>
+                            <div class="col-10 d-flex align-items-center">
+                                <p id="likeUsername-@Model.Id-@user.Id" class="m-0">@user.Name</p>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>

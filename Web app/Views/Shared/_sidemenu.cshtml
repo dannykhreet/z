@@ -1,0 +1,443 @@
+﻿@model WebApp.ViewModels.BaseViewModel
+@using System.Security.Claims
+@using WebApp.Models.User
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@{
+    var username = User.Identity.Name;
+    var profileImg = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.UserData)?.Value.ToObjectFromJson<UserProfile>().Picture;
+    var profileImgUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model?.ApplicationSettings, profileImg);
+    var defaultProfileImg = "/assets/img/user-placeholder.jpg";
+    if (profileImg == null || string.IsNullOrEmpty(profileImg) || profileImg == "emptyprofile")
+    {
+        profileImgUrl = defaultProfileImg;
+    }
+}
+
+<style>
+    .user-panel img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    }
+</style>
+
+<a href="#" class="brand-link" style="cursor: default">
+    <img src="/images/logo.png" alt="EZ Factory Logo" class="brand-image d-none" style="opacity: .8">
+    <span class="brand-text font-weight-light">&nbsp;</span>
+</a>
+
+<!-- Sidebar -->
+<div id="mainSidebar" class="sidebar">
+    <!-- Sidebar user panel (optional) -->
+    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+            <img src="/images/media-loading.gif" data-src="@profileImgUrl" class="img-circle" alt="User Image : @username.Replace("\"","")">
+        </div>
+
+        <div class="info">
+            <a href="#" class="d-block" style="cursor: default">@username</a>
+        </div>
+    </div>
+
+    <!-- New sidebar menu -->
+    <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column nav-legacy" data-widget="treeview" role="menu" data-accordion="false">
+            <li class="nav-item fg-success" data-container="nav" data-toggle="tooltip" data-placement="right">
+                <a asp-controller="dashboard" asp-action="index" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.DASHBOARD ? "active" : null)">
+                    <div class="ezgo-tooltip">
+                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <div class="ezgo-tooltip-text">
+                            <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.MenuDashboardTitleHover, "Dashboard") ?? "Dashboard")</span>
+                        </div>
+                    </div>
+
+                    <p class="ml-5">
+                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.MenuDashboardTitle, "Dashboard") ?? "Dashboard")
+                    </p>
+                </a>
+            </li>
+
+            @if (Model?.IsAdminCompany == true)
+            {
+                //building
+                <li class="nav-item">
+                    <a asp-controller="Company" asp-action="Index" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.COMPANIES ? "active" : null)">
+                        <div class="ezgo-tooltip">
+                            <i class="nav-icon fas fa-building"></i>
+                            <div class="ezgo-tooltip-text">
+                                <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsCompanies, "Companies") ?? "Companies")</span>
+                            </div>
+                        </div>
+
+                        <p class="ml-5">
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsCompanies, "Companies") ?? "Companies")
+                            <span class="right badge badge-danger d-none">@(Model?.CmsLanguage.GetValue(LanguageKeys.Shared.NewTitle, "New") ?? "New")</span>
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="Language" asp-action="Overview" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.APPLANGUAGES ? "active" : null)">
+                        <div class="ezgo-tooltip">
+                            <i class="nav-icon fas fa-language"></i>
+                            <div class="ezgo-tooltip-text">
+                                <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.MenuAppLanguageTitle, "App Languages") ?? "App Languages")</span>
+                            </div>
+                        </div>
+
+                        <p class="ml-5">
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.MenuAppLanguageTitle, "App Languages") ?? "App Languages")
+                            <span class="right badge badge-danger d-none">@(Model?.CmsLanguage.GetValue(LanguageKeys.Shared.NewTitle, "New") ?? "New")</span>
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="Announcement" asp-action="Index" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.ANNOUNCEMENTS ? "active" : null)">
+                        <div class="ezgo-tooltip">
+                            <i class="nav-icon fas fa-bullhorn"></i>
+                            <div class="ezgo-tooltip-text">
+                                <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsAnnouncements, "Announcements") ?? "Announcements")</span>
+                            </div>
+                        </div>
+
+                        <p class="ml-5">
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsAnnouncements, "Announcements") ?? "Announcements")
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="Settings" asp-action="Index" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.SETTINGS ? "active" : null)">
+                        <div class="ezgo-tooltip">
+                            <i class="nav-icon fas fa-cog"></i>
+                            <div class="ezgo-tooltip-text">
+                                <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsSettings, "Settings") ?? "Settings")</span>
+                            </div>
+                        </div>
+
+                        <p class="ml-5">
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsSettings, "Settings") ?? "Settings")
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="RawViewer" asp-action="Index" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.RAWVIEWER ? "active" : null)">
+                        <div class="ezgo-tooltip">
+                            <i class="nav-icon fas fa-eye"></i>
+                            <div class="ezgo-tooltip-text">
+                                <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsRawViewer, "Raw viewer") ?? "Raw viewer")</span>
+                            </div>
+                        </div>
+
+                        <p class="ml-5">
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsRawViewer, "Raw viewer") ?? "Raw viewer")
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="RawViewer" asp-action="Scheduler" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.RAWSCHEDULER ? "active" : null)">
+                        <div class="ezgo-tooltip">
+                            <i class="nav-icon far fa-calendar-alt"></i>
+                            <div class="ezgo-tooltip-text">
+                                <span class="tooltiptext shadow">@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.AdminStatsScheduler, "Scheduler") ?? "Scheduler")</span>
+                            </div>
+                        </div>
+
+                        <p class="ml-5">
+                            @(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.AdminStatsScheduler, "Scheduler") ?? "Scheduler")
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="Datawarehouse" asp-action="Index" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.DATAWAREHOUSE ? "active" : null)">
+                        <div class="ezgo-tooltip">
+                            <i class="nav-icon fas fa-database"></i>
+                            <div class="ezgo-tooltip-text">
+                                <span class="tooltiptext shadow">Datawarehouse</span>
+                            </div>
+                        </div>
+
+                        <p class="ml-5">
+                            Datawarehouse
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="Version" asp-action="Index" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.VERSIONS ? "active" : null)">
+                        <div class="ezgo-tooltip">
+                            <i class="nav-icon fa-solid fa-code-commit"></i>
+                            <div class="ezgo-tooltip-text">
+                                <span class="tooltiptext shadow">Versions</span>
+                            </div>
+                        </div>
+
+                        <p class="ml-5">
+                            Versions
+                        </p>
+                    </a>
+                </li>
+            }
+            else
+            {
+                if (Model?.ApplicationSettings?.Features?.ChecklistsEnabled == true)
+                {
+                    <li class="nav-item">
+                        <a asp-controller="checklist" asp-action="Index" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.CHECKLISTS || Model?.Filter.Module == FilterViewModel.ApplicationModules.COMPLETEDCHECKLISTS ? "active" : null)">
+                            <div class="ezgo-tooltip">
+                                <i class="nav-icon fas fa-check-double"></i>
+                                <div class="ezgo-tooltip-text">
+                                    <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.MenuChecklistTitleHover, "Manage checklists") ?? "Manage checklists")</span>
+                                </div>
+                            </div>
+
+                            <p class="ml-5">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.MenuChecklistTitle, "Checklists") ?? "Checklists")
+                            </p>
+                        </a>
+                    </li>
+                }
+
+                @if (Model?.ApplicationSettings?.Features?.TasksEnabled == true)
+                {
+                    <li class="nav-item">
+                        <a asp-controller="Task" asp-action="Index" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.TASKS || Model?.Filter.Module == FilterViewModel.ApplicationModules.COMPLETEDTASKS ? "active" : null)">
+                            <div class="ezgo-tooltip">
+                                <i class="nav-icon fas fa-clipboard-check"></i>
+                                <div class="ezgo-tooltip-text">
+                                    <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.MenuTaskTitleHover, "Manage tasks") ?? "Manage tasks")</span>
+                                </div>
+                            </div>
+
+                            <p class="ml-5">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.MenuTaskTitle, "Tasks") ?? "Tasks")
+                            </p>
+                        </a>
+                    </li>
+                }
+
+                @if (Model?.ApplicationSettings?.Features?.AuditsEnabled == true)
+                {
+                    <li class="nav-item">
+                        <a asp-controller="Audit" asp-action="Index" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.AUDITS || Model?.Filter.Module == FilterViewModel.ApplicationModules.COMPLETEDAUDITS ? "active" : null)">
+                            <div class="ezgo-tooltip">
+                                <i class="nav-icon fas fa-signature"></i>
+                                <div class="ezgo-tooltip-text">
+                                    <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.MenuAuditTitleHover, "Manage audits") ?? "Manage audits")</span>
+                                </div>
+                            </div>
+
+                            <p class="ml-5">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.MenuAuditTitle, "Audits") ?? "Audits")
+                            </p>
+                        </a>
+                    </li>
+                }
+
+
+                @if (Model?.ApplicationSettings?.Features?.ActionsEnabled == true)
+                {
+                    <li class="nav-item">
+                        <a asp-controller="Action" asp-action="Index" asp-route-filter="action" class="nav-link  @(Model?.Filter.Module == FilterViewModel.ApplicationModules.ACTIONS ? "active" : null)">
+                            <div class="ezgo-tooltip">
+                                <i class="nav-icon fas fa-bolt-lightning"></i>
+                                <div class="ezgo-tooltip-text">
+                                    <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.MenuActionTitleHover, "Get track on actions") ?? "Get track on actions")</span>
+                                </div>
+                            </div>
+
+                            <p class="ml-5">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.MenuActionTitle, "Actions") ?? "Actions")
+                            </p>
+                        </a>
+                    </li>
+                }
+
+                @if (Model?.ApplicationSettings?.Features?.ReportsEnabled == true)
+                {
+                    <li class="nav-item d-none">
+                        <a asp-controller="Report" asp-action="Index" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.REPORT ? "active" : null)">
+                            <i class="nav-icon fas fa-chart-area"></i>
+                            <p class="ml-5">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.MenuDashboardTitle, "Dashboard") ?? "Dashboard") @(Model?.CmsLanguage.GetValue(LanguageKeys.Shared.Reports, "Reports") ?? "Reports")
+                            </p>
+                        </a>
+                    </li>
+                }
+
+                @if (Model?.ApplicationSettings?.Features?.WorkInstructions == true)
+                {
+                    <li class="nav-item">
+                        <a asp-controller="WorkInstructions" asp-action="Index" class="nav-link @((Model?.Filter.Module == FilterViewModel.ApplicationModules.WORKINSTRUCTIONS || Model?.Filter.Module == FilterViewModel.ApplicationModules.WICHANGENOTIFICATIONS) ? "active" : null)">
+                            <div class="ezgo-tooltip">
+                                <i class="nav-icon fas fa-hard-hat"></i>
+                                <div class="ezgo-tooltip-text">
+                                    <span class="tooltiptext shadow">@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.MenuWorkInstructionTitle, "Work instructions") ?? "Work instructions")</span>
+                                </div>
+                            </div>
+
+                            <p class="ml-5">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.MenuWorkInstructionTitle, "Work instructions") ?? "Work instructions")
+                            </p>
+                        </a>
+                    </li>
+                }
+
+                @if (Model?.ApplicationSettings?.Features?.SkillAssessments == true)
+                {
+                    <li class="nav-item">
+                        <a asp-controller="Skills" asp-action="Index" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.SKILLASSESSMENTS || Model?.Filter.Module == FilterViewModel.ApplicationModules.REPORTSKILLASSESSMENTS ? "active" : null)">
+                            <div class="ezgo-tooltip">
+                                <i class="nav-icon fas fa-graduation-cap"></i>
+                                <div class="ezgo-tooltip-text">
+                                    <span class="tooltiptext shadow">@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.MenuAssessmentsTitle, "Assessments") ?? "Assessments")</span>
+                                </div>
+                            </div>
+
+                            <p class="ml-5">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.MenuAssessmentsTitle, "Assessments") ?? "Assessments")
+                            </p>
+                        </a>
+                    </li>
+                }
+
+                @if (Model?.ApplicationSettings?.Features?.SkillMatrix == true)
+                {
+                    <li class="nav-item">
+                        <a asp-controller="Skills" asp-action="MatrixIndex" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.SKILLSMATRIX ? "active" : null)">
+                            <div class="ezgo-tooltip">
+                                <i class="nav-icon fas fa-border-none"></i>
+                                <div class="ezgo-tooltip-text">
+                                    <span class="tooltiptext shadow">@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.MenuSkillMatricesTitle, "Skill matrices") ?? "Skill matrices")</span>
+                                </div>
+                            </div>
+
+                            <p class="ml-5">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.MenuSkillMatricesTitle, "Skill matrices") ?? "Skill matrices")
+                            </p>
+                        </a>
+                    </li>
+                }
+
+                @if (Model?.ApplicationSettings?.Features?.FactoryFeedEnabled == true)
+                {
+                    <li class="nav-item">
+                        <a asp-controller="FactoryFeed" asp-action="Index" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.FACTORYFEED ? "active" : null)">
+                            <div class="ezgo-tooltip">
+                                <i class="nav-icon fas fa-comment-alt"></i>
+                                <div class="ezgo-tooltip-text">
+                                    <span class="tooltiptext shadow">@(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.MenuEZFeedTitle, "EZ-Feed") ?? "EZ-Feed")</span>
+                                </div>
+                            </div>
+
+                            <p class="ml-5">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.MenuEZFeedTitle, "EZ-Feed") ?? "EZ-Feed")
+                            </p>
+                        </a>
+                    </li>
+                }
+
+                @if (User.IsInRole("serviceaccount") || ((Model?.ApplicationSettings?.Features?.RoleManagementEnabled.HasValue == false || Model?.ApplicationSettings?.Features?.RoleManagementEnabled.Value == false) && User.IsInRole("manager")) || (Model?.ApplicationSettings?.Features?.RoleManagementEnabled.HasValue == true && Model?.ApplicationSettings?.Features?.RoleManagementEnabled.Value == true && User.IsInRole("usermanager")))
+                {
+                    <li class="nav-item">
+                        <a asp-controller="UserPermission" asp-action="Index" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.USERS ? "active" : null)">
+                            <div class="ezgo-tooltip">
+                                <i class="nav-icon fas fa-user-pen"></i>
+                                <div class="ezgo-tooltip-text">
+                                    <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.MenuUserTitleHover, "Manage user profiles") ?? "Manage user profiles")</span>
+                                </div>
+                            </div>
+
+                            <p class="ml-5">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.MenuUserTitle, "Users") ?? "Users")
+                            </p>
+                        </a>
+                    </li>
+                } 
+                
+                @if (User.IsInRole("manager"))
+                {
+                    <li class="nav-item">
+                        <a asp-controller="Config" asp-action="Index" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.CONFIG ? "active" : null)">
+                            <div class="ezgo-tooltip">
+                                <i class="nav-icon fas fa-gear"></i>
+                                <div class="ezgo-tooltip-text">
+                                    <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.MenuConfigTitleHover, "Configuration") ?? "Configuration")</span>
+                                </div>
+                            </div>
+
+                            <p class="ml-5">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.MenuConfigTitle, "Configuration") ?? "Configuration")
+                            </p>
+                        </a>
+                    </li>
+                }
+
+                @if (User.IsInRole("serviceaccount"))
+                {
+                    <li class="nav-item">
+                        <a asp-controller="Tools" asp-action="Index" class="nav-link @(Model?.Filter.Module == FilterViewModel.ApplicationModules.TOOLS ? "active" : null)">
+                            <div class="ezgo-tooltip">
+                                <i class="nav-icon fa-solid fa-screwdriver-wrench"></i>
+                                <div class="ezgo-tooltip-text">
+                                    <span class="tooltiptext shadow">Tools</span>
+                                </div>
+                            </div>
+
+                            <p class="ml-5">
+                                Tools
+                            </p>
+                        </a>
+                    </li>
+                }
+            }
+
+            @if (Model != null)
+            {
+                @if (!Model.IsAdminCompany && Model.ApplicationSettings.AvailableLanguages != null)
+                {
+                    if (!string.IsNullOrEmpty(Model.Locale))
+                    {
+                        System.Globalization.CultureInfo currentCulture;
+                        try
+                        {
+                            currentCulture = System.Globalization.CultureInfo.GetCultureInfo(Model.Locale);
+                        } catch (System.Globalization.CultureNotFoundException ex)
+                        {
+                            currentCulture = System.Globalization.CultureInfo.InvariantCulture;
+                        }
+                      
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="$('#modalLanguageChoice').modal('show')">
+                                <div class="ezgo-tooltip">
+                                    @{
+                                        var flagImage = string.Format("/assets/img/flags/{0}.png", Model.Locale.ToString().ToLower());
+
+                                    }
+                                    <img src="@flagImage" class="img-fluid nav-icon" style="max-width:25px;max-height:20px;cursor:pointer" onerror="" alt="@currentCulture.NativeName" />
+                                    <div class="ezgo-tooltip-text">
+                                        <span class="tooltiptext shadow">@currentCulture.NativeName</span>
+                                    </div>
+                                </div>
+
+                                <p class="ml-5">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.ChooseLanguageTitle, "Choose language") ?? "Choose language")
+                                </p>
+                            </a>
+                        </li>
+ 
+                    }
+
+                }
+            }
+        </ul>
+    </nav>
+    <!-- End new sidebar menu -->
+</div>

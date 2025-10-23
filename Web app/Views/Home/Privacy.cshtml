@@ -1,0 +1,6 @@
+﻿@{
+    ViewData["Title"] = Model?.CmsLanguage.GetValue(LanguageKeys.Home.PrivacyPolicyTitle, "Privacy Policy") ?? "Privacy Policy";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>@(Model?.CmsLanguage.GetValue(LanguageKeys.Home.UseThisToPrivacyPolicy, "Use this page to detail your site's privacy policy.") ?? "Use this page to detail your site's privacy policy.")</p>

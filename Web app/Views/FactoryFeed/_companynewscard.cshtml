@@ -1,0 +1,197 @@
+﻿@model FactoryFeedViewModel
+@{
+    var feedModel = Model?.Feed?.Where(f => f.FeedType == EZGO.Api.Models.Enumerations.FeedTypeEnum.FactoryUpdates).FirstOrDefault();
+    var firstMessage = feedModel?.Items?.FirstOrDefault();
+    var otherMessages = feedModel?.Items?.Skip(1).Take(4).ToList();
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+}
+<section class="sticky-top">
+    <div class="card">
+        <div class="card-header">
+            <div class="pull-left border-dark">
+                <div class="row">
+
+                    <div class="col-10">
+                        <h5 style="color: #93C54B">@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.FactoryUpdatesTitle, "Factory Updates") ?? "Factory Updates")</h5>
+                    </div>
+
+                    @if (Model.CurrentUser.Role.ToLower().Equals("manager"))
+                    {
+                        <div class="col-2" style="display: flex; align-items: start; justify-content: right">
+                            <a href="#" onclick="ezgofactoryfeed.showFactoryUpdatesModal()" style="display: flex; float: right; text-align: center; flex-basis: 23px; flex-grow: 0; flex-shrink: 0; border: 2px solid #93C54B; border-radius: 100%; font-size: 10px; line-height: 18px; color: #909090 ">
+                                <i class="fa fa-plus fa-lg" style="font-size: 10px; line-height: 18px; color: #93C54B; padding-left: 5px"></i>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @{
+            string mediaUrl = "";
+        }
+        @if (firstMessage != null)
+        {
+
+        }
+        @if (feedModel == null)
+        {
+            <div class="row">
+                <div class="col-12">
+                    <div class="px-2" style="display: flex;">
+                        <div class="px-2">Save the company to enable EZ Feed.</div>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="card-body p-0" style="max-height:65vh; overflow-y: scroll; overflow-x: hidden">
+            <div class="mx-0 mb-3" id="factoryUpdateMessages">
+                @if (firstMessage != null)
+                {
+                    <div class="row" id="factoryUpdatePicture-@firstMessage.Id">
+                        <div class="col-12">
+                            @{
+                                EZGO.Api.Models.Attachment mediaAttachment = null;
+                            }
+                            @if (firstMessage.Media != null && firstMessage.Media.Any() && firstMessage.Media.FirstOrDefault() != null && !string.IsNullOrEmpty(firstMessage.Media.FirstOrDefault().Uri))
+                            {
+                                @if (firstMessage.Media.First().Uri.ToLower().EndsWith(".mp4") || firstMessage.Media.First().Uri.ToLower().EndsWith(".mov"))
+                                {
+                                    mediaUrl = firstMessage.Media.First().Uri;
+
+                                    if (!firstMessage.Media.FirstOrDefault().Uri.StartsWith("https:"))
+                                    {
+                                        mediaUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, firstMessage.Media.FirstOrDefault().Uri);
+                                    }
+
+                                    var thumbnailUri = firstMessage.Media.First().VideoThumbnailUri;
+
+                                    if (!string.IsNullOrEmpty(firstMessage.Media.First().VideoThumbnailUri))
+                                    {
+                                        thumbnailUri = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, firstMessage.Media.First().VideoThumbnailUri);
+                                    }
+                                    
+                                    mediaAttachment = new EZGO.Api.Models.Attachment() {
+                                        AttachmentType = firstMessage.Media.First().AttachmentType,
+                                        FileExtension = firstMessage.Media.First().FileExtension,
+                                        FileName = firstMessage.Media.First().FileName,
+                                        FileType = firstMessage.Media.First().FileType,
+                                        LastModified = firstMessage.Media.First().LastModified,
+                                        Size = firstMessage.Media.First().Size,
+                                        Uri = mediaUrl,
+                                        VideoThumbnailUri = thumbnailUri
+                                    };
+
+                                    <div id="factoryUpdateVideoContainer-@firstMessage.Id">
+                                        <video controls style="max-width: 100%" src="/images/media-loading.mp4" data-src="@mediaUrl" >
+                                            @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                        </video>
+                                    </div>
+                                }
+                                else if (firstMessage.Media.FirstOrDefault().Uri.ToLower().EndsWith(".pdf"))
+                                {
+                                    mediaUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, firstMessage.Media.FirstOrDefault().Uri);
+                                    
+                                    mediaAttachment = new EZGO.Api.Models.Attachment() {
+                                        AttachmentType = firstMessage.Media.First().AttachmentType,
+                                        FileExtension = firstMessage.Media.First().FileExtension,
+                                        FileName = firstMessage.Media.First().FileName,
+                                        FileType = firstMessage.Media.First().FileType,
+                                        LastModified = firstMessage.Media.First().LastModified,
+                                        Size = firstMessage.Media.First().Size,
+                                        Uri = mediaUrl
+                                    };
+
+                                    <div id="factoryUpdatePdfContainer-@firstMessage.Id" class="pb-2 pl-3 pr-2">
+                                        <a href="/images/media-loading.gif" data-href="@mediaUrl" data-fancybox="factoryUpdateImageFancybox-@firstMessage.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                                            <div class="row">
+                                                <div class="col-9 p-0 factoryFeedPdfBGFactoryUpdate" style="background-color: #E6E6E6"></div>
+                                                <div class="col-3 p-0">
+                                                    <div class="pdfTriangleFactoryUpdate"></div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12 p-0 factoryFeedPdfBGFactoryUpdate" style="text-align: center">
+                                                    <img class="factoryFeedPdfLogoFactoryUpdate" src="/images/logo-green.png" />
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12 factoryFeedPdfBottomSectionFactoryUpdate">
+                                                    PDF
+                                                </div>
+                                            </div>
+                                        </a>
+
+                                    </div>
+                                }
+                                else
+                                {
+                                    mediaUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, firstMessage.Media.FirstOrDefault().Uri);
+                                    
+                                    mediaAttachment = new EZGO.Api.Models.Attachment() {
+                                        AttachmentType = firstMessage.Media.First().AttachmentType,
+                                        FileExtension = firstMessage.Media.First().FileExtension,
+                                        FileName = firstMessage.Media.First().FileName,
+                                        FileType = firstMessage.Media.First().FileType,
+                                        LastModified = firstMessage.Media.First().LastModified,
+                                        Size = firstMessage.Media.First().Size,
+                                        Uri = mediaUrl
+                                    };
+
+                                    <div id="factoryUpdateImageContainer-@firstMessage.Id">
+                                        <a href="/images/media-loading.gif" data-href="@mediaUrl" data-fancybox="factoryUpdateFancybox-@firstMessage.Id">
+                                            <img class="card-img w-100 d-block rounded-0" src="/images/media-loading.gif" data-src="@mediaUrl"  />
+                                        </a>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    var username = User.Identity.Name;
+                    
+                    var defaultProfileImg = "/assets/img/user-placeholder.jpg";
+                    var profileImg = firstMessage.PostUser?.Picture;
+                    var profileImgUrl = profileImg.IsNullOrEmpty() || profileImg == "emptyprofile" ? defaultProfileImg : WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, profileImg);
+                    
+                    string firstMessagePosterName = firstMessage.PostUser != null ? firstMessage.PostUser.FirstName + " " + firstMessage.PostUser.LastName : "Unknown User";
+                    
+                    var itemDate = DateTime.SpecifyKind(firstMessage.ItemDate, DateTimeKind.Utc);
+
+                    <div class="row" id="factoryUpdate-@firstMessage.Id">
+                        <div class="col-12 py-2" style="padding-left: 27px; cursor: pointer" onclick="ezgofactoryfeed.showFactoryUpdateDetail(this, @firstMessage.Id, '@Html.Encode(firstMessage.Title)', '@Html.Encode(firstMessage.Description.Replace("\n", "<br />"))', '@TimeZoneInfo.ConvertTime(itemDate, timezone).ToString("dd-M-yyyy HH:mm:ss")', @(mediaAttachment?.ToJsonFromObject() ?? "''"), '@firstMessagePosterName', '@profileImgUrl', @firstMessage.Id, @firstMessage.CompanyId, @Json.Serialize(firstMessage.IsSticky))" id="factoryUpdateMessage-@firstMessage.Id">
+                            <div class="pb-0 mb-0" style="display: flex">
+                                <div style="text-overflow: ellipsis; height: 1.5em; overflow: hidden; white-space: nowrap; display: block; color: black; font-weight: bold">@firstMessage.Title</div>
+                                @if (firstMessage.IsSticky)
+                                {<i style="margin-left: auto; margin-right: 5px" class="fas fa-thumbtack"></i>}
+                            </div>
+                            <span>@firstMessage.Description</span>
+                            <div style="color: #787878; font-size: 12px; display: flex">@TimeZoneInfo.ConvertTime(itemDate, timezone).ToString("dd-M-yyyy HH:mm:ss")</div>
+                        </div>
+                    </div>
+                }
+                @if (otherMessages != null)
+                {
+                    foreach (var message in otherMessages)
+                    {
+                        <partial name="_factoryupdate" model="message" />
+                    }
+                }
+            </div>
+        </div>
+        <div class="card-footer" style="text-align:center;">
+            <div id="factoryUpdatesLoader" class="card mb-0" style="display: none; overflow-x:hidden">
+                <div class="list-group-item list-group-item-action">
+                    <img style="width: 100px; height: 100px" src="/images/feed-loading.gif" />
+                </div>
+            </div>
+            <span id="load_more_loader" style="margin-top:-10px;"></span>
+            <div style="text-align:center;margin-top:5px;" id="loadMoreFactoryUpdates">
+                <a class="btn btn-ezgo" style="width:100%;" data-actiontype="load_more"><i class="fas fa-angle-double-down"></i></a>
+            </div>
+
+        </div>
+    </div>
+</section>

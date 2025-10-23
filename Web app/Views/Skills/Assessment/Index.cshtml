@@ -1,0 +1,619 @@
+﻿@model WebApp.ViewModels.AssessmentViewModel
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = @Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.StatsAssessmentsTitle, "Assessments") ?? "Assessments";
+}
+
+@section CSS{
+    <style>
+        #contentBody .card {
+            border: solid 1px transparent;
+            transition: transform .2s; /* Animation */
+        }
+
+            #contentBody .card:hover {
+                border: solid 1px #93c54b;
+                box-shadow: 0 .425rem .75rem rgba(0,0,0,.075) !important;
+                color: #93c54b !important;
+                transform: scale(1.010);
+                margin-left: 5px;
+                left: 5px;
+            }
+
+        #contentBody .card a:hover {
+            color: #93c54b !important;
+        }
+
+        #contentBody img.img-fluid {
+            border-radius: 5px;
+            border: solid 1px #bfbfbf;
+        }
+
+        .user-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+        }
+
+        @* Darg and drop styles *@
+        .user-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+        }
+
+        .myhighlight {
+            background-color: lime;
+        }
+
+        #userlist, #participantlist {
+            overflow-y: auto;
+            height: 416px;
+            overflow-x: hidden;
+        }
+
+        .user {
+            border-radius: 10px;
+            z-index: 1;
+            cursor: move;
+        }
+
+            .user:hover {
+                border: solid 1px silver;
+            }
+
+        .drop {
+            background-color: #f9f9f9;
+        }
+
+        .list-group-area-filter-inline {
+            padding-right: 0px;
+            height: 230px;
+            padding-left: 0px;
+            overflow: auto;
+        }
+
+        #inlineAreaTree .list-group-area-filter-inline {
+            border: none;
+            height: unset;
+        }
+
+        #inlineAreaTree a {
+            color: slategrey;
+            cursor: pointer;
+        }
+
+            #inlineAreaTree a:hover {
+                text-decoration: none;
+            }
+    </style>
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-3">
+                &nbsp;
+                <h1>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OverViewTitle, "Assessment overview") ?? "Assessment overview")</h1>
+            </div>
+            <div class="col-sm-3 align-self-end"><span style="margin-left:10px;"><a href="/report/skillassessment/completed" target="_top" data-tracking="enabled" data-tracking-name="completed skillassessment" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.CompletedAssessments, "Completed assessments") ?? "Completed assessments")">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.StatsAssessmentsCompletedTitle, "Last completed assessments") ?? "Last completed assessments")</a></span></div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row pt-1" style="height:calc(100vh - 185px);overflow:auto;">
+            <div class="col-xl-3 d-none d-xl-inline-block" style="padding-right: 15px">
+                <div class="card card-filter h-100">
+                    <div class="card-header pb-0 d-flex" style="border-bottom: none;width:100%">
+                        <h3 class="card-title d-flex" style="width:100%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.CardTitle, "Filters") ?? "Filters")</h3>
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn" onclick="areaFilter.reset('block')" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body card-filter pt-0">
+                        <partial name="_filters_block" model="Model.Filter" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12 col-xl-9" style="padding-left: 7.5px">
+                <div class="card template-searchbar" style="margin-left: 0px">
+                    <div class="card-header d-flex" style="margin-left:-11px; height: 55px">
+                        <div style="display: flex; height: 100%; width: 100%; align-items: center">
+                            <h3 id="cardHeader" class="card-title d-sm-inline-block" style="width:100%">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.StatsAssessmentsTitle, "Assessments") ?? "Assessments")<span id="counter"></span>
+                            </h3>
+                        </div>
+                        <div class="d-xl-none" style="width: 100%;text-align: right; padding-right: 10px">
+                            <div class="collapseFilter collapse">
+                                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" style="width: 80px" onclick="showInlineTagFilterModal()">Filter tags</button>
+                                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" style="width: 80px" onclick="showInlineAreaFilterModal()">Filter area</button>
+                            </div>
+                        </div>
+                        <div style="width: auto; text-align: right">
+                            <div class="card-tools" style="width: 236px; display: inline-block">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" id="skillassesmentSearchBox" name="skillassesmentSearchBox" class="form-control float-right" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.Search, "Search") ?? "Search")" data-boxtype="search">
+
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                        <button type="button" class="btn btn-default d-block d-xl-none" data-toggle="collapse" data-target=".collapseFilter"><i class="fas fa-filter"></i></button>
+                                        <button type="button" class="btn btn-default d-xl-none" onclick="areaFilter.reset('block')" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="contentBody" class="pr-3" style="height: calc(100vh - 252px);overflow:auto;">
+                    <partial name="~/Views/Skills/Assessment/_overview.cshtml" model="@Model" />
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Modal -->
+<div class="modal fade" id="executeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row w-100">
+                    <div class="col-6">
+                        <h4>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SelectParticipantsTitle, "Select participants") ?? "Select participants")</h4>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="input-group">
+                            <div class="input-group-prepend"></div><input class="form-control" type="search" id="searchpersonexecute" name="searchpersonexecute" data-action="search_person" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.Search, "Search") ?? "Search")" />
+                            <div class="input-group-append">
+                                <button class="btn btn-default" type="button"><i class="fa fa-search"></i></button>
+                                <button type="button" class="btn btn-default" id="clear_search_btn" title="Reset search"><i class="fas fa-sync"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-body" style="overflow-y: auto; height: 450px;">
+                <div class="row" style="padding-right: 15px;padding-left: 15px;">
+                    <div id="user-container" class="col-6">
+                        <div id="userlist" class="p-3">
+                            <h6>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AvailableUsersTitle, "Available users") ?? "Available users")</h6>
+                            <div class="row no-gutters row-cols-3 p-0">
+                                @if (Model.Users != null)
+                                {
+                                    foreach (var user in Model.Users)
+                                    {
+                                        var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, user.Picture);
+                                        if (user.Picture.IsNullOrEmpty() || user.Picture.ToLower() == "emptyprofile")
+                                        {
+                                            picture = "/images/user-placeholder.jpg";
+                                        }
+                                        <!-- User tile -->
+                                <div class="col-4 pb-2 pr-2" data-lastname="@user.LastName" data-firstname="@user.FirstName" data-id="@user.Id" data-containertype="user_choice" data-action="user_choice">
+                                    <div class="card h-100 user user-select-none border">
+                                        <div class="card-body text-center">
+                                            <div class="d-flex justify-content-center"><img class="user-img" src="/images/media-loading.gif" data-src="@picture"  /></div><span style="font-size: 14px;">@user.FirstName @user.LastName</span>
+                                        </div>
+                                    </div>
+                                </div>
+ <!-- End user tile -->
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="participant-container" class="col-6" style="z-index:0;">
+                        <div id="participantlist" class="p-3 sticky-top">
+                            <h6>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ParticipantsTitle, "Participants") ?? "Participants")</h6>
+                            <div class="row no-gutters row-cols-4 equal" style="min-height: 118px;"></div>
+                            <p id="participantsInfo">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ParticipantsInfoTitle, "Drag and drop participants from the left side to this side to add participants.") ?? "Drag and drop participants from the left side to this side to add participants.")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-ezgo btn-sm" data-action="execute" disabled>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnExecute, "Execute") ?? "Execute")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<a id="back-to-top" href="#" class="btn btn-ezgo btn-lg back-to-top shadow" role="button"><i class="fas fa-chevron-up"></i></a>
+
+<!-- Modal tags filter -->
+<div class="modal fade" id="modalTagsFilter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLongTitle">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagsFiltering, "Tags filtering") ?? "Tags filtering")</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" style="display: flex; justify-content: center">
+                <div id="tagsModalBody" style="overflow-x: scroll">
+                    <div class="col-12 p-0 pb-3" data-item="steps-view">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsMainTitle, "Tags") ?? "Tags")</h3>
+                            </div>
+                            <div class="card-body px-3 pb-3 pt-0">
+                                <partial name="_tags_filtering_block" model="Model.Filter" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal inline area filter -->
+<div class="modal fade" id="modalInlineAreaFilter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content" style="overflow-y: scroll">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLongTitle">Filter area</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" style="display: flex; justify-content: center">
+                <div style="width: 80%">
+                    <div class="col-12 p-0 pb-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 style="font-weight: 700" class="card-title">@(Model.CmsLanguage?.GetValue(LanguageKeys.Filters.AreaTitle, "Area") ?? "Area")</h3>
+                            </div>
+                            <div class="card-body pb-3 pt-0">
+                                <div id="inlineAreaTree" style="overflow-y: hidden"></div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script src="/js/areafilter.js"></script>
+    @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+            {
+    <script src="~/js/analytics.js"></script>
+    <script>ezgoAnalytics.init('skillassessment');</script>
+            }
+    <script>
+                areaFilter.init('/config/getareatree', 'assessment');
+
+                $('.bootstrap-select button .filter-option').addClass('d-flex');
+
+                $(document).ready(function () {
+                    ezgomediafetcher.preloadVisibleImagesAndVideos();
+                    var cntr = $('#contentCol .results:visible').length;
+                    $('#counter').html('&nbsp;(' + cntr + ')');
+                    $('#back-to-top').fadeOut();
+                    $('#contentBody').scroll(function () {
+                        ezgomediafetcher.preloadVisibleImagesAndVideos();
+                        if ($('#contentBody').scrollTop() > 50) {
+                            $('#back-to-top').fadeIn();
+                        } else {
+                            $('#back-to-top').fadeOut();
+                        }
+                    });
+
+                    $('#back-to-top').click(function () {
+                        $('#contentBody').animate({
+                            scrollTop: 0
+                        }, 400);
+                        return false;
+                    });
+
+                    $('#btn-close').on('click', function (e) {
+                        $('.actionRow').css('backgroundColor', '');
+                        $('.panel-wrap').css('transform', 'translateX(100%)');
+                    });
+
+                    $("#skillassesmentSearchBox").on("keyup", function () {
+                        var value = $(this).val().toLowerCase();
+                        $("#contentCol div.results").filter(function () {
+                            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                        });
+                        var cntr = $('#contentCol .results:visible').length;
+                        $('#counter').html('&nbsp;(' + cntr + ')');
+                        $('#back-to-top').click();
+                        ezgomediafetcher.preloadVisibleImagesAndVideos();
+                    });
+
+                    $("#skillassesmentSearchBox").on('search', function () {
+                        var value = '';
+
+                        $("#contentCol div.row.results:visible").filter(function () {
+                            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                        });
+                        var cntr = $('#contentCol .results:visible').length;
+                        $('#counter').html('&nbsp;(' + cntr + ')');
+                        $('#back-to-top').click();
+                    });
+
+                    $("#contentCol").on('filterDone', function () {
+                        var cntr = $('#contentCol .results:visible').length;
+                        $('#counter').html('&nbsp;(' + cntr + ')');
+
+                    });
+
+                    @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+                    {
+                        <text>
+                        $("#skillassesmentSearchBox").on("focusout", function () {
+                            var value = $(this).val().toLowerCase();
+
+                            if (value.length > 0) {
+                                ezgoAnalytics.customLog("Search", "Search used", "skillassessment", "search value:" + value);
+                            }
+                        });
+                        </text>
+                    }
+                    @if(Model.ApplicationSettings.Features.TagsEnabled.HasValue && Model.ApplicationSettings.Features.TagsEnabled.Value)
+                    {
+                        <text>
+                            $('.btn-tagsfilter').on('click', function() {
+                                $('#modalTagsFilter').modal('show');
+                            });
+
+                            $('.modal-filter-tag').on('click', function(e) {
+                                var tagId = $(this).data('id');
+                                if($($(this).children()[0]).hasClass('selected-tag'))
+                                {
+                                    $(`#filter-tag-${tagId}`).css('display', 'flex');
+                                }
+                                else {
+                                    $(`#filter-tag-${tagId}`).css('display', 'none');
+                                }
+                                areaFilter.doFilter('block');
+                            });
+
+                        </text>
+    
+                    }
+                });
+
+                var assessments = {
+                    selectedAssessmentId: 0,
+                    selectedUserId: 0,
+                    init: function () {
+                        assessments.initHandlers();
+                    },
+                    initHandlers: function () {
+                        $('[data-action="execute_person"]').on('click', function (e) {
+                            e.stopPropagation();
+                            assessments.resetModal();
+                            assessments.selectedAssessmentId = $(this).attr('data-id');
+                            assessments.initModal();
+                            return false;
+                        });
+                        $('[data-action="continue_assessment"]').on('click', function (e) {
+                            e.stopPropagation();
+                            assessments.selectedAssessmentId = $(this).attr('data-id');
+                            if (assessments.selectedAssessmentId > 0) {
+                                var form = document.createElement("form");
+                                form.setAttribute("method", 'post');
+                                //form.setAttribute("type", 'multipart/form-data');
+                                form.setAttribute("action", '/assessment/viewer/' + assessments.selectedAssessmentId);
+
+                                var u = document.createElement("input"); //input element, text
+                                u.setAttribute('type', "text");
+                                u.setAttribute('name', "UserId");
+                                u.setAttribute('value', assessments.selectedUserId);
+
+                                form.appendChild(u);
+
+                                document.body.appendChild(form);
+
+                                form.submit(); //auto submit
+                            }
+                            return false
+                        });
+                        $('[data-action="show_execution_report"]').on('click', function (e) {
+                            e.stopPropagation();
+                            window.location.href = $(this).data('url');
+                            return false;
+                        });
+                        $('[data-action="execute"]').on('click', function () {
+                            assessments.loadAssessment();
+                        });
+                        $('[data-action="user_choice"]').on('click', function () {
+                            assessments.resetModalUserChoice();
+                            assessments.selectedUserId = $(this).attr('data-id');
+                            //$('[data-action="execute"]').removeAttr('disabled');
+                            $(this).find('[data-containertype="user_choice_name"]').addClass('font-weight-bold');
+                            $(this).find('[data-containertype="user_choice_check"]').show();
+
+                        });
+                        $('[data-action="search_person"]').on('keyup', function () {
+                            assessments.searchModal($(this).val());
+                        });
+                        $('[data-action="close"]').on('click', function () {
+                            assessments.resetModal();
+                        });
+                        $('#clear_search_btn').on('click', function () {
+                            $('#searchpersonexecute').val('');
+                            assessments.searchModal('');
+                        });
+
+                        $('#executeModal').on('shown.bs.modal', function() {
+                            ezgomediafetcher.preloadVisibleImagesAndVideos();
+                        });
+
+                        $('#userlist').on('scroll', function() {
+                            ezgomediafetcher.preloadVisibleImagesAndVideos();
+                        })
+                    },
+                    initModal: function () {
+                        $('#executeModal').modal('show');
+                        $('[data-containertype="user_choice"]').show();
+                    },
+                    loadAssessment: function () {
+
+                        var participants = [];
+                        $('#participantlist div[data-containertype="user_choice"]').each(function (index,participant) {
+                            participants.push(parseInt($(participant).data('id')));
+                        });
+
+                        //console.log(participants);
+
+                        $.ajax({
+                            url: '/assessment/execute/' + assessments.selectedAssessmentId,
+                            type: 'POST',
+                            contentType: 'application/json; charset=utf-8',
+                            data: JSON.stringify({ UserId: 1, participants: participants }),
+                            success: function(result) {
+                                window.location.href = '/assessment/viewer/' + result.id;
+                            }
+                        });
+
+                    },
+                    resetModal: function () {
+                        assessments.selectecAssessmentId = 0;
+                        assessments.resetModalUserChoice();
+                        $('#searchpersonexecute').val('');
+                        $('[data-action="execute"]').attr('disabled', true);
+                    },
+                    resetModalUserChoice: function () {
+                        assessments.selectedUserId = 0;
+                        $('[data-containertype="user_choice_name"]').removeClass('font-weight-bold');
+                        $('[data-containertype="user_choice_check"]').hide();
+                    },
+                    searchModal: function (searchValue) {
+                        searchValue = searchValue.replaceAll(',', '');
+                        searchValue = searchValue.replaceAll(';', '');
+                        var searchTerms = searchValue.split(' ');
+                        if (searchValue != null && searchValue != '') {
+                            $('#userlist [data-containertype="user_choice"]').hide();
+                            $('#userlist [data-containertype="user_choice"]').each(function () {
+                                var elem = this;
+                                searchTerms.forEach(function (s) {
+                                    if ($(elem).attr('data-lastname').toLowerCase().includes(s.toLowerCase()) || $(elem).attr('data-firstname').toLowerCase().includes(s.toLowerCase())) {
+                                        $(elem).show();
+                                    }
+                                });
+                            });
+                        } else {
+                            $('[data-containertype="user_choice"]').show();
+                        }
+
+                    },
+                    continueOrExecuteAssessment: function (e) {
+                        $(e).find('span.btn').click();
+                    }
+
+                }
+
+                assessments.init();
+    </script>
+
+    <script>
+                // drag and drop
+
+                $(function () {
+
+                    var $userlist = $('#userlist'),
+                        $participantlist = $('#participantlist'),
+                        $participantcontainer = $('#participant-container'),
+                        $usercontainer = $('#user-container');
+
+                    $("div.col-4", $userlist, $participantlist).draggable({
+                        cancel: "a.ui-icon",
+                        revert: "invalid",
+                        containment: "window",
+                        helper: "clone",
+                        cursor: "move",
+                        start: function (event, ui) {
+                            $('#participantsInfo').hide();
+                            $(ui.helper).find('.card').addClass('shadow');
+                        }
+                    });
+
+                    $participantcontainer.droppable({
+                        accept: "#userlist > div.row > div.col-4",
+                        activeClass: "drop",
+                        classes: {
+                            "ui-droppable-active": "myhighlight"
+                        },
+                        drop: function (event, ui) {
+                            deleteImage(ui.draggable);
+                        }
+                    });
+
+                    $usercontainer.droppable({
+                        accept: "#participantlist > div.row > div.col-4",
+                        activeClass: "drop",
+                        classes: {
+                            "ui-droppable-active": "myhighlight"
+                        },
+                        drop: function (event, ui) {
+                            deleteImageEx(ui.draggable);
+                        }
+                    });
+
+                    function deleteImage($item) {
+                        @*$item.hide(function () {
+                            //$('#participantlist > div.row').append($item).fadeIn();
+                            $item.appendTo('#participantlist > div.row').show('scale');
+                        });*@
+                        $('#participantlist > div.row').append($item)
+
+                        $('#participantlist div[data-containertype="user_choice"]').length > 0 ? $('button[data-action="execute"]').prop('disabled', false) : $('button[data-action="execute"]').prop('disabled', true);
+                    }
+
+                    function deleteImageEx($item) {
+                        //console.log($item);
+                        $('#userlist > div.row').append($item);
+                        setTimeout(function () {
+                            $('#participantlist div[data-containertype="user_choice"]').length === 0 ? $('button[data-action="execute"]').prop('disabled', true) : $('button[data-action="execute"]').prop('disabled', false);
+                        }, 200);
+
+                    }
+
+                });
+
+        function showInlineAreaFilterModal() {
+            $('#modalInlineAreaFilter').modal('show');
+        }
+        
+        @if(Model.ApplicationSettings.Features.TagsEnabled.HasValue && Model.ApplicationSettings.Features.TagsEnabled.Value)
+        {
+            <text>
+                function showInlineTagFilterModal() {
+                    $('#modalTagsFilter').modal('show');
+                }
+            </text>
+        }
+    </script>
+
+}

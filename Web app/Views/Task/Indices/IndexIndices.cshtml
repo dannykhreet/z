@@ -1,0 +1,298 @@
+﻿@model WebApp.ViewModels.TaskViewModel
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TasksTitle, "Tasks") ?? "Tasks";
+
+}
+
+@section CSS{
+
+    <style>
+    #contentBody .card{
+        @*box-shadow:none;*@
+        border: solid 1px transparent;
+    }
+        #contentBody .card:hover {
+            border: solid 1px #93c54b;
+            box-shadow: 0 .425rem .75rem rgba(0,0,0,.075) !important;
+            color: #93c54b !important;
+        }
+        #contentBody .card a:active, #contentBody .card a:link, #contentBody .card a:visited {
+            @*background-color: aquamarine;*@
+        }
+        #contentBody .card a:hover {
+            color: #93c54b !important;
+        }
+    #contentBody img.img-fluid {
+        border-radius: 5px;
+        border: solid 1px #bfbfbf;
+    }
+        .noselect {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            cursor: pointer;
+        }
+    </style>
+
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-6">
+                <a asp-controller="Task" asp-action="Index"><i class="fa fa-arrow-left"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.NavBackTitle, "Back to tasks") ?? "Back to tasks")</a>
+                <h1>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.ChangeTaskSortTitle, "Change task sort order") ?? "Change task sort order")</h1>
+            </div>
+            <div class="col-sm-6 d-flex  flex-row-reverse">
+                <button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" id="save_indices" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.SaveIndicesTitle , "Save the current set of changed items. This will include the re-ordered items and all items in between. Ordered items with another filter active will also be saved.") ?? "Save the current set of changed items. This will include the re-ordered items and all items in between. Ordered items with another filter active will also be saved.")">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.BtnSave, "Save") ?? "Save")</button>
+                @if (Model.EnableTaskIndexingButtons)
+                {
+                    <button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" id="reindex_indices_visible" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.ReindexIndicesVisibleTitle, "If needed this option can be used to set indices for all current visible items without re-ordering them manually.") ?? "If needed this option can be used to set indices for all current visible items without re-ordering them manually.")">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.BtnVisibleItems, "Re-index visible items") ?? "Re-index visible items")</button>
+                    <button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" id="reindex_indices_all" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.ReindexIndicesAllTitle, "Re-index all items based on their area.") ?? "Re-index all items based on their area.")">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.BtnAllItems, "Re-index all items") ?? "Re-index all items")</button>
+                }
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+
+<section class="content">
+
+    <div class="container-fluid">
+
+        <div class="row pt-1" style="height:calc(100vh - 165px);overflow:auto;">
+
+            <div class="col-xl-3 d-none d-xl-inline-block">
+                <div class="card card-filter">
+                    <div class="card-header">
+                        <h3 class="card-title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.CardTitle, "Filters") ?? "Filters")</h3>
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-default" onclick="areaFilter.reset('block')" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body card-filter">
+                        <partial name="~/Views/Shared/_filters_block.cshtml" model="Model.Filter" />
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="col-lg-12 col-xl-9">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 id="cardHeader" class="card-title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsTaskTitle, "Task templates") ?? "Task templates") <span id="counter"></span></h3>
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-header collapse" id="collapseExample">
+
+                        <partial name="~/Views/Shared/_filters_inline.cshtml" model="Model.Filter" />
+
+                    </div>
+
+                </div>
+                <div id="contentBody" style="height: calc(100vh - 245px);overflow:auto;">
+
+                    <partial name="~/Views/Task/Indices/_overview.cshtml" model="@Model" />
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+<a id="back-to-top" href="#" class="btn btn-ezgo btn-lg back-to-top shadow" role="button"><i class="fas fa-chevron-up"></i></a>
+
+
+
+
+
+
+@section Scripts{
+
+    <script src="/js/areafilter.js"></script>
+    @if (Model.ApplicationSettings.Features.ExportAdvancedEnabled.HasValue || Model.ApplicationSettings.Features.ExportEnabled.HasValue)
+    {
+        if (Model.ApplicationSettings.Features.ExportAdvancedEnabled.Value || Model.ApplicationSettings.Features.ExportEnabled.Value)
+        {
+            <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+            <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+        }
+    }
+
+    <script>
+        var areaid = 0;
+        areaFilter.init('/config/getareatree', 'task');
+
+        $(document).ready(function () {
+            var cntr = $('#contentCol .card:visible').length;
+            $('#counter').html('&nbsp;(' + cntr + ')');
+
+            $('#contentBody').scroll(function () {
+                ezgomediafetcher.preloadVisibleImagesAndVideos();
+                if ($('#contentBody').scrollTop() > 50) {
+                    $('#back-to-top').fadeIn();
+                } else {
+                    $('#back-to-top').fadeOut();
+                }
+            });
+
+
+            $('#back-to-top').click(function () {
+                $('#contentBody').animate({
+                    scrollTop: 0
+                }, 400);
+                return false;
+            });
+
+            $('#btn-close').on('click', function (e) {
+                $('.actionRow').css('backgroundColor', '');
+                $('.panel-wrap').css('transform', 'translateX(100%)');
+            });
+
+
+            $("#taskSearchBox").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#contentCol div.results").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+                var cntr = $('#contentCol .card:visible').length;
+                $('#counter').html('&nbsp;(' + cntr + ')');
+                $('#back-to-top').click();
+            });
+
+            $("#contentCol").on('filterDone', function () {
+                //console.log('filterDone');
+                var cntr = $('#contentCol .card:visible').length;
+                $('#counter').html('&nbsp;(' + cntr + ')');
+
+            });
+
+
+
+        });
+
+        var TemplateOrder = {
+            OrderVisibleAll: function () {
+                let counter = 0;
+                $('[data-container="template"]:visible').each(function () {
+                    let currentIndex = $(this).attr('data-index');
+                    if (counter != currentIndex) {
+                        $(this).find('[data-container="index_display"]').text(counter);
+                        $(this).attr('data-index', counter);
+                        $(this).attr('data-ischanged', true);
+                    }
+
+                    counter = counter + 1;
+                });
+            },
+            OrderAll: function () {
+                let counter = 0;
+                let currentAreaKey = '';
+
+                var templates = $('[data-container="template"]').sort(sort_auto);
+                $('#contentCol').html('');
+                $('#contentCol').append(templates);
+
+                $('[data-container="template"]').each(function () {
+                    let areaItemKey = $(this).attr('data-pathids');
+                    //console.log(currentAreaKey, areaItemKey);
+                    if (areaItemKey != currentAreaKey) {
+                        counter = 0;
+                    }
+
+                    let currentIndex = $(this).attr('data-index');
+                    if (counter != currentIndex) {
+                        $(this).find('[data-container="index_display"]').text(counter);
+                        $(this).attr('data-index', counter);
+                        $(this).attr('data-ischanged', true);
+                    }
+
+                    counter = counter + 1;
+
+                    currentAreaKey = areaItemKey;
+
+                });
+
+                function sort_auto(a, b) {
+                    return ($(b).data('pathids')).toString() < ($(a).data('pathids')).toString() ? 1 : -1;
+                }
+            },
+            Save: function () {
+                var items = [];
+                $('[data-ischanged="true"]').each(function () {
+                    var item = {};
+                    item.id = parseInt($(this).attr('data-id'));
+                    item.index = parseInt($(this).attr('data-index'));
+                    items.push(item);
+                });
+                //[{"index":1,"id":1},{"index":2,"id":2}]
+
+                toastr.remove();
+                $('body').toggleClass('loaded');
+
+                //add responses management from api (invalid password, upn already exists, username already exists etc,.)
+                $.ajax({
+                    type: "POST",
+                    url: '/task/indices/save',
+                    data: JSON.stringify(items),
+                    success: function (data) {
+                        $('body').toggleClass('loaded');
+                        toastr.success('Indices saved');
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('body').toggleClass('loaded');
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+
+            },
+            InitHandlers: function () {
+                $('#save_indices').on('click', function () {
+                    TemplateOrder.Save();
+                });
+                $('#reindex_indices_visible').on('click', function () {
+                    TemplateOrder.OrderVisibleAll();
+                });
+                $('#reindex_indices_all').on('click', function () {
+                    TemplateOrder.OrderAll();
+                });
+
+                $('#contentCol').on('sortupdate', function (event, ui) { TemplateOrder.OrderVisibleAll(); });
+            },
+            InitSort: function () {
+                $('#contentCol').sortable();
+            },
+            Init: function () {
+                TemplateOrder.InitSort();
+                TemplateOrder.InitHandlers();
+
+            }
+        }
+
+        TemplateOrder.Init();
+
+
+    </script>
+
+
+
+}
+
+

@@ -1,0 +1,16 @@
+﻿@model FactoryFeedViewModel
+<section class="sticky-top">
+    <div class="card">
+        <div class="card-header"></div>
+        <div class="card-body p-0 pb-4">
+            <ul class="list-group border-white">
+                <li class="list-group-item d-flex justify-content-between align-items-center btn-active"><span>@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.MostRecentTitle, "Most recent") ?? "Most recent")</span><span class="badge badge-primary badge-pill" style="background: rgba(151, 193, 49, 0.82);">23</span></li>
+                <li class="list-group-item d-flex justify-content-between align-items-center"><span>@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.TasksTitle, "Tasks") ?? "Tasks")</span><span class="badge badge-primary badge-pill" style="background: rgba(151, 193, 49, 0.82);">10</span></li>
+                <li class="list-group-item d-flex justify-content-between align-items-center"><span>@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.ChecklistTitle, "Checklists") ?? "Checklists")</span><span class="badge badge-primary badge-pill" style="background: rgba(151, 193, 49, 0.82);"> 5 </span></li>
+                <li class="list-group-item d-flex justify-content-between align-items-center"><span>@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.AuditsTitle, "Audits") ?? "Audits")</span><span class="badge badge-primary badge-pill" style="background: rgba(151, 193, 49, 0.82);"> 3 </span></li>
+                <li class="list-group-item d-flex justify-content-between align-items-center"><span>@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.ActionsTitle, "Actions") ?? "Actions")</span><span class="badge badge-primary badge-pill" style="background: rgba(151, 193, 49, 0.82);"> 31 </span></li>
+            </ul>
+        </div>
+
+    </div>
+</section>

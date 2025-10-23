@@ -1,0 +1,378 @@
+﻿@model WebApp.ViewModels.WorkInstructionsViewModel
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.WorkInsctructionTitle, "Work Instructions") ?? "Work Instructions";
+}
+
+@section CSS{
+    <style>
+        #contentBody .results {
+            border: solid 1px transparent;
+            transition: transform .2s; /* Animation */
+        }
+
+            #contentBody .results:hover {
+                border: solid 1px #93c54b;
+                box-shadow: 0 .425rem .75rem rgba(0,0,0,.075) !important;
+                color: #93c54b !important;
+                transform: scale(1.010);
+                margin-left: 5px;
+                left: 5px;
+            }
+
+            #contentBody .results a:hover {
+                color: #93c54b !important;
+            }
+
+        #contentBody img.img-fluid {
+            border-radius: 5px;
+            border: solid 1px #bfbfbf;
+        }
+
+        .list-group-area-filter-inline {
+            padding-right: 0px;
+            height: 230px;
+            padding-left: 0px;
+            overflow: auto;
+        }
+
+        #inlineAreaTree .list-group-area-filter-inline {
+            border: none;
+            height: unset;
+        }
+
+        #inlineAreaTree a {
+            color: slategrey;
+            cursor: pointer;
+        }
+
+            #inlineAreaTree a:hover {
+                text-decoration: none;
+            }
+    </style>
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-3">
+                &nbsp;
+                <h1>@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.OverViewTitle, "Instruction overview") ?? "Instruction overview")</h1>
+            </div>
+            <div class="col-sm-3 align-self-end">
+                <span style="margin-left:10px;">
+                    @if (Model?.ApplicationSettings?.Features != null && Model?.ApplicationSettings.Features.WorkInstructionsChangedNotificationsEnabled != null && Model?.ApplicationSettings.Features.WorkInstructionsChangedNotificationsEnabled.Value == true)
+                    {
+                        <a href="/report/workinstructionchangenotifications" target="_top" data-tracking="enabled" data-tracking-name="work instruction change notifications" title="Work Instruction change notifications">
+                            @(Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.ReportPageTitle, "Last changed workinstructions") ?? "Last changed workinstructions")
+                        </a>
+                    }
+                </span>
+            </div>
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                <a asp-controller="workinstructions" asp-action="add" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.OverviewListTitle, "Add new instruction") ?? "Add new instruction")</a>
+                @if (Model?.ApplicationSettings?.Features != null && Model.ApplicationSettings.Features.ExportAdvancedEnabled != null && Model.ApplicationSettings.Features.ExportAdvancedEnabled.Value && Model.ApplicationSettings.Features.ChecklistsEnabled != null && Model.ApplicationSettings.Features.ChecklistsEnabled.Value)
+                {
+                    <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="workinstructiontemplates" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ExportTemplates, "Export workinstruction templates") ?? "Export workinstruction templates")"><i class="fa fa-file-excel"></i></button>
+                }
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row pt-1" style="height:calc(100vh - 165px);">
+            <div class="col-xl-3 d-none d-xl-inline-block" style="padding-right: 15px">
+                <div class="card card-filter h-100">
+                    <div class="card-header pb-0 d-flex" style="border-bottom: none;width:100%">
+                        <h3 class="card-title d-flex" style="width:100%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.CardTitle, "Filters") ?? "Filters")</h3>
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn" onclick="areaFilter.reset('block')" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body card-filter pt-0">
+                        <partial name="_filters_block" model="Model.Filter" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12 col-xl-9" style="padding-left: 7.5px">
+                <div class="card template-searchbar" style="margin-left: 0px">
+                    <div class="card-header d-flex" style="margin-left:-11px; height: 55px">
+                        <div style="display: flex; height: 100%; width: 100%; align-items: center">
+                            <h3 id="cardHeader" class="card-title d-none d-sm-inline-block" style="width:100%">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.WorkAndAssessmentInstructionTitle, "Work and assessment instructions") ?? "Work and assessment instructions")<span id="counter"></span>
+                            </h3>
+                        </div>
+                        <div class="d-xl-none" style="width: 100%;text-align: right; padding-right: 10px">
+                            <div class="collapseFilter collapse">
+                                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" style="width: 80px" onclick="showInlineTagFilterModal()">Filter tags</button>
+                                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" style="width: 80px" onclick="showInlineAreaFilterModal()">Filter area</button>
+                            </div>
+                        </div>
+                        <div style="width: auto; text-align: right">
+                            <div class="card-tools" style="width: 236px; display: inline-block">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" id="workinstructionSearchBox" name="workinstructionSearchBox" class="form-control float-right" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.Search, "Search") ?? "Search")" data-boxtype="search">
+
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                        <button type="button" class="btn btn-default d-block d-xl-none" data-toggle="collapse" data-target=".collapseFilter"><i class="fas fa-filter"></i></button>
+                                        <button type="button" class="btn btn-default d-xl-none" onclick="areaFilter.reset('block')" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-xl-none" style="padding-left: 5px; padding-right: 5px">
+                        <div class="card-header collapse collapseFilter">
+                            <partial name="_filters_inline" model="Model.Filter" />
+                        </div>
+                    </div>
+                </div>
+
+                <div id="contentBody" class="pr-3" style="height: calc(100vh - 252px);overflow:auto;">
+                    <partial name="_overview" model="@Model" />
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<a id="back-to-top" href="#" class="btn btn-ezgo btn-lg back-to-top shadow" role="button"><i class="fas fa-chevron-up"></i></a>
+
+<!-- Modal tags filter -->
+<div class="modal fade" id="modalTagsFilter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLongTitle">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagsFiltering, "Tags filtering") ?? "Tags filtering")</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" style="display: flex; justify-content: center">
+                <div id="tagsModalBody" style="overflow-x: scroll">
+                    <div class="col-12 p-0 pb-3" data-item="steps-view">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsMainTitle, "Tags") ?? "Tags")</h3>
+                            </div>
+                            <div class="card-body px-3 pb-3 pt-0">
+                                <partial name="_tags_filtering_block" model="Model.Filter" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal inline area filter -->
+<div class="modal fade" id="modalInlineAreaFilter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content" style="overflow-y: scroll">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLongTitle">Filter area</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" style="display: flex; justify-content: center">
+                <div style="width: 80%">
+                    <div class="col-12 p-0 pb-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 style="font-weight: 700" class="card-title">@(Model.CmsLanguage?.GetValue(LanguageKeys.Filters.AreaTitle, "Area") ?? "Area")</h3>
+                            </div>
+                            <div class="card-body pb-3 pt-0">
+                                <div id="inlineAreaTree" style="overflow-y: hidden"></div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="/js/areafilter.js"></script>
+    @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+    {
+        <script src="~/js/analytics.js"></script>
+        <script>ezgoAnalytics.init('workinstructions');</script>
+    }
+
+    @if (Model.ApplicationSettings?.Features?.ExportAdvancedEnabled == true || Model.ApplicationSettings?.Features?.ExportEnabled == true)
+    {
+        <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+        <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+    }
+
+    <script>
+        @if (Model.ApplicationSettings?.Features?.SkillAssessments == true)
+        {
+            <text>
+                areaFilter.language = {
+                    workAndAssessmentInstructions: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.WorkAndAssessmentInstructionTitle, "Work and assessment instructions") ?? "Work and assessment instructions")',
+                    assessmentInstructions: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AssessmentInstructionTitle, "Assessment instructions") ?? "Assessment instructions")',
+                    workInstructions: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.WorkInsctructionsLabel, "Work instructions") ?? "Work instructions")',
+                };
+            </text>
+        }
+        else
+        {
+            <text>
+                areaFilter.language = {
+                    workAndAssessmentInstructions: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.WorkInsctructionsLabel, "Work instructions") ?? "Work instructions")',
+                    assessmentInstructions: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AssessmentInstructionTitle, "Assessment instructions") ?? "Assessment instructions")',
+                    workInstructions: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.WorkInsctructionsLabel, "Work instructions") ?? "Work instructions")',
+                };
+            </text>
+        }
+
+        areaFilter.init('/config/getareatree', 'workinstruction');
+
+        $(document).ready(function () {
+            ezgomediafetcher.preloadVisibleImagesAndVideos();
+            var cntr = $('#contentCol .results:visible').length;
+            $('#counter').html('&nbsp;(' + cntr + ')');
+            $('#back-to-top').fadeOut();
+            $('#contentBody').scroll(function () {
+                ezgomediafetcher.preloadVisibleImagesAndVideos();
+                if ($('#contentBody').scrollTop() > 50) {
+                    $('#back-to-top').fadeIn();
+                } else {
+                    $('#back-to-top').fadeOut();
+                }
+            });
+
+            $('#back-to-top').click(function () {
+                $('#contentBody').animate({
+                    scrollTop: 0
+                }, 400);
+                return false;
+            });
+
+            $('#btn-close').on('click', function (e) {
+                $('.actionRow').css('backgroundColor', '');
+                $('.panel-wrap').css('transform', 'translateX(100%)');
+            });
+
+            $("#workinstructionSearchBox").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#contentCol div.results").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+                var cntr = $('#contentCol .results:visible').length;
+                $('#counter').html('&nbsp;(' + cntr + ')');
+                $('#back-to-top').click();
+                ezgomediafetcher.preloadVisibleImagesAndVideos();
+            });
+
+            $("#workinstructionSearchBox").on('search', function () {
+                var value = '';
+
+                $("#contentCol div.row.results:visible").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+                var cntr = $('#contentCol .results:visible').length;
+                $('#counter').html('&nbsp;(' + cntr + ')');
+                $('#back-to-top').click();
+            });
+
+            $("#contentCol").on('filterDone', function () {
+                var cntr = $('#contentCol .results:visible').length;
+                $('#counter').html('&nbsp;(' + cntr + ')');
+                $('.bootstrap-select button .filter-option').addClass('d-flex');
+            });
+            
+            function applyWorkInstructionTypeFilter() {
+                if (areaFilter.initialized === false) {
+                    window.setTimeout(applyWorkInstructionTypeFilter, 100); /* this checks the flag every 100 milliseconds*/
+                } else {
+                    if ('@Model.WorkInstructionTypeFilter' != "") {
+                        if ('@Model.WorkInstructionTypeFilter' == "assessmentinstructions") {
+                            $('#workinstructionTypeFilter').val(1).selectpicker("refresh");
+                            $('#workinstructionTypeFilterInline').val(1).selectpicker("refresh");
+                        }
+                        else if ('@Model.WorkInstructionTypeFilter' == "basicinstructions") {
+                            $('#workinstructionTypeFilter').val(0).selectpicker("refresh");
+                            $('#workinstructionTypeFilterInline').val(0).selectpicker("refresh");
+                        }
+                        areaFilter.doFilter('block');
+                    }
+                }
+            }
+
+            applyWorkInstructionTypeFilter();
+
+            @if (Model.ApplicationSettings.Features.TagsEnabled.HasValue && Model.ApplicationSettings.Features.TagsEnabled.Value)
+            {
+                <text>
+                    $('.btn-tagsfilter').on('click', function () {
+                        $('#modalTagsFilter').modal('show');
+                    });
+
+                    $('.modal-filter-tag').on('click', function (e) {
+                        var tagId = $(this).data('id');
+                        if ($($(this).children()[0]).hasClass('selected-tag')) {
+                            $(`#filter-tag-${tagId}`).css('display', 'flex');
+                        }
+                        else {
+                            $(`#filter-tag-${tagId}`).css('display', 'none');
+                        }
+                        areaFilter.doFilter('block');
+                    });
+
+                </text>
+
+            }
+            @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+            {
+                <text>
+                    $("#workinstructionSearchBox").on("focusout", function () {
+                        var value = $(this).val().toLowerCase();
+
+                        if (value.length > 0) {
+                            ezgoAnalytics.customLog("Search", "Search used", "workinstruction", "search value:" + value);
+                        }
+                    });
+                </text>
+            }
+        });
+
+        function showInlineAreaFilterModal() {
+            $('#modalInlineAreaFilter').modal('show');
+        }
+        
+        @if(Model.ApplicationSettings.Features.TagsEnabled.HasValue && Model.ApplicationSettings.Features.TagsEnabled.Value)
+        {
+            <text>
+                function showInlineTagFilterModal() {
+                    $('#modalTagsFilter').modal('show');
+                }
+            </text>
+        }
+    </script>
+}

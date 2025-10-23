@@ -1,0 +1,13 @@
+﻿@model WebApp.ViewModels.BaseViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = null;
+}
+<div class="jumbotron jumbotron-fluid rounded pt-5" style="margin:auto;margin-top:20px;">
+    <div class="container" style="margin:20px;">
+        <h2 class="display-5">@(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.NoTemplatesGeneralMessage, "No templates available") ?? "No templates available")</h2>
+        <p class="lead">@(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.NoTemplatesGeneralDetailMessage, "There are no templates added to this area yet.") ?? "There are no templates added to this area yet.")</p>
+    </div>
+</div>

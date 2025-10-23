@@ -1,0 +1,113 @@
+﻿@model WebApp.ViewModels.ChecklistViewModel
+@{
+    Layout = null;
+}
+
+@if(Model != null && Model.ChecklistTemplates != null) 
+{
+    <input type="text" value="@Model.ChecklistTemplates.Count" id="checklistTemplatesCounter" style="display: none" />
+    @if (Model.ChecklistTemplates.Count > 0)
+    {
+        @foreach (WebApp.Models.Checklist.ChecklistTemplateModel checklistTemplate in Model.ChecklistTemplates)
+        {
+            var id = checklistTemplate.Id;
+            var instructions = 0;
+            @if (checklistTemplate.TaskTemplates != null)
+            {
+                instructions = checklistTemplate.TaskTemplates.Sum(item => item.StepsCount) + 
+                                                                           checklistTemplate.TaskTemplates.Where(item => item.DescriptionFile != null || (item.Attachments != null && item.Attachments.Count > 0)).Count() +
+                                                                           checklistTemplate.TaskTemplates.Where(item => item.WorkInstructionRelations != null && item.WorkInstructionRelations.Count > 0).Count();
+            }
+            var hasImage = !string.IsNullOrEmpty(checklistTemplate.Picture) ? "true" : "false";
+            var areaPathIds = checklistTemplate.AreaPathIds != null ? checklistTemplate.AreaPathIds.Replace(" -> ", ",") : "";
+            var tagsList = new List<int>();
+            if (checklistTemplate.Tags != null && checklistTemplate.Tags.Count > 0)
+            {
+                tagsList.AddRange(checklistTemplate.Tags.Select(t => t.Id));
+            }
+
+            if (checklistTemplate.TaskTemplates != null && checklistTemplate.TaskTemplates.Count > 0)
+            {
+                foreach (var item in checklistTemplate.TaskTemplates)
+                {
+                    if (item.Tags != null && item.Tags.Count > 0)
+                    {
+                        tagsList.AddRange(item.Tags.Select(t => t.Id));
+                    }
+                }
+            }
+
+            var uniqueTags = String.Join(',', tagsList.Distinct());
+
+            <div class="card w-100 results mr-1 my-1" data-id="@id"
+                                            data-role="@checklistTemplate.Role"
+                                            data-instructions="@instructions"
+                                            data-hasimage="@hasImage"
+                                            data-pathids="@areaPathIds"
+                                            data-tags="@uniqueTags">
+
+                <div class="card-body p-0">
+                    @{
+                        var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, checklistTemplate.Picture);
+                        if (string.IsNullOrEmpty(checklistTemplate.Picture))
+                        {
+                            picture = @"/assets/img/normal_unavailable_image.png";
+                        }
+                    }
+                    <a class="text-muted fs-0 fs-lg-1" asp-controller="checklist" asp-action="details" asp-route-id="@checklistTemplate.Id">
+                        <div class="col-12 p-1">
+                            <div class="p-1">
+                                <div class="row" data-containertype="checklist_container" data-id="@checklistTemplate.Id">
+                                    <div class="col-sm-5 col-md-3 col-lg-3 col-xl-2">
+                                        <img src="/images/media-loading.gif" data-src="@picture" @*crossorigin="anonymous"*@ class="img-fluid" loading="lazy" @*onerror="this.onerror = null; this.src = '/assets/img/normal_unavailable_image.png';"*@ />
+                                    </div>
+
+                                    <div class="col-sm-7 col-md-8">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <h5 class="mt-3 mt-sm-0">@checklistTemplate.Name</h5>
+                                                <p class="fs--1 mb-2 mb-md-2"><span class="badge badge-secondary">@checklistTemplate.AreaPath</span></p>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-12 d-flex justify-content-between flex-column">
+                                                <div class="row checklistRow">
+                                                    <div class="col-md-6 col-lg-3 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TemplateId, "Id") ?? "Id"): <strong>@checklistTemplate.Id</strong></small></div>
+                                                    <div class="col-md-6 col-lg-3 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.ItemsTitle, "Items") ?? "Items"): <strong>@checklistTemplate?.TaskTemplates?.Count()</strong></small></div>
+                                                    <div class="col-md-6 col-lg-3 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.InstructionDialogTitle, "Instructions") ?? "Instructions"): <strong>@instructions</strong></small></div>
+                                                    <div class="col-md-6 col-lg-3 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TemplateRoleTitle, "Role") ?? "Role"): <strong>@(checklistTemplate.Role != null ? checklistTemplate.Role.Replace('_', ' ') : "")</strong></small></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        @if (checklistTemplate.Tags?.Count > 0 && Model.ApplicationSettings.Features?.TagsEnabled == true)
+                                        {
+                                            <div class="row">
+                                                @foreach (var tag in checklistTemplate.Tags)
+                                                {
+                                                    <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                                                        <div class="tag-wrapper" style="color:white;">
+                                                            <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                            <span class="my-1 ml-1 mr-3 tag-span" style="font-size:.78rem;">@tag.Name</span>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div id="noChecklistTemplatesFound" style="display: none">
+            <partial name="~/Views/Shared/_no_templates_message.cshtml" model="@Model" />
+        </div>
+    }
+}

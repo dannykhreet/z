@@ -1,0 +1,315 @@
+﻿@using WebApp.Models.Properties;
+@using EZGO.Api.Models;
+@{
+    Layout = null;
+}
+
+<style>
+    #valueProps {
+        list-style-type: none;
+        padding: 0px;
+    }
+
+        #valueProps li {
+            float: left;
+            margin-right: 15px;
+            cursor: pointer;
+            border: solid 1px #ced4da;
+            border-radius: 3px;
+        }
+
+            #valueProps li:hover {
+                box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+                border: dashed 1px #93C54B;
+                background-color: #93c54b1f;
+            }
+
+            #valueProps li .bigbutton {
+                width: 135px;
+                height: 85px;
+                align-content: center;
+                position: relative;
+            }
+
+            #valueProps li .bigbutton-plus {
+                width: 135px;
+                height: 85px;
+                align-content: center;
+            }
+
+            #valueProps li .bigbutton div {
+                text-align: center;
+            }
+
+            #valueProps li .x-btn {
+                position: absolute;
+                background: red;
+                color: #fff !important;
+                top: -10px;
+                right: -10px;
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                font-size: 12px;
+            }
+
+                #valueProps li .x-btn i {
+                    margin-top: 6px;
+                }
+
+            #valueProps li .bigbutton div:nth-child(1) {
+                text-align: center;
+                font-size: 13px;
+                line-height: 20px;
+                color: #6c757d !important;
+                padding-top: 2px;
+                top: 1%;
+                position: absolute;
+                width: 100%;
+                word-wrap: break-word !important;
+            }
+
+            #valueProps li .bigbutton div:nth-child(2) {
+                text-align: center;
+                font-size: 20px;
+                line-height: 20px;
+                top: 49%;
+                left: 50%;
+                transform: translate(-50%,-49%);
+                position: absolute;
+                width: 100%;
+                word-wrap: break-word !important;
+            }
+
+            #valueProps li .bigbutton div:nth-child(3) {
+                text-align: center;
+                font-size: 13px;
+                line-height: 20px;
+                color: #6c757d !important;
+                position: absolute;
+                bottom: 0px;
+                width: 100%;
+                padding-bottom: 2px;
+            }
+
+    .edit-circle {
+        position: absolute;
+        top: -10px;
+        right: 16px;
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+        border-radius: 50%;
+        background: grey;
+        color: white;
+        text-align: center;
+    }
+</style>
+
+<div id="valuePanel" data-index="0" class="w-100 mt-3 shadow" style="background-color: #f6ffea;position:absolute;display:flex;z-index:3;border:solid 1px #93C54B;border-radius:5px;top:90px;">
+    <div class="customArrow arrow" style="left:40px;"></div>
+    <div id="app" class="w-100" style="margin: 0px 8px 0px 7px;"></div>
+</div>
+
+<!-- Modal Edit Properties -->
+<div class="modal" id="modalEditProperty" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" id="modal_body" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="property_modal_title">Edit Property: </h4>  <!-- TRANSLATION NEEDED -->
+                <button type="button" class="close" onclick="$('#modalEditProperty').modal('hide');">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form id="my-form">
+                    <div class="form-group mb-3 row">
+                        <label class="col-sm-2 col-form-label">
+                            Default value:
+                        </label>
+                        <input class="form-control col-sm-3" type="text" id="property_value" />
+                        <div class="col-form-label col-sm-1 text-center font-weight-bold hidden" id="hidden_line"> - </div>
+                        <input class="form-control col-sm-3" type="hidden" id="property_secondary_value" />
+                        <label class="col-sm-2 col-form-label" id="property_property_value"></label>
+                    </div>
+
+                    <div class="form-group mb-3 row">
+                        <label class="col-sm-2 col-form-label">Display title:</label>
+                        <input class="form-control col-sm-3" type="text" id="property_title" />
+                    </div>
+
+                    <div class="form-group mb-3 row">
+                        <label class="col-sm-2 col-form-label">Display footer:</label>
+                        <input class="form-control col-sm-3" type="text" id="property_footer" />
+                    </div>
+
+                    <div class="form-group p-1">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="is_required">
+                            <label class="custom-control-label card-text" style="font-weight: 400 !important;" for="is_required">
+                                Make property required
+                            </label>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="property_id" id="property_id" />
+                    <input type="hidden" name="template_id" id="template_id" />
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-ezgo btn-sm" onclick="$('#modalEditProperty').modal('hide');" data-action="close">Close</button> <!-- TRANSLATION NEEDED-->
+                <button type="button" id="save_property_button" class="btn btn-ezgo btn-sm" onclick="saveProperty()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showEditPropertyModal(id) {
+        var property = ezgoprops._template.Properties.filter(x => x.Id == id)[0];
+
+        if (property.TitleDisplay != null) {
+            $('#property_modal_title').html('Edit Property: ' + property.TitleDisplay);
+        }
+        else if (property.Property?.ShortName != null) {
+            $('#property_modal_title').html('Edit Property: ' + property.Property.ShortName);
+        }
+
+        if (property.PropertyValue?.Name != null) {
+            $('#property_property_value').html(property.PropertyValue.Name);
+        }
+        else {
+            $('#property_property_value').html('');
+        }
+
+        if (property.ValueType === null) {
+            $('#property_value').attr('type', 'text');
+            $('#property_value').prop('disabled', true);
+            $('#property_value').val(property.PrimaryIntValue + property.PrimaryDecimalValue + property.PrimaryStringValue + property.PrimaryDateTimeValue + property.PrimaryTimeValue + property.BoolValue);
+        }
+        else if (property.ValueType === 0) {  //Integer
+            $('#property_value').attr('type', 'number');
+            $('#property_value').val(property.PrimaryIntValue);
+            $('#property_value').attr('step', 1);
+            $('#property_value').attr('onkeypress', 'return event.charCode >= 48 && event.charCode <= 57');
+        }
+        else if (property.ValueType === 1) {  //Number with Decimals
+            $('#property_value').attr('type', 'number');
+            $('#property_value').val(property.PrimaryDecimalValue);
+            $('#property_value').attr('step', 0.01);
+            $('#property_value').attr('onkeypress', '');
+        }
+        else {
+            $('#property_value').attr('step', '');
+            $('#property_value').attr('onkeypress', '');
+
+            if (property.ValueType === 2) {  //String
+                $('#property_value').attr('type', 'text');
+                $('#property_value').val(property.PrimaryStringValue);
+            }
+            else if (property.ValueType === 3) {  //Date
+                $('#property_value').attr('type', 'date');
+                $('#property_value').val(property.PrimaryDateTimeValue);
+            }
+            else if (property.ValueType === 4) {  //Time
+                $('#property_value').attr('type', 'time');
+                $('#property_value').val(property.PrimaryTimeValue);
+            }
+            else if (property.ValueType === 5) {  //DateTime
+                $('#property_value').attr('type', 'datetime-local');
+                $('#property_value').val(property.PrimaryDateTimeValue);
+            }
+            else if (property.ValueType === 6) {  //Boolean
+                $('#property_value').attr('type', 'checkbox');
+                $('#property_value').prop('checked', property.BoolValue);
+            }
+        }
+
+        if (property.FieldType === 2) {
+            $('#hidden_line').removeClass('hidden');
+            if (property.ValueType === 0) {  //Integer
+                $('#property_secondary_value').attr('type', 'number');
+                $('#property_secondary_value').val(property.SecondaryIntValue);
+                $('#property_secondary_value').attr('step', 1);
+                $('#property_secondary_value').attr('onkeypress', 'return event.charCode >= 48 && event.charCode <= 57');
+            }
+            else if (property.ValueType === 1) {  //Number with Decimals
+                $('#property_secondary_value').attr('type', 'number');
+                $('#property_secondary_value').val(property.SecondaryDecimalValue);
+                $('#property_secondary_value').attr('step', 0.01);
+                $('#property_secondary_value').attr('onkeypress', '');
+            }
+            else {
+                $('#property_secondary_value').attr('step', '');
+                $('#property_secondary_value').attr('onkeypress', '');
+
+                if (property.ValueType === 2) {  //String
+                    $('#property_secondary_value').attr('type', 'text');
+                    $('#property_secondary_value').val(property.SecondaryStringValue);
+                }
+                else if (property.ValueType === 3) {  //Date
+                    $('#property_secondary_value').attr('type', 'date');
+                    $('#property_secondary_value').val(property.SecondaryDateTimeValue);
+                }
+                else if (property.ValueType === 4) {  //Time
+                    $('#property_secondary_value').attr('type', 'time');
+                    $('#property_secondary_value').val(property.SecondaryTimeValue);
+                }
+                else if (property.ValueType === 5) {  //DateTime
+                    $('#property_secondary_value').attr('type', 'datetime-local');
+                    $('#property_secondary_value').val(property.SecondaryDateTimeValue);
+                }
+            }
+        }
+        else {
+            $('#hidden_line').addClass('hidden');
+            $('#property_secondary_value').attr('type', 'hidden');
+            $('#property_secondary_value').val('');
+        }
+
+        $('#is_required').prop('checked', property.IsRequired);
+        $('#property_id').val(property.Id);
+        $('#property_title').val(property.TitleDisplay);
+        $('#property_footer').val(property.PropertyValueDisplay);
+        $('#modalEditProperty').modal('show');
+    }
+
+    function saveProperty() {
+        var prop = ezgoprops._template.Properties.filter(x => x.Id == $('#property_id').val())[0];
+
+        prop.IsRequired = $('#is_required').is(":checked");
+        prop.TitleDisplay = $('#property_title').val() == '' ? undefined : $('#property_title').val();
+        prop.PropertyValueDisplay = $('#property_footer').val() == '' ? undefined : $('#property_footer').val();
+
+        if (prop.ValueType === 0) {  //Integer
+            prop.PrimaryIntValue = $('#property_value').val() == '' ? undefined : +$('#property_value').val();
+            prop.SecondaryIntValue = $('#property_secondary_value').val() == '' ? undefined : +$('#property_secondary_value').val();
+        }
+        else if (prop.ValueType === 1) {  //Number with Decimals
+            prop.PrimaryDecimalValue = $('#property_value').val() == '' ? undefined : +$('#property_value').val();
+            prop.SecondaryDecimalValue = $('#property_secondary_value').val() == '' ? undefined : +$('#property_secondary_value').val();
+        }
+        else if (prop.ValueType === 2) {  //String
+            prop.PrimaryStringValue = $('#property_value').val() == '' ? undefined : $('#property_value').val();
+            prop.SecondaryStringValue = $('#property_secondary_value').val() == '' ? undefined : $('#property_secondary_value').val();
+        }
+        else if (prop.ValueType === 3 || prop.ValueType === 5) {  //Date(Time)
+            prop.PrimaryDateTimeValue = $('#property_value').val() == '' ? undefined : $('#property_value').val();
+            prop.SecondaryDateTimeValue = $('#property_secondary_value').val() == '' ? undefined : $('#property_secondary_value').val();
+        }
+        else if (prop.ValueType === 4) {  //Time
+            prop.PrimaryTimeValue = $('#property_value').val() == '' ? undefined : $('#property_value').val();
+            prop.SecondaryTimeValue = $('#property_secondary_value').val() == '' ? undefined : $('#property_secondary_value').val();
+        }
+        else if (prop.ValueType === 6) {  //Boolean
+            prop.BoolValue = $('#property_value').is(":checked");
+        }
+
+        ezgoprops._template.Properties.filter(x => x.Id == $('#property_id').val())[0] = prop;
+        ezgoprops.loadTemplateProps(ezgoprops._template);
+
+        $('#modalEditProperty').modal('hide');
+    }
+</script>

@@ -1,0 +1,31 @@
+﻿@model WebApp.ViewModels.CompletedAuditViewModel
+@using WebApp.Models.Audit
+
+@if (Model.CompletedAudits != null && Model.CompletedAudits.Count > 0)
+{
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+
+    var single = new WebApp.ViewModels.CompletedAuditSingleViewModel();
+
+
+    @foreach (CompletedAuditModel completeAudit in Model.CompletedAudits)
+    {
+        {
+            single = ViewModelConverters.ConvertToViewModel(completeAudit);
+            single.CompletedTextValue = Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.CompletedBy, "Completed by") ?? "Completed by";
+            single.Timezone = timezone;
+            single.Locale = Model?.Locale;
+        }
+        if (completeAudit.Signatures.Any())
+        {
+            <partial name="~/Views/Report/Audit/_completed_audit.cshtml" model="single" />
+        }
+
+
+    }
+}
+
+
+

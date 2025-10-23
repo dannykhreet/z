@@ -1,0 +1,308 @@
+﻿@model WebApp.ViewModels.CompaniesViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "";
+}
+
+@functions {
+    public string MakeVertical(string input)
+    {
+        return string.Join("<br />", input.ToCharArray());
+    }
+
+    public string ParseTitleName(string fieldName)
+    {
+        switch(fieldName)
+        {
+            case "ActionCommentsEnabled": return "Action Comments";
+            case "ActionOnTheSportEnabled": return "Action on the Spot";
+            case "ActionPropertyEnabled": return "Action Properties";
+            case "ActionPropertyValueRegistrationEnabled": return "Action Value Registration";
+            case "ActionsEnabled": return "Actions";
+            case "AdvancedSearchEnabled": return "Advanced Search";
+            case "AnalyticsEnabled": return "Analytics";
+            case "AuditsEnabled": return "Audits";
+            case "AuditsPropertyEnabled": return "Audit Properties";
+            case "AuditsPropertyValueRegistrationEnabled": return "Audit Value Registration";
+            case "ChecklistsConditionalEnabled": return "Checklist Conditional";
+            case "ChecklistsEnabled": return "Checklists";
+            case "ChecklistsPropertyEnabled": return "Checklist Properties";
+            case "ChecklistsPropertyValueRegistrationEnabled": return "Checklist Value Registration";
+            case "EasyCommentsEnabled": return "Comments";
+            case "EnableSupportChat": return "Support Chat";
+            case "ExportAdvancedEnabled": return "Export Advanced";
+            case "ExportEnabled": return "Export";
+            case "ExportTaskProperties": return "Export Task Properties";
+            case "FactoryFeedEnabled": return "Factory Feed";
+            case "FirebaseLoggingCMSEnabled": return "Firebase CMS Logging";
+            case "MarketEnabled": return "Marketplace";
+            case "OrderAudits": return "Order Audits";
+            case "OrderChecklists": return "Order Checklists";
+            case "OrderTasks": return "Order Tasks";
+            case "QRCode": return "QRCode";
+            case "ReportsEnabled": return "Reports";
+            case "RequiredProof": return "Require Proof";
+            case "SkillAssessments": return "Skill Assessments";
+            case "SkillAssessmentsRunningInCms": return "Skill Assessments in CMS";
+            case "SkillMatrix": return "Skills Matrix";
+            case "SkillMatrixMandatorySkills": return "Matrix Mandatory Skills";
+            case "SkillMatrixOperationalBehaviour": return "Matrix Operational Behaviour";
+            case "SkillMatrixOperationalSkills": return "Matrix Operational Skills";
+            case "TagsEnabled": return "Tags";
+            case "TaskGenerationOptions": return "Task Generation Options";
+            case "TaskMultiskipEnabled": return "Tasks Multi Skip";
+            case "TasksEnabled": return "Tasks";
+            case "TasksPropertyEnabled": return "Task Properties";
+            case "TasksPropertyValueRegistrationEnabled": return "Task Value Registration";
+            case "TaskTypeDynamicDayEnabled": return "Tasks Dynamic Day";
+            case "TaskTypeDynamicHourEnabled": return "Tasks Dynamic Hour";
+            case "TaskTypeDynamicMinuteEnabled": return "Tasks Dynamic Minute";
+            case "TaskTypeMonthEnabled": return "Tasks Month";
+            case "TaskTypeNoRecurrencyEnabled": return "Tasks No Recurrency";
+            case "TaskTypePeriodDayEnabled": return "Tasks Period Day";
+            case "TaskTypePeriodHourEnabled": return "Tasks Period Hour";
+            case "TaskTypePeriodMinuteEnabled": return "Tasks Period Minute";
+            case "TaskTypeShiftEnabled": return "Tasks Shift";
+            case "TaskTypeWeekEnabled": return "Tasks Week";
+            case "UserProfileManagementEnabled": return "User Profile Management";
+            case "UseStaticAuditStorage": return "Use Static Audit Storage";
+            case "UseStaticChecklistStorage": return "Use Static Checklist Storage";
+            case "WorkInstructions": return "Work Instructions";
+        }
+        return fieldName;
+    }
+}
+<html>
+    <head>
+
+    <!-- jQuery -->
+    <script src="/plugins/jquery/jquery.min.js"></script>
+
+    <!-- jQuery UI 1.11.4 -->
+    <script src="/plugins/jquery-ui/jquery-ui.min.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/plugins/fontawesome-pro-6.5.2-web/css/all.min.css" />
+    <link href="~/library/datatables/datatables.css" rel="stylesheet" />
+    <script src="~/library/datatables/datatables.min.js"></script>
+
+    <script src="~/library/datatables/dataTables.buttons.min.js"></script>
+    <script src="~/library/datatables/jszip.min.js"></script>
+    <script src="~/library/datatables/pdfmake.min.js"></script>
+    <script src="~/library/datatables/vfs_fonts.js"></script>
+    <script src="~/library/datatables/buttons.html5.min.js"></script>
+    <script src="~/library/datatables/buttons.print.min.js"></script>
+
+    <style>
+        .header-vertical {
+            -ms-writing-mode: tb-rl;
+            -webkit-writing-mode: vertical-rl;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            white-space: nowrap;
+            text-align: left;
+            font-weight: bolder;
+        }
+
+        .header-td {
+            min-width: 20px;
+            line-height: 10px;
+            font-size: 10px;
+            text-align: center;
+            letter-spacing: 2px;
+            vertical-align: bottom;
+            font-weight: bolder;
+        }
+
+        .header-bottom {
+            vertical-align: bottom;
+            text-align: left;
+            font-weight: bolder;
+        }
+
+        .company-name {
+            text-align: left;
+            font-weight: bolder;
+        }
+
+        td {
+            margin: 10px;
+            text-align: center;
+        }
+
+        .green {
+            color: #0099AA;
+        }
+
+        .red {
+            color: #FF0000;
+        }
+
+        body, td, th, div, section {
+            font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            font-size: 10px;
+        }
+
+        body {
+            background-color: rgba(211, 213, 211, .6);
+        }
+
+        th, td {
+            white-space: nowrap;
+        }
+
+        div.dataTables_wrapper {
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        table#companyDataTable.dataTable tbody tr:hover {
+            background-color: #ffa;
+        }
+
+        table#companyDataTable.dataTable tbody tr:hover > .sorting_1 {
+            background-color: #ffa;
+        }
+
+        table#companyDataTable.dataTable tbody td:hover > .sorting_1 {
+            background-color: #FFC0C0;
+        }
+
+        table#companyDataTable.dataTable tbody td:hover {
+            background-color: #F1F1F1;
+        }
+
+
+/*        table.dataTable thead .sorting {
+            background-image: url("DataTables-1.10.21/images/sort_both.png");
+        }
+*/
+        table#companyDataTable.dataTable thead th.sorting_asc {
+            background: url("/library/datatables/DataTables-1.10.21/images/sort_asc.png") no-repeat bottom right;
+            background-position-x: right;
+            background-position-y: bottom;
+        }
+
+        table#companyDataTable.dataTable thead th.sorting_desc {
+            background: url("/library/datatables/DataTables-1.10.21/images/sort_desc.png") no-repeat bottom right;
+        }
+
+        table#companyDataTable.dataTable thead th.sorting {
+            background: url("/library/datatables/DataTables-1.10.21/images/sort_both.png") no-repeat bottom right;
+            color:aqua;
+        }
+
+    </style>
+    </head>
+
+
+<body>
+
+
+
+
+
+<section class="content">
+
+    @if (Model.CompaniesFeatures != null && Model.CompaniesFeatures.Count != 0)
+    {
+            <table id="companyDataTable" class="table table-striped table-bordered cell-border" style="width:100%">
+            <thead>
+            <tr>
+                <th class="header-bottom">Company</th>
+                <th class="header-bottom">Tier</th>
+                <th class="header-bottom">Task generation</th>
+                @{
+                    Type type = typeof(EZGO.Api.Models.Settings.Features);
+
+                    foreach (var field in type.GetProperties().Where(p => !new[] { "TierPremium", "TierAdvanced", "TierEssentials" }.ToList().Contains(p.Name)).OrderBy(p => p.Name))
+                    {
+                                <th class="header-td" title="@ParseTitleName(field.Name)">@Html.Raw(MakeVertical(ParseTitleName(field.Name)).ToUpper())</th>
+                    }                           
+                }
+            </tr>
+            </thead>
+            <tbody>
+
+            @foreach (var company in Model.CompaniesFeatures.Where(x=> !x.CompanyName.Contains("DELETED")))
+            {
+                <tr data-search="@company.CompanyName">
+                    <td class="company-name">@company.CompanyName (@company.CompanyId)</td>
+                      <td>
+                        @if (company.Features.TierPremium.HasValue && company.Features.TierPremium.Value)
+                        {
+                                    <div title="@company.CompanyName (@company.CompanyId) - Premium">Premium</div>
+                        }
+                        else if (company.Features.TierAdvanced.HasValue && company.Features.TierAdvanced.Value)
+                        {
+                                    <div title="@company.CompanyName (@company.CompanyId) - Advanced">Advanced</div>
+                        }
+                        else if (company.Features.TierEssentials.HasValue && company.Features.TierEssentials.Value)
+                        {
+                                    <div title="@company.CompanyName (@company.CompanyId) - Essentials">Essentials</div>
+                        }
+                        else
+                        {
+                            <div>None</div>
+                        }
+                    </td>
+                            <td title="@company.CompanyName (@company.CompanyId) - Task Generation">
+                                <span style="display:none;">@company.TaskGenerationEnabled</span>
+                                @if (company.TaskGenerationEnabled)
+                                {
+                                    <i class="fa-solid fa-check green"></i>
+                                }
+                                else
+                                {
+                                    <i class="fa-solid fa-xmark red"></i>
+                                }
+                    </td>
+                    @foreach (var field in type.GetProperties().Where(p => !new[] { "TierPremium", "TierAdvanced", "TierEssentials" }.ToList().Contains(p.Name)).OrderBy(p => p.Name))
+                    {
+                                <td title="@company.CompanyName (@company.CompanyId) - @ParseTitleName(field.Name)">
+                                    <span style="display:none;">@Convert.ToBoolean(field.GetValue(company.Features))</span>
+                            @if (Convert.ToBoolean(field.GetValue(company.Features))) {
+                                <i class="fa-solid fa-check green"></i>
+                            } else
+                            {
+                                <i class="fa-solid fa-xmark red"></i>
+                            }
+
+                        </td>
+                    }
+                </tr>
+                                                                
+            }
+            </tbody>
+        </table>
+    } 
+
+</section>
+    <script>
+
+
+        $(document).ready(function () {
+            $('#companyDataTable').DataTable({
+                scrollY: '800px',
+                scrollCollapse: true,
+                scrollX: true,
+                fixedHeader: true,
+                paging: false,
+                fixedColumns: {
+                    left: 1
+                },
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'print', 
+                    {
+                        extend: 'pdfHtml5',
+                        orientation: 'landscape',
+                        pageSize: '4A0'
+                    }
+                ]
+            });
+        });
+    </script>
+</body>
+</html>

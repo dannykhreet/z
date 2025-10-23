@@ -1,0 +1,284 @@
+﻿@model WebApp.ViewModels.CompanySettingsViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = Model?.CmsLanguage.GetValue(LanguageKeys.Config.SettingTitle, "Setting") ?? "Setting";
+}
+
+<style>
+    /* General Style Changes */
+    .settingContent {
+        height: calc(100vh - 186px);
+    }
+
+    /* Sidebar Button Styling */
+    .list-group-item {
+        background-color: #93C54B !important; /* Unselected color */
+        color: #fff !important;
+        border: none !important;
+        font-weight: bold;
+        text-align: center;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .list-group-item.active {
+            background-color: #668F2A !important; /* Selected color */
+            color: #fff !important;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    /* Right Content Area Styling */
+    #right_content_area {
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-group-toggle .btn {
+        border-radius: 8px;
+        border: none;
+        padding: 20px;
+        margin-right: 10px;
+        width: 48%;
+        box-shadow: none;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+        .btn-group-toggle .btn.active {
+            background-color: #668F2A;
+            color: #fff !important;
+        }
+
+        .btn-group-toggle .btn:not(.active) {
+            background-color: #f5f5f5;
+            color: #5B9C5A !important;
+        }
+
+        .btn-group-toggle .btn:hover {
+            background-color: #d3e6bc;
+        }
+
+    .btn-group-toggle i,
+    .btn-group-toggle img {
+        margin-right: 15px;
+        font-size: 40px;
+    }
+</style>
+
+<style>
+    .work-instructions-option {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        margin-right: 10px;
+        border-radius: 8px;
+        transition: background-color 0.3s, box-shadow 0.3s, color 0.3s;
+        cursor: pointer;
+        background-color: #f5f5f5;
+        color: black !important; /* Default unselected text color */
+    }
+
+        .work-instructions-option.active {
+            background-color: #668F2A;
+            color: white !important; /* Selected text color */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .work-instructions-option .option-content {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+    /* Default icon color when inactive */
+    label.work-instructions-option .notification-icon {
+        color: black !important; /* Ensure icon is black when inactive */
+    }
+
+    /* Icon color when active */
+    label.work-instructions-option.active .notification-icon {
+        color: white !important; /* Change icon color to white when active */
+    }
+
+    .work-instructions-option .icon {
+        width: 65px;
+        height: 65px;
+        margin-right: 20px;
+        font-size: 50px;
+        align-content: center;
+    }
+
+    .work-instructions-option:hover {
+        background-color: #d3e6bc;
+        color: black;
+    }
+
+    .btn-group-toggle label {
+        color: inherit !important;
+    }
+
+    .list-group-item:first-child {
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+</style>
+@{
+    var enableModificationOwnCompanySettingsAssessment = (Model?.ApplicationSettings?.Features?.EnableModificationOwnCompanySettingsAssessment == true && Model?.ApplicationSettings?.Features?.SkillAssessments == true);
+    var enableModificationOwnCompanySettingsWorkInstruction = (Model?.ApplicationSettings?.Features?.EnableModificationOwnCompanySettingsWorkInstruction == true && Model?.ApplicationSettings?.Features?.WorkInstructions == true);
+    var enableModificationOwnCompanySettingsMatrix = (Model?.ApplicationSettings?.Features?.EnableModificationOwnCompanySettingsMatrix == true && Model?.ApplicationSettings?.Features?.SkillMatrix == true);
+}
+<div class="settingContent mx-0">
+    <div class="container d-flex mx-0" style="height: 100%;max-width: 100%">
+
+        <div class="row mx-0" style="flex-wrap: nowrap; width: 100%">
+            <!-- Left Sidebar -->
+            <div class="col-3 p-4 mr-4" style="background-color: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                <div class="list-group">
+                    @if (enableModificationOwnCompanySettingsAssessment)
+                    {
+                        <a href="#" id="assessment_link" class="list-group-item">Assessment</a>
+                    }
+                    @if (enableModificationOwnCompanySettingsWorkInstruction)
+                    {
+                        <a href="#" id="work_instructions_link" class="list-group-item active">@(Model?.CmsLanguage.GetValue(LanguageKeys.Setting.WorkInstruction, "Work Instructions") ?? "Work Instructions")</a>
+                    }
+                    @if (enableModificationOwnCompanySettingsMatrix)
+                    {
+                        <a href="#" id="skills_matrix_link" class="list-group-item">@(Model?.CmsLanguage.GetValue(LanguageKeys.Setting.WorkInstruction, "Skill Matrix") ?? "Skill Matrix")</a>
+                    }
+                </div>
+            </div>
+
+            <!-- Right Content Area -->
+            <div id="right_content_area" class="col p-4" style="background-color: white;">
+                <!-- Content will be loaded here dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // Load content dynamically without callback dependency
+        function loadContent(url) {
+            $('#right_content_area').load(url, function () {
+                
+                @if (enableModificationOwnCompanySettingsWorkInstruction)
+                {
+                    @:initializeWorkInstructions();
+                }
+                else if (enableModificationOwnCompanySettingsAssessment)
+                {
+                    //show assessment setting edit details TODO implement when setting is there
+                }
+                else if (enableModificationOwnCompanySettingsMatrix)
+                {
+                    //show matrix setting edit details TODO implement when setting is there
+                }
+            });
+        }
+
+        // Function to initialize the correct state for Work Instructions
+        function initializeWorkInstructions() {
+            // Setting the initial state based on server-rendered values
+            if ($('#notify').is(':checked')) {
+                $('#notify_label').addClass('active');
+                $('#notify_icon').removeClass('text-muted').addClass('text-success');
+                $('#dispensable_notifications_image').attr('src', '/images/setting/NA_Dispensable notifications.svg');
+            } else if ($('#donotnotify').is(':checked')) {
+                $('#do_not_notify_label').addClass('active');
+                $('#dispensable_notifications_image').attr('src', '/images/setting/A_Dispensable notifications.svg');
+                $('#notify_icon').removeClass('text-success').addClass('text-muted');
+            }
+        }
+
+        // Load default content for work instructions on page load
+        @if (enableModificationOwnCompanySettingsWorkInstruction)
+        {
+            @:$('.list-group-item').removeClass('active');
+            @:$('#work_instructions_link').addClass('active');
+
+            @:loadContent('/CompanySettings/WorkInstructions');
+        }
+        else if (enableModificationOwnCompanySettingsAssessment)
+        {
+            @:$('.list-group-item').removeClass('active');
+            @:$('#assessment_link').addClass('active');
+
+            // Set right content area to default background color (white)
+            @:$('#right_content_area').css('background-color', 'white');
+
+            // Load assessment content
+            @:loadContent('/CompanySettings/Assessment');
+        }
+        else if (enableModificationOwnCompanySettingsMatrix)
+        {
+            @:$('.list-group-item').removeClass('active');
+            @:$('#skills_matrix_link').addClass('active');
+
+            // Set right content area to default background color (white)
+            @:$('#right_content_area').css('background-color', 'white');
+
+            // Load skills matrix content
+            @:loadContent('/CompanySettings/SkillsMatrix');
+        }
+
+        // Using event delegation for dynamically loaded content within the right content area
+        $('#right_content_area').on('click', '.btn-group-toggle label', function () {
+            // Remove active class from all buttons
+            $('.btn-group-toggle label').removeClass('active');
+
+            // Add active class to the clicked button
+            $(this).addClass('active');
+
+            // Update images/icons based on the selected state
+            if ($(this).attr('id') === 'notify_label') {
+                // Enable notifications selected
+                $('#notify').prop('checked', true);
+                $('#notify_icon').removeClass('text-muted').addClass('text-success');
+                $('#dispensable_notifications_image').attr('src', '/images/setting/NA_Dispensable notifications.svg');
+            } else if ($(this).attr('id') === 'do_not_notify_label') {
+                // Dispensable notifications selected
+                $('#donotnotify').prop('checked', true);
+                $('#dispensable_notifications_image').attr('src', '/images/setting/A_Dispensable notifications.svg');
+                $('#notify_icon').removeClass('text-success').addClass('text-muted');
+            }
+        });
+
+        // Event listeners for sidebar navigation links
+        $('#assessment_link').on('click', function () {
+            // Update active class on the sidebar
+            $('.list-group-item').removeClass('active');
+            $(this).addClass('active');
+
+            // Set right content area to default background color (white)
+            $('#right_content_area').css('background-color', 'white');
+
+            // Load assessment content
+            loadContent('/CompanySettings/Assessment');
+        });
+
+        $('#work_instructions_link').on('click', function () {
+            // Update active class on the sidebar
+            $('.list-group-item').removeClass('active');
+            $(this).addClass('active');
+
+            // Load work instructions content with initialization
+            loadContent('/CompanySettings/WorkInstructions');
+        });
+
+        $('#skills_matrix_link').on('click', function () {
+            // Update active class on the sidebar
+            $('.list-group-item').removeClass('active');
+            $(this).addClass('active');
+
+            // Set right content area to default background color (white)
+            $('#right_content_area').css('background-color', 'white');
+
+            // Load skills matrix content
+            loadContent('/CompanySettings/SkillsMatrix');
+        });
+    });
+</script>
+

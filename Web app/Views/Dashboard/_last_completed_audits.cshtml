@@ -1,0 +1,290 @@
+﻿@model WebApp.ViewModels.DashboardViewModel
+@using WebApp.Models.Audit
+@using System.Text
+@{
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+
+    string getIconColor(string state)
+    {
+        switch (state.ToLower())
+        {
+            case "ok":
+                return "bg-green";
+            case "not ok":
+                return "bg-red";
+            case "skipped":
+                return "bg-warning";
+            default:
+                return "bg-lightGray";
+        }
+    }
+
+    string getIcon(string state, string scoretype, int value)
+    {
+        if (scoretype == "thumbs")
+        {
+            switch (state.ToLower())
+            {
+                case "ok":
+                    return "fa-thumbs-up status-icon";
+                case "not ok":
+                    return "fa-thumbs-down status-icon";
+                case "skipped":
+                    return "fa-forward status-icon";
+                default:
+                    return "fa-question";
+            }
+        }
+        else
+        {
+            if (value > 0)
+            {
+                return "status-icon";
+            }
+            else
+            {
+                return "fa-forward status-icon";
+            }
+        }
+    }
+}
+
+<style>
+    .action-status {
+        width: 40px;
+        height: 40px;
+        padding: 8px 10px 0px 14px;
+        color: #fff !important;
+    }
+</style>
+
+<div class="card h-100">
+    <div class="card-header pb-4 d-flex">
+        <h3 class="card-title" style="width:85%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsAuditCompletedTitle, "Last completed audits") ?? "Last completed audits")</h3>
+        <a href="/report/audit/completed" class="float-right" style="width:15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.ShowAll, "Show all") ?? "Show all")</a>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="accordion" id="accordionAudits">
+            @if (Model.CompletedAudits != null && Model.CompletedAudits.Any())
+            {
+                @foreach (var audit in Model.CompletedAudits)
+                {
+                    if (audit.Signatures.Any())
+                    {
+                        var target = string.Format("collapseChecklist{0}", audit.Id);
+                        var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, audit.Picture);
+                        var colorCalculator = (WebApp.Logic.Interfaces.IScoreColorCalculator)audit.ScoreColorCalculator;
+
+                        <div class="card" style="box-shadow:none;margin-bottom:0px;cursor:pointer;">
+                            <div class="card-header p-0" id="headingOne" data-toggle="collapse" data-target="#@target">
+                                <div class="row no-gutters">
+                                    <div class="col-md-12">
+                                        <div class="card-body p-1 ml-3">
+                                            <h5 class="card-title">@audit.Name</h5>
+
+                                            @if (audit.Signatures.Any())
+                                            {
+                                                DateTime SignedDate = TimeZoneInfo.ConvertTime(audit.Signatures[0].SignedAt, timezone);
+                                                <p class="card-text p-0 m-0">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.CompletedBy, "Completed by") ?? "Completed by"): @audit.Signatures[0].SignedBy</p>
+                                                <p class="card-text p-0 m-0">
+                                                    <span class="text-muted">@SignedDate.ToLocaleFullDateShortTimeString(Model.Locale)</span>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="infoText m-1 mr-2">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.ClickToClose, "click to close") ?? "click to close")</div>
+                            </div>
+
+                            <div id="@target" class="collapse" aria-labelledby="headingOne" data-parent="#accordionChecklists">
+                                <div class="card-body p-0 bg-light">
+                                    <ul id="completedChecklistContainer" class="list-group lastCompletedList">
+                                        @if (audit.OpenFieldsProperties != null && audit.OpenFieldsProperties.Any())
+                                        {
+                                            <li class="list-group-item d-flex justify-content-between align-items-center" style="padding: .50rem .75rem;">
+                                                <div class="row w-100">
+                                                    @foreach (var openfield in audit.OpenFieldsProperties)
+                                                    {
+                                                        <div class="col-6">@openfield.TitleDisplay: @audit.OpenFieldsPropertyUserValues.Where(m => m.TemplatePropertyId.Equals(openfield.Id)).FirstOrDefault()?.UserValueString @(openfield.IsRequired.HasValue && openfield.IsRequired.Value ? "*" : "")</div>
+                                                    }
+                                                </div>
+                                            </li>
+                                        }
+
+                                        @if (audit.Tasks != null)
+                                        {
+                                            @foreach (var completedTask in audit.Tasks)
+                                            {
+                                                var taskPicture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                                                if (!string.IsNullOrEmpty(completedTask.Picture))
+                                                {
+                                                    taskPicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, completedTask.Picture);
+                                                }
+
+                                                if (!string.IsNullOrEmpty(completedTask.VideoThumbnail))
+                                                {
+                                                    taskPicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, completedTask.VideoThumbnail);
+                                                }
+
+                                                <li class="list-group-item d-flex justify-content-between align-items-center" style="padding: .50rem .75rem;">
+                                                    <img src="/images/media-loading.gif" data-src="@taskPicture" style="object-fit: cover; object-position: center; height: 70px; width: 80px; float: left;" loading="lazy" />
+
+                                                    <div class="position-absolute" style="margin-left:90px;margin-right:120px;">
+                                                        <span style="float:left;clear:left;position:relative;">@completedTask.Name</span>
+                                                        <span style="float:left;clear:left;position:relative;">@(WebApp.Helpers.CompletedItemDisplayHelpers.GetPropertiesAsString(completedTask, timezone, Model.Locale))</span>
+                                                    </div>
+
+                                                    <div style="margin-left: auto">
+                                                    </div>
+                                                    @if (completedTask.ActionsCount > 0 || completedTask.CommentCount > 0)
+                                                    {
+                                                        <a href="/action/taskactions/@completedTask.Id/@completedTask.TemplateId/false" class="status-circle bg-warning m-1"><i class="fa fa-bolt-lightning status-icon"></i></a>
+                                                    }
+
+                                                    @if (completedTask.PictureProof != null)
+                                                    {
+                                                        <a onclick="showPictureProofData(@completedTask.Id)" style="background-color: lightgray; cursor: pointer;" class="status-circle m-1"><i class="fas fa-camera status-icon"></i></a>
+                                                    }
+
+                                                    @if (audit.ScoreType == "thumbs" || completedTask.Status == "skipped")
+                                                    {
+                                                        <span class="@getIconColor(completedTask.Status) status-circle">
+                                                            <i class="fa @getIcon(completedTask.Status, audit.ScoreType, completedTask.Score)" title="@completedTask.Status"></i>
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="status-circle @colorCalculator.GetColor(completedTask.Score)">
+                                                            <span class="text-white">@(audit.ScoreType == "score" ? completedTask.Score.ToString() : "")</span>
+                                                        </span>
+                                                    }
+                                                </li>
+
+                                                @if (completedTask.Tags?.Count > 0 && Model.ApplicationSettings?.Features?.TagsEnabled == true)
+                                                {
+                                                    <li class="row">
+                                                        @foreach (var tag in completedTask.Tags)
+                                                        {
+                                                            <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                                                                <div class="tag-wrapper" style="color:white;">
+                                                                    <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                                    <span class="my-1 ml-1 mr-3 tag-span" style="font-size:.78rem;">@tag.Name</span>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </li>
+                                                }
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+
+                                <div class="card-footer text-center bg-light">
+                                    @foreach (var signature in audit.Signatures)
+                                    {
+                                        var sigpic = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, signature.SignatureImage);
+
+                                        <div class="float-left mr-2">
+                                            @if (!string.IsNullOrEmpty(signature.SignatureImage))
+                                            {
+                                                <img src="/images/media-loading.gif" data-src="@sigpic" style="width:120px;" class="d-block" loading="lazy" />
+                                            }
+                                            <span class="d-inline-block" style="width:100px;">@signature.SignedBy</span>
+                                        </div>
+                                    }
+                                    <span class="float-right m-3">
+                                        @if (Model.EnableInBrowserPdfPrint)
+                                        {
+                                            <a href="javascript:void(0);" onclick="window.open('/pdf/viewer/completedaudit/@(audit.Id)', '_blank', 'toolbar=no,top=10,left=10,width=' + (screen.availWidth-10) + ',height=' + (screen.availHeight-10) + '');" class="btn btn-sm btn-ezgo mt-3 float-right"><i class="fa fa-print"></i></a>
+                                        }
+                                        else
+                                        {
+                                            <a href="/pdf/render/1/@(audit.Id)" class="btn btn-sm btn-ezgo mt-3 float-right"><i class="fa fa-print"></i></a>
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <hr style="padding:2px;margin:2px;" />
+                    }
+                }
+            }
+            else
+            {
+                <p class="card-text p-4">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.NoDataView, "There is no data to view.") ?? "There is no data to view.")</p>
+            }
+        </div>
+    </div>
+</div>
+
+@if (Model.CompletedAudits != null)
+{
+    foreach (var audit in Model.CompletedAudits)
+    {
+        if (audit.Tasks != null)
+        {
+            foreach (var completedTask in audit.Tasks)
+            {
+                @if (completedTask.PictureProof != null)
+                {
+                    <div role="dialog" tabindex="-1" class="modal fade h-100" data-backdrop="static" id="pictureProofData-@completedTask.Id" style="z-index: 10040">
+                        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="exampleModalLongTitle">
+                                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.PictureProofTitle, "Picture Proof") ?? "Picture Proof")
+                                    </h4>
+
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+
+                                <div class="modal-body" style="display: flex; justify-content: center">
+                                    <div id="pictureProofBody">
+                                        <h5>
+                                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.PictureProofTitle, "Picture Proof") ?? "Picture Proof")
+                                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.TakenAt, "taken at") ?? "taken at")
+                                            @TimeZoneInfo.ConvertTime(completedTask.PictureProof.ProofTakenUtc, timezone).ToString()
+                                        </h5>
+
+                                        @foreach (var ppMedia in completedTask.PictureProof.Media)
+                                        {
+                                            var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, ppMedia.UriPart);
+                                            <div style="height: 80px">
+
+                                                <a href="/images/media-loading.gif" data-href="@picture" data-fancybox="items-@completedTask.Id" data-caption="">
+                                                    <img class="mr-1" style="object-fit: cover; object-position: center; height: 70px; width: 80px; float: left;" src="/images/media-loading.gif" data-src="@picture" />
+                                                </a>
+                                                <p class="pl-2">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.PictureProofItem, "Picture Proof item") ?? "Picture Proof item") @ppMedia.ItemName @(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.TakenBy, "taken by") ?? "taken by") @ppMedia.UserFullName @(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.At, "at") ?? "at") @TimeZoneInfo.ConvertTime(ppMedia.PictureTakenUtc, timezone).ToString()</p>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        }
+    }
+}
+
+<script>
+    function showPictureProofData(taskId) {
+        $(`#pictureProofData-${taskId}`).modal('show');
+    }
+
+    $(document).ready(function() {
+        $('[id^="pictureProofData"]').off('shown.bs.modal').on('shown.bs.modal', function () {
+            ezgomediafetcher.preloadVisibleImagesAndVideos();
+        });
+    });
+</script>

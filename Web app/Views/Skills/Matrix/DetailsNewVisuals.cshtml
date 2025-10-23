@@ -1,0 +1,1856 @@
+﻿@model WebApp.ViewModels.SkillsViewModel
+@using WebApp.Logic
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = @Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatrixDetailsTitle, "Skill matrix details") ?? "Skill matrix details";
+}
+
+@section CSS{
+    <style>
+        #instructions {
+            top: 0px;
+            position: absolute;
+            z-index: 3;
+        }
+
+        .card {
+            margin-bottom: 0px !important;
+        }
+
+        .customArrow {
+            width: 100%;
+            position: absolute;
+            height: 0px;
+            width: 0px;
+            display: block;
+            transition: top 200ms;
+            border-bottom: 20px #93C54B solid;
+            border-left: 20px transparent solid;
+            border-right: 20px transparent solid;
+            margin-top: -21px;
+        }
+
+        .pencil-action {
+            height: 45px;
+            width: 45px;
+            margin-top: 15px;
+            margin-right: 15px;
+            font-size: 25px;
+            color: #364c59;
+            cursor: pointer;
+        }
+
+            .pencil-action svg {
+                margin-top: 3px;
+                margin-left: 11px;
+            }
+
+        .modal {
+            padding: 0 !important;
+        }
+
+        .value-placeholder {
+            height: 70px;
+            border: 1px dashed #fff;
+            width: 115px;
+            margin: 10px 15px 0px 0px;
+            cursor: pointer;
+        }
+
+            .value-placeholder span {
+                font-weight: 700;
+                font-size: 1.2rem;
+            }
+
+            .value-placeholder.active {
+                border: solid 1px silver;
+                background-color: lightgray;
+            }
+
+        .paperclip {
+            height: 160px;
+            background-color: #8ea968;
+            text-align: center;
+            color: #fff;
+        }
+
+            .paperclip i {
+                margin-top: 25px;
+            }
+
+                .paperclip i::after {
+                    display: block;
+                    font-size: 26px;
+                    font-style: normal;
+                    font-weight: 600;
+                }
+
+        .addclip {
+            height: 130px;
+            text-align: center;
+            color: #93C54B;
+            cursor: pointer;
+        }
+
+            .addclip:hover {
+                border: dashed 1px #93C54B;
+                background-color: #93c54b1f;
+            }
+
+            .addclip i {
+                margin-top: 39px;
+            }
+
+                .addclip i::after {
+                    display: block;
+                    font-size: 26px;
+                    font-style: normal;
+                    font-weight: 600;
+                }
+
+        .addvalue {
+            height: 70px;
+            text-align: center;
+            color: #93C54B;
+            cursor: pointer;
+            width: 115px;
+        }
+
+            .addvalue i {
+                margin-top: 20px;
+            }
+
+                .addvalue i::after {
+                    display: block;
+                    font-size: 26px;
+                    font-style: normal;
+                    font-weight: 600;
+                }
+
+        .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+            color: #fff;
+            background-color: #93C54B;
+        }
+
+        .nav-pills .nav-link:not(.active):hover {
+            color: #93C54B;
+        }
+
+        ::-webkit-scrollbar {
+            -webkit-appearance: none;
+            width: 10px;
+            height: 10px !important;
+        }
+
+        .itemlist .card {
+            width: 12rem;
+        }
+
+            .itemlist .card .card-body {
+                font-size: 9.5pt;
+                color: #6c757d !important;
+            }
+
+                .itemlist .card .card-body p {
+                    padding-bottom: 0px;
+                }
+
+            .itemlist .card:hover {
+                box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+            }
+
+        v.list-inline-item {
+            padding: 5px;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 0px;
+            margin: 15px;
+        }
+
+        .main-image-pencil {
+            background: #93c54b;
+            width: 35px;
+            height: 35px;
+            margin: 10px;
+            opacity: 0.8;
+            z-index: 1;
+            color: #fff;
+            border: solid 1px #333333 !important;
+            cursor: pointer;
+        }
+
+            .main-image-pencil i {
+                width: 35px;
+                height: 33px;
+                position: relative;
+                display: flex;
+            }
+
+            .main-image-pencil:hover {
+                border: solid 1px #fff !important;
+            }
+
+        .itemlist .pencil {
+            background: #333333;
+            width: 35px;
+            height: 35px;
+            margin: 10px;
+            opacity: 0.8;
+            z-index: 1;
+            position: absolute;
+            left: 70px;
+            top: 105px;
+            color: #fff;
+            border: solid 1px #333333 !important;
+            cursor: pointer;
+        }
+
+            .itemlist .pencil i {
+                width: 35px;
+                height: 33px;
+                position: relative;
+                display: flex;
+            }
+
+            .itemlist .pencil:hover {
+                border: solid 1px #fff !important;
+            }
+
+        .itemlist .ui-state-highlight {
+            height: 240px;
+            line-height: 1.2em;
+            width: 12rem;
+            margin-right: 22px;
+            background-color: rgba(241,241,241,0.52) !important;
+            border: dashed 1px rgb(191,191,191);
+            margin-top: 6px;
+        }
+
+        .itemlist .valuePropHolder {
+            width: 100px;
+            height: 60px;
+            border-radius: 6px;
+            float: left;
+            margin-right: 18px;
+            border: 1px solid rgb(214,214,214);
+        }
+
+        .itemlist .card-link {
+            position: relative;
+            display: flex;
+            height: 160px;
+            margin: -1px;
+            border: solid 1px rgba(0,0,0,0);
+        }
+
+            .itemlist .card-link img {
+                object-fit: cover;
+                width: 100%;
+                height: 160px;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+            }
+
+        .btn-light:not(:disabled):not(.disabled).active, .btn-light:not(:disabled):not(.disabled):active, .show > .btn-light.dropdown-toggle {
+            color: #fff !important;
+            background-color: #93C54B;
+            border-color: #d3d9df;
+        }
+
+        .tpl {
+            display: none;
+        }
+
+        .list-group-item:last-child {
+            margin-bottom: 0;
+            border-bottom-right-radius: 0rem;
+            border-bottom-left-radius: 0rem;
+        }
+
+        @@media print {
+            .pagebreak {
+                page-break-after: always !important;
+                break-after: always !important;
+            }
+
+            #mainCol {
+                display: block !important;
+                position: relative !important;
+                width: auto !important;
+                height: auto !important;
+                overflow: visible !important;
+                margin-left: 0 !important;
+            }
+
+            .content-wrapper {
+                background-color: #fff !important;
+            }
+        }
+
+        .dropdown-item.active, .dropdown-item:active {
+            color: #fff;
+            text-decoration: none;
+            background-color: #93C54B;
+        }
+
+        .form-group {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+            color: #fff;
+            background-color: #93C54B;
+        }
+
+        #valueProps {
+            list-style-type: none;
+            padding: 0px;
+        }
+
+            #valueProps li {
+                float: left;
+                margin-right: 15px;
+                cursor: pointer;
+                border: solid 1px #ced4da;
+                border-radius: 3px;
+            }
+
+                #valueProps li:hover {
+                    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+                    border: dashed 1px #93C54B;
+                    background-color: #93c54b1f;
+                }
+
+                #valueProps li .bigbutton {
+                    width: 135px;
+                    height: 85px;
+                    align-content: center;
+                    position: relative;
+                }
+
+                #valueProps li .bigbutton-plus {
+                    width: 135px;
+                    height: 85px;
+                    align-content: center;
+                }
+
+                #valueProps li .bigbutton div {
+                    text-align: center;
+                }
+
+                #valueProps li .x-btn {
+                    position: absolute;
+                    background: red;
+                    color: #fff !important;
+                    top: -10px;
+                    right: -10px;
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                    font-size: 12px;
+                }
+
+                    #valueProps li .x-btn i {
+                        margin-top: 6px;
+                    }
+
+                #valueProps li .bigbutton div:nth-child(2) {
+                    text-align: center;
+                    font-size: 13px;
+                    line-height: 20px;
+                    color: #6c757d !important;
+                    padding-top: 2px;
+                }
+
+                #valueProps li .bigbutton div:nth-child(3) {
+                    text-align: center;
+                    font-size: 20px;
+                    line-height: 20px;
+                    top: 49%;
+                    left: 50%;
+                    transform: translate(-50%,-49%);
+                    position: absolute;
+                    width: 100%;
+                    word-wrap: break-word !important;
+                }
+
+                #valueProps li .bigbutton div:nth-child(4) {
+                    text-align: center;
+                    font-size: 13px;
+                    line-height: 20px;
+                    color: #6c757d !important;
+                    position: absolute;
+                    bottom: 0px;
+                    width: 100%;
+                    padding-bottom: 2px;
+                }
+
+                #valueProps li.active {
+                    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+                    border: solid 1px #93C54B;
+                    background-color: #93c54b1f;
+                }
+
+        #ChangeSkillOrderModal .changeSkillOrderSkill {
+            border: solid 1px transparent;
+            border-radius: 10px;
+            background-color: #FFF;
+        }
+
+            #ChangeSkillOrderModal .changeSkillOrderSkill:hover {
+                border: solid 1px #93c54b;
+                box-shadow: 0 .425rem .75rem rgba(0,0,0,.075) !important;
+                color: #93c54b !important;
+            }
+
+        .noselect {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            cursor: pointer;
+        }
+    </style>
+
+    <link rel="stylesheet" href="/css/matrix/matrix.css" />
+    <link rel="stylesheet" href="/css/matrix/matrix-hover.css" />
+    <link rel="stylesheet" href="/css/matrix/matrix-buttons.css" />
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-6">
+                <a asp-controller="skills" asp-action="matrixindex"><i class="fa fa-arrow-left"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.NavBackTitle, "Back to skill matrices overview") ?? "Back to skill matrices overview")</a>
+                <h1>@Model.CurrentSkillsMatrix.Name</h1>
+                <h6>@Model.CurrentSkillsMatrix.Description</h6>
+            </div>
+
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                <button id="btnChangeUserGroups" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto">
+                    <i class="fa fa-people-group pr-1"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnAddOrChangeUserGroups, "Edit user groups") ?? "Edit user groups")
+                </button>
+
+                <button id="btnAddChangeBehaviourSkills" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto">
+                    <i class="fa fa-graduation-cap pr-1"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnAddOrChangeSkills, "Edit skills") ?? "Edit skills")
+                </button>
+                
+                <button id="btnChangeSkillOrder" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto">
+                    <i class="fa fa-sort pr-1"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnChangeSkillOrder, "Skill ordering") ?? "Skill ordering")
+                </button>
+
+                <button id="btnViewModalLegend" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto">
+                    <i class="fa fa-table-list pr-1"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnViewMatrixLegend, "Matrix legend") ?? "Matrix legend")
+                </button>
+                
+                <a class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto" href="/pdf/render/9/@(Model.CurrentSkillsMatrix.Id)" target="_blank" rel="noopener noreferrer">
+                    <i class="fa fa-print"></i>
+                </a>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section id="contentDiv" class="content">
+    @if (Model.CurrentUser.Role.ToLower().Equals("manager"))
+    {
+        <div class="popUp hidePopUp popUpScore" data-containertype="score_choice">
+            <div class="arrowUp"></div><div class='item btn-clear' data-actionvalue="0"></div><div class='item btn-red' data-actionvalue="1">1</div><div class='item btn-orangered' data-actionvalue="2">2</div><div class='item btn-orange' data-actionvalue="3">3</div><div class='item btn-orangegreen' data-actionvalue="4">4</div><div class='item btn-green' data-actionvalue="5">5</div>
+        </div>
+    }
+
+    <div id="matrixBody" style="width: 100%;height: calc(100vh - 175px); overflow: auto; position: relative">
+        @if (Model.CurrentSkillsMatrix.NumberOfMandatorySkills == 0 && Model.CurrentSkillsMatrix.NumberOfOperationalSkills == 0)
+        {
+            <div>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.NumberOfOperationalSkillsTitle, "Please select or create one or more mandatory / operational skills.") ?? "Please select or create one or more mandatory / operational skills.")</div>
+        }
+
+        @if (Model.CurrentSkillsMatrix.NumberOfUserGroups == 0)
+        {
+            <div>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.NumberOfUserGroupsTitle, "Please select or create one or more user groups.") ?? "Please select or create one or more user groups.")</div>
+        }
+
+        @{
+            int colspan = 0;
+        }
+
+        <!-- Matrix Preview (Only user groups added!) -->
+        @if (Model.CurrentSkillsMatrix.NumberOfUserGroups > 0 && Model.CurrentSkillsMatrix.NumberOfMandatorySkills == 0 && Model.CurrentSkillsMatrix.NumberOfOperationalSkills == 0)
+        {
+            <table>
+                <tr>
+                    <td rowspan="1" colspan="3"></td>
+                    @foreach (var usergroup in Model.CurrentSkillsMatrix.UserGroups)
+                    {
+                        <td class="rowtitle" colspan="@usergroup.Users.Count()"><span>@(usergroup.Name)</span></td>
+                        <td rowspan="5"></td>
+                    }
+                </tr>
+
+                <tr>
+                    <td></td>
+                    <td style="vertical-align: bottom; padding: 0">
+                        <div>
+                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixGoalTitle, "Goal") ?? "Goal")</span>
+                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixResultTitle, "Result") ?? "Result")</span>
+                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixDeltaTitle, "Delta") ?? "Delta")</span>
+                        </div>
+                    </td>
+
+                    <td></td>
+                    @foreach (var usergroup in Model.CurrentSkillsMatrix.UserGroups)
+                    {
+                        @if (usergroup.Users.Count == 0)
+                        {
+                            <td style="background: #f1f3f1"></td>
+                        }
+                        else
+                        {
+                            @foreach (var profile in usergroup.Users)
+                            {
+                                colspan++;
+                                <td class="user-title" style="border-left: 1px solid rgb(210,210,210)">
+                                    <div>
+                                        <span class="d-inline vertical">@profile.FirstName @profile.LastName</span>
+                                    </div>
+                                    <img class="user-img" loading="lazy" src="/images/media-loading.gif" data-src="@(WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, profile.Picture))">
+                                </td>
+                            }
+                        }
+                    }
+                </tr>
+
+                <tr><td colspan="@colspan"></td></tr>
+
+                <tr class="skillsrow" style="opacity: 0.3">
+                    <td class="rowtitle" rowspan="1">
+                        <span class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MandatorySkillsTitle, "Mandatory skills") ?? "Mandatory skills")</span>
+                    </td>
+
+                    <td class="goalcell">
+                        <div class="goaldiv">
+                            <div class="matrix-tooltip">
+                                <span data-containertype="goal_value">0</span>
+                                <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixGoalValue, "Goal of mandatory skills") ?? "Goal of mandatory skills")</span>
+                            </div>
+
+                            <div class="matrix-tooltip">
+                                <span data-containertype="result_value">0</span>
+                                <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixResultTitle, "Result of mandatory skills") ?? "Result of mandatory skills")</span>
+                            </div>
+
+                            <div class="matrix-tooltip">
+                                <span data-containertype="difference_value">0</span>
+                                <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixDifferenceValue, "Difference between goal and result") ?? "Difference between goal and result")</span>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td class="endcell skillcell" style="width: 125px">
+                        <div></div>
+                        <small></small>
+                    </td>
+                    @foreach (var usergroup in Model.CurrentSkillsMatrix.UserGroups)
+                    {
+                        @if (usergroup.Users.Count == 0)
+                        {
+                            <td class="buttoncellEmpty" style="background: #f1f3f1"></td>
+                        }
+                        else
+                        {
+                            @foreach (var profile in usergroup.Users)
+                            {
+                                string tdClass = "";
+                                if (profile == usergroup.Users.First())
+                                {
+                                    tdClass += "buttonstartcell ";
+                                }
+                                else if (profile == usergroup.Users.Last())
+                                {
+                                    tdClass += "buttonendcell ";
+                                }
+                                <td class="buttoncell @tdClass"><button class="btn circlebtn" type="button"></button></td>
+                            }
+                        }
+                    }
+                </tr>
+
+                <tr class="spacerow"><td colspan="@colspan"></td></tr>
+            </table>
+        }
+
+        <!-- Matrix Preview (Only user skills added!) -->
+        @if (Model.CurrentSkillsMatrix.NumberOfUserGroups == 0 && (Model.CurrentSkillsMatrix.NumberOfMandatorySkills != 0 || Model.CurrentSkillsMatrix.NumberOfOperationalSkills != 0))
+        {
+            <table>
+                <tr style="opacity: 0.3">
+                    <td rowspan="1" colspan="3"></td>
+                    <td class="rowtitle" colspan="5"><span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.UserGroupTitle, "User group") ?? "User group")</span></td>
+                </tr>
+
+                <tr style="opacity: 0.3">
+                    <td></td>
+                    <td style="vertical-align: bottom; padding: 0">
+                        <div>
+                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixGoalTitle, "Goal") ?? "Goal")</span>
+                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixResultTitle, "Result") ?? "Result")</span>
+                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixDeltaTitle, "Delta") ?? "Delta")</span>
+                        </div>
+                    </td>
+
+                    <td></td>
+                    @for (int i = 0; i < 5; i++)
+                    {
+                        <td class="user-title user-title-endcell" style="border-left: 1px solid rgb(210,210,210)">
+                            <div>
+                                <span class="d-inline vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.UsernameTitle, "Username") ?? "Username")</span>
+                            </div>
+                            <img class="user-img" loading="lazy" src="/images/user-placeholder.jpg">
+                        </td>
+                    }
+                </tr>
+
+                <tr><td colspan="5"></td></tr>
+
+                @{
+                    bool isHeader = true;
+                }
+
+                @if (Model.CurrentSkillsMatrix.MandatorySkills != null)
+                {
+                    @foreach (var skillset in Model.CurrentSkillsMatrix.MandatorySkills.OrderBy(s => s.Index))
+                    {
+                        <tr class="skillsrow" data-containertype="mandatory_skill_row">
+                            @if (isHeader)
+                            {
+                                <td class="rowtitle" rowspan="@Model.CurrentSkillsMatrix.MandatorySkills.Count()"><span class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MandatorySkillsTitle, "Mandatory skills") ?? "Mandatory skills")</span></td>
+                                isHeader = false;
+                            }
+
+                            <td class="goalcell">
+                                <div class="goaldiv"><div class="matrix-tooltip"><span data-containertype="goal_value">@skillset.Goal</span><span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixGoalValue, "Goal of mandatory skills") ?? "Goal of mandatory skills")</span></div><div class="matrix-tooltip"><span data-containertype="result_value">@skillset.Result</span><span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixResultValue, "Result of mandatory skills") ?? "Result of mandatory skills")</span></div><div class="matrix-tooltip"><span data-containertype="difference_value">@skillset.GoalResultDifference</span><span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixDifferenceValue, "Difference between goal and result") ?? "Difference between goal and result")</span></div></div>
+                            </td>
+
+                            <td class="endcell skillcell">
+                                <div>@skillset.Name</div>
+                                <small>@skillset.Description</small>
+                            </td>
+
+                            @for (int i = 0; i < 5; i++)
+                            {
+                                var score = -1;
+                                var endClass = "";
+                                if (i == 4)
+                                {
+                                    endClass = " buttonendcell ";
+                                }
+                                switch (score)
+                                {
+                                    case 0:
+                                        <td class="buttoncell @endClass" data-containertype="value"><button class="btn circlebtn" type="button" data-popup="thumbs" data-value="0" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice"></button></td>
+                                        break;
+                                    case 1:
+                                        <td class="buttoncell @endClass" data-containertype="value"><button class="circlebtn btn-thumbs-red" type="button" data-popup="thumbs" data-value="1" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice"><i class="fa-solid fa-thumbs-down"></i></button></td>
+                                        break;
+                                    case 2:
+                                        <td class="buttoncell @endClass" data-containertype="value"><button class="circlebtn btn-thumbs-green" type="button" data-popup="thumbs" data-value="2" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice"><i class="fa-solid fa-thumbs-up"></i></button></td>
+                                        break;
+                                    case 5:
+                                        <td class="buttoncell @endClass" data-containertype="value"><button class="circlebtn btn-thumbs-orange" type="button" data-popup="thumbs" data-value="5" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice"><i class="fa-solid fa-triangle-exclamation"></i></button></td>
+                                        break;
+                                    default:
+                                        <td class="buttoncell @endClass" data-containertype="value"><button class="btn circlebtn" type="button" data-popup="thumbs" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice"></button></td>
+                                        break;
+                                }
+                            }
+                        </tr>
+                    }
+                }
+                @{
+                    bool isHeaderr = true;
+                }
+                @if (Model.CurrentSkillsMatrix.OperationalSkills != null)
+                {
+                    @foreach (var skillset in Model.CurrentSkillsMatrix.OperationalSkills.OrderBy(s => s.Index))
+                    {
+                        <tr class="skillsrow" data-containertype="operational_skill_row">
+                            @if (isHeaderr)
+                            {
+                                <td class="rowtitle" rowspan="@Model.CurrentSkillsMatrix.OperationalSkills.Count()"><span class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OperationalSkills, "Operational skills") ?? "Operational skills")</span></td>
+                                isHeaderr = false;
+                            }
+
+                            <td class="goalcell">
+                                <div class="goaldiv"><div data-containertype="goal_value">@skillset.Goal</div><div data-containertype="result_value">@skillset.Result</div><div data-containertype="difference_value">@skillset.GoalResultDifference</div></div>
+                            </td>
+
+                            <td class="endcell skillcell">
+                                <div class="matrix-tooltip">
+                                    <div>@skillset.Name</div>
+                                    <small>@skillset.Description</small>
+                                    <span class="tooltiptext shadow">@skillset.Name - @skillset.SkillAssessmentName</span>
+                                </div>
+                            </td>
+
+                            @for (int i = 0; i < 5; i++)
+                            {
+                                var score = -1;
+                                var endClass = "";
+                                if (i == 4)
+                                {
+                                    endClass = " buttonendcell ";
+                                }
+                                switch (score)
+                                {
+                                    case 0:
+                                        <td class="buttoncell @endClass" data-containertype="value"><button class="btn circlebtn" style="font-size:22px !important;" type="button" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice"></button></td>
+                                        break;
+                                    case 1:
+                                        <td class="buttoncell @endClass" data-containertype="value"><button class="circlebtn btn-red" style="font-size:22px !important;" type="button" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">@score</button></td>
+                                        break;
+                                    case 2:
+                                        <td class="buttoncell @endClass" data-containertype="value"><button class="circlebtn btn-orangered" style="font-size:22px !important;" type="button" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">@score</button></td>
+                                        break;
+                                    case 3:
+                                        <td class="buttoncell @endClass" data-containertype="value"><button class="circlebtn btn-orange" style="font-size:22px !important;" type="button" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">@score</button></td>
+                                        break;
+                                    case 4:
+                                        <td class="buttoncell @endClass" data-containertype="value"><button class="circlebtn btn-orangegreen" style="font-size:22px !important;" type="button" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">@score</button></td>
+                                        break;
+                                    case 5:
+                                        <td class="buttoncell @endClass" data-containertype="value"><button class="circlebtn btn-green" style="font-size:22px !important;" type="button" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">@score</button></td>
+                                        break;
+                                    default:
+                                        <td class="buttoncell @endClass" data-containertype="value"><button class="btn circlebtn" style="font-size:22px !important;" type="button" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice"></button></td>
+                                        break;
+                                }
+                            }
+                        </tr>
+                    }
+                }
+
+                <tr class="spacerow"><td colspan="@colspan"></td></tr>
+            </table>
+        }
+
+        <!-- Matrix display (User Groups and User Skills both added!) -->
+        @if (Model.CurrentSkillsMatrix.NumberOfUserGroups != 0 && (Model.CurrentSkillsMatrix.NumberOfMandatorySkills != 0 || Model.CurrentSkillsMatrix.NumberOfOperationalSkills != 0))
+        {
+            <table>
+                <tr>
+                    <td rowspan="1" colspan="3" id="matrixSpacer2"></td>
+                    @{
+                        int rowspan = (Model.CurrentSkillsMatrix.MandatorySkills != null ? Model.CurrentSkillsMatrix.MandatorySkills.Count() : 0) +
+                        (Model.CurrentSkillsMatrix.OperationalSkills != null ? Model.CurrentSkillsMatrix.OperationalSkills.Count() : 0) + 11;
+
+                        foreach (var usergroup in Model.CurrentSkillsMatrix.UserGroups)
+                        {
+                                <td class="rowtitle" colspan="@(usergroup.Users.Count())"><span>@(usergroup.Name)</span></td>
+                                <td rowspan="@rowspan"></td>
+                        }
+                    }
+                </tr>
+
+                <tr class="text-center">
+                    <td></td>
+                    <td style="vertical-align: bottom; padding: 0">
+                        <div>
+                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixGoalTitle, "Goal") ?? "Goal")</span>
+                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixResultTitle, "Result") ?? "Result")</span>
+                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixDeltaTitle, "Delta") ?? "Delta")</span>
+                        </div>
+                    </td>
+
+                    <td id="matrixSpacer1"></td>
+                    @{
+                        int collspan = 0;
+                    }
+
+                    @if (Model.CurrentSkillsMatrix.UserGroups != null)
+                    {
+                        @foreach (var usergroup in Model.CurrentSkillsMatrix.UserGroups)
+                        {
+                            collspan++;
+                            @if (usergroup.Users.Count == 0)
+                            {
+                                <td style="background: #f1f3f1"></td>
+                            }
+                            else
+                            {
+                                foreach (var userprofile in usergroup.Users)
+                                {
+                                    collspan++;
+                                    <td class="user-title" style="border: 1px solid rgb(210,210,210); cursor: pointer" data-containertype="user" data-id="@userprofile.Id" onclick="matrix.showUserSkillValuesModal(@Model.CurrentSkillsMatrix.Id, @userprofile.UserProfileId, '@userprofile.LastName, @userprofile.FirstName')">
+                                        <div class="user-title-content">
+                                            <div>
+                                                <span class="d-inline vertical" data-containertype="username" data-id="@userprofile.Id">
+                                                    @(string.Format("{0} {1}", userprofile.FirstName, userprofile.LastName))
+                                                </span>
+                                            </div>
+
+                                            @if (string.IsNullOrEmpty(userprofile.Picture) || userprofile.Picture == "emptyprofile")
+                                            {
+                                                <img class="user-img" loading="lazy" src="/images/user-placeholder.jpg">
+                                            }
+                                            else
+                                            {
+                                                <img class="user-img" loading="lazy" src="/images/media-loading.gif" data-src="@(WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, userprofile.Picture))">
+                                            }
+                                        </div>
+                                    </td>
+                                }
+                            }
+                        }
+                    }
+                </tr>
+
+                <tr>
+                    <td colspan="@collspan"></td>
+                </tr>
+
+                @{
+                    bool isHeader = true;
+                }
+
+                @if (Model.CurrentSkillsMatrix.MandatorySkills != null && Model.ApplicationSettings.Features.SkillMatrixMandatorySkills != null && Model.ApplicationSettings.Features.SkillMatrixMandatorySkills.Value)
+                {
+                    @foreach (var skillset in Model.CurrentSkillsMatrix.MandatorySkills.OrderBy(s => s.Index))
+                    {
+                        <tr class="skillsrow" data-containertype="mandatory_skill_row">
+                            @if (isHeader)
+                            {
+                                <td class="rowtitle" rowspan="@Model.CurrentSkillsMatrix.MandatorySkills.Count()"><span class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MandatorySkillsTitle, "Mandatory skills") ?? "Mandatory skills")</span></td>
+                                isHeader = false;
+                            }
+
+                            <td class="goalcell">
+                                <div class="goaldiv"><div class="matrix-tooltip"><span data-containertype="goal_value">@skillset.Goal</span><span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixGoalValue, "Goal of mandatory skills") ?? "Goal of mandatory skills")</span></div><div class="matrix-tooltip"><span data-containertype="result_value">@skillset.Result</span><span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixResultValue, "Result of mandatory skills") ?? "Result of mandatory skills")</span></div><div class="matrix-tooltip"><span data-containertype="difference_value">@skillset.GoalResultDifference</span><span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixDifferenceValue, "Difference between goal and result") ?? "Difference between goal and result")</span></div></div>
+                            </td>
+
+                            <td class="endcell skillcell matrixmandatoryskill">
+                                <div>@skillset.Name</div>
+                                <small>@skillset.Description</small>
+                            </td>
+
+                            @foreach (var usergroup in Model.CurrentSkillsMatrix.UserGroups)
+                            {
+                                @if (usergroup.Users.Count == 0)
+                                {
+                                    <td class="buttoncellEmpty" style="background: #f1f3f1"></td>
+                                }
+                                else
+                                {
+                                    foreach (var userprofile in usergroup.Users)
+                                    {
+                                        int score = -1;
+                                        @if (skillset.Values != null)
+                                        {
+                                            var found = skillset.Values.Where(m => m.UserId.Equals(userprofile.UserProfileId));
+                                            if (found != null && found.Any())
+                                            {
+                                                score = (int)found.FirstOrDefault().Score;
+                                            }
+                                        }
+
+                                        switch (score)
+                                        {
+                                            case 0:
+                                                <td class="buttoncell" data-containertype="value"><button class="btn circlebtn" type="button" data-popup="thumbs" data-value="0" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice"></button></td>
+                                                break;
+                                            case 1:
+                                                <td class="buttoncell" data-containertype="value"><button class="circlebtn btn-thumbs-red" type="button" data-popup="thumbs" data-value="1" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice"><i class="fa-solid fa-thumbs-down"></i></button></td>
+                                                break;
+                                            case 2:
+                                                <td class="buttoncell" data-containertype="value"><button class="circlebtn btn-thumbs-green" type="button" data-popup="thumbs" data-value="2" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice"><i class="fa-solid fa-thumbs-up"></i></button></td>
+                                                break;
+                                            case 5:
+                                                <td class="buttoncell" data-containertype="value"><button class="circlebtn btn-thumbs-orange" type="button" data-popup="thumbs" data-value="5" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice"><i class="fa-solid fa-triangle-exclamation"></i></button></td>
+                                                break;
+                                            default:
+                                                <td class="buttoncell" data-containertype="value"><button class="btn circlebtn" type="button" data-popup="thumbs" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice"></button></td>
+                                                break;
+                                        }
+                                    }
+                                }
+                            }
+                        </tr>
+                    }
+                }
+
+                <tr class="spacerow">
+                    <td colspan="@collspan"></td>
+                </tr>
+
+                @{
+                    isHeader = true;
+                }
+
+                @if (Model.CurrentSkillsMatrix.OperationalSkills != null && Model.ApplicationSettings.Features.SkillMatrixOperationalSkills != null && Model.ApplicationSettings.Features.SkillMatrixOperationalSkills.Value)
+                {
+                    @foreach (var skillset in Model.CurrentSkillsMatrix.OperationalSkills.OrderBy(s => s.Index))
+                    {
+                        <tr class="skillsrow" data-containertype="operational_skill_row">
+                            @if (isHeader)
+                            {
+                                <td class="rowtitle" rowspan="@Model.CurrentSkillsMatrix.OperationalSkills.Count()"><span class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OperationalSkills, "Operational skills") ?? "Operational skills")</span></td>
+                                isHeader = false;
+                            }
+
+                            <td class="goalcell">
+                                <div class="goaldiv"><div data-containertype="goal_value">@skillset.Goal</div><div data-containertype="result_value">@skillset.Result</div><div data-containertype="difference_value">@skillset.GoalResultDifference</div></div>
+                            </td>
+
+                            <td class="endcell skillcell matrixoperationalskill">
+                                <div class="matrix-tooltip">
+                                    <div>@skillset.Name</div>
+                                    <small>@skillset.Description</small>
+                                    <span class="tooltiptext shadow">@skillset.Name - @skillset.SkillAssessmentName</span>
+                                </div>
+                            </td>
+
+                            @foreach (var usergroup in Model.CurrentSkillsMatrix.UserGroups)
+                            {
+                                @if (usergroup.Users.Count == 0)
+                                {
+                                    <td class="buttoncellEmpty" style="background: #f1f3f1"></td>
+                                }
+                                else
+                                {
+                                    foreach (var userprofile in usergroup.Users)
+                                    {
+                                        int score = -1;
+                                        decimal decimalScore = -1;
+                                        bool expired = false;
+                                        bool almostExpired = false;
+                                        @if (skillset.Values != null)
+                                        {
+                                            var found = skillset.Values?
+                                            .Where(m => m.UserId.Equals(userprofile.UserProfileId))
+                                            .OrderByDescending(s => s.ValueDate)
+                                            .ToList();
+
+                                            if (found != null && found.Any())
+                                            {
+                                                var firstFound = found.FirstOrDefault();
+
+                                                if (firstFound != null)
+                                                {
+                                                    decimalScore = firstFound.Score;
+                                                    // Round according to your setting
+                                                    score = Model.ApplicationSettings?.Features?.EnableMatrixScoreStandard == true
+                                                    ? (int)Math.Round(decimalScore, MidpointRounding.AwayFromZero)  // Standard rounding
+                                                    : (int)Math.Floor(decimalScore);                                // Always round down
+
+
+                                                    if (score != 0 && skillset.ExpiryInDays.HasValue && firstFound.ValueDate != DateTime.MinValue)
+                                                    {
+                                                        if (firstFound.ValueDate.AddDays(skillset.ExpiryInDays.Value) < DateTime.UtcNow)
+                                                        {
+                                                            expired = true;
+                                                        }
+                                                        else if (skillset.NotificationWindowInDays.HasValue && ((skillset.NotificationWindowInDays.Value > skillset.ExpiryInDays.Value) || (firstFound.ValueDate.AddDays(skillset.ExpiryInDays.Value - skillset.NotificationWindowInDays.Value) < DateTime.UtcNow)))
+                                                        {
+                                                            almostExpired = true;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        if (!expired && !almostExpired)
+                                        {
+                                            switch (score)
+                                            {
+                                                case 0:
+                                                    <td class="buttoncell" title="@decimalScore" data-containertype="value"><button class="btn circlebtn" style="font-size:22px !important;" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice"></button></td>
+                                                    break;
+                                                case 1:
+                                                    <td class="buttoncell" title="@decimalScore" data-containertype="value"><button class="circlebtn btn-red" style="font-size:22px !important;" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">@score</button></td>
+                                                    break;
+                                                case 2:
+                                                    <td class="buttoncell" title="@decimalScore" data-containertype="value"><button class="circlebtn btn-orangered" style="font-size:22px !important;" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">@score</button></td>
+                                                    break;
+                                                case 3:
+                                                    <td class="buttoncell" title="@decimalScore" data-containertype="value"><button class="circlebtn btn-orange" style="font-size:22px !important;" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">@score</button></td>
+                                                    break;
+                                                case 4:
+                                                    <td class="buttoncell" title="@decimalScore" data-containertype="value"><button class="circlebtn btn-orangegreen" style="font-size:22px !important;" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">@score</button></td>
+                                                    break;
+                                                case 5:
+                                                    <td class="buttoncell" title="@decimalScore" data-containertype="value"><button class="circlebtn btn-green" style="font-size:22px !important;" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">@score</button></td>
+                                                    break;
+                                                default:
+                                                    <td class="buttoncell" title="@decimalScore" data-containertype="value"><button class="btn circlebtn" style="font-size:22px !important;" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice"></button></td>
+                                                    break;
+                                            }
+                                        }
+                                        else if (almostExpired && !expired)
+                                        {
+                                            //almostExpired skill value so view triangle instead of score
+                                            switch (score)
+                                            {
+                                                case 0:
+                                                    <td class="buttoncell" data-containertype="value">
+                                                        <div style="position: relative">
+                                                            <button class="btn circlebtn" style="font-size:22px !important;" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice"></button>
+                                                            <div title="Operational almost expired" class="circlebtn btn-orange" style="position: absolute; border: 1px solid #ffa500; height: 19px; width: 19px; right: -2px; bottom: -2px; border-radius: 19px; float: right; font-size: 19px; background: url(/images/icons/v2/warning.png) center / 10px no-repeat, #FFF0D4;"></div>
+                                                        </div>
+                                                    </td>
+                                                    break;
+                                                case 1:
+                                                    <td class="buttoncell" data-containertype="value" title="@decimalScore">
+                                                        <div style="position: relative">
+                                                            <button class="btn circlebtn btn-red" style="font-size:22px !important;" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">@score</button>
+                                                            <div title="Operational almost expired" class="circlebtn btn-orange" style="position: absolute; border: 1px solid #ffa500; height: 19px; width: 19px; right: -2px; bottom: -2px; border-radius: 19px; float: right; font-size: 19px; background: url(/images/icons/v2/warning.png) center / 10px no-repeat, #FFF0D4;"></div>
+                                                        </div>
+                                                    </td>
+                                                    break;
+                                                case 2:
+                                                    <td class="buttoncell" data-containertype="value" title="@decimalScore">
+                                                        <div style="position: relative">
+                                                            <button class="btn circlebtn btn-orangered" style="font-size:22px !important;" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">@score</button>
+                                                            <div title="Operational almost expired" class="circlebtn btn-orange" style="position: absolute; border: 1px solid #ffa500; height: 19px; width: 19px; right: -2px; bottom: -2px; border-radius: 19px; float: right; font-size: 19px; background: url(/images/icons/v2/warning.png) center / 10px no-repeat, #FFF0D4;"></div>
+                                                        </div>
+                                                    </td>
+                                                    break;
+                                                case 3:
+                                                    <td class="buttoncell" data-containertype="value" title="@decimalScore">
+                                                        <div style="position: relative">
+                                                            <button class="btn circlebtn btn-orange" style="font-size:22px !important;" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">@score</button>
+                                                            <div title="Operational almost expired" class="circlebtn btn-orange" style="position: absolute; border: 1px solid #ffa500; height: 19px; width: 19px; right: -2px; bottom: -2px; border-radius: 19px; float: right; font-size: 19px; background: url(/images/icons/v2/warning.png) center / 10px no-repeat, #FFF0D4;"></div>
+                                                        </div>
+                                                    </td>
+                                                    break;
+                                                case 4:
+                                                    <td class="buttoncell" data-containertype="value" title="@decimalScore">
+                                                        <div style="position: relative">
+                                                            <button class="btn circlebtn btn-orangegreen" style="font-size:22px !important;" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">@score</button>
+                                                            <div title="Operational almost expired" class="circlebtn btn-orange" style="position: absolute; border: 1px solid #ffa500; height: 19px; width: 19px; right: -2px; bottom: -2px; border-radius: 19px; float: right; font-size: 19px; background: url(/images/icons/v2/warning.png) center / 10px no-repeat, #FFF0D4;"></div>
+                                                        </div>
+                                                    </td>
+                                                    break;
+                                                case 5:
+                                                    <td class="buttoncell" data-containertype="value" title="@decimalScore">
+                                                        <div style="position: relative">
+                                                            <button class="btn circlebtn btn-green" style="font-size:22px !important;" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">@score</button>
+                                                            <div title="Operational almost expired" class="circlebtn btn-orange" style="position: absolute; border: 1px solid #ffa500; height: 19px; width: 19px; right: -2px; bottom: -2px; border-radius: 19px; float: right; font-size: 19px; background: url(/images/icons/v2/warning.png) center / 10px no-repeat, #FFF0D4;"></div>
+                                                        </div>
+                                                    </td>
+                                                    break;
+                                                default:
+                                                    <td class="buttoncell" data-containertype="value">
+                                                        <div style="position: relative">
+                                                            <button class="btn circlebtn" style="font-size:22px !important;" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice"></button>
+                                                            <div title="Operational almost expired" class="circlebtn btn-orange" style="position: absolute; border: 1px solid #ffa500; height: 19px; width: 19px; right: -2px; bottom: -2px; border-radius: 19px; float: right; font-size: 19px; background: url(/images/icons/v2/warning.png) center / 10px no-repeat, #FFF0D4;"></div>
+                                                        </div>
+                                                    </td>
+                                                    break;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            //expired skill value so view triangle instead of score
+                                            switch (score)
+                                            {
+                                                case 0:
+                                                    <td class="buttoncell" data-containertype="value">
+                                                        <button class="circlebtn" style="font-size:22px !important;position: relative" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice">
+                                                            <div title="Operational skill expired" class="btn circlebtn btn-orange" style="position: absolute; border: 1px solid rgb(210, 210, 210); height: 19px; width: 19px; right: -5px; bottom: -5px; border-radius: 19px; float: right; font-size: 12px !important"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                                        </button>
+                                                    </td>
+                                                    break;
+                                                case 1:
+                                                    <td class="buttoncell" data-containertype="value" title="@decimalScore">
+                                                        <button class="circlebtn btn-red" style="font-size:22px !important;position: relative" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">
+                                                            @score
+                                                            <div title="Operational skill expired" class="circlebtn btn-orange" style="position: absolute; border: 1px solid rgb(210, 210, 210); height: 19px; width: 19px; right: -5px; bottom: -5px; border-radius: 19px; float: right; font-size: 12px !important"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                                        </button>
+                                                    </td>
+                                                    break;
+                                                case 2:
+                                                    <td class="buttoncell" data-containertype="value" title="@decimalScore">
+                                                        <button class="circlebtn btn-orangered" style="font-size:22px !important;position: relative" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">
+                                                            @score
+                                                            <div title="Operational skill expired" class="circlebtn btn-orange" style="position: absolute; border: 1px solid rgb(210, 210, 210); height: 19px; width: 19px; right: -5px; bottom: -5px; border-radius: 19px; float: right; font-size: 12px !important"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                                        </button>
+                                                    </td>
+                                                    break;
+                                                case 3:
+                                                    <td class="buttoncell" data-containertype="value" title="@decimalScore">
+                                                        <button class="circlebtn btn-orange" style="font-size:22px !important;position: relative" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">
+                                                            @score
+                                                            <div title="Operational skill expired" class="circlebtn btn-orange" style="position: absolute; border: 1px solid rgb(210, 210, 210); height: 19px; width: 19px; right: -5px; bottom: -5px; border-radius: 19px; float: right; font-size: 12px !important"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                                        </button>
+                                                    </td>
+                                                    break;
+                                                case 4:
+                                                    <td class="buttoncell" data-containertype="value" title="@decimalScore">
+                                                        <button class="circlebtn btn-orangegreen" style="font-size:22px !important;position: relative" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">
+                                                            @score
+                                                            <div title="Operational skill expired" class="circlebtn btn-orange" style="position: absolute; border: 1px solid rgb(210, 210, 210); height: 19px; width: 19px; right: -5px; bottom: -5px; border-radius: 19px; float: right; font-size: 12px !important"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                                        </button>
+                                                    </td>
+                                                    break;
+                                                case 5:
+                                                    <td class="buttoncell" data-containertype="value" title="@decimalScore">
+                                                        <button class="circlebtn btn-green" style="font-size:22px !important;position: relative" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" data-value="@score">
+                                                            @score
+                                                            <div title="Operational skill expired" class="circlebtn btn-orange" style="position: absolute; border: 1px solid rgb(210, 210, 210); height: 19px; width: 19px; right: -5px; bottom: -5px; border-radius: 19px; float: right; font-size: 12px !important"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                                        </button>
+                                                    </td>
+                                                    break;
+                                                default:
+                                                    <td class="buttoncell" data-containertype="value">
+                                                        <button class="btn circlebtn" style="font-size:22px !important;position: relative" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice">
+                                                            <div title="Operational skill expired" class="circlebtn btn-orange" style="position: absolute; border: 1px solid rgb(210, 210, 210); height: 19px; width: 19px; right: -5px; bottom: -5px; border-radius: 19px; float: right; font-size: 12px !important"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                                        </button>
+                                                    </td>
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        </tr>
+                    }
+                }
+
+                <tr id="operationalBehaviourStart" class="spacerow">
+                    <td colspan="@collspan">
+                        @if (Model.ApplicationSettings.Features.SkillMatrixOperationalBehaviour != null && Model.ApplicationSettings.Features.SkillMatrixOperationalBehaviour.Value)
+                        {
+                            <a onclick="minimizeOperationalBehaviours(this)" class="align-middle" style="color: rgb(147, 197, 75); border-radius: 20px; border: 2px solid rgb(153, 153, 153); display: block; text-align: center; vertical-align: middle; height: 24px; width: 24px"><i id="minimizeOperationalBehaviourButton" class="fas fa-plus-square"></i></a>
+                        }
+                    </td>
+                </tr>
+
+                @{
+                    isHeader = true;
+                }
+                
+                <tr class="spacerow">
+                    <td colspan="@collspan"></td>
+                </tr>
+            </table>
+        }
+
+        <div id="matrixUsersOverlay" style="position: absolute; display:none; z-index: 4">
+            <table style="table-layout: fixed">
+                <tr>
+                    @{
+                        int rowspanOverlay = (Model.CurrentSkillsMatrix.MandatorySkills != null ? Model.CurrentSkillsMatrix.MandatorySkills.Count() : 0) +
+                        (Model.CurrentSkillsMatrix.OperationalSkills != null ? Model.CurrentSkillsMatrix.OperationalSkills.Count() : 0) +
+                        (Model.CurrentSkillsMatrix.OperationalBehaviours != null ? Model.CurrentSkillsMatrix.OperationalBehaviours.Count() : 0) + 6;
+
+                        foreach (var usergroup in Model.CurrentSkillsMatrix.UserGroups)
+                        {
+                                <td class="rowtitle" colspan="@(usergroup.Users.Count())"><span>@(usergroup.Name)</span></td>
+                                <td rowspan="@rowspanOverlay"></td>
+                        }
+                    }
+                </tr>
+
+                <tr>
+                    @foreach (var usergroup in Model.CurrentSkillsMatrix.UserGroups)
+                    {
+                        @if (usergroup.Users.Count == 0)
+                        {
+                            <td style="background: #f1f3f1"></td>
+                        }
+                        else
+                        {
+                            @foreach (var profile in usergroup.Users)
+                            {
+                                colspan++;
+                                <td class="userOverlay user-title-endcell" style="border: 1px solid rgb(210,210,210)">
+                                    <div class="user-title-overlay-content">
+                                        <div>
+                                            <span class="d-inline vertical" data-containertype="username" data-id="@profile.Id">
+                                                @(
+                                            string.Format("{0} {1}", profile.FirstName, profile.LastName)
+                                        )
+                                            </span>
+                                        </div>
+                                        @if (string.IsNullOrEmpty(profile.Picture) || profile.Picture == "emptyprofile")
+                                        {
+                                            <img class="user-img" loading="lazy" src="/images/user-placeholder.jpg">
+                                        }
+                                        else
+                                        {
+                                            <img class="user-img" loading="lazy" src="/images/media-loading.gif" data-src="@(WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, profile.Picture))">
+                                        }
+                                    </div>
+                                </td>
+                            }
+                        }
+                    }
+                </tr>
+            </table>
+        </div>
+
+        <div id="matrixSkillsOverlay" style="position: absolute; display:none; z-index:5">
+            @{
+                bool useSpacer = false;
+            }
+
+            <table style="table-layout: fixed">
+                <tr>
+                    <td style="background-color: #F1F3F1" id="greySpacer">
+                    </td>
+                </tr>
+
+                @if (Model.ApplicationSettings.Features.SkillMatrixMandatorySkills != null && Model.ApplicationSettings.Features.SkillMatrixMandatorySkills.Value)
+                {
+                    useSpacer = true;
+                    @foreach (var skillset in Model.CurrentSkillsMatrix.MandatorySkills.OrderBy(s => s.Index))
+                    {
+                        <tr class="skillsrow" data-containertype="mandatory_skill_row">
+                            <td class="endcell skillcell matrixmandatoryskilloverlay" style="height: 59px">
+                                <div>@skillset.Name</div>
+                                <small>@skillset.Description</small>
+                            </td>
+                        </tr>
+                    }
+                }
+
+                @if (Model.ApplicationSettings.Features.SkillMatrixOperationalSkills != null && Model.ApplicationSettings.Features.SkillMatrixOperationalSkills.Value)
+                {
+                    if (useSpacer)
+                    {
+                        <tr class="spacerow" style="background-color: #F1F3F1"><td></td></tr>
+                        useSpacer = false;
+                    }
+                    useSpacer = true;
+                    @foreach (var skillset in Model.CurrentSkillsMatrix.OperationalSkills.OrderBy(s => s.Index))
+                    {
+                        <tr class="skillsrow" data-containertype="operational_skill_row">
+                            <td class="endcell skillcell matrixoperationalskilloverlay" style="height: 59px">
+                                <div class="matrix-tooltip">
+                                    <div>@skillset.Name</div>
+                                    <small>@skillset.Description</small>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+
+                <tr id="matrixSkillsOverlayOBStart" class="spacerow" style=" background-color: #F1F3F1; height: 35px"><td></td></tr>
+                
+                <tr id="matrixSkillsOverlayOBEnd"><td></td></tr>
+            </table>
+        </div>
+    </div>
+</section>
+
+
+<!-- Modal -->
+<div class="modal fade" id="AddChangeSkillBehaviourModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AddOrChangeSkillTitle, "Add or Change Skill (Operational or Mandatory)") ?? "Add or Change Skill (Operational or Mandatory)")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-group input-group">
+                        <select class="form-control" id="dialog_skillselection">
+                            @if (Model.UserSkills != null && Model.UserSkills.Count > 0)
+                            {
+                                var idsInMatrix = Model.CurrentSkillsMatrix.MandatorySkills != null ? Model.CurrentSkillsMatrix.MandatorySkills.Select(x => x.UserSkillId).ToList() : new List<int>();
+                                if (Model.CurrentSkillsMatrix.OperationalSkills != null)
+                                {
+                                    idsInMatrix.AddRange(Model.CurrentSkillsMatrix.OperationalSkills.Select(x => x.UserSkillId).ToList());
+                                }
+
+                                <option value="" title="Please select an existing skill">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SelectSkillTitle, "Please select an existing skill.") ?? "Please select an existing skill.")</option>
+                                <optgroup label="In matrix" id="opt_skill_in_matrix">
+                                    @foreach (var item in Model.UserSkills.Where(x => x.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Mandatory && idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name))
+                                    {
+                                        <option value="@item.Id.ToString()" title="@item.Description" data-inmatrix="true" data-store="@item.ToJsonFromObject()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionMandatorySkill, "Mandatory Skill") ?? "Mandatory Skill") - @item.Name</option>
+                                    }
+
+                                    @foreach (var item in Model.UserSkills.Where(x => x.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Operational && idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name))
+                                    {
+                                        <option value="@item.Id.ToString()" title="@item.Description" data-inmatrix="true" data-store="@item.ToJsonFromObject()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionOperationalSkill, "Operational Skill") ?? "Operational Skill") - @item.Name</option>
+                                    }
+                                </optgroup>
+
+                                <optgroup label="Not in matrix" id="opt_skill_not_in_matrix">
+                                    @foreach (var item in Model.UserSkills.Where(x => x.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Mandatory && !idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name))
+                                    {
+                                        <option value="@item.Id.ToString()" title="@item.Description" data-inmatrix="false" data-store="@item.ToJsonFromObject()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionMandatorySkill, "Mandatory Skill") ?? "Mandatory Skill") - @item.Name</option>
+                                    }
+
+                                    @foreach (var item in Model.UserSkills.Where(x => x.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Operational && !idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name))
+                                    {
+                                        <option value="@item.Id.ToString()" title="@item.Description" data-inmatrix="false" data-store="@item.ToJsonFromObject()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionOperationalSkill, "Operational Skill") ?? "Operational Skill") - @item.Name</option>
+                                    }
+                                </optgroup>
+                            }
+                            else
+                            {
+                                <option value="" title="No skill available, please select create new">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionNoSkillsAvailable, "No skills available.") ?? "No skills available.")</option>
+                            }
+                        </select>
+
+                        <div class="input-group-append" style="display: none">
+                            <button class="btn btn-default" title="New" id="btn_new_skill" onclick=""><i class="fas fa-plus"></i></button>
+                            @if (Model.UserSkills != null && Model.UserSkills.Count > 0)
+                            {
+                                <button class="btn btn-default" title="Edit" id="btn_edit_skill" onclick=""><i class="fas fa-edit"></i></button>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div data-containertype="dialog_skilldetails">
+                    <div class="row">
+                        <div class="form-group col-md-10">
+                            <label for="dialog_skillname">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.DialogSkillName, "Name") ?? "Name")</label><input type="text" class="form-control" name="dialog_skillname" id="dialog_skillname" />
+                        </div>
+
+                        <div class="form-group col-md-2 align-self-md-center" data-containertype="skill_in_matrix_container">
+                            <label for="">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillInMatrix, "In Matrix") ?? "In Matrix")</label>
+                            <input type="checkbox" id="skill_in_matrix" name="skill_in_matrix" class="form-control" style="accent-color: #93C54B" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label for="dialog_skilldescription">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.DialogSkillDescription, "Description") ?? "Description")</label><input type="text" class="form-control" name="dialog_skilldescription" id="dialog_skilldescription" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <div>
+                                <label for="">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillTypeTitle, "Skill type") ?? "Skill type")</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="dialog_type" id="dialog_type_1" onclick="if ($(this).is(':checked')) { $('#modal_assessment_container').hide(); };">
+                                <label class="form-check-label" for="dialog_type_1">
+                                    @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionMandatorySkill, "Mandatory skill") ?? "Mandatory skill")
+                                </label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="dialog_type" id="dialog_type_2" checked onclick="if ($(this).is(':checked')) { $('#modal_assessment_container').show(); };">
+                                <label class="form-check-label" for="dialog_type_2">
+                                    @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionOperationalSkill, "Operational skill") ?? "Operational skill")
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="" title="Aimed number of users that completed this operational/mandatory skill">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixGoalTitle, "Goal") ?? "Goal")</label>
+                            <input type="number" class="form-control" name="dialog_goal" id="dialog_goal" min="0" />
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="" title="Notification window when data is expiring">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.DialogNotificationWindowDays, "Notification window in days") ?? "Notification window in days")</label>
+                            <input type="number" class="form-control" name="dialog_notification_window_days" id="dialog_notification_window_days" min="0" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="" title="Expiry in days after creation">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.DialogExpiryInDays, "Expiry in days") ?? "Expiry in days")</label>
+                            <input type="number" class="form-control" name="dialog_expiryindays" id="dialog_expiryindays" min="0" />
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="" style="display: none">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.DialogValidFrom, "Valid from") ?? "Valid from")</label>
+                            <input type="date" class="form-control" name="dialog_validfrom" id="dialog_validfrom" disabled style="display: none" />
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="" style="display: none">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.DialogValidTo, "Valid to") ?? "Valid to")</label>
+                            <input type="date" class="form-control" name="dialog_validto" id="dialog_validto" disabled style="display: none" />
+                        </div>
+                    </div>
+
+                    <div class="row" id="modal_assessment_container">
+                        <div class="form-group col-md-12">
+                            <label for="modal_assessment_choice">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SelectAssessmentTitle, "Select Assessment") ?? "Select Assessment")</label>
+                            @if (Model.SkillAssessmentTemplates != null)
+                            {
+                                <select id="modal_assessment_choice" class="form-control">
+                                    @foreach (var item in Model.SkillAssessmentTemplates)
+                                    {
+                                        <option value="@item.Id">@item.Name</option>
+                                    }
+                                </select>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="btnDeleteUserSkill" type="button" class="btn btn-danger btn-sm" disabled>Delete</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-ezgo btn-sm" data-action="update" id="skill_update_matrix" disabled>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnUpdate, "Update") ?? "Update")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="AddChangeUserGroupModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AddOrChangeUserGroupsTitle, "Add or Change user groups") ?? "Add or Change user groups")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-actiontype="close_modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-group input-group col-md-12">
+                        @*TODO replace with groups call*@
+                        <select id="group_choice" class="form-control">
+                            @if (Model.UserGroups != null)
+                            {
+                                var idsInMatrix = Model.CurrentSkillsMatrix.UserGroups != null ? Model.CurrentSkillsMatrix.UserGroups.Select(x => x.UserGroupId).ToList() : new List<int>();
+                                var groupsInMatrix = Model.UserGroups.Where(x => idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name).ToList();
+                                var groupsNotInMatrix = Model.UserGroups.Where(x => !idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name).ToList();
+
+                                <option value="" title="Please select a group">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionSelectAnExistingGroup, "Please select an existing group.") ?? "Please select an existing group.")</option>
+                                <optgroup label="In Matrix" id="opt_group_in_matrix">
+                                    @foreach (var item in groupsInMatrix)
+                                    {
+                                        <option value="@item.Id" title="@item.Description" data-inmatrix="true" data-store="@item.ToJsonFromObject()">@item.Name</option>
+                                    }
+                                </optgroup>
+
+                                <optgroup label="Not in Matrix" id="opt_group_not_in_matrix">
+                                    @foreach (var item in groupsNotInMatrix)
+                                    {
+                                        <option value="@item.Id" title="@item.Description" data-inmatrix="false" data-store="@item.ToJsonFromObject()">@item.Name</option>
+                                    }
+                                </optgroup>
+                            }
+                            else
+                            {
+                                <option value="" title="No group available">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionNoGroupAvailable, "No groups available, create a new one.") ?? "No groups available, create a new one.")</option>
+                            }
+                        </select>
+
+                        <div class="input-group-append" style="display: none">
+                            <button type="button" class="btn btn-default" title="New" id="btn_add_group"><i class="fa fa-plus"></i></button>
+                            <button type="button" class="btn btn-default" title="Change" id="btn_change_group"><i class="fa fa-edit"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="row col-md-12" data-containertype="group_details" style="display:none;">
+                        <div class="form-group col-md-4">
+                            <label for="">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.GroupName, "Group name") ?? "Group name")</label>
+                            <input type="text" id="group_name" name="group_name" class="form-control" />
+                        </div>
+
+                        <div class="form-group col-md-7" style="padding-left: 13px">
+                            <label for="">@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.GroupDesctiprion, "Group description") ?? "Group description")</label>
+                            <input type="text" id="group_description" name="group_name" class="form-control" />
+                        </div>
+
+                        <div class="form-group col-md-1 align-self-md-center" data-containertype="in_matrix_container">
+                            <label for="">In Matrix</label>
+                            <input type="checkbox" id="group_in_matrix" name="group_in_matrix" class="form-control" style="accent-color: #93C54B" />
+                        </div>
+
+                        <div class="col-md-12" data-containertype="change_group_buttons">
+                            <button id="btn_save_group" class="btn btn-ezgo btn-sm">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnSaveGropu, "Save group") ?? "Save group")</button>
+                            <button id="btn_cancel_group" class="btn btn-ezgo btn-sm">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnCancel, "Cancel") ?? "Cancel")</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" data-containertype="group_user_details">
+                    <div class="col-4">
+                        <div class="row">
+                            <div class="input-group border-light" style="margin: 7px; padding-right: 5px;">
+                                <input type="text" id="searchpersonexecute" name="searchpersonexecute" class="form-control" data-action="search_person" />
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-default"><i class="fas fa-search" title="Search"></i></button>
+                                    <button type="button" class="btn btn-default" id="clear_search_btn" title="Reset search"><i class="fas fa-sync"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row input-group" style="margin: 5px;">
+                            <div style="max-height: 500px; overflow: auto;">
+                                <ul style="width:100%;margin-left:0px;padding-left:0px;" data-containertype="group_all_users">
+                                    @if (Model.Users != null)
+                                    {
+                                        foreach (var user in Model.Users)
+                                        {
+                                            var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, user.Picture);
+
+                                            <li class="list-group-item" data-lastname="@user.LastName" data-firstname="@user.FirstName" data-id="@user.Id" data-containertype="user_choice" data-action="user_choice" style="margin-left: 5px; margin-right: 5px; cursor: pointer; ">
+                                                <div class="row">
+                                                    <div class="col-md-9" data-containertype="user_choice_name"><img class="user-img" src="/images/media-loading.gif" data-src="@picture" style="width:25px;height:25px;" loading="lazy" />&nbsp;&nbsp;<span>@user.LastName, @user.FirstName</span></div>
+                                                    <div class="col-md-3" style="text-align:right;"><button data-actiontype="add_user_to_group" data-id="@user.Id" class="btn btn-sm btn-ezgo">>></button></div>
+                                                </div>
+                                            </li>
+                                        }
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-8">
+                        <div style="margin-top: 7px; height: 620px; max-height: 620px; overflow: auto; " class="border rounded">
+                            <ul style="margin-left:0px;padding-left:0px;" data-containertype="group_users">
+                                @if (Model.Users != null)
+                                {
+                                    @foreach (var user in Model.Users)
+                                    {
+                                        var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, user.Picture);
+                                        var possibleMatrixUsers = Model.MatrixUsers.Where(x => x.UserProfileId == user.Id);
+
+                                        <li class="list-group-item" data-lastname="@user.LastName" data-firstname="@user.FirstName" data-groupid="@(possibleMatrixUsers != null && possibleMatrixUsers.Any() ? possibleMatrixUsers.Select(x => x.GroupId).ToList().ToJsonFromObject() : "")" data-id="@user.Id" data-containertype="user_chosen" data-action="user_chosen" style="margin-left: 5px; margin-right: 5px; cursor: pointer; ">
+                                            <div class="row">
+                                                <div class="col-md-9" data-containertype="user_chosen_name">
+                                                    <img class="user-img" src="/images/media-loading.gif" data-src="@picture" style="width:25px;height:25px;" loading="lazy" />&nbsp;&nbsp;<span>@user.LastName, @user.FirstName</span>
+                                                </div>
+
+                                                <div class="col-md-3" data-actiontype="remove_user_from_group" data-id="@user.Id" style="text-align:right;">
+                                                    <i class="far fa-trash-alt red"></i>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="btnDeleteUserGroup" type="button" class="btn btn-danger btn-sm" disabled>Delete</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-ezgo btn-sm" data-action="update">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnUpdate, "Update") ?? "Update")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="MatrixLegendModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendTitle, "Matrix legend") ?? "Matrix legend")</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                @if (Model.ApplicationSettings.Features.SkillMatrixMandatorySkills != null && Model.ApplicationSettings.Features.SkillMatrixMandatorySkills.Value)
+                {
+                    <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixMandatorySkills, "Mandatory skills (users can fill these in)") ?? "Mandatory skills (users can fill these in)")</h5>
+                    <div class="row">
+                        <div class="col-4">
+                            <button class="circlebtn btn-thumbs-green m-2" type="button" data-popup="thumbs" data-value="2" data-actiontype="user_value_choice"><i class="fa-solid fa-thumbs-up"></i></button>
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueMastersTheSkill, "Masters the skill") ?? "Masters the skill")
+                        </div>
+
+                        <div class="col-4">
+                            <button class="circlebtn btn-thumbs-orange m-2" type="button" data-popup="thumbs" data-value="5" data-actiontype="user_value_choice"><i class="fa-solid fa-triangle-exclamation"></i></button>
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueAlmostExpired, "Almost expired") ?? "Almost expired")
+                        </div>
+
+                        <div class="col-4">
+                            <button class="circlebtn btn-thumbs-red m-2" type="button" data-popup="thumbs" data-value="1" data-actiontype="user_value_choice"><i class="fa-solid fa-thumbs-down"></i></button>
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueExpired, "Expired") ?? "Expired")
+                        </div>
+                    </div>
+                }
+
+                @if (Model.ApplicationSettings.Features.SkillMatrixOperationalSkills != null && Model.ApplicationSettings.Features.SkillMatrixOperationalSkills.Value)
+                {
+                    <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixOperationalSkillsTitle, "Operational skills (users can fill these in)") ?? "Operational skills (users can fill these in)")</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <button class="circlebtn btn-green m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice">5</button>
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueCanEducateOthers, "Can educate others") ?? "Can educate others")
+                        </div>
+
+                        <div class="col-6">
+                            <button class="circlebtn btn-orangegreen m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice">4</button>
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueNonStandardConditions, "Is able to apply it in non-standard conditions") ?? "Is able to apply it in non-standard conditions")
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <button class="circlebtn btn-orange m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice">3</button>
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueStandardSituations, "Is able to apply it in standard situations") ?? "Is able to apply it in standard situations")
+                        </div>
+
+                        <div class="col-6">
+                            <button class="circlebtn btn-orangered m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice">2</button>
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueKnowTheTheory, "Knows the theory") ?? "Knows the theory")
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <button class="circlebtn btn-red m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice">1</button>
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueNoKnowTheTheory, "Doesn't know the theory") ?? "Doesn't know the theory")
+                        </div>
+
+                        <div class="col-6">
+                            <div style="display: inline-block" class="m-2">
+                                <button class="circlebtn" style="font-size:22px !important;position: relative" type="button" data-popup="score" data-actiontype="user_value_choice">
+                                    <div title="Operational skill expired" class="circlebtn btn-orange" style="position: absolute; border: 1px solid rgb(210, 210, 210); height: 19px; width: 19px; right: -5px; bottom: -5px; border-radius: 19px; float: right; font-size: 12px !important"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                </button>
+                            </div>
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueOperationalSkillExpired, "Operational skill expired") ?? "Operational skill expired")
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <button class="btn circlebtn btn-orange warning m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice"></button>
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueAlmostExpired, "Operational almost expired") ?? "Operational almost expired")
+                        </div>
+                    </div>
+                }
+
+                @if (Model.ApplicationSettings.Features.SkillMatrixOperationalBehaviour != null && Model.ApplicationSettings.Features.SkillMatrixOperationalBehaviour.Value)
+                {
+                    <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixOperationalBehaviorTitle, "Operational behavior (generated statistics)") ?? "Operational behavior (generated statistics)")</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <button style="cursor: default; " class="circlebtn btn-green m-2" type="button" data-popup="grade" title="The King with 80-100% score of total"><i class="fa-solid fa-crown"></i></button>
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueTheKingScoreOfTotal, "The King with a score of above 100%") ?? "The King with a score of above 100%")
+                        </div>
+
+                        <div class="col-6">
+                            <button style="cursor: default; " class="circlebtn btn-orangegreen m-2" type="button" data-popup="grade" title="Champion with 60-80% score of total"><i class="fa-solid fa-trophy"></i></button>
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueChampionScoreOfTotal, "Champion with a score between 90 - 100%") ?? "Champion with a score between 90 - 100%")
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <button style="cursor: default; " class="circlebtn btn-orange m-2" type="button" data-popup="grade" title="Spot On with 40-60% score of total"><i class="fa-solid fa-bullseye"></i></button>
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueSpotOnScoreOfTotal, "Spot On with a score of 60 - 90%") ?? "Spot On with a score of 60 - 90%")
+                        </div>
+
+                        <div class="col-6">
+                            <button style="cursor: default; " class="circlebtn btn-orangered m-2" type="button" data-popup="grade" title="Rising Star with 20-40% score of total"><i class="fa-solid fa-sun"></i></button>
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueRisingStarScoreOfTotal, "Rising Star with a score between 20 - 60%") ?? "Rising Star with a score between 20 - 60%")
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <button style="cursor: default; " class="circlebtn btn-red m-2" type="button" data-popup="grade" title="Power Up with 0-20% score of total"><i class="fa-solid fa-hand-fist"></i></button>
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValuePowerUpScoreOfTotal, "Power Up with a score between 0 - 20%") ?? "Power Up with a score between 0 - 20%")
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="UserSkillValuesModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="UserSkillValuesModalTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkills, "User skills") ?? "User skills")</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" id="UserSkillValuesModalBody">
+                <div class="row">
+                    <div class="col-6">
+                        <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MandatorySkillsTitle, "Mandatory skills") ?? "Mandatory skills")</h5>
+                        <div id="UserSkillValuesModalBodyMandatory">
+                            <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ModalHeaderTitle, "modal header") ?? "modal header")</h5>
+                            <p>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ModalContentTitle, "modal content") ?? "modal content")</p>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OperationalSkills, "Operational skills") ?? "Operational skills")</h5>
+                        <div id="UserSkillValuesModalBodyOperational">
+                            <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ModalHeaderTitle, "modal header") ?? "modal header")</h5>
+                            <p>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ModalContentTitle, "modal content") ?? "modal content")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="ChangeSkillOrderModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="background-color: #f1f3f1">
+            <div class="modal-header">
+                <h4 class="modal-title" id="ChangeSkillOrderTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ChangeSkillOrder, "Change skill order") ?? "Change skill order")</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" id="ChangeSkillOrderBody">
+                <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MandatorySkillsTitle, "Mandatory skills") ?? "Mandatory skills")</h5>
+                <div id="ChangeSkillOrderMandatorySkills" class="noselect">
+                    @foreach (var skill in Model.CurrentSkillsMatrix.MandatorySkills.OrderBy(s => s.Index))
+                    {
+
+                        <div class="mb-1 mt-1 p-1 changeSkillOrderSkill col-12" style="" data-matrixid="@Model.CurrentSkillsMatrix.Id" data-userskillid="@skill.UserSkillId" data-relationid="@skill.Id" data-index="@skill.Index" data-ischanged="false" data-container="mandatorySkill">
+                            <div class="col-2">
+                                <small data-container="index_display_mandatory">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.IndexNr, "Index nr: ") ?? "Index nr: ")@skill.Index</small>
+                            </div>
+
+                            <div class="col-9">
+                                <h6>@skill.Name</h6>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <h5 class="pt-2 mt-2">Operational skills</h5>
+                <div id="ChangeSkillOrderOperationalSkills" class="noselect">
+                    @foreach (var skill in Model.CurrentSkillsMatrix.OperationalSkills.OrderBy(s => s.Index))
+                    {
+                        <div class="mb-1 mt-1 p-1 changeSkillOrderSkill col-12" style="" data-matrixid="@Model.CurrentSkillsMatrix.Id" data-userskillid="@skill.UserSkillId" data-relationid="@skill.Id" data-index="@skill.Index" data-ischanged="false" data-container="operationalSkill">
+                            <div class="col-2">
+                                <small data-container="index_display_operational">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.IndexNr, "Index nr: ") ?? "Index nr: ")@skill.Index</small>
+                            </div>
+
+                            <div class="col-9">
+                                <h6>@skill.Name</h6>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" id="save_indices">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.BtnSave, "Save") ?? "Save")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="/js/ezgoUtils.js"></script>
+    <script src="/js/matrixNewVisuals.js"></script>
+    <script>
+        matrix.language = {
+            userSkills: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkillModalUserSkills, "User skills - ") ?? "User skills - ")',
+            expiryInDays: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkillModalExpiryInDays, "Expiry in days: ") ?? "Expiry in days: ")',
+            expiryInDaysNotSet: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkillModalExpiryInDaysNotSet, "Expiry in days: not set") ?? "Expiry in days: not set")',
+            expiryWarningInDays: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkillModalExpiryWarningInDays, "expiry warning in days: ") ?? "expiry warning in days: ")',
+            expiryWarningInDaysNotSet: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkillModalExpiryWarningInDaysNotSet, "expiry warning in days: not set") ?? "expiry warning in days: not set")',
+            certifiedAt: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkillModalCertifiedAt, "Certified at") ?? "Certified at")',
+            confirm: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkillModalConfirm, "Confirm") ?? "Confirm")'
+        };
+
+        function printSkillAssessment() {
+            var t = $('#itemlist li').eq(15).append('<div style="height:170px;page-break-after: always !important;page-break: always !important;" class="pagebreak"></div>');
+            var result = $('ul.list-group li.active').map(function (i, opt) {
+                return $(opt).text();
+            }).toArray().join(' -> ');
+            $("#mainCol").animate({ scrollTop: $('#mainCol').prop("scrollHeight") }, 1000);
+            $('#areaprintlist').text(': ' + result);
+            $('#mainCol').css('height', 'auto !important');
+            $('.content-wrapper').removeClass('main-bg-color');
+            $('.main-footer').hide();
+            setTimeout(function () {
+                window.print();
+                t.remove();
+                $('.content-wrapper').addClass('main-bg-color');
+                $('#mainCol').css('height', 'height:calc(100vh - 175px)');
+                $('#areaprintlist').text('');
+                $('#mainCol').scrollTop(0);
+            }, 1000);
+        }
+
+        matrix.init(@Model.CurrentSkillsMatrix.Id);
+        function minimizeOperationalBehaviours(e) {
+            if ($('#minimizeOperationalBehaviourButton').hasClass("fa-minus-square")) {
+                $('.operationalbehaviour').fadeOut();
+                $('.operationalbehaviouroverlay').fadeOut();
+
+
+                $('#minimizeOperationalBehaviourButton').removeClass('fa-minus-square');
+                $('#minimizeOperationalBehaviourButton').addClass('fa-plus-square');
+                $(e).css('color', 'rgb(147, 197, 75)');
+
+                $('.operationalbehaviour').remove();
+                $('.operationalbehaviouroverlay').remove();
+            }
+            else {
+                $.ajax({
+                    type: "GET",
+                    url: '/skillmatrices/operationalbehaviour/' + matrix.currentMatrixId,
+                    success: function (data) {
+                        if (data != null) {
+                            $('.operationalbehaviour').remove();
+                            $('.operationalbehaviouroverlay').remove();
+                            $('#operationalBehaviourStart').after(data);
+
+                            $('.operationalbehaviour').fadeIn();
+                            $('#minimizeOperationalBehaviourButton').removeClass('fa-plus-square');
+                            $('#minimizeOperationalBehaviourButton').addClass('fa-minus-square');
+                            $(e).css('color', 'rgb(147, 197, 75)');
+
+                            $('.matrixoperationalbehaviour').each(function (index, elem) {
+                                var obName = $(elem).data('name');
+                                var obDescription = $(elem).data('description');
+
+                                $('#matrixSkillsOverlayOBEnd').before(
+                                `<tr class="skillsrow operationalbehaviouroverlay">
+                                    <td class="endcell skillcell matrixoperationalbehaviouroverlay" style="height: 59px">
+                                        <div>{{name}}</div>
+                                        <small>{{description}}</small>
+                                    </td>
+                                </tr>`
+                                .replaceAll('{{name}}', obName).replaceAll('{{description}}', obDescription));
+                            });
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            }
+        }
+
+        ezgomediafetcher.preloadImagesAndVideos();
+    </script>
+}

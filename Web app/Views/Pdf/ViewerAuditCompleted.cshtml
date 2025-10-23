@@ -1,0 +1,984 @@
+﻿@model PdfAuditCompletedViewModel
+@{
+    Layout = null;
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+
+    string getIconColor(string state)
+    {
+        switch (state.ToLower())
+        {
+            case "ok":
+                return "bg-green ok-status";
+            case "not ok":
+                return "bg-red notok-status";
+            case "skipped":
+                return "bg-warning skipped-status";
+            default:
+                return "bg-lightGray";
+        }
+    }
+    string getIcon(string state)
+    {
+        switch (state.ToLower())
+        {
+            case "ok":
+                return "fa-thumbs-up status-icon";
+            case "not ok":
+                return "fa-thumbs-down status-icon";
+            case "skipped":
+                return "fa-forward status-icon";
+            default:
+                return "fa-question";
+        }
+    }
+
+    var completedDate = TimeZoneInfo.ConvertTime(Model.CompletedAt, timezone);
+            
+}
+<!doctype html>
+<html lang="en"s>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>@(Model?.CmsLanguage.GetValue(LanguageKeys.PdfAuditCompleted.Title, "Completed audit") ?? "Completed audit") @Model.Audit.Name</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/plugins/fontawesome-pro-6.5.2-web/css/all.min.css" />
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1337.0.min.js"></script>
+    <script src="/js/ezgomediafetcher.js"></script>
+
+    <style>
+        body {
+            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,'Noto Sans Malayalam','Noto Sans KR','Noto Sans Thai',"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+        }
+
+        hr {
+            border-top: 2px solid #00a054;
+        }
+
+
+        .narrow {
+            border-top: 1px solid #00a054;
+        }
+
+        .header {
+            position: relative;
+            background-color: #00a054;
+            height: 100px;
+            width: 100%;
+            display: block;
+        }
+
+        .header .title {
+            font-size: 20px;
+            margin:10px;
+            color: #FFFFFF;
+            font-weight: bolder;
+        }
+
+        .header .subtitle {
+            font-size: 14px;
+            margin-left: 10px;
+            margin-right: 10px;
+            color: #FFFFFF;
+        }
+
+        .header .score {
+            font-size: 12px;
+            text-align: right;
+            margin-right: 10px;
+            margin-left: 10px;
+            color: #FFFFFF;
+            font-weight: bolder;
+        }
+
+        .footer {
+            position: relative;
+            background-color: #00a054;
+            height: 100px;
+            width: 100%;
+            display: block;
+        }
+
+            .footer .title {
+                font-size: 20px;
+                margin: 10px;
+                color: #FFFFFF;
+                font-weight: bolder;
+            }
+
+            .footer .subtitle {
+                font-size: 14px;
+                margin-left: 10px;
+                margin-right: 10px;
+                color: #FFFFFF;
+            }
+
+        .tag {
+            padding:4px;
+            margin:2px;
+            border-radius: 0.25rem;
+            font-size: 12px;
+            display: inline-block;
+            font-weight: bolder;
+            color: #FFFFFF
+        }
+
+        .openfield {
+            margin: 2px;
+        }
+
+            .openfield .title {
+                font-size: 12px;
+                font-weight: bolder;
+            }
+
+            .openfield .value {
+                font-size: 12px;
+            }
+
+
+        .tags-container {
+            margin-top:5px;
+            display: block;
+            position: relative;
+        }
+
+        .tasks-container {
+            margin-top: 5px;
+            display: block;
+            position: relative;
+        }
+
+        .openfields-container {
+            margin-top: 5px;
+            display: block;
+            position: relative;
+        }
+
+        .properties-container {
+            display: block;
+            position: relative;
+        }
+
+        .image-container {
+            position: relative;
+            display:inline-block;
+        }
+
+        .image-wrapper {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .image-wrapper img {
+            max-height: 245px;
+            max-width: 245px;
+        }
+
+        .actioncomment-image-container {
+            position: relative;
+            display: block;
+
+        }
+
+        .actioncomment-image-container .image-wrapper {
+            max-height: 400px;
+            max-width: 400px;
+            position: relative;
+            display: inline-block;
+            align-content: center; 
+            text-align: center;     
+            vertical-align: top;
+            margin: 2px;
+        }
+
+       .actioncomment-image-container .image-wrapper img {
+            max-height: 400px;
+            max-width: 400px;
+        }
+
+        .signature-image-container {
+            max-height: 350px;
+            max-width: 350px;
+            display: inline-block;
+        }
+
+        .signature-image-container .image-wrapper {
+            max-height: 350px;
+            max-width: 350px;
+            position: relative;
+            display: inline-block;
+            align-content: center;
+            text-align: center;
+            vertical-align: top;
+        }
+
+        .signature-image-container .image-wrapper img {
+            max-height: 350px;
+            max-width: 350px;
+            display: inline-block;
+            /*border: 1px solid #00a054;*/
+        }
+
+        .item-number-container {
+            position: absolute;
+            left:0px;
+            top:0px;
+            width: 35px;
+            height: 35px;
+            background-color: #00a054;
+            color: #FFFFFF;
+            text-align:center;
+            font-size:20px;
+            vertical-align: middle;
+            font-weight: bolder;
+            border: 2px solid #FFFFFF;
+        }
+
+        .property { 
+            position: relative;
+            display: inline-block;
+            margin-left: 2px;
+            height: 100px;
+            width: 100px;
+            overflow: hidden;
+        }
+
+        .property-wrapper {
+            display:table;
+       
+        }
+
+        .property-title {
+            margin-top: 2px;
+            width: 100px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bolder;
+            color: #FFFFFF;
+            height:25px;
+            vertical-align: middle;
+            line-height: normal;
+            display: inline-table;
+            overflow: hidden; 
+
+        }
+
+        .property-value {
+            width: 100px;
+            text-align: center;
+            font-size: 10px;
+            color: #FFFFFF;
+            height: 50px;
+            vertical-align: middle;
+            line-height:normal;
+            display: inline-table;
+            overflow: hidden;
+        }
+
+        .property-date {
+            width: 100px;
+            text-align: center;
+            font-size: 10px;
+            color: #FFFFFF;
+            height: 10px;
+            vertical-align: middle;
+            line-height: normal;
+            display: inline-table;
+            overflow: hidden;
+        }
+
+        .item-details {
+            display:inline-block;
+            vertical-align: top;
+            width: calc(100vw - 350px) !important;
+
+        }
+
+        .item-details-name {
+            font-weight: bolder;
+        }
+
+        .item-container {
+            position: relative;
+            display: block;
+            vertical-align: top;
+        }
+
+        .item-main {
+            position:relative;
+            display: block;
+            margin-top: 3px;
+        }
+
+        .item-main .image-container {
+           width:250px; 
+        }
+
+        .item-score {
+            position:absolute;
+            right: 0px;
+            bottom: 0px;
+        }
+
+        .rounded-circle {
+            border-radius: 50% !important;
+            min-width: 35px;
+            min-height: 35px;
+            max-width: 35px;
+            max-height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-size:20px;
+        }
+
+        .status .status-icon {
+            font-size: 1.3em;
+        }
+
+        .status .text-white {
+            color: #ffffff;
+        }
+
+        .status .ok-status {
+            width: 35px;
+            height: 35px;
+            padding: 3px 3px 3px 3px;
+        }
+
+        .status .notok-status {
+            width: 35px;
+            height: 35px;
+            padding: 3px 3px 3px 3px;
+        }
+
+        .status .skipped-status {
+            width: 35px;
+            height: 35px;
+            padding: 3px 3px 3px 3px;
+            color: #fff !important;
+        }
+
+        .status .action-status {
+            width: 35px;
+            height: 35px;
+            padding: 3px 3px 3px 3px;
+            color: #fff !important;
+        }
+
+        .status .score {
+            color: #fff;
+            font-weight:bolder;
+            width: 35px;
+            height: 35px;
+            padding: 3px;
+        }
+
+        .bg-warning {
+            background-color: #FFC107 !important;
+        }
+
+        .bg-red {
+            background-color: #dc3545;
+        }
+
+        .bg-green {
+            background-color: #28a745;
+        }
+
+
+        .picture-proof-container {
+            text-align: right;
+            align-content: flex-end;
+            position: relative;
+        }
+
+        .picture-proof {
+            margin-left: 5px;
+            margin-top: 5px;
+            height: 400px;
+            width:400px;
+            text-align: left;
+            display: inline-block;
+            position:relative;
+        }
+
+        .picture-proof img {
+            max-width: 400px;
+            max-height: 400px;
+            object-fit: cover;
+            object-position: center
+        }
+
+        .picture-proof-icon {
+            position:absolute;
+            top:2px;
+            right:2px;
+        }
+
+        .task-actions-comment-container {
+            position: relative;
+        }
+
+        .task-actions-comment-container .actioncomment-item-number-container {
+            position: relative;
+            width: 35px;
+            height: 35px;
+            background-color: #00a054;
+            color: #FFFFFF;
+            text-align: center;
+            font-size: 20px;
+            vertical-align: middle;
+            font-weight: bolder;
+            display:inline-block;
+        }
+
+        .task-actions-comment-container .task-title {
+            position:relative;
+            height: 50px;
+        }
+
+        .task-actions-comment-container .task-title span {
+            margin-left: 5px;
+
+        }
+
+        .task-actions-comment-container .title {
+            font-weight:bolder;
+        }
+
+        .signature-container {
+            position:relative;
+            display: block;
+        }
+
+        .signature-container .title {
+            font-weight:bolder;
+        }
+
+        .signature-container .signature-signed {
+            font-weight: bolder;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="title">@Model.Audit.Name</div>
+        <div class="subtitle">Completed by: @Model.CompletedByUserName  |  @completedDate.ToLongDateString() @completedDate.ToShortTimeString()</div>
+        <div class="score">Audit score: @Model.AuditTotalScorePercentage%</div>
+    </div>
+
+    @if (Model.ApplicationSettings.Features?.TagsEnabled == true)
+    {
+        @if (Model.Audit.Tags != null && Model.Audit.Tags.Count > 0)
+        {
+            <hr />
+            <!-- Tags -->
+            <div class="tags-container">
+            @foreach (var tag in Model.Audit.Tags)
+            {
+                <div class="tag" style="background-color: @tag.ColorCode">
+                    <div class="tag-wrapper">
+                        <i class="@(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                        <span>@tag.Name</span>
+                    </div>
+                </div>
+            }
+            </div>
+        }
+    }
+
+    <!-- Open fields -->
+    @if (Model.Audit.OpenFieldsProperties != null && Model.Audit.OpenFieldsProperties.Count > 0)
+    {
+        <hr />
+        <div class="openfields-container">
+            @for (int i = 0; i < Model.Audit.OpenFieldsProperties.Count; i++)
+            {
+                <div class="openfield">
+                    <label class="title">@Model.Audit.OpenFieldsProperties[i].TitleDisplay:</label>
+                    <span class="value">
+                        @Model.Audit.OpenFieldsPropertyUserValues.Where(m => m.TemplatePropertyId.Equals(Model.Audit.OpenFieldsProperties[i].Id)).FirstOrDefault()?.UserValueString
+                    </span>
+                    <span class="isrequired">@(Model.Audit.OpenFieldsProperties[i].IsRequired.HasValue && Model.Audit.OpenFieldsProperties[i].IsRequired.Value ? "*" : "")</span>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Tasks -->
+    @if (Model.Audit != null && Model.Audit.Tasks != null && Model.Audit.Tasks.Count > 0)
+    {
+        <div class="tasks-container">
+
+        @foreach (var auditItem in Model.Audit.Tasks)
+        {
+            <hr />
+            @if (Model.ApplicationSettings.Features?.TagsEnabled == true)
+            {
+                @if (auditItem.Tags != null)
+                {
+                    <div class="tag-container"> 
+                        @foreach (var tag in auditItem.Tags)
+                        {
+                            <div class="tag" style="background-color: @tag.ColorCode">
+                                <div class="tag-wrapper">
+                                    <i  class="@(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                    <span>@tag.Name</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+
+            <div class="item-container">
+            @{
+                string mediaImageUrl = Constants.General.ImageUnavailableUrl;
+            
+                if (!string.IsNullOrEmpty(auditItem.Picture))
+                {
+                    mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, auditItem.Picture);
+                } else if (!string.IsNullOrEmpty(auditItem.VideoThumbnail))
+                {
+                    mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, auditItem.VideoThumbnail);
+                }
+            }
+
+                <div class="item-main"> 
+                    <div class="image-container">
+                        <div class="image-wrapper"><img data-src="@mediaImageUrl" /></div>
+                        <div class="item-number-container">@(Model.Audit.Tasks.IndexOf(auditItem) + 1)</div>
+                    </div>
+
+                    <div class="item-details">
+                        <div class="item-details-name">@auditItem.Name</div>
+                        <div class="item-details-description">@auditItem.Description</div>
+                    </div>
+
+                    <div class="item-score status">
+                        @if (auditItem.ActionsCount > 0 || auditItem.CommentCount > 0)
+                        {
+                            <span class="rounded-circle action-status bg-warning status-icon"><i class="fa fa-bolt-lightning"></i></span>
+                            @:&nbsp;
+                        }
+                        @if (Model.Audit.ScoreType == "thumbs" || auditItem.Status == "skipped")
+                        {
+                            <span class="rounded-circle @getIconColor(auditItem.Status) text-white"><i class="fa @getIcon(auditItem.Status)" title="@auditItem.Status"></i></span>
+                        }
+                        else
+                        {
+                            var twodigitclass = "";
+                            @if (auditItem.Score >= 10)
+                            {
+                                twodigitclass = "white-space: nowrap; padding-left: 3px";
+                            }
+                            <span class="rounded-circle @Model.ScoreColorCalculator.GetColor(auditItem.Score ?? 10) score" style="@twodigitclass">
+                               @(Model.Audit.ScoreType == "score" ? auditItem.Score.ToString() : "")
+                            </span>
+                        }
+                    </div>
+                </div>
+
+                @if (auditItem.Properties != null && auditItem.Properties.Count() > 0)
+                {
+                    <div class="properties-container">
+                        <hr class="narrow" />
+
+                        @for (int i = 0; i < auditItem.Properties.Count(); i++)
+                        {
+                            var templateProperty = auditItem.Properties[i];
+                            var possibePropertyValue = auditItem.PropertyUserValues.Where(x => x.PropertyId == templateProperty.PropertyId && x.TemplatePropertyId == templateProperty.Id).FirstOrDefault();
+                            if (possibePropertyValue != null && possibePropertyValue.Id > 0)
+                            {
+                                string color = "";
+
+                                DateTime propertyDate = TimeZoneInfo.ConvertTime(possibePropertyValue.CreatedAt.ToLocalTime(), timezone);
+                                
+                                if (possibePropertyValue.RegisteredAt != null)
+                                {
+                                    propertyDate = TimeZoneInfo.ConvertTime(possibePropertyValue.RegisteredAt.Value.ToLocalTime(), timezone);
+                                }
+
+                                color = WebApp.Helpers.PropertyHelpers.GetStatusColor(templateProperty, possibePropertyValue);
+
+                                <div class="property" style="background: @color">
+
+                                    <div class="property-wrapper">
+
+                                        @if (templateProperty.IsRequired == true)
+                                        {
+                                            if (color == "#ed5454")
+                                            {
+                                                <i class="fa-solid fa-asterisk m-1" style="color: rgb(100, 104, 107); position: absolute; top: 1px; right: 1px;"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fa-solid fa-asterisk m-1" style="color: red; position: absolute; top: 1px; right: 1px;"></i>
+                                            }
+                                        }
+
+                                        <div class="property-title">
+                                            @if (!String.IsNullOrEmpty(templateProperty.TitleDisplay))
+                                            {
+                                                <span>@templateProperty.TitleDisplay</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@templateProperty.Property.ShortName</span>
+                                            }
+                                        </div>
+
+                                        <div class="property-value" data-fulltext="@possibePropertyValue.UserValueString">
+                                            @if (possibePropertyValue.UserValueBool == null && possibePropertyValue.UserValueDate == null &&
+                                            possibePropertyValue.UserValueDecimal == null && possibePropertyValue.UserValueInt == null &&
+                                            possibePropertyValue.UserValueString == null && possibePropertyValue.UserValueTime == null)
+                                            {
+                                                <span>Not measured</span>
+                                            }
+                                            else
+                                            {
+                                                <span>
+                                                    @possibePropertyValue.UserValueBool
+                                                    @possibePropertyValue.UserValueDate
+                                                    @(possibePropertyValue.UserValueDecimal / 1.000000000000000000000000000000000m)
+                                                    @possibePropertyValue.UserValueInt
+                                                    @possibePropertyValue.UserValueString
+                                                    @possibePropertyValue.UserValueTime
+                                                </span>
+                                                @if (!string.IsNullOrEmpty(templateProperty.PropertyValueDisplay))
+                                                {
+                                                    @templateProperty.PropertyValueDisplay
+                                                    ;
+                                                }
+                                                else if (templateProperty.PropertyValue != null)
+                                                {
+                                                    @templateProperty.PropertyValue.ValueSymbol
+                                                    ;
+                                                }
+                                            }
+
+                                        </div>
+                                        <div class="property-date">
+                                                <span>@propertyDate.ToString("dd MMM yyyy") @propertyDate.ToString("H:mm")</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+
+                <!-- Picture proof -->
+                @if (auditItem.PictureProof != null && auditItem.PictureProof.Media != null && auditItem.PictureProof.Media.Count > 0)
+                {
+                     <hr class="narrow" />
+
+                    var startColor = 250;
+                    var endColor = 230;
+                    var difference = startColor - endColor;
+                    var stepSize = difference / (double)auditItem.PictureProof.Media.Count;
+
+                    var pictureProofColor = (int)(startColor);
+                    for (int i = 0; i < auditItem.PictureProof.Media.Count; i++)
+                    {
+                        DateTime pictureProofDate = TimeZoneInfo.ConvertTime(auditItem.PictureProof.Media[i].PictureTakenUtc.ToLocalTime(), timezone);
+                        string ppPicture = Constants.General.ImageUnavailableUrl;
+
+                        if (!string.IsNullOrEmpty(auditItem.PictureProof.Media[i].UriPart))
+                        {
+                            ppPicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, auditItem.PictureProof.Media[i].UriPart);
+                        }
+
+                        var iconColor = "";
+                        @if (Model.Audit.ScoreType == "thumbs" || auditItem.Status == "skipped")
+                        {
+                            iconColor = getIconColor(auditItem.Status);
+                        }
+                        else
+                        {
+                            iconColor = Model.ScoreColorCalculator.GetColor(auditItem.Score ?? 10);
+                        }
+
+                        <div class="picture-proof" style="background-color: rgb(@pictureProofColor, @pictureProofColor, @pictureProofColor)">
+                            <div class="picture-proof-icon"><a class="rounded-circle @iconColor text-white"><i class="fas fa-camera status-icon"></i></a></div>
+                            <div><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditCompleted.PictureProofDate, "Date") ?? "Date"):</strong> </div>
+                            <div>@pictureProofDate.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                            <div>
+                                <img style="" data-src="@ppPicture" />
+                            </div>
+                            <div><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditCompleted.PictureProofTakenBy, "Taken By") ?? "Taken By"):</strong> </div>
+                            <div>@auditItem.PictureProof.Media[i].UserFullName</div>
+                        </div>
+                        pictureProofColor = (int)(pictureProofColor - stepSize);
+                    }
+                }
+            </div>
+
+        }
+        </div>
+    }
+
+ 
+    <!-- Actions -->
+  
+    @if (Model.Actions != null && (Model.Actions.Where(a => Model.Audit.Tasks.Select(t => t.Id).Contains(a.TaskId)).Count() > 0 || Model.Actions.Count > 0))
+    {
+        <div style="break-after:page"></div>
+    <hr />
+    <div class="actions-container">
+        <div><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditCompleted.Actions, "Actions") ?? "Actions")</strong></div>
+
+        @foreach (var task in Model.Audit.Tasks)
+        {
+            if (Model.Actions != null && Model.Actions.Where(a => a.TaskId == task.Id).Count() > 0)
+            {
+                <div class="task-actions-comment-container">
+                    <hr />
+                    <div class="task-title">
+                        <div class="actioncomment-item-number-container">@(Model.Audit.Tasks.IndexOf(task) + 1)</div>
+                        <span>@task.Name</span>
+                    </div>
+                                          
+                    @foreach (var action in Model.Actions)
+                    {
+                        @if (action.TaskId == task.Id)
+                        {
+                            
+                            <hr />
+                            @if (Model.ApplicationSettings.Features?.TagsEnabled == true)
+                            {
+                                @if (action.Tags != null && action.Tags.Count > 0)
+                                {
+                                        
+                                    <div class="tag-container">
+                                        @foreach (var tag in action.Tags)
+                                        {
+                                            <div class="tag" style="background-color: @tag.ColorCode">
+                                                <div class="tag-wrapper">
+                                                    <i class="@(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                    <span>@tag.Name</span>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                    <hr class="narrow" />
+                                }
+                            }
+                            <div class="title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditCompleted.ActionComment, "Comment") ?? "Comment"):</div>
+                            <div>@Html.Raw(action.Comment.Replace(System.Environment.NewLine, "<br />").Replace("\n\r", "<br />").Replace("\n", "<br />").Replace("\r", "<br />"))</div>
+                                <hr class="narrow" />
+                            <div class="title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditCompleted.ActionAction, "Action") ?? "Action"):</div>
+                            <div>@Html.Raw(action.Description.Replace(System.Environment.NewLine, "<br />").Replace("\n\r", "<br />").Replace("\n", "<br />").Replace("\r", "<br />"))</div>
+                                <hr class="narrow" />
+                            <div class="title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditCompleted.ActionAuthor, "Author") ?? "Author"):</div>
+                            <div>@action.CreatedBy</div>
+
+                            <div class="title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditCompleted.ActionDate, "Date") ?? "Date"):</div>
+                            <div>@action.CreatedAt.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+
+                            @if (!action.CreatedAt.Equals(action.ModifiedAt))
+                            {
+                                <div>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditCompleted.ActionModificationDate, "Modification date") ?? "Modification date"):</div>
+                                <div>@action.ModifiedAt.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                            }
+
+                            <div class="title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditCompleted.ActionDueDate, "Due date") ?? "Due date"):</div>
+                            <div>@action.DueDate.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+
+
+                            if ((action.Images != null || action.VideoThumbNails != null) && (action.Images.Count > 0 || action.VideoThumbNails.Count > 0))
+                            {
+                                    <hr class="narrow" />
+                                <div class="title">Pictures: </div>
+                                <div class="actioncomment-image-container">
+                                    @foreach (var image in action.Images)
+                                    {
+                                        string actionImageUrl = Constants.General.ImageUnavailableUrl;
+                                        if (!string.IsNullOrEmpty(image))
+                                        {
+                                            actionImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, image);
+                                            actionImageUrl = actionImageUrl.Replace("/media/media", "/media"); //fix for incorrect data in db
+                                        }
+                                        <div class="image-wrapper">
+                                            <img data-src="@actionImageUrl" />
+                                        </div>
+                                    }
+                                    @foreach (var videoThumbnail in action.VideoThumbNails)
+                                    {
+                                        string actionVideoThumbnailUrl = Constants.General.ImageUnavailableUrl;
+                                        if (!string.IsNullOrEmpty(videoThumbnail))
+                                        {
+                                            actionVideoThumbnailUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, videoThumbnail);
+                                            actionVideoThumbnailUrl = actionVideoThumbnailUrl.Replace("/media/media", "/media"); //fix for incorrect data in db
+                                        }
+                                            <div class="image-wrapper">
+                                            <img data-src="@actionVideoThumbnailUrl" />
+                                        </div>
+                                    }
+                                </div>  
+                            }
+
+                           
+
+                        }
+                    }
+
+                </div>
+
+            }
+        }
+    </div>
+    }
+
+
+    @if (Model.Comments != null && (Model.Comments.Where(a => Model.Audit.Tasks.Select(t => t.Id).Contains(a.TaskId ?? -1)).Count() > 0 || Model.Comments.Count > 0))
+    {
+        <div style="break-after:page"></div>
+        <hr />
+        <div class="actions-container">
+            <div><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditCompleted.Comments, "Comments") ?? "Comments")</strong></div>
+            @foreach (var task in Model.Audit.Tasks)
+            {
+                if (Model.Comments != null && Model.Comments.Where(a => a.TaskId == task.Id).Count() > 0)
+                {
+                    <div class="task-actions-comment-container">
+                        <hr />
+                        <div class="task-title">
+                            <div class="actioncomment-item-number-container">@(Model.Audit.Tasks.IndexOf(task) + 1)</div>
+                            <span>@task.Name</span>
+                        </div>
+                                           
+                        @foreach (var comment in Model.Comments)
+                        {
+
+                            @if ((comment.TaskId ?? -1) == task.Id)
+                            {
+                                DateTime createdAt = TimeZoneInfo.ConvertTime(comment.CreatedAt, timezone);
+                                <hr />
+                                @if (Model.ApplicationSettings.Features?.TagsEnabled == true)
+                                {
+                                    @if (comment.Tags != null && comment.Tags.Count > 0)
+                                    {
+                                        
+                                        <div class="tag-container">
+                                            @foreach (var tag in comment.Tags)
+                                            {
+                                                <div class="tag" style="background-color: @tag.ColorCode">
+                                                    <div class="tag-wrapper">
+                                                        <i class="@(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                        <span>@tag.Name</span>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                        <hr class="narrow" />
+                                    }
+                                }
+                                <div class="title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditCompleted.CommentComment, "Comment") ?? "Comment"):</div>
+                                 <div>@Html.Raw(comment.CommentText.Replace(System.Environment.NewLine, "<br />").Replace("\n\r", "<br />").Replace("\n", "<br />").Replace("\r", "<br />"))</div>
+                                <hr class="narrow" />
+                                <div class="title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditCompleted.CommentAuthor, "Author") ?? "Author"):</div>
+                                <div>@comment.CreatedBy</div>
+
+                                <div class="title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditCompleted.CommentDate, "Date") ?? "Date"):</div>
+                                <div>@createdAt.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                                                        
+                                @if (!comment.CreatedAt.Equals(comment.ModifiedAt))
+                                {
+
+                                    <div class="title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditCompleted.CommentModificationDate, "Modification date") ?? "Modification date"):</div>
+                                    <div>@comment.ModifiedAt.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                         
+                                }
+
+                                if(comment.Attachments != null && comment.Attachments.Count > 0)
+                                {
+                                    <hr class="narrow" />
+                                    <div class="title">Pictures: </div>
+                                    <div class="actioncomment-image-container">
+                                        @foreach (var attachment in comment.Attachments)
+                                        {
+                                            string commentImageUrl = Constants.General.ImageUnavailableUrl;
+                                            if (!string.IsNullOrEmpty(attachment))
+                                            {
+                                                commentImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, attachment);
+                                                commentImageUrl = commentImageUrl.Replace("/media/media", "/media"); //fix for incorrect data in db
+                                            }
+                                            <div class="image-wrapper">
+                                                <img data-src="@commentImageUrl" />
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            }
+                        }
+                    </div>
+                }
+            }
+        </div>
+        }
+
+
+        @if (Model.Audit.Signatures != null && (Model.Audit.IsSignatureRequired || Model.Audit.IsDoubleSignatureRequired))
+        {
+            <div style="break-after:page"></div>
+            <hr />
+       
+            <div class="signature-container">
+            <div class="title"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditCompleted.Signatures, "Signatures") ?? "Signatures")</strong></div>
+                 <hr />
+
+                @foreach (var signature in Model.Audit.Signatures)
+                {
+                     var sigpic = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, signature.SignatureImage);
+
+                    <div class="signature-image-container">
+                        @if (!string.IsNullOrEmpty(signature.SignatureImage))
+                        {
+                            <div class="image-wrapper">
+                                <img class="signature-image" data-src="@sigpic" />
+                            </div>
+                        }
+                        <div class="signature-signed">@signature.SignedBy</div>
+                    </div>
+                }
+            </div>
+        }
+
+    <hr />
+    <div class="footer">
+        <div class="title">@Model.Audit.Name</div>
+        <div class="subtitle">Completed by: @Model.CompletedByUserName  |  @completedDate.ToLongDateString() @completedDate.ToShortTimeString()</div>
+    </div>
+    <input type="text" id="dummyfocus" style="width:0px;height:0px;border: 0px;maring:0px;padding:0px;"/>
+   
+
+    <script>
+        ezgomediafetcher.preloadImagesAndVideos();
+
+        //print functionality, make sure page is fully loaded, scrolldown, focus on dummy element to force render if not already occured, add print to stack, set timeout with close so page will auto close. 
+        window.onload = function () {
+            setTimeout(() => {
+                window.scrollTo(0, document.body.scrollHeight);
+                dummyfocus.focus();
+                setTimeout(() => {
+                    window.print();  
+                });
+                setTimeout(function () { window.close(); }, 2000);
+            }, 2000);
+        };
+    </script>
+</body>
+</html>
+
+

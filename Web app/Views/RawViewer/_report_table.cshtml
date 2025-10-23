@@ -1,0 +1,56 @@
+﻿@model WebApp.ViewModels.RawViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@if (Model.Data != null && Model.Data.Columns != null && Model.Data.Columns.Any())
+{
+    <table class="report-table" data-type="datatable">
+        <thead>
+            <tr>
+                @{
+                    var columnArray = Model.Data.Columns.ToArray();
+                    var columnTypeArray = Model.Data.ColumnTypes.ToArray();
+                }
+
+                @foreach (var column in Model.Data.Columns)
+                {
+                    <th data-name="@column" class="report-bottom">@column</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in Model.Data.Data)
+            {
+            <tr>
+                @{
+                    var rowArray = row.ToArray();
+                }
+                @for (var i = 0; i < Model.Data.Columns.Count; i++)
+                {
+                <td data-searchcolumn="@columnArray[i]">
+                    @if (string.IsNullOrEmpty(columnArray[i]) || rowArray[i].Length < 300)
+                    {
+                        @rowArray[i]
+                    }
+                    else
+                    {
+                        @rowArray[i].Substring(0, 299)
+                        <span title="@rowArray[i].Replace("\"","'")">...</span>
+                    }
+
+                </td>
+
+                }
+            </tr>
+                    }
+
+        </tbody>
+    </table>
+
+}
+else
+{
+    <partial name="~/Views/Shared/_no_data_message.cshtml" model="@Model" />
+}

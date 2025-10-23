@@ -1,0 +1,519 @@
+﻿@model WebApp.ViewModels.AssessmentViewModel
+@using WebApp.Logic
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = @Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.StatsAssessmentsTitle, "Assessments") ?? "Assessments";
+}
+
+@section CSS {
+    <style>
+        .card-img-top {
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            width: 100%;
+            height: 15vw;
+            object-fit: cover;
+        }
+
+        .image-parent {
+            max-width: 45px;
+            max-height: 45px;
+        }
+
+            .image-parent img {
+                border-radius: 50px;
+                border: solid 1px green;
+                height: 45px;
+            }
+
+        .list-group {
+            border-radius: 0px !important;
+            height: auto !important;
+        }
+
+        .list-group-item {
+            border-left: 0px;
+            border-right: 0px;
+        }
+
+            .list-group-item:last-child {
+                border-bottom-right-radius: inherit;
+                border-bottom-left-radius: inherit;
+        @*border-bottom: 0px;*@
+            }
+
+            .list-group-item:first-child {
+                border-top: solid 1px rgba(0,0,0,.125) !important;
+            }
+
+        .circlebtn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: inline-block;
+            color: #fff;
+            border: 1px solid rgb(210,210,210);
+        }
+
+            .circlebtn:hover {
+                cursor: pointer;
+                transform: scale(1.15);
+                color: #fff;
+            }
+
+            .circlebtn i {
+                font-size: 22px;
+            }
+
+        .popUpThumbs {
+            width: 230px;
+        }
+
+        .btn-green {
+            background-color: green;
+            font-size: 22px;
+            font-weight: 400;
+        }
+
+        .btn-red {
+            background-color: rgb(203,0,0);
+            font-size: 22px !important;
+            font-weight: 400;
+        }
+
+        .btn-clear {
+            background-color: lightgray;
+            font-size: 22px;
+            font-weight: 400;
+            border: solid 1px silver;
+        }
+
+        .btn-orangered {
+            background-color: orangered;
+            font-size: 22px;
+            font-weight: 400;
+        }
+
+        .btn-orange {
+            background-color: orange;
+            font-size: 22px;
+            font-weight: 400;
+        }
+
+        .btn-orangegreen {
+            background-color: rgb(141,163,5);
+            font-size: 22px;
+            font-weight: 400;
+        }
+
+        .btn-border-green {
+            border: solid 1px #abd28e;
+            border-radius: 50%;
+            background-color: #fff;
+            font-size: 22px;
+            font-weight: 400;
+        }
+
+        .popUp {
+            position: absolute;
+            top: 75px;
+            left: 0px;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: space-around;
+            width: 292px;
+            padding: 5px 15px;
+            border-radius: 30px;
+            box-shadow: 10px 10px 26px -12px rgba(0,0,0,0.34);
+            -webkit-box-shadow: 10px 10px 26px -12px rgba(0,0,0,0.34);
+            -moz-box-shadow: 10px 10px 26px -12px rgba(0,0,0,0.34);
+            animation: bounceIn 0.4s;
+            z-index: 10;
+        }
+
+        .hidePopUp {
+            display: none;
+        }
+
+        .item {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 300;
+            color: #fff;
+            border: solid 1px rgb(210,210,210);
+        }
+
+        .itemSelected {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: inline-block;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 300;
+            color: #fff;
+        }
+
+        .item:hover {
+            cursor: pointer;
+            transform: scale(1.05);
+        }
+
+        .imgFade {
+            opacity: 0.2;
+        }
+
+        .user-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+        }
+
+        .user {
+            border-radius: 10px;
+            z-index: 1;
+            cursor: move;
+        }
+
+        .image-parent {
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+        }
+
+            .image-parent:hover img {
+                opacity: 0.4;
+            }
+
+            .image-parent:hover a {
+                opacity: 1;
+                top: 0;
+                z-index: 500;
+            }
+
+                .image-parent:hover a i {
+                    top: 50%;
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    transform: translateY(-50%);
+                    color: red;
+                }
+
+            .image-parent a {
+                display: block;
+                position: absolute;
+                top: -100%;
+                opacity: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                text-align: center;
+                color: inherit;
+            }
+
+    </style>
+}
+
+@*main content*@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-3">
+                &nbsp;
+                <h1>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OngoingAssessmentsTitle, "Ongoing assessments") ?? "Ongoing assessments")</h1>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section><!-- /.content-header -->
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row pt-1" style="height:calc(100vh - 167px);overflow:auto;">
+            <div class="col-xl-3 col-md-3 col-sm-3">
+                <div class="card card-filter h-100">
+                    <div class="card-header">
+                        <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ParticipantsTitle, "Participants") ?? "Participants")</h5>
+                    </div>
+
+                    <div id="participants" class="card-body p-0"></div>
+                </div> <!-- /.card-filter -->
+            </div>
+
+            <div class="col-lg-9 col-xl-9">
+                <div class="card" style="margin-bottom: 5px;margin-left: 12px !important;">
+                    <div class="card-header" style="margin-left:-11px;">
+                        <h3 id="cardHeader" class="card-title d-none d-sm-inline-block">
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.InstructionsTitle, "Instructions") ?? "Instructions")
+                        </h3>
+                    </div>
+
+                    <div class="card-header pt-0" style="margin-left:-11px;">
+                        <span id="cardDescription">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.DescriptionTitle, "Description") ?? "Description")</span>
+                    </div>
+                </div>
+
+                <div id="assessmentNavigationContainer" class="card" style="margin-bottom: 5px;margin-left: 12px !important; flex-direction: row">
+                    <div style="width: 33%; text-align: left" class="pl-2"><a id="navigatePrevious"><i class="fas fa-arrow-alt-circle-left" style="font-size: 20px;line-height: 34px;color: #93C54B; width: 20%"></i></a></div>
+                    <div style="width: 33%; text-align: center" class="pl-2"><a id="navigateHome"><i class="fas fa-home" style="font-size: 20px; line-height: 34px; color: #93C54B; width: 20%"></i></a></div>
+                    <div style="width: 33%; text-align: right" class="pl-2"><a id="navigateNext"><i class="fas fa-arrow-alt-circle-right" style="font-size: 20px; line-height: 34px; color: #93C54B; width: 20%"></i></a></div>
+                </div>
+
+                <div id="contentBody" class="pl-2 pr-3" style="height: calc(100vh - 252px);overflow:auto;"></div>
+            </div>
+        </div> <!-- /.row pt-1 auto calc -->
+    </div>
+</section>
+
+<div class="popUp hidePopUp popUpScore" id="popUpScore">
+    <div class="arrowUp"></div><div class='item btn-clear'>0</div><div class='item btn-red'>1</div><div class='item btn-orangered'>2</div><div class='item btn-orange'>3</div><div class='item btn-orangegreen'>4</div><div class='item btn-green'>5</div>
+</div>
+
+<div class="popUp hidePopUp popUpThumbs">
+    <div class="arrowUp"></div><button class='item btn-clear'></button><button class='item btn-orange'><i class="fa fa-exclamation-triangle" style="color: rgb(255,255,255);"></i></button><button class='item btn-red'><i class="fa fa-thumbs-down" style="color: rgb(255,255,255);"></i></button><button class='item btn-green'><i class="fa fa-thumbs-up" style="color: rgb(255,255,255);"></i></button>
+</div>
+
+<div id="signatures" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SignAssessmentTitle, "Sign this assessment") ?? "Sign this assessment")</h5>
+                <button type="button" class="close d-none" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div id="signature1" class="col-12 text-center">
+                        <canvas id="signature1canvas" ref="canvas" class="canvas border" width="350" height="200" @@click="draw"></canvas>
+                        <div id="assessor1" class="btn btn-block border" style="margin-left: 12px;width: 352px;"></div>
+                    </div>
+
+                    <div id="signature2" class="col-6 text-center d-none">
+                        <canvas id="signature2canvas" ref="canvas" class="canvas border" width="350" height="200" @@click="draw"></canvas>
+                        <div id="assessor2" class="btn btn-block border" style="margin-left: 12px;width: 352px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnCancel, "Cancel") ?? "Cancel")</button>
+                <button id="btnFinish" type="button" class="btn btn-ezgo" onclick="ezgoassessment.signAndFinish()" disabled>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnFinishAssessment, "Finish assessment") ?? "Finish assessment")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="executeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row w-100">
+                    <div class="col-6">
+                        <h4>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SelectParticipantsTitle, "Select participants") ?? "Select participants")</h4>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="input-group">
+                            <div class="input-group-prepend"></div><input class="form-control" type="search" id="searchpersonexecute" name="searchpersonexecute" data-action="search_person" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.Search, "Search") ?? "Search")" />
+                            <div class="input-group-append">
+                                <button class="btn btn-default" type="button"><i class="fa fa-search"></i></button>
+                                <button type="button" class="btn btn-default" id="clear_search_btn" title="Reset search"><i class="fas fa-sync"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-body" style="overflow-y: auto; height: 450px;">
+                <div class="row" style="padding-right: 15px;padding-left: 15px;">
+                    <div id="user-container" class="col-6">
+                        <div id="userlist" class="p-3">
+                            <h6>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AvailableUsersTitle, "Available users") ?? "Available users")</h6>
+                            <div class="row no-gutters row-cols-3 p-0">
+                                @if (Model.Users != null)
+                                {
+                                    foreach (var user in Model.Users)
+                                    {
+                                        var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, user.Picture);
+                                        if (user.Picture.IsNullOrEmpty() || user.Picture.ToLower() == "emptyprofile")
+                                        {
+                                            picture = "/images/user-placeholder.jpg";
+                                        }
+
+                                        <!-- User tile -->
+                                        <div class="col-4 pb-2 pr-2" data-lastname="@user.LastName" data-firstname="@user.FirstName" data-id="@user.Id" data-containertype="user_choice" data-action="user_choice">
+                                            <div class="card h-100 user user-select-none border">
+                                                <div class="card-body text-center">
+                                                    <div class="d-flex justify-content-center"><img class="user-img" src="/images/media-loading.gif" data-src="@picture" /></div><span style="font-size: 14px;">@user.FirstName @user.LastName</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- End user tile -->
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="participant-container" class="col-6" style="z-index:0;">
+                        <div id="participantlist" class="p-3 sticky-top">
+                            <h6>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ParticipantsTitle, "Participants") ?? "Participants")</h6>
+                            <div class="row no-gutters row-cols-4 equal" style="min-height: 118px;"></div>
+                            <p id="participantsInfo">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ParticipantsInfoTitle, "Drag and drop participants from the left side to this side to add participants.") ?? "Drag and drop participants from the left side to this side to add participants.")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-ezgo btn-sm" data-action="execute" disabled>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnAdd, "Add") ?? "Add")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/js/ezgoUtils.js"></script>
+    <script src="/js/ezgoassessment.js"></script>
+    <script src="/js/ezgosignpad.js"></script>
+    <script>
+        const signPads = []
+        const canvas = document.querySelectorAll('.canvas');
+        canvas.forEach(element => {
+            if (!element) return
+
+            signPads.push(new SignPad(element))
+        });
+
+        signPads.forEach(element => {
+            element.addEventListeners()
+            element.initContext()
+        });
+
+        ezgoassessment.placeholderProfileImageUrl = '@(Constants.General.UserImagePlaceHolder)';
+        ezgoassessment.placeholderImageUrl = '@(Constants.General.ImageUnavailableUrl)';
+        ezgoassessment.mediaUrl = '@(string.IsNullOrEmpty(Model.ApplicationSettings?.MediaLocations?.ImageMediaBaseUri) ? Constants.General.MediaUrl : Model.ApplicationSettings?.MediaLocations?.ImageMediaBaseUri)';
+        ezgoassessment.users = @(Html.Raw(Model.Users.Where(m => m.Role.Equals("manager") || m.Role.Equals("shift_leader")).ToJsonFromObject()));
+        ezgoassessment.init(@(Html.Raw(Model.SkillAssessments.ToJsonFromObject())));
+
+        $('[data-action="execute"]').on('click', function () {
+            var participants = [];
+            $('#participantlist div[data-containertype="user_choice"]').each(function (index, participant) {
+                participants.push(parseInt($(participant).data('id')));
+            });
+
+            if (ezgoassessment.data.length > 0) {
+                var templateId = ezgoassessment.data[0].TemplateId;
+                $('body').toggleClass('loaded');
+                $.ajax({
+                    url: '/assessment/execute/' + templateId,
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify({ UserId: 1, participants: participants }),
+                    success: function (result) {
+                        window.location.href = '/assessment/viewer/' + result.id;
+                    }
+                });
+            }
+        });
+
+        $('[data-action="search_person"]').on('keyup', function () {
+            searchModal($(this).val());
+        });
+
+        function searchModal(searchValue) {
+            searchValue = searchValue.replaceAll(',', '');
+            searchValue = searchValue.replaceAll(';', '');
+            var searchTerms = searchValue.split(' ');
+            if (searchValue != null && searchValue != '') {
+                $('#userlist [data-containertype="user_choice"]').hide();
+                $('#userlist [data-containertype="user_choice"]').each(function () {
+                    var elem = this;
+                    searchTerms.forEach(function (s) {
+                        if ($(elem).attr('data-lastname').toLowerCase().includes(s.toLowerCase()) || $(elem).attr('data-firstname').toLowerCase().includes(s.toLowerCase())) {
+                            $(elem).show();
+                        }
+                    });
+                });
+            } else {
+                $('[data-containertype="user_choice"]').show();
+            }
+
+        };
+        //////// sign pad initialization //////
+
+        ////// saving img functions://///////
+    </script>
+
+    <script>
+        // drag and drop
+        $(function () {
+            var $userlist = $('#userlist'),
+                $participantlist = $('#participantlist'),
+                $participantcontainer = $('#participant-container'),
+                $usercontainer = $('#user-container');
+
+            $("div.col-4", $userlist, $participantlist).draggable({
+                cancel: "a.ui-icon",
+                revert: "invalid",
+                containment: "window",
+                helper: "clone",
+                cursor: "move",
+                start: function (event, ui) {
+                    $('#participantsInfo').hide();
+                    $(ui.helper).find('.card').addClass('shadow');
+                }
+            });
+
+            $participantcontainer.droppable({
+                accept: "#userlist > div.row > div.col-4",
+                activeClass: "drop",
+                classes: {
+                    "ui-droppable-active": "myhighlight"
+                },
+                drop: function (event, ui) {
+                    deleteImage(ui.draggable);
+                }
+            });
+
+            $usercontainer.droppable({
+                accept: "#participantlist > div.row > div.col-4",
+                activeClass: "drop",
+                classes: {
+                    "ui-droppable-active": "myhighlight"
+                },
+                drop: function (event, ui) {
+                    deleteImageEx(ui.draggable);
+                }
+            });
+
+            function deleteImage($item) {
+                $('#participantlist > div.row').append($item)
+
+                $('#participantlist div[data-containertype="user_choice"]').length > 0 ? $('button[data-action="execute"]').prop('disabled', false) : $('button[data-action="execute"]').prop('disabled', true);
+            }
+
+            function deleteImageEx($item) {
+                //console.log($item);
+                $('#userlist > div.row').append($item);
+                setTimeout(function () {
+                    $('#participantlist div[data-containertype="user_choice"]').length === 0 ? $('button[data-action="execute"]').prop('disabled', true) : $('button[data-action="execute"]').prop('disabled', false);
+                }, 200);
+            }
+        });
+    </script>
+
+    <script>
+        ezgomediafetcher.preloadImagesAndVideos();
+    </script>
+}

@@ -1,0 +1,1136 @@
+﻿@model PdfTasksCompletedViewModel
+@{
+    Layout = null;
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+
+    string getIconColor(string state)
+    {
+        switch (state.ToLower())
+        {
+            case "ok":
+                return "bg-green ok-status";
+            case "not ok":
+                return "bg-red notok-status";
+            case "skipped":
+                return "bg-orange skipped-status";
+            default:
+                return "bg-lightGray";
+        }
+    }
+    string getIcon(string state)
+    {
+        switch (state.ToLower())
+        {
+            case "ok":
+                return "fa-thumbs-up status-icon";
+            case "not ok":
+                return "fa-thumbs-down status-icon";
+            case "skipped":
+                return "fa-forward status-icon";
+            default:
+                return "fa-question";
+        }
+    }
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Completed tasks pdf</title>
+    <link rel="stylesheet" href="/css/pdf.css" />
+    <partial name="_pdfCss" /> @*above link doesnt work on docker for some reason*@
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/plugins/fontawesome-pro-6.5.2-web/css/all.min.css" />
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1337.0.min.js"></script>
+    <script src="/js/ezgomediafetcher.js"></script>
+    <style>
+
+        body {
+            font-family: "Source Sans Pro",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+            font-size: 18px;
+            white-space: nowrap;
+            margin: 0px;
+        }
+
+        table {
+            table-layout: fixed;
+            border-collapse: separate;
+            border-spacing: 0px;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        strong {
+            font-weight: 600;
+        }
+
+        .pdfTable {
+            width: 100%;
+            height: auto;
+            margin: 0;
+            border-collapse: collapse;
+            table-layout: fixed;
+            page-break-inside: avoid;
+        }
+
+        td {
+            background-size: 100% 100%;
+            background-position-x: 0;
+            background-position-y: 0;
+            word-wrap: break-word;
+            white-space: normal;
+            overflow: hidden;
+        }
+
+        tr {
+            padding-left: 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            font-weight: 400;
+            color: #212529;
+            text-align: center;
+            vertical-align: middle;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-color: transparent;
+            border: 1px solid transparent;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 0.25rem;
+            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .signatureimg {
+            width: 25%;
+            height: 25%;
+            padding-bottom: 10px;
+        }
+
+    </style>
+
+    <!-- Tags -->
+    <style>
+        .card {
+            position: relative;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: #ffffff;
+            background-clip: border-box;
+            border: 0 solid rgba(0, 0, 0, 0.125);
+            border-radius: 0.25rem;
+        }
+
+        .tag-card {
+            display: inline-block;
+            width: 9em;
+            color: white;
+            align-content: center;
+            align-items: center;
+        }
+
+        .tag-wrapper {
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+            display: flex;
+            height: 2.6em;
+            line-height: 1.1;
+        }
+
+        .tag-span {
+            text-align: center;
+            align-self: center;
+            display: inline-block;
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+        }
+
+        .nav-icon {
+            float: left;
+            display: inline-block;
+        }
+
+        .card {
+            box-shadow: none;
+            border-radius: 10px;
+        }
+    </style>
+
+    <!-- Properties -->
+    <style>
+        .propertyTile {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            width: 80px;
+            height: 80px;
+            min-width: 80px;
+            min-height: 80px;
+            width: fit-content;
+            height: fit-content;
+        }
+
+            .propertyTile > div {
+                background: inherit;
+                border: inherit;
+                width: inherit;
+                height: inherit;
+                min-width: inherit;
+                min-height: inherit;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+        .propertyTitle {
+            font-size: 10px;
+            text-align: center;
+            word-break: break-word;
+            padding-top: 5px;
+        }
+
+        .propertyDate {
+            font-size: 10px;
+            text-align: center;
+            word-break: break-word;
+            padding-bottom: 5px;
+        }
+
+        .propertyValue {
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+
+    <!-- Picture proof and icon colors -->
+    <style>
+
+        .rounded-circle {
+            border-radius: 50% !important;
+            min-width: 40px;
+            min-height: 40px;
+            max-width: 40px;
+            max-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-icon {
+            font-size: 1.3em;
+        }
+
+        .text-white {
+            color: #ffffff;
+        }
+
+        .ok-status {
+            width: 40px;
+            height: 40px;
+            padding: 10px 10px 10px 10px;
+        }
+
+        .notok-status {
+            width: 40px;
+            height: 40px;
+            padding: 10px 10px 10px 10px;
+        }
+
+        .skipped-status {
+            width: 40px;
+            height: 40px;
+            padding: 10px 10px 10px 10px;
+            color: #fff !important;
+            background-color: #F39E00 !important;
+        }
+
+        .action-status {
+            width: 40px;
+            height: 40px;
+            padding: 10px 10px 10px 10px;
+            color: #fff !important;
+            background-color: #F39E00 !important;
+        }
+
+        .bg-red {
+            background-color: #dc3545;
+        }
+
+        .bg-orange {
+            background-color: #fd7e14;
+        }
+
+        .bg-green {
+            background-color: #28a745;
+        }
+
+        .d-flex {
+            display: -ms-flexbox !important;
+            display: flex !important;
+        }
+
+        .justify-content-between {
+            -ms-flex-pack: justify !important;
+            justify-content: space-between !important;
+        }
+
+        .align-items-center {
+            -ms-flex-align: center !important;
+            align-items: center !important;
+        }
+
+        .align-items-end {
+            -ms-flex-align: end !important;
+            align-items: flex-end !important;
+        }
+
+        .overlaytop {
+            position: absolute;
+            padding: 0px;
+            margin: 0px;
+            top: 0;
+            left: 0;
+            width: 3em;
+            height: 3em;
+            line-height: 3em;
+            vertical-align: middle;
+            text-align: center;
+            background: #E07200;
+            color: white;
+        }
+
+        .overlaytop2 {
+            position: absolute;
+            padding: 0px;
+            margin: 0px;
+            top: 0;
+            left: 0;
+            width: 2rem;
+            height: 2rem;
+            line-height: 2rem;
+            font-size: 0.67rem;
+            vertical-align: middle;
+            text-align: center;
+            background: #E07200;
+            color: white;
+        }
+
+        .overlaybottom {
+            position: absolute;
+            padding: 0px;
+            margin: 0px;
+            left: 0;
+            bottom: 0;
+            width: 2em;
+            height: 2em;
+            line-height: 2em;
+            vertical-align: middle;
+            text-align: center;
+            background: black;
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+    <partial name="_completedTasksHeader.cshtml" model="Model.HeaderInfo" />
+    <!-- Checklist items -->
+    @{
+        var itemBackgroundColor = "#f9f9f9";
+    }
+    @foreach (var task in Model.Tasks)
+    {
+        @if (Model.ApplicationSettings.Features?.TagsEnabled == true)
+        {
+            @if (task.Tags != null && task.Tags.Count > 0)
+            {
+                <table class="pdfTable" style="background-color: @itemBackgroundColor">
+                    <tr>
+                        <td style="padding-left: 2rem; padding-top: 1rem; padding-bottom: 1rem; padding-right: 1rem">
+                            @foreach (var tag in task.Tags)
+                            {
+                                <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; margin: 0.25rem">
+                                    <div class="tag-wrapper" style="">
+                                        <i style="margin-top: auto; margin-bottom: auto; margin-left: 0.5rem; margin-right: 0px" class="nav-icon my-auto ml-2 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                        <span style="margin-top: auto; margin-bottom: auto; margin-right: 0.5rem" class="my-auto mr-2 tag-span">@tag.Name</span>
+                                    </div>
+                                </div>
+                            }
+                        </td>
+                    </tr>
+                </table>
+            }
+        }
+        <table class="pdfTable" style="background-color: @itemBackgroundColor">
+            <tr>
+                <td rowspan="2" style="padding-left: 2rem; padding-top: 2rem; padding-bottom: 2rem; width: 25%; max-width: 25%">
+                    @{
+                        string mediaImageUrl = Constants.General.ImageUnavailableUrl;
+
+                        if (!string.IsNullOrEmpty(task.Picture))
+                        {
+                            mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, task.Picture);
+                        }
+                        if (!string.IsNullOrEmpty(task.VideoThumbnail))
+                        {
+                            mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, task.VideoThumbnail);
+                        }
+                    }
+                    <div style="position: relative">
+                        <div class="imageWrapper"><img style="width: 100%; height: 100%; object-fit: cover; object-position: center" data-src="@mediaImageUrl" /></div>
+                        <div class="overlaytop"><h1 style="margin: 0; padding: 0">@(Model.Tasks.IndexOf(task) + 1)</h1></div>
+                    </div>
+                </td>
+                <td style="width: 60%; vertical-align: top; padding-top: 2rem; padding-left: 1rem">
+                    <div style="font-weight: bold; font-size: 110%;">@task.Name</div>
+                    @if (task.Signature != null && !task.Signature.SignedBy.IsNullOrEmpty())
+                    {
+                        <div style="">
+                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.CompletedBy, "Completed by") ?? "Completed by") @task.Signature.SignedBy @(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.At, "at") ?? "at") @TimeZoneInfo.ConvertTime(task.Signature.SignedAt.Value, timezone).ToLocaleFullDateShortTimeString(Model.Locale)
+                        </div>
+                    }
+                </td>
+                <td>
+
+                </td>
+            </tr>
+            <tr>
+                <td style="position: relative; padding-left: 1rem; padding-right: 1rem; padding-bottom: 2rem; vertical-align: bottom">
+                    @{
+                        string color = "";
+
+                        for (int i = 0; i < task.Properties.Count(); i++)
+                        {
+                            var templateProperty = task.Properties[i];
+                            var possibePropertyValue = task.PropertyUserValues.Where(x => x.PropertyId == templateProperty.PropertyId && x.TemplatePropertyId == templateProperty.Id).FirstOrDefault();
+                            if (possibePropertyValue != null && possibePropertyValue.Id > 0)
+                            {
+                                DateTime propertyDate = TimeZoneInfo.ConvertTime(possibePropertyValue.CreatedAt.ToLocalTime(), timezone);
+
+                                if (possibePropertyValue.RegisteredAt != null)
+                                {
+                                    propertyDate = TimeZoneInfo.ConvertTime(possibePropertyValue.RegisteredAt.Value.ToLocalTime(), timezone);
+                                }
+
+                                color = WebApp.Helpers.PropertyHelpers.GetStatusColor(templateProperty, possibePropertyValue);
+
+                                <div class="propertyTile" style="position: relative; float: left; margin-left: 0.3rem; margin-right: 0.3rem; background: @color" onclick="ClickTile(this)">
+
+                                    @if (templateProperty.IsRequired == true)
+                                    {
+                                        if (color == "#ed5454")
+                                        {
+                                            <i class="fa-solid fa-asterisk m-1" style="color: rgb(100, 104, 107); position: absolute; top: 1px; right: 1px;"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fa-solid fa-asterisk m-1" style="color: red; position: absolute; top: 1px; right: 1px;"></i>
+                                        }
+                                    }
+                                    <div style="padding-left: 0.5rem; padding-right: 0.5rem">
+                                        <div class="propertyTitle">
+                                            @if (!String.IsNullOrEmpty(templateProperty.TitleDisplay))
+                                            {
+                                                @templateProperty.TitleDisplay
+                                            }
+                                            else
+                                            {
+                                                @templateProperty.Property.ShortName
+                                            }
+                                        </div>
+
+                                        <div class="propertyValue" data-fulltext="@possibePropertyValue.UserValueString">
+                                            @if (possibePropertyValue.UserBoolValue == null && possibePropertyValue.UserValueDate == null && 
+                                                possibePropertyValue.UserValueDecimal == null && possibePropertyValue.UserValueInt == null && 
+                                                possibePropertyValue.UserValueString == null && possibePropertyValue.UserValueTime == null)
+                                            {
+                                                <div style="font-weight: 600">Not measured</div>
+                                            }
+                                            else {
+                                                <strong>
+                                                    @possibePropertyValue.UserBoolValue
+                                                    @possibePropertyValue.UserValueDate
+                                                    @(possibePropertyValue.UserValueDecimal / 1.000000000000000000000000000000000m)
+                                                    @possibePropertyValue.UserValueInt
+                                                    @possibePropertyValue.UserValueString
+                                                    @possibePropertyValue.UserValueTime
+                                                </strong>
+                                                @if (!string.IsNullOrEmpty(templateProperty.PropertyValueDisplay))
+                                                {
+                                                    @templateProperty.PropertyValueDisplay
+                                                    ;
+                                                }
+                                                else if (templateProperty.PropertyValue != null)
+                                                {
+                                                    @templateProperty.PropertyValue.ValueSymbol
+                                                    ;
+                                                }
+                                            }
+
+                                            
+                                        </div>
+                                        <div class="propertyDate">
+                                            @propertyDate.ToString("dd MMM yyyy") @propertyDate.ToString("H:mm")
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
+                </td>
+                <!-- Checklist item status -->
+                <td>
+                    <div class="list-group-item d-flex align-items-end" style="padding: .50rem .75rem; float: right">
+                        @if (task.ActionsCount > 0 || task.CommentCount > 0)
+                        {
+                            <a class="rounded-circle action-status status-icon ml-auto mr-2"><i class="fa fa-bolt-lightning"></i></a>
+                            @:&nbsp;
+                        }
+                        <span class="rounded-circle @getIconColor(task.Status) text-white"><i class="fa @getIcon(task.Status)" title="@task.Status"></i></span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <!-- Picture proof -->
+        @if (task.PictureProof != null && task.PictureProof.Media != null)
+        {
+            var startColor = 250;
+            var endColor = 230;
+            var difference = startColor - endColor;
+            var stepSize = difference / (double)task.PictureProof.Media.Count;
+            
+
+            var pictureProofColor = (int)(startColor);
+            for (int i = 0; i < task.PictureProof.Media.Count; i++)
+            {
+
+                DateTime pictureProofDate = TimeZoneInfo.ConvertTime(task.PictureProof.Media[i].PictureTakenUtc.ToLocalTime(), timezone);
+                string ppPicture = Constants.General.ImageUnavailableUrl;
+
+                if (!string.IsNullOrEmpty(task.PictureProof.Media[i].UriPart))
+                {
+                    ppPicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, task.PictureProof.Media[i].UriPart);
+                }
+                <div style="margin-left: 5rem; margin-top: 0.5rem; margin-bottom: 0.5rem; border-radius: 150px; height: 100%; background-color: rgb(@pictureProofColor, @pictureProofColor, @pictureProofColor)">
+                    <table class="pdfTable" style="page-break-inside: avoid">
+                        <tr>
+                            <td rowspan="2" style="padding-left: 2rem; width: 20%"><div><a class='rounded-circle @getIconColor(task.Status) text-white mr-2'><i class='fas fa-camera status-icon'></i></a></div></td>
+                            <td style="padding-left: 1rem; vertical-align: bottom"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.PictureProofDate, "Date") ?? "Date"):</strong> </td>
+                            <td style="width: 50%; vertical-align: bottom">@pictureProofDate.ToLocaleFullDateShortTimeString(Model.Locale)</td>
+                            <td rowspan="2" style="width: 20%">
+                                <div class="imageWrapper">
+                                    <img style="width: 100%; height: 100%; object-fit: cover; object-position: center" data-src="@ppPicture" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding-left: 1rem; vertical-align: top"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.PictureProofTakenBy, "Taken By") ?? "Taken By"):</strong> </td>
+                            <td style="width: 50%; vertical-align: top">@task.PictureProof.Media[i].UserFullName</td>
+                        </tr>
+                    </table>
+                </div>
+                pictureProofColor = (int)(pictureProofColor - stepSize);
+            }
+        }
+
+        if (itemBackgroundColor == "#f9f9f9")
+        {
+            itemBackgroundColor = "#f3f4f4";
+        }
+        else if (itemBackgroundColor == "#f3f4f4")
+        {
+            itemBackgroundColor = "#f9f9f9";
+        }
+    }
+    <!-- Actions -->
+    @if (Model.Actions != null && Model.Actions.Where(a => Model.Tasks.Select(t => t.Id).Contains(a.TaskId)).Count() > 0)
+    {
+        <table class="pdfTable">
+            <tr>
+                <td>
+                    <div style="padding-top: 1rem; padding-bottom: 1rem; padding-left: 2rem; text-transform: uppercase; background-color: #f1f3f0"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.Actions, "Actions") ?? "Actions")</strong></div>
+                </td>
+            </tr>
+            @{
+                var actionBackgroundColor = "#f9f9f9";
+            }
+            @foreach (var task in Model.Tasks)
+            {
+                if (Model.Actions != null && Model.Actions.Where(a => a.TaskId == task.Id).Count() > 0)
+                {
+                    <tr style="page-break-inside: avoid">
+                        <td>
+                            <div style="background-color: @actionBackgroundColor; padding-left: 2rem">
+                                <table class="pdfTable">
+                                    <tr style="page-break-inside: avoid">
+                                        <td style="width: 15%; padding: 1rem">
+                                            @{
+                                                string mediaImageUrl = Constants.General.ImageUnavailableUrl;
+                                                if (!string.IsNullOrEmpty(task.Picture))
+                                                {
+                                                    mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, task.Picture);
+                                                }
+                                                if (!string.IsNullOrEmpty(task.VideoThumbnail))
+                                                {
+                                                    mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, task.VideoThumbnail);
+                                                }
+                                            }
+                                            <div style="position: relative">
+                                                <div class="imageWrapper"><img style="width: 100%; height: 100%; object-fit: cover; object-position: center" data-src="@mediaImageUrl" /></div>
+                                                <div class="overlaytop2"><h1 style="margin: 0; padding: 0">@(
+                                            Model.Tasks.IndexOf(task) + 1
+                                            )</h1></div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 85%; vertical-align: top; padding-top: 1rem; padding-bottom: 1rem; padding-right: 1rem">
+                                            @task.Name
+                                        </td>
+                                    </tr>
+                                </table>
+                                @foreach (var action in Model.Actions)
+                                {
+                                    @if (action.TaskId == task.Id)
+                                    {
+                                        var actionComment = (action.Comment ?? "").Replace(System.Environment.NewLine, "<br />").Replace("\n\r", "<br />").Replace("\n", "<br />").Replace("\r", "<br />");
+                                        <table class="pdfTable" style="background-color: @actionBackgroundColor">
+                                            @{
+                                                var actionMediaCount = (action.Images?.Count ?? 0) + (action.VideoThumbNails?.Count ?? 0);
+                                                var actionrowspan = action.CreatedAt.Equals(action.ModifiedAt) ? 5 : 6;
+                                            }
+                                            @if(actionMediaCount == 1)
+                                            {
+                                                string actionImageUrl = Constants.General.ImageUnavailableUrl;
+                                                var base64actionImageUrl = mediaImageUrl;
+                                                if (action.Images != null && action.Images.Count > 0 && !string.IsNullOrEmpty(action.Images.FirstOrDefault()))
+                                                {
+                                                    actionImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, action.Images.FirstOrDefault());
+                                                    actionImageUrl = actionImageUrl.Replace("/media/media", "/media"); //fix for incorrect data in db
+                                                    base64actionImageUrl = await Model.MediaService.GetMediaAsBase64(actionImageUrl);
+                                                }
+                                                else if (action.VideoThumbNails != null && action.VideoThumbNails.Count > 0 && !string.IsNullOrEmpty(action.VideoThumbNails.FirstOrDefault()))
+                                                {
+                                                    actionImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, action.VideoThumbNails.FirstOrDefault());
+                                                    actionImageUrl = actionImageUrl.Replace("/media/media", "/media"); //fix for incorrect data in db
+                                                    base64actionImageUrl = await Model.MediaService.GetMediaAsBase64(actionImageUrl);
+                                                }
+                                                <tr>
+                                                    <td rowspan=@actionrowspan style="width: 15%">
+
+                                                    </td>
+                                                    <td rowspan=@actionrowspan style="width: 20%; padding: 1rem">
+                                                        <div class="imageWrapper" style="height: 10rem; width: 15rem">
+                                                            <img style="width: 100%; height: 100%; object-fit: cover; object-position: center" src="@base64actionImageUrl" />
+                                                        </div>
+                                                    </td>
+                                                    <td style="padding-left: 1rem; padding-top: 1rem">
+                                                        <div style="display: inline-block; width: 20%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionComment, "Comment") ?? "Comment"):</div>
+                                                        <div style="display: inline-block">@actionComment</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 20%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionAction, "Action") ?? "Action"):</div>
+                                                        <div style="display: inline-block">@action.Description</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 20%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionAuthor, "Author") ?? "Author"):</div>
+                                                        <div style="display: inline-block">@action.CreatedBy</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 20%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionDate, "Date") ?? "Date"):</div>
+                                                        <div style="display: inline-block">@action.CreatedAt.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                                                    </td>
+                                                </tr>
+                                                @if (!action.CreatedAt.Equals(action.ModifiedAt))
+                                                {
+                                                    <tr>
+                                                        <td style="padding-left: 1rem">
+                                                            <div style="display: inline-block; width: 20%">
+                                                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionModificationDate, "Modification date") ?? "Modification date"):
+                                                            </div>
+                                                            <div style="display: inline-block">@action.ModifiedAt.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                <tr>
+                                                    <td style="padding-left: 1rem; padding-bottom: 1rem">
+                                                        <div style="display: inline-block; width: 20%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionDueDate, "Due date") ?? "Due date"):</div>
+                                                        <div style="display: inline-block">@action.DueDate.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                            else if(actionMediaCount > 1)
+                                            {
+                                                <tr>
+                                                    <td rowspan="@(actionrowspan+1)" style="width: 15%">
+                                                    </td>
+                                                    <td style="">
+                                                        @foreach(var image in action.Images)
+                                                        {
+                                                            string actionImageUrl = Constants.General.ImageUnavailableUrl;
+                                                            var base64actionImageUrl = actionImageUrl;
+                                                            if (!string.IsNullOrEmpty(image))
+                                                            {
+                                                                actionImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, image);
+                                                                actionImageUrl = actionImageUrl.Replace("/media/media", "/media"); //fix for incorrect data in db
+                                                                base64actionImageUrl = await Model.MediaService.GetMediaAsBase64(actionImageUrl);
+                                                            }
+                                                            <div class="imageWrapper" style="display: inline-block; padding-left: 1rem; padding-top: 1rem; height: 10rem; width: 15rem">
+                                                                <img style="width: 100%; height: 100%; object-fit: cover; object-position: center" src="@base64actionImageUrl" />
+                                                            </div>
+                                                        }
+                                                        @foreach (var videoThumbnail in action.VideoThumbNails)
+                                                        {
+                                                            string actionVideoThumbnailUrl = Constants.General.ImageUnavailableUrl;
+                                                            var base64actionVideoThumbnailUrl = actionVideoThumbnailUrl;
+                                                            if (!string.IsNullOrEmpty(videoThumbnail))
+                                                            {
+                                                                actionVideoThumbnailUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, videoThumbnail);
+                                                                actionVideoThumbnailUrl = actionVideoThumbnailUrl.Replace("/media/media", "/media"); //fix for incorrect data in db
+                                                                base64actionVideoThumbnailUrl = await Model.MediaService.GetMediaAsBase64(actionVideoThumbnailUrl);
+                                                            }
+                                                            <div class="imageWrapper" style="display: inline-block; padding-left: 1rem; height: 10rem; width: 15rem">
+                                                                <img style="width: 100%; height: 100%; object-fit: cover; object-position: center" src="@base64actionVideoThumbnailUrl" />
+                                                            </div>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem; padding-top: 1rem">
+                                                        <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionComment, "Comment") ?? "Comment"):</div>
+                                                        <div style="display: inline-block">@actionComment</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionAction, "Action") ?? "Action"):</div>
+                                                        <div style="display: inline-block">@action.Description</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionAuthor, "Author") ?? "Author"):</div>
+                                                        <div style="display: inline-block">@action.CreatedBy</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionDate, "Date") ?? "Date"):</div>
+                                                        <div style="display: inline-block">@action.CreatedAt.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                                                    </td>
+                                                </tr>
+                                                @if (!action.CreatedAt.Equals(action.ModifiedAt))
+                                                {
+                                                    <tr>
+                                                        <td style="padding-left: 1rem">
+                                                            <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionModificationDate, "Modification date") ?? "Modification date"):</div>
+                                                            <div style="display: inline-block">@action.ModifiedAt.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionDueDate, "Due date") ?? "Due date"):</div>
+                                                        <div style="display: inline-block">@action.DueDate.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td rowspan="@(actionrowspan+1)" style="width: 15%">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionComment, "Comment") ?? "Comment"):</div>
+                                                        <div style="display: inline-block">@actionComment</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionAction, "Action") ?? "Action"):</div>
+                                                        <div style="display: inline-block">@action.Description</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionAuthor, "Author") ?? "Author"):</div>
+                                                        <div style="display: inline-block">@action.CreatedBy</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionDate, "Date") ?? "Date"):</div>
+                                                        <div style="display: inline-block">@action.CreatedAt.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                                                    </td>
+                                                </tr>
+                                                @if (!action.CreatedAt.Equals(action.ModifiedAt))
+                                                {
+                                                    <tr>
+                                                        <td style="padding-left: 1rem">
+                                                            <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionModificationDate, "Modification date") ?? "Modification date"):</div>
+                                                            <div style="display: inline-block">@action.ModifiedAt.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.ActionDueDate, "Due date") ?? "Due date"):</div>
+                                                        <div style="display: inline-block">@action.DueDate.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                                                    </td>
+                                                </tr>
+                                            }
+
+                                        </table>
+                                        @if (Model.ApplicationSettings.Features?.TagsEnabled == true)
+                                        {
+                                            @if (action.Tags != null && action.Tags.Count > 0)
+                                            {
+                                                <table class="pdfTable" style="background-color: @actionBackgroundColor">
+                                                    <tr>
+                                                        <td style="width: 15%">
+                                                        </td>
+                                                        <td style="padding: 0.75rem">
+                                                            @foreach (var tag in action.Tags)
+                                                            {
+                                                                <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; margin: 0.25rem">
+                                                                    <div class="tag-wrapper" style="">
+                                                                        <i style="margin-top: auto; margin-bottom: auto; margin-left: 0.5rem; margin-right: 0px" class="nav-icon my-auto ml-2 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                                        <span style="margin-top: auto; margin-bottom: auto; margin-right: 0.5rem" class="my-auto mr-2 tag-span">@tag.Name</span>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                </table>
+
+                                            }
+                                        }
+
+                                        if (actionBackgroundColor == "#f9f9f9")
+                                        {
+                                            actionBackgroundColor = "#f3f4f4";
+                                        }
+                                        else if (actionBackgroundColor == "#f3f4f4")
+                                        {
+                                            actionBackgroundColor = "#f9f9f9";
+                                        }
+                                    }
+                                }
+                            </div>
+                    </td>
+                    </tr>
+                }
+            }
+        </table>
+    }
+    <!-- Comments -->
+    @if (Model.Comments != null && Model.Comments.Where(a => Model.Tasks.Select(t => t.Id).Contains(a.TaskId ?? -1)).Count() > 0)
+    {
+        <table class="pdfTable">
+            <tr>
+                <td>
+                    <div style="padding-top: 1rem; padding-bottom: 1rem; padding-left: 2rem; text-transform: uppercase; background-color: #f1f3f0"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.Comments, "Comments") ?? "Comments")</strong></div>
+                </td>
+            </tr>
+            @{
+                var commentBackgroundColor = "#f9f9f9";
+            }
+            @foreach (var task in Model.Tasks)
+            {
+                if (Model.Comments != null && Model.Comments.Where(a => a.TaskId == task.Id).Count() > 0)
+                {
+                    <tr style="page-break-inside: avoid">
+                        <td>
+                            <div style="background-color: @commentBackgroundColor; padding-left: 2rem">
+                                <table class="pdfTable">
+                                    <tr style="page-break-inside: avoid">
+                                        <td style="width: 15%; padding: 1rem">
+                                            @{
+                                                string mediaImageUrl = Constants.General.ImageUnavailableUrl;
+                                                var base64mediaImageUrl = mediaImageUrl;
+                                                if (!string.IsNullOrEmpty(task.Picture))
+                                                {
+                                                    mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, task.Picture);
+                                                    base64mediaImageUrl = await Model.MediaService.GetMediaAsBase64(mediaImageUrl);
+                                                }
+                                                if (!string.IsNullOrEmpty(task.VideoThumbnail))
+                                                {
+                                                    mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, task.VideoThumbnail);
+                                                    base64mediaImageUrl = await Model.MediaService.GetMediaAsBase64(mediaImageUrl);
+                                                }
+                                            }
+                                            <div style="position: relative">
+                                                <div class="imageWrapper"><img style="width: 100%; height: 100%; object-fit: cover; object-position: center" src="@base64mediaImageUrl" /></div>
+                                                <div class="overlaytop2"><h1 style="margin: 0; padding: 0">@(
+                                            Model.Tasks.IndexOf(task) + 1
+                                            )</h1></div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 85%; vertical-align: top; padding-top: 1rem; padding-bottom: 1rem; padding-right: 1rem">
+                                            @task.Name
+                                        </td>
+                                    </tr>
+                                </table>
+                                @foreach (var comment in Model.Comments)
+                                {
+                                    @if ((comment.TaskId ?? -1) == task.Id)
+                                    {
+                                        var commentCommentText = comment.CommentText.Replace(System.Environment.NewLine, "<br />").Replace("\n\r", "<br />").Replace("\n", "<br />").Replace("\r", "<br />");
+                                        <table class="pdfTable" style="background-color: @commentBackgroundColor">
+                                            @{
+                                                var commentMediaCount = (comment.Attachments?.Count ?? 0);
+                                                var commentrowspan = comment.CreatedAt.Equals(comment.ModifiedAt) ? 3 : 4;
+                                            }
+                                            @if(commentMediaCount == 1)
+                                            {
+                                                string commentImageUrl = Constants.General.ImageUnavailableUrl;
+                                                var base64commentImageUrl = mediaImageUrl;
+                                                if (comment.Attachments != null && comment.Attachments.Count > 0 && !string.IsNullOrEmpty(comment.Attachments.FirstOrDefault()))
+                                                {
+                                                    commentImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, comment.Attachments.FirstOrDefault());
+                                                    commentImageUrl = commentImageUrl.Replace("/media/media", "/media"); //fix for incorrect data in db
+                                                    base64commentImageUrl = await Model.MediaService.GetMediaAsBase64(commentImageUrl);
+                                                }
+                                                <tr>
+                                                    <td rowspan="@commentrowspan" style="width: 15%">
+
+                                                    </td>
+                                                    <td rowspan="@commentrowspan" style="width: 20%; padding: 1rem">
+                                                        <div class="imageWrapper">
+                                                            <img style="width: 15rem; height: 10rem; object-fit: cover; object-position: center" src="@base64commentImageUrl" />
+                                                        </div>
+                                                    </td>
+                                                    <td style="padding-left: 1rem; padding-top: 1rem">
+                                                        <div style="display: inline-block; width: 20%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.CommentComment, "Comment") ?? "Comment"):</div>
+                                                        <div style="display: inline-block">@commentCommentText</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 20%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.CommentAuthor, "Author") ?? "Author"):</div>
+                                                        <div style="display: inline-block">@comment.CreatedBy</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 20%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.CommentDate, "Date") ?? "Date"):</div>
+                                                        <div style="display: inline-block">@comment.CreatedAt.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                                                    </td>
+                                                </tr>
+                                                @if (!comment.CreatedAt.Equals(comment.ModifiedAt)) 
+                                                {
+                                                    <tr>
+                                                        <td style="padding-left: 1rem; padding-bottom: 1rem">
+                                                            <div style="display: inline-block; width: 20%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.CommentModificationDate, "Modification date") ?? "Modification date"):</div>
+                                                            <div style="display: inline-block">@comment.ModifiedAt.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else if(commentMediaCount > 1)
+                                            {
+                                                <tr>
+                                                    <td rowspan="@(commentrowspan+1)" style="width: 15%">
+                                                    </td>
+                                                    <td style="">
+                                                        @foreach(var attachment in comment.Attachments)
+                                                        {
+                                                            string commentImageUrl = Constants.General.ImageUnavailableUrl;
+                                                            var base64commentImageUrl = commentImageUrl;
+                                                            if (!string.IsNullOrEmpty(attachment))
+                                                            {
+                                                                commentImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, attachment);
+                                                                commentImageUrl = commentImageUrl.Replace("/media/media", "/media"); //fix for incorrect data in db
+                                                                base64commentImageUrl = await Model.MediaService.GetMediaAsBase64(commentImageUrl);
+                                                            }
+                                                            <div class="imageWrapper" style="max-width: 20%; display: inline-block; padding-left: 1rem; padding-top: 1rem">
+                                                                <img style="width: 15rem; height: 10rem; object-fit: cover; object-position: center" src="@base64commentImageUrl" />
+                                                            </div>
+                                                        }
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="padding-left: 1rem; padding-top: 1rem">
+                                                        <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.CommentComment, "Comment") ?? "Comment"):</div>
+                                                        <div style="display: inline-block">@commentCommentText</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.CommentAuthor, "Author") ?? "Author"):</div>
+                                                        <div style="display: inline-block">@comment.CreatedBy</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.CommentDate, "Date") ?? "Date"):</div>
+                                                        <div style="display: inline-block">@comment.CreatedAt.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                                                    </td>
+                                                </tr>
+                                                @if (!comment.CreatedAt.Equals(comment.ModifiedAt)) 
+                                                {
+                                                    <tr>
+                                                        <td style="padding-left: 1rem">
+                                                            <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.CommentModificationDate, "Modification date") ?? "Modification date"):</div>
+                                                            <div style="display: inline-block">@comment.ModifiedAt.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td rowspan="@(commentrowspan+1)" style="width: 15%">
+
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.CommentComment, "Comment") ?? "Comment"):</div>
+                                                        <div style="display: inline-block">@commentCommentText</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.CommentAuthor, "Author") ?? "Author"):</div>
+                                                        <div style="display: inline-block">@comment.CreatedBy</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-left: 1rem">
+                                                        <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.CommentDate, "Date") ?? "Date"):</div>
+                                                        <div style="display: inline-block">@comment.CreatedAt.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                                                    </td>
+                                                </tr>
+                                                @if (!comment.CreatedAt.Equals(comment.ModifiedAt)) 
+                                                {
+                                                    <tr>
+                                                        <td style="padding-left: 1rem">
+                                                            <div style="display: inline-block; width: 15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfChecklistCompleted.CommentModificationDate, "Modification date") ?? "Modification date"):</div>
+                                                            <div style="display: inline-block">@comment.ModifiedAt.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </table>
+                                        @if (Model.ApplicationSettings.Features?.TagsEnabled == true)
+                                        {
+                                            @if (comment.Tags != null && comment.Tags.Count > 0)
+                                            {
+                                                <table class="pdfTable" style="background-color: @commentBackgroundColor">
+                                                    <tr>
+                                                        <td style="width: 15%">
+                                                        </td>
+                                                        <td style="padding: 0.75rem">
+                                                            @foreach (var tag in comment.Tags)
+                                                            {
+                                                                <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; margin: 0.25rem">
+                                                                    <div class="tag-wrapper" style="">
+                                                                        <i style="margin-top: auto; margin-bottom: auto; margin-left: 0.5rem; margin-right: 0px" class="nav-icon my-auto ml-2 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                                        <span style="margin-top: auto; margin-bottom: auto; margin-right: 0.5rem" class="my-auto mr-2 tag-span">@tag.Name</span>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            }
+                                        }
+                                        if (commentBackgroundColor == "#f9f9f9")
+                                        {
+                                            commentBackgroundColor = "#f3f4f4";
+                                        }
+                                        else if (commentBackgroundColor == "#f3f4f4")
+                                        {
+                                            commentBackgroundColor = "#f9f9f9";
+                                        }
+                                    }
+                                }
+                            </div>
+                </tr>
+                }
+            }
+        </table>
+    }
+
+    <script>
+        var taskImgs = document.images,
+            taskImgsLength = taskImgs.length,
+            taskImgsCounter = 0,
+            taskImgsLoaded = false,
+            taskImgsCheckerInterval = null;
+
+        $(taskImgs).each(function(index, img) {
+            if (img.complete && $(img).attr('src') != undefined && ($(img).attr('src').includes('normal_unavailable_image.png') || $(img).attr('src').startsWith('blob:')))
+            {
+                incrementCounter();
+            }
+            else
+            {
+                console.log(img);
+                console.log(img.complete);
+                img.addEventListener('load', incrementCounter, false);
+            }
+        })
+
+        function incrementCounter() {
+            taskImgsCounter++;
+            if (taskImgsCounter === taskImgsLength) {
+                taskImgsLoaded = true
+            }
+        }
+
+        function checkTaskImgsLoaded() {
+            if (!taskImgsLoaded) {
+                //do nothing
+                console.log("waiting for images to load");
+            }
+            else {
+                clearInterval(taskImgsCheckerInterval);
+                setTimeout(() => {
+                    window.print();
+                });
+                setTimeout(function () { window.close(); }, 2000);
+            }
+        }
+
+        checkTaskImgsLoaded();
+        window.onload = function () {
+            taskImgsCheckerInterval = setInterval(() => {
+                checkTaskImgsLoaded();
+
+            }, 1000);
+        }
+
+        ezgomediafetcher.preloadImagesAndVideos();
+    </script>
+</body>
+</html>

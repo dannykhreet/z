@@ -1,0 +1,138 @@
+﻿@model WebApp.ViewModels.LoginViewModel
+@{
+    //pattern="[a-z0-9._%+-]+@@[a-z0-9.-]+\.[a-z]{2,15}$"
+    Layout = "~/Views/Shared/_Layout_auth.cshtml";
+    ViewData["Title"] = Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.LoginPageTitle, "Login Page") ?? "Login Page";
+    var query = (Context.Request.QueryString != null && Context.Request.QueryString.HasValue) ? Context.Request.QueryString.ToString() : "";
+}
+
+@if (Model != null && Model.LoggedIn == true)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div style="width: 50%;">
+            <div class="card shadow">
+                <div class="card-header" style="height:auto;">
+                    <i class="fas fa-exclamation-circle float-right" style="font-size: 42px;color: var(--danger);"></i>
+                    <h5 class="mb-0 text-white" style="line-height: 42px;">@(Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.AccessDeniedText, "Access denied") ?? "Access denied")</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">@(Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.InsufficientRightsText, "It seems that you have insufficient rights to make use of this portal. Please contact your manager if you believe you should have access to this system.") ?? "It seems that you have insufficient rights to make use of this portal. Please contact your manager if you believe you should have access to this system.")</p>
+                    <a class="card-link" asp-controller="Authentication" asp-action="login">@(Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.ClickLoginPageLink, "Click here to navigate back to the login page") ?? "Click here to navigate back to the login page")</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container-fluid">
+        <div class="row mh-100vh">
+            <div class="col-10 col-sm-8 col-md-6 col-lg-6 offset-1 offset-sm-2 offset-md-3 offset-lg-0 align-self-center d-lg-flex align-items-lg-center align-self-lg-stretch p-5 rounded rounded-lg-0 my-5 my-lg-0" style="background-color: #f1f3f1;" id="login-block">
+                <div class="m-auto w-lg-75 w-xl-50">
+                    <h2 class="text-info font-weight-light mb-5"><img src="~/images/ezgo_logo.png" style="width:200px;"></h2>
+                    <form action="/login@(query)" method="post">
+                        @if (Model.UseApiKey)
+                        {
+
+                        <div class="form-group">
+                            <label class="text-secondary" id="connection_key_label">@(Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.ConnectionKeyText, "Connection key") ?? "Connection key")</label>
+                            <input asp-for="ApiConnectionKey" class="form-control" type="text" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.ConnectionKeyPlaceholder, "Connection key") ?? "Connection key")">
+                        </div>
+
+                        }
+                        <div class="form-group">
+                            <label class="text-secondary" id="username_label">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Login.UserName, "Username") ?? "Username")</label>
+                            <input id="loginUsername" asp-for="LoginName" class="form-control" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label class="text-secondary" id="password_label">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Login.PassWord, "Password") ?? "Password")</label>
+                            <input id="loginPassword" asp-for="LoginPassword" class="form-control" type="password">
+                        </div>
+                        <div class="form-row mt-2">
+                            <div class="col-md-4">
+
+                                <select asp-for="Locale" asp-items="@Model.Languages" class="form-control">
+                                    @*<option>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Login.PleaseSelect, "Please select") ?? "Please select")</option>*@
+                                </select>
+                            </div>
+                            <div class="col-md-8 text-right">
+                                @if (Model.UseExternalLogin)
+                                {
+                                    <span class="btn btn-secondary" onclick="document.location.href='/login/external'" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.ExternalLoginTitle, "External login can be used when enabled by EZ Factory.") ?? "External login can be used when enabled by EZ Factory.")" id="external_login_label">@(Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.BtnExternalLogin, "External login") ?? "External login")</span>
+                                }
+                                <button class="btn btn-success" type="submit" id="login_button" onclick="login.disableLoginInputs()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Login.LoginButton, "Login") ?? "Login")</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-6 d-flex align-items-end" id="bg-block" style="background-image: url('/assets/img/factory_bgr.jpg');background-size: cover;background-position: center center;"></div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @if (!string.IsNullOrWhiteSpace(Model.Message))
+    {
+        <script>
+            toastr.warning('@Model.Message')
+        </script>
+    }
+    <script>
+        var login = {
+            init: function () {
+                login.initHandlers();
+                login.switchLabels(document.getElementById('Locale').value);
+            },
+            initHandlers: function () {
+                document.getElementById('Locale').onchange = function () {
+                    login.setLanguageCookie(this.value);
+                    login.switchLabels(this.value);
+                };
+            },
+            disableLoginInputs: function() {
+                document.getElementById('loginUsername').readOnly = true;
+                document.getElementById('loginPassword').readOnly = true;
+            },
+            setLanguageCookie: function(selectedLocale) {
+                document.cookie = 'language=' + selectedLocale + ';path=/';
+            },
+            switchLabels: function (selectedLocale) {
+                switch (selectedLocale) { //TODO Use language keys because this hard coded stuff is harder to maintain.
+                    case 'ar-eg': document.getElementById('username_label').innerHTML = 'اسم المستخدم'; document.getElementById('password_label').innerHTML = 'كلمة المرور'; document.getElementById('external_login_label').innerHTML = 'تسجيل الدخول الخارجي'; document.getElementById('login_button').innerHTML = 'تسجيل الدخول'; break;
+                    case 'de-de': document.getElementById('username_label').innerHTML = 'Benutzername'; document.getElementById('password_label').innerHTML = 'Passwort'; document.getElementById('external_login_label').innerHTML = 'Externe Anmeldung'; document.getElementById('login_button').innerHTML = 'Anmeldung'; break;
+                    case 'da-dk': document.getElementById('username_label').innerHTML = 'Brugernavn'; document.getElementById('password_label').innerHTML = 'Adgangskode'; document.getElementById('external_login_label').innerHTML = 'Eksternt login'; document.getElementById('login_button').innerHTML = 'Log ind'; break;
+                    case 'es-es': document.getElementById('username_label').innerHTML = 'Usuario'; document.getElementById('password_label').innerHTML = 'Contraseña'; document.getElementById('external_login_label').innerHTML = 'Inicio de sesión externo'; document.getElementById('login_button').innerHTML = 'Iniciar sesión'; break;
+                    case 'fi-fi': document.getElementById('username_label').innerHTML = 'Käyttäjänimi'; document.getElementById('password_label').innerHTML = 'Salasana'; document.getElementById('external_login_label').innerHTML = 'Ulkoinen kirjautuminen'; document.getElementById('login_button').innerHTML = 'Sisäänkirjautuminen'; break;
+                    case 'fil-ph': document.getElementById('username_label').innerHTML = 'User name'; document.getElementById('password_label').innerHTML = 'Password'; document.getElementById('external_login_label').innerHTML = 'Panlabas na pag-login'; document.getElementById('login_button').innerHTML = 'Mag-login'; break;
+                    case 'fr-fr': document.getElementById('username_label').innerHTML = 'Nom d’utilisateur'; document.getElementById('password_label').innerHTML = 'Mot de passe'; document.getElementById('external_login_label').innerHTML = 'Connexion externe'; document.getElementById('login_button').innerHTML = 'Identifiant'; break;
+                    case 'it-it': document.getElementById('username_label').innerHTML = 'Nome utente'; document.getElementById('password_label').innerHTML = 'Password'; document.getElementById('external_login_label').innerHTML = 'Login esterno'; document.getElementById('login_button').innerHTML = 'Accedi'; break;
+                    case 'ko-kr': document.getElementById('username_label').innerHTML = '사용자 이름'; document.getElementById('password_label').innerHTML = '비밀번호'; document.getElementById('external_login_label').innerHTML = '외부 로그인'; document.getElementById('login_button').innerHTML = '로그인'; break;
+                    case 'ms-my': document.getElementById('username_label').innerHTML = 'Nama pengguna'; document.getElementById('password_label').innerHTML = 'Kata laluan'; document.getElementById('external_login_label').innerHTML = 'Log masuk luaran'; document.getElementById('login_button').innerHTML = 'Log masuk'; break;
+                    case 'nb-no': document.getElementById('username_label').innerHTML = 'Brukernavn'; document.getElementById('password_label').innerHTML = 'Passord'; document.getElementById('external_login_label').innerHTML = 'Ekstern pålogging'; document.getElementById('login_button').innerHTML = 'Logg inn'; break;
+                    case 'nl-nl': document.getElementById('username_label').innerHTML = 'Gebruikersnaam'; document.getElementById('password_label').innerHTML = 'Wachtwoord'; document.getElementById('external_login_label').innerHTML = 'Externe login'; document.getElementById('login_button').innerHTML = 'Aanmelden'; break;
+                    case 'pt-pt': document.getElementById('username_label').innerHTML = 'Nome de utilizador'; document.getElementById('password_label').innerHTML = 'Palavra-passe'; document.getElementById('external_login_label').innerHTML = 'Login externo'; document.getElementById('login_button').innerHTML = 'Login'; break;
+                    case 'ro-ro': document.getElementById('username_label').innerHTML = 'Nume de utilizator'; document.getElementById('password_label').innerHTML = 'Parola'; document.getElementById('external_login_label').innerHTML = 'Conectare externă'; document.getElementById('login_button').innerHTML = 'Autentificare'; break;
+                    case 'th-th': document.getElementById('username_label').innerHTML = 'ชื่อผู้ใช้'; document.getElementById('password_label').innerHTML = 'รหัสผ่าน'; document.getElementById('external_login_label').innerHTML = 'เข้าสู่ระบบภายนอก'; document.getElementById('login_button').innerHTML = 'ล็อกอิน'; break;
+                    case 'pl-pl': document.getElementById('username_label').innerHTML = 'Nazwa użytkownika'; document.getElementById('password_label').innerHTML = 'Hasło'; document.getElementById('external_login_label').innerHTML = 'Zewnętrzne logowanie'; document.getElementById('login_button').innerHTML = 'Zaloguj się'; break;
+                   default: document.getElementById('username_label').innerHTML = 'User name'; document.getElementById('password_label').innerHTML = 'Password'; document.getElementById('external_login_label').innerHTML = 'External login'; document.getElementById('login_button').innerHTML = 'Login'; break;
+                }
+            }
+        }
+
+        login.init();
+
+        if (window.history != null) {
+            var entriesToClear = window.history.lenght; 
+            for (let i = 0; i < entriesToClear; i++) {
+                window.history.go(-1); 
+            }
+        }
+
+        window.addEventListener('popstate', () => {
+            document.location.href = '/login';
+        });
+
+        localStorage.clear();
+    </script>
+}

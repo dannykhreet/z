@@ -1,0 +1,490 @@
+﻿@model WebApp.ViewModels.CompletedTaskViewModel
+@using WebApp.Models.Task
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.StatsTaskCompletedTitle, "Completed tasks") ?? "Completed tasks";
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+}
+
+@section CSS {
+    <style>
+        .my-circle {
+            display: inline-block;
+            border-radius: 60px;
+            padding: 0.8em 1.1em;
+            background-color: #3f903f;
+            color: #fff;
+        }
+
+            .my-circle i {
+                font-size: 20px;
+            }
+
+        .status-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff !important;
+            flex-grow: 0;
+            flex-shrink: 0;
+        }
+
+        .status-icon {
+            display: flex;
+            margin: auto;
+            font-size: 1.3em;
+        }
+
+        .width-available {
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+        }
+
+        #fade-wrapper {
+            display: none;
+            position: fixed;
+            height: 100vh;
+            width: 100vw;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 10000;
+        }
+
+        .scale-up {
+            transform: translate(-15px, -140px);
+            width: 200%;
+            transition: all 0.2s ease-in-out;
+            border-radius: 6px !important;
+        }
+
+        #accordionChecklists .card .card-header {
+            cursor: pointer;
+        }
+
+        #completedChecklistContainer {
+            height: 400px;
+        }
+
+        .infoText {
+            position: fixed;
+            right: 0;
+            top: 0;
+            margin: 10px;
+        }
+
+        .score {
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            padding: 3px 10px 0px 14px;
+            font-size: 23px;
+        }
+
+        .score-large {
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            padding: 3px 0px 0px 8px;
+            font-size: 23px;
+        }
+    </style>
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-6">
+                <a asp-controller="task" asp-action="index"><i class="fa fa-arrow-left"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.NavBackTitle, "Back to task overview") ?? "Back to task overview")</a>
+                <h1>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsTaskCompletedTitle, "Completed tasks") ?? "Completed tasks")</h1>
+            </div>
+
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                @if (Model?.ApplicationSettings?.Features != null)
+                {
+                    @if (Model.ApplicationSettings.Features.ExportAdvancedEnabled.HasValue || Model.ApplicationSettings.Features.ExportEnabled.HasValue)
+                    {
+                        @if (Model.ApplicationSettings.Features.ExportTaskProperties != null && Model.ApplicationSettings.Features.ExportTaskProperties.Value && Model.ApplicationSettings.Features.TasksPropertyValueRegistrationEnabled != null && Model.ApplicationSettings.Features.TasksPropertyValueRegistrationEnabled.Value && Model.ApplicationSettings.Features.TasksEnabled != null && Model.ApplicationSettings.Features.TasksEnabled.Value)
+                        {
+                            <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="taskproperties" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.DownloadValueRegistration, "Download value registration data") ?? "Download value registration data")"><i class="far fa-object-group"></i></button>
+                        }
+
+                        @if (Model.ApplicationSettings.Features.ExportEnabled != null && Model.ApplicationSettings.Features.ExportEnabled.Value && Model.ApplicationSettings.Features.TasksEnabled != null && Model.ApplicationSettings.Features.TasksEnabled.Value)
+                        {
+                            <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="tasks" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.DownloadTasks, "Download tasks") ?? "Download tasks")"><i class="fas fa-download"></i></button>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="container-fluid">
+        <div class="row" style="height:calc(100vh - 167px);">
+            <!-- Left column -->
+            <div class="col-xl-3 d-none d-xl-inline-block">
+                <div class="card card-filter h-100">
+                    <div class="card-header pb-0">
+                        <h3 class="card-title d-none">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.CardTitle, "Filters") ?? "Filters")</h3>
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" onclick="resetFilters()" data-action="resetfilters">
+                                        <i class="fas fa-undo"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body card-filter pt-0">
+                        <partial name="_filters_block" model="Model.Filter" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle column -->
+            <div class="col-xl-4 d-xl-inline-block" style="height:calc(100vh - 190px);">
+                <div class="card h-100">
+                    <div class="card-header h5">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsTaskCompletedTitle, "Completed tasks") ?? "Completed tasks")</div>
+                    <div class="card-body p-0">
+                        <div id="nocontent" class="pl-3 pt-3 pb-0 text-muted">
+                            <h4>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Reports.NoCompletedTasksFound, "No completed tasks found") ?? "No completed tasks found")</h4>
+                        </div>
+
+                        <div id="taskStatistics" class="list-group h-100" data-container="completed_tasks"></div>
+                    </div>
+
+                    <div class="card-footer" style="text-align:center;">
+                        <div id="taskStatisticsLoader" class="card mb-0" style="display: none; overflow-x:hidden">
+                            <div class="list-group-item list-group-item-action">
+                                <h5>
+                                    @(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.CompletedTaskLoaderStats, "Loading task statistics, please wait...") ?? "Loading task statistics, please wait...")
+                                </h5>
+
+                                <div class="spinner-border text-success pt-2 pb-2" role="status">
+                                    <span class="sr-only">@(Model?.CmsLanguage.GetValue(LanguageKeys.Reports.LoadingChecklistTaskContent, "Loading...") ?? "Loading...")</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <span id="load_more_loader" style="margin-top:-10px;"></span>
+
+                        <div style="text-align:center;">
+                            <a class="btn btn-ezgo" style="width:200px;" data-actiontype="load_more"><i class="fas fa-angle-double-down"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right column -->
+            <div class="col-xl-5 d-xl-inline-block" style="height:calc(100vh - 188px);">
+                <div id="tasklistContainer" class="card h-100" style="display: none">
+                    <div class="card-header h5">
+                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsTaskCompletedTitle, "Completed tasks") ?? "Completed tasks")
+                        <a id="createTaskPdf" class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto" style="float: right"><i class="fa fa-print"></i></a>
+                    </div>
+
+                    <div id="tasklistLoader" class="text-center w-100 pt-5" style="display: none">
+                        <img src="/images/factory-loading.gif" class="w-50" />
+                    </div>
+
+                    <div id="tasklist" class="card-body p-0 list-group h-100"></div>
+
+                    <div class="card-footer" style="text-align: center">
+                        <div id="taskDetailsLoader" class="card mb-0" style="display: none; overflow-x:hidden">
+                            <div class="list-group-item list-group-item-action">
+                                <h5>
+                                    @(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.CompletedTaskLoaderTasks, "Loading tasks, please wait...") ?? "Loading tasks, please wait...")
+                                </h5>
+
+                                <div class="spinner-border text-success pt-2 pb-2" role="status">
+                                    <span class="sr-only">@(Model?.CmsLanguage.GetValue(LanguageKeys.Reports.LoadingChecklistTaskContent, "Loading...") ?? "Loading...")</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <span id="load_more_tasks_loader" style="margin-top:-10px;"></span>
+
+                        <div style="text-align:center;">
+                            <a class="btn btn-ezgo" style="width:200px;" data-actiontype="load_more_tasks"><i class="fas fa-angle-double-down"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="/js/areafilter.js"></script>
+
+    @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+    {
+        <script src="~/js/analytics.js"></script>
+        <script>ezgoAnalytics.init('task');</script>
+    }
+
+    @if (Model.ApplicationSettings.Features.ExportAdvancedEnabled.HasValue || Model.ApplicationSettings.Features.ExportEnabled.HasValue)
+    {
+        if (Model.ApplicationSettings.Features.ExportAdvancedEnabled.Value || Model.ApplicationSettings.Features.ExportEnabled.Value)
+        {
+            <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+            <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+        }
+    }
+
+    <script>
+        $('document').ready(function () {
+            ezgomediafetcher.preloadImagesAndVideos();
+            ezgomediafetcher.preloadFancyboxAnchors();
+            localStorage.setItem('last_completed_overview_location', window.location.pathname + window.location.search);
+        });
+
+        areaFilter.init('/config/getareatree', '', true);
+
+        $('#templateFilter').on('change', function (e) {
+            completedTasks.taskStatsLoaded = false;
+            completedTasks.date = new Date();
+            completedTasks.limit = 10;
+            completedTasks.offset = 0;
+            $('#tasklist').empty();
+            $('#tasklistContainer').hide();
+            completedTasks.templateId = +this.value.replace('template', '');
+            loadTasksStatistics($("#completedTasksGroupFilter").val(), 0);
+        });
+
+        $('#nocontent').hide();
+        $('#tasklistContainer').hide();
+        $('#contentCol').on('filterDone', function () {
+            $('#nocontent').toggle($('#contentCol div.results:visible').length === 0);
+        });
+        var statisticsRequest = undefined;
+        var detailsRequest = undefined;
+
+        function loadTasksStatistics(filterType, areaId) {
+            if ((areaId == 0 || areaId == undefined) && (completedTasks.templateId == undefined || completedTasks.templateId == 0)) {
+                $('#taskStatistics').html(
+                    '<div class="card mb-0">' +
+                    '<div class="list-group-item list-group-item-action">' +
+                    '<h5>' + '@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.SelectAnAreaToView, "Please select an area to view completed tasks.") ?? "Please select an area to view completed tasks.")' + '</h5>' +
+                    '</div>' +
+                    '</div>');
+
+                $('[data-actiontype="load_more"]').hide();
+
+                return;
+            }
+
+            $('#taskStatisticsLoader').show();
+            $('[data-actiontype="load_more"]').hide();
+
+            if (statisticsRequest != undefined) {
+                statisticsRequest.abort();
+            }
+
+            let areaIdParameter = !(areaId == 0 || areaId == undefined) ? `&areaId=${areaId}` : '';
+            let templateIdParamater = !(completedTasks.templateId == undefined || completedTasks.templateId == 0) ? `&templateid=${completedTasks.templateId}` : "";
+
+            statisticsRequest = $.ajax({
+                type: "GET",
+                url: `/report/task/completedstatistics`,
+                data: `filterType=${filterType}&referenceDate=${completedTasks.date.toISOString()}${areaIdParameter}${templateIdParamater}`,
+                success: function (data) {
+                    if (data.length < 10) { //empty response
+                        $('#taskStatistics').html(
+                            '<div class="card">' +
+                            '<a href="#" class="list-group-item list-group-item-action">' +
+                            '<h5>' + '@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.NoCompletedTasksFound, "No completed tasks found with selected filtering rules or no area selected.") ?? "No completed tasks found with selected filtering rules or no area selected.")' + '</h5>' +
+                            '</a>' +
+                            '</div>');
+                    }
+                    else {
+                        if (completedTasks.taskStatsLoaded) {
+                            $('#taskStatistics').append(data);
+                        }
+                        else {
+                            $('#taskStatistics').html(data);
+                            completedTasks.taskStatsLoaded = true;
+                        }
+
+                        if (filterType == "previousshifts") {
+                            completedTasks.date.setDate(completedTasks.date.getDate() - 7)
+                        }
+                        else if (filterType == "previousdays") {
+                            completedTasks.date.setDate(completedTasks.date.getDate() - 7)
+                        }
+                        else if (filterType == "previousweeks") {
+                            completedTasks.date.setDate(completedTasks.date.getDate() - 28)
+                        }
+                    }
+                    $('#taskStatisticsLoader').hide();
+                    $('[data-actiontype="load_more"]').show();
+                }
+            });
+        };
+
+        function loadTasks(e, filterType, from, to, areaId) {
+            $('#tasklistContainer').show();
+            $('#tasklistLoader').show();
+            $('[data-actiontype="load_more_tasks"]').hide();
+            $('#taskDetailsLoader').show();
+
+            if (detailsRequest != undefined) {
+                detailsRequest.abort();
+            }
+
+            if (completedTasks.lastFrom != from || completedTasks.lastTo != to) {
+                $('#taskStatistics a').removeClass('active');
+                $(e.currentTarget).addClass('active');
+            }
+
+            completedTasks.lastFrom = from;
+            completedTasks.lastTo = to;
+            
+            let templateParameter = completedTasks.templateId > 0 ? `&templateid=${completedTasks.templateId}` : '';
+            let areaParameter = areaId > 0 ? `&areaId=${areaId}` : '';
+
+            detailsRequest = $.get(`/report/task/completeddetails?filterType=${filterType}&from=${from}&to=${to}&offset=${completedTasks.offset}&limit=${completedTasks.limit}${areaParameter}${templateParameter}`, function (data) {
+                if (data.length < 10) { //empty response
+                    $('[data-actiontype="load_more_tasks"]').hide();
+                    $('#taskDetailsLoader').hide();
+                }
+                else {
+                    $('#tasklist').append(data);
+                    $('#taskDetailsLoader').hide();
+                    $('[data-actiontype="load_more_tasks"]').show();
+                }
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+            });
+            completedTasks.offset += 10;
+            $('#tasklistLoader').hide();
+            $('#createTaskPdf').attr('onclick', `window.open('/pdf/viewer/tasks?filterType=${filterType}&from=${from}&to=${to}${areaParameter}${templateParameter}', '_blank', 'toolbar=no,top=10,left=10,width=' + (screen.availWidth-10) + ',height=' + (screen.availHeight-10) + '');`);
+        };
+
+        function resetFilters() {
+            $('#completedTasksGroupFilter').val('previousshifts');
+            $("#completedTasksGroupFilter").selectpicker("refresh");
+            areaFilter.reset();
+            completedTasks.templateId = undefined;
+            $('#tasklist').empty();
+            $('#tasklistContainer').hide();
+            loadTasksStatistics($("#completedTasksGroupFilter").val(), areaid);
+        };
+
+        var completedTasks = {
+            date: new Date(),
+            lastFrom: "",
+            lastTo: "",
+            taskStatsLoaded: false,
+            limit: 10,
+            offset: 0,
+            templateId: @Model.TemplateId
+        };
+
+        $('#completedTasksGroupFilter').change(function () {
+            completedTasks.taskStatsLoaded = false;
+            completedTasks.date = new Date();
+            completedTasks.limit = 10;
+            completedTasks.offset = 0;
+            $('#tasklist').empty();
+            $('#tasklistContainer').hide();
+            loadTasksStatistics($("#completedTasksGroupFilter").val(), areaid);
+        });
+
+        $('#areatree').on('click', 'a', function () {
+            completedTasks.taskStatsLoaded = false;
+            completedTasks.date = new Date();
+            completedTasks.limit = 10;
+            completedTasks.offset = 0;
+            $('#tasklist').empty();
+            $('#tasklistContainer').hide();
+            var areaFilterValue = ($(this).css('font-weight') == '700') ? 0 : $(this).attr('data-id');
+            loadTasksStatistics($("#completedTasksGroupFilter").val(), areaFilterValue);
+        });
+
+        $('#taskStatistics').on('click', '.completedTaskStatisticsCard', function (e) {
+            completedTasks.limit = 10;
+            completedTasks.offset = 0;
+            $('#tasklist').empty();
+            $('#tasklistContainer').hide();
+            loadTasks(e, $("#completedTasksGroupFilter").val(), $(e.currentTarget).data('from'), $(e.currentTarget).data('to'), areaid);
+        });
+
+        $('[data-actiontype="load_more"]').on('click', function (e) {
+            loadTasksStatistics($("#completedTasksGroupFilter").val(), areaid);
+        });
+
+        $('[data-actiontype="load_more_tasks"]').on('click', function (e) {
+            loadTasks(e, $("#completedTasksGroupFilter").val(), completedTasks.lastFrom, completedTasks.lastTo, areaid);
+        });
+
+        $('#taskStatistics').html(
+            '<div class="card mb-0">' +
+            '<div class="list-group-item list-group-item-action">' +
+            '<h5>' + '@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.SelectAnAreaToView, "Please select an area to view completed tasks.") ?? "Please select an area to view completed tasks.")' + '</h5>' +
+            '</div>' +
+            '</div>');
+
+        $('[data-actiontype="load_more"]').hide();
+
+        @if (Model.TemplateId != 0)
+        {
+            @:$('#templateFilter').selectpicker('val', 'template' + @(Model.TemplateId));
+            @:loadTasksStatistics($("#completedTasksGroupFilter").val(), 0);
+        }
+
+        @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+        {
+            <text>
+                $('#completedTasksGroupFilter').change(function () {
+                    var value = $("#completedTasksGroupFilter").val();
+                    ezgoAnalytics.customLog("custom", "completed task filter", "task", "filter value:" + value);
+                });
+            </text>
+        }
+    </script>
+
+    <script>
+        $('#filter_datechoice').val('DD-MM-YYYY');
+
+        $('#filter_datechoice').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            autoUpdateInput: false,
+            opens: 'center', drops: 'up',
+            locale: {
+                format: 'DD-MM-YYYY',
+                firstDay: 1
+            }
+        });
+
+        $('#filter_datechoice').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD-MM-YYYY'));
+            $('#filter_datechoice').trigger('change');
+
+        });
+
+        $('#filter_datechoice').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+        });
+
+        $('[data-action="cleardatefilter"]').on('click', function () {
+            $('#filter_datechoice').val('DD-MM-YYYY');
+            $('#filter_datechoice').trigger('change');
+        });
+    </script>
+
+    <script>
+        function showPictureProofData(taskId) {
+            $(`#pictureProofData-${taskId}`).modal('show');
+        }
+    </script>
+}

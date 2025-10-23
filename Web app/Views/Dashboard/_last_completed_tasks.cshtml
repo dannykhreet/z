@@ -1,0 +1,179 @@
+﻿@model WebApp.ViewModels.DashboardViewModel
+@using System.Threading;
+@using WebApp.Models.Checklist
+@using System.Text
+@{
+    string getIconColor(string state)
+    {
+        switch (state.ToLower())
+        {
+            case "ok":
+                return "bg-green";
+            case "not ok":
+                return "bg-red";
+            case "skipped":
+                return "bg-warning";
+            default:
+                return "bg-lightGray";
+        }
+    }
+
+    string getIcon(string state)
+    {
+        switch (state.ToLower())
+        {
+            case "ok":
+                return "fa-thumbs-up status-icon";
+            case "not ok":
+                return "fa-thumbs-down status-icon";
+            case "skipped":
+                return "fa-forward status-icon";
+            default:
+                return "fa-question";
+        }
+    }
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+}
+
+<style>
+    .fg-green {
+        color: #28a745 !important;
+    }
+
+    .fg-orange {
+        color: #ffc107 !important;
+    }
+
+    .fg-red {
+        color: #dc3545 !important;
+    }
+
+    .action-status {
+        width: 40px;
+        height: 40px;
+        padding: 8px 10px 0px 14px;
+        color: #fff !important;
+    }
+</style>
+
+<div class="card h-100">
+    <div class="card-header pb-4 d-flex">
+        <h3 class="card-title" style="width:85%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsTaskCompletedTitle, "Last completed tasks") ?? "Last completed tasks")</h3>
+        <a href="/report/task/completed" class="float-right" style="width:15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.ShowAll, "Show all") ?? "Show all")</a>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="accordion" id="accordionTasks">
+            @if (Model.CompletedTasks != null && Model.CompletedTasks.Any())
+            {
+                @foreach (var task in Model.CompletedTasks.Where(t => t.Status != "todo"))
+                {
+                    var target = string.Format("collapseTask{0}", task.Id);
+                    var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, task.Picture);
+
+                    <div class="card" style="box-shadow:none;margin-bottom:0px;">
+                        <div class="card-header p-0">
+                            <div class="row no-gutters">
+                                <div class="col-md-12">
+                                    <div class="card-body p-1 ml-3">
+                                        <div class="row">
+                                            <div class="col-sm-8">
+                                                <h5 class="card-title" title="@task.Name">@(task.Name.Length > 80 ? string.Concat(task.Name.Substring(0, 77), "...") : task.Name)</h5>
+                                                
+                                                @if (task.Signature != null)
+                                                {
+                                                    DateTime SignedDate = TimeZoneInfo.ConvertTime(task.Signature.SignedAt, timezone);
+                                                    <p class="card-text p-0 m-0">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.CompletedBy, "Completed by") ?? "Completed by"): @task?.Signature?.SignedBy</p>
+                                                    <p class="card-text p-0 m-0"><span class="text-muted">@SignedDate.ToLocaleFullDateShortTimeString(Model.Locale)</span></p>
+                                                }
+                                            </div>
+
+                                            <div class="col-sm-4" style="display: flex; align-items:center; justify-content:flex-end;">
+                                                @if (task.PictureProof != null)
+                                                {
+                                                    <a onclick="showPictureProofData(@task.Id)" style="background-color: lightgray; cursor: pointer;" class="status-circle m-1"><i class="fas fa-camera status-icon"></i></a>
+                                                }
+
+                                                @if (task.ActionsCount > 0 || task.CommentCount > 0)
+                                                {
+                                                    <a href="/action/taskactions/@task.Id/@task.TemplateId/false" class="status-circle bg-warning m-1" style="border-radius: 50%; "><i class="fa fa-bolt-lightning status-icon"></i></a>
+                                                }
+
+                                                <span class="@getIconColor(task.Status) status-circle m-1"><i class="fa @getIcon(task.Status)" title="@task.Status"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr style="padding:2px;margin:2px;" />
+                }
+            }
+            else
+            {
+                <p class="card-text p-4">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.NoDataView, "There is no data to view.") ?? "There is no data to view.")</p>
+            }
+        </div>
+    </div>
+</div>
+
+@if (Model.CompletedTasks != null && Model.CompletedTasks.Any())
+{
+    foreach (var completedTask in Model.CompletedTasks)
+    {
+        @if (completedTask.PictureProof != null)
+        {
+            <div role="dialog" tabindex="-1" class="modal fade h-100" data-backdrop="static" id="pictureProofData-@completedTask.Id" style="z-index: 10040">
+                <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.PictureProofTitle, "Picture Proof") ?? "Picture Proof")</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="modal-body" style="display: flex; justify-content: center">
+                            <div id="pictureProofBody">
+                                <h5>
+                                    @(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.PictureProofTitle, "Picture Proof") ?? "Picture Proof") @(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.TakenAt, "taken at") ?? "taken at") @TimeZoneInfo.ConvertTime(completedTask.PictureProof.ProofTakenUtc, timezone).ToString()
+                                </h5>
+
+                                @foreach (var ppMedia in completedTask.PictureProof.Media)
+                                {
+                                    var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, ppMedia.UriPart);
+                                    <div style="height: 80px">
+
+                                        <a href="/images/media-loading.gif" data-href="@picture" data-fancybox="items-@completedTask.Id" data-caption="">
+                                            <img class="mr-1" style="object-fit: cover; object-position: center; height: 70px; width: 80px; float: left;" src="/images/media-loading.gif" data-src="@picture"  />
+                                        </a>
+                                        <p class="pl-2">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.PictureProofItem, "Picture Proof item") ?? "Picture Proof item") @ppMedia.ItemName @(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.TakenBy, "taken by") ?? "taken by") @ppMedia.UserFullName @(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.At, "at") ?? "at") @TimeZoneInfo.ConvertTime(ppMedia.PictureTakenUtc, timezone).ToString()</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
+
+<script>
+    function showPictureProofData(taskId) {
+        $(`#pictureProofData-${taskId}`).modal('show');
+    }
+
+    $(document).ready(function() {
+        $('[id^="pictureProofData"]').off('shown.bs.modal').on('shown.bs.modal', function () {
+            ezgomediafetcher.preloadVisibleImagesAndVideos();
+        });
+    });
+</script>

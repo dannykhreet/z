@@ -1,0 +1,93 @@
+﻿@model WebApp.Models.Action.ActionModel
+@using WebApp.Models.User
+@*
+
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var picture = Constants.General.GetMediaUrl(Model.Picture);
+    if (string.IsNullOrEmpty(Model.Picture))
+    {
+        picture = @"/assets/img/normal_unavailable_image.jpg";
+    }
+
+    List<string> Images = new List<string>();
+    if (Model.Images != null && Model.Images.Count > 0)
+    {
+        Images = Model.Images;
+    }
+}
+<div class="container">
+    <div class="row">
+        <div class="col" style="margin-top:12px;">
+            <h1>Action Profile</h1>
+            <p>Manage this action</p>
+        </div>
+    </div>
+    <form>
+        <div class="row">
+            <br />
+            <div class="col">
+                <label for="txtFirstname">Description</label>
+                @Html.TextBoxFor(m => m.Description, null, new { @class = "form-control", placeholder = "Description", @type = "text" })
+            </div>
+            <div class="col">
+                <label for="txtLastname">Comment</label>
+                @Html.TextBoxFor(m => m.Comment, null, new { @class = "form-control", placeholder = "Comment", @type = "text" })
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col">
+                @if (Images != null)
+                {
+                    <div id="carousel-example-1z" class="carousel slide carousel-fade" data-ride="carousel">
+                        <!--Indicators-->
+                        <ol class="carousel-indicators">
+                            <li data-target="#carousel-example-1z" data-slide-to="0" class="active"></li>
+                            <li data-target="#carousel-example-1z" data-slide-to="1"></li>
+                            <li data-target="#carousel-example-1z" data-slide-to="2"></li>
+                        </ol>
+                        <!--/.Indicators-->
+                        <!--Slides-->
+                        <div class="carousel-inner" role="listbox">
+
+                            @for (int i = 0; i < Images.Count; i++)
+                            {
+                                <div class="carousel-item @(i == 0 ? "active": "")">
+                                    <img class="d-block w-100" src="https://acceptance.ezfactory.nl/media/@Images[i]" />
+                                </div>
+
+                            }
+
+                        </div>
+                        <!--/.Slides-->
+                        <!--Controls-->
+                        <a class="carousel-control-prev" href="#carousel-example-1z" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carousel-example-1z" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                        <!--/.Controls-->
+                    </div>
+                }
+            </div>
+
+
+        </div>
+
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $('.carousel').carousel({
+            interval: 2000
+            })
+        });
+    </script>
+}

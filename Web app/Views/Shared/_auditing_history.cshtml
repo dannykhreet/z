@@ -1,0 +1,255 @@
+﻿@model WebApp.ViewModels.AuditingLogViewModel;
+
+<style>
+    #changedOn i:hover {
+        cursor: pointer;
+    }
+
+    .auditing-history-content {
+        margin-top: 10px;
+        max-height: calc(100vh - 180px);
+        overflow: auto;
+    }
+
+    #auditing-history-container {
+        margin-top: 52px; /*page header height*/
+        margin-bottom: 44px; /*page footer height*/
+        padding: 1rem;
+        z-index: 11;
+    }
+
+    #auditing-details-contrainer {
+        margin-top: 52px; /*page header height*/
+        margin-bottom: 44px; /*page footer height*/
+        padding: 1rem;
+        z-index: 11;
+    }
+
+    #slide-in {
+        position: absolute;
+        right: 0;
+        width: 0;
+        height: 100%;
+        overflow: hidden;
+        transition: 1s;
+        z-index: 11;
+        top: 0;
+        background: url(/images/abstract.jpg) no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+
+    .back-drop {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 0;
+        height: 100%;
+        background-color: rgba(0,0,0,0.3);
+        z-index: 10;
+    }
+</style>
+
+<div id="slide-in" class="shadow">
+    <div id="auditing-history-container" style="float:left;">
+        <button class="btn btn-light" onclick="auditingLog.hideChangeLog()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.CloseButtonTitle, "Close") ?? "Close")</button>
+        <div class="auditing-history-content">
+            <div id="auditing-history"></div>
+
+            <div class="d-flex justify-content-center mt-2">
+                <button class="btn btn-ezgo" id="loadMoreAuditingHistory" onclick=auditingLog.getChanges()>Load more</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="auditing-details-contrainer">
+        <div id="auditingDetails">
+            No log selected...
+        </div>
+    </div>
+</div>
+
+<div id="back-drop" class="back-drop" onclick="auditingLog.hideChangeLog()"></div>
+
+<script>
+    auditingLog = {
+        isFristTimeOpeningChangeLog: true,
+        currentOffset: 0,
+        changeLogWidth: "30rem",
+        detailsWidth: "70rem",
+
+        init: function () {
+            auditingLog.getLatestChange();
+
+            //isRtl was set in _Layout_template.cshtml
+            if (isRtl) {
+                $('#slide-in').css({
+                    'left': '0',
+                    'right': 'unset'
+                });
+                document.querySelector("#auditing-history-container").style.cssFloat = 'right';
+            }
+
+            document.querySelector("#auditing-history-container").style.width = auditingLog.changeLogWidth;
+            document.querySelector("#auditing-details-contrainer").style.width = auditingLog.detailsWidth;
+        },
+
+        getChanges: function () {
+            $.ajax({
+                type: "GET",
+                url: '/@Model.ItemType/getchanges/@Model.TemplateId?limit=10&offset=' + auditingLog.currentOffset,
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    if (data) {
+                        var changes = JSON.parse(data);
+
+                        if (auditingLog.ulChangeLog == undefined) {
+                            auditingLog.ulChangeLog = document.createElement('ul');
+                            auditingLog.ulChangeLog.setAttribute('class', 'list-group h-auto');
+                            document.getElementById('auditing-history').appendChild(auditingLog.ulChangeLog);
+                        }
+
+                        $(changes).each(function () {
+                            var changeDate = new Date(this.CreatedOn);
+
+
+                            var a = document.createElement('a');
+                            a.setAttribute('href', '#');
+                            @if (Model.EnablingAuditing)
+                            {
+                            @:a.setAttribute('onclick', 'auditingLog.loadDetails(event, ' + this.Id + ', "' + this.ObjectType + '")');
+                            }
+                            a.setAttribute('class', 'list-group-item list-group-item-action');
+                            a.setAttribute('style', 'background-color: #ffffff00; color: #495057; @if (!Model.EnablingAuditing) {<text>pointer-events: none;</text>}');
+
+                            var div = document.createElement('div');
+                                div.setAttribute('class', 'd-flex w-100 justify-content-between');
+
+                                var h6 = document.createElement('h6');
+                                h6.setAttribute('class', 'mb-0');
+
+                                var small = document.createElement('small');
+                                var p = document.createElement('p');
+                                p.setAttribute('class', 'mb-1');
+
+                                var li = document.createElement('li');
+                                li.setAttribute('style', 'background-color: #ffffff00;');
+                                small.innerHTML = changeDate.toLocaleString();
+                                h6.innerHTML = this.Description;
+                                div.appendChild(h6);
+                                div.appendChild(small);
+                                p.innerHTML = this.UserFullName;
+
+                                a.appendChild(div);
+                                a.appendChild(p);
+                                li.appendChild(a);
+
+                                auditingLog.ulChangeLog.appendChild(li);
+                            });
+
+                        if (changes.length == 10) {
+                            auditingLog.currentOffset += 10;
+                        } else {
+                            $('#loadMoreAuditingHistory').hide();
+                        }
+                    }
+
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR);
+                }
+            });
+        },
+
+        showChangeLog: function () {
+            $('#slide-in').width(auditingLog.changeLogWidth);
+            $('#back-drop').width("100%");
+            if (auditingLog.isFristTimeOpeningChangeLog) {
+                auditingLog.getChanges();
+                auditingLog.isFristTimeOpeningChangeLog = false;
+            }
+        },
+
+        hideChangeLog: function () {
+            $('#slide-in').width("0");
+            $('#back-drop').width("0");
+        },
+
+        getLatestChange: function () {
+            $.ajax({
+                type: "GET",
+                url: '/@Model.ItemType/getlatestchange/@Model.TemplateId',
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    if (data) {
+                        var latestChange = JSON.parse(data);
+                        var changeDate = new Date(latestChange.CreatedOn);
+                        var text = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Auditing.LastModifiedAt, "Last modified on ") ?? "Last modified on ")' + changeDate.toLocaleString(); //translate
+
+                        if (latestChange.UserFullName) {
+                            text += ' by ' + latestChange.UserFullName
+                        }
+
+                        text += "  <i class='fa fa-info-circle' onclick='auditingLog.showChangeLog()'></i>";
+                        $('#changedOn').html(text);
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR);
+                }
+            });
+        },
+
+        loadDetails: function (e, id, objecttype) {
+            $('#auditingDetails').html('@(Model?.CmsLanguage?.GetValue(LanguageKeys.Reports.LoadingChecklistTaskContent, "Loading...") ?? "Loading...")');
+            $('#auditing-history a').removeClass('active');
+            $.get('/auditing/details/' + id + '?objecttype=' + objecttype, function (data) {
+                $('#auditingDetails').html(data);
+                auditingLog.setPropertyNameWidth();
+            });
+            $(e.currentTarget).addClass('active');
+            auditingLog.showDetails();
+        },
+
+        showDetails: function () {
+            $('#slide-in').width(auditingLog.detailsWidth);
+        },
+
+        hideDetails: function () {
+            $('#slide-in').width(auditingLog.changeLogWidth);
+        },
+
+        setPropertyNameWidth: function () {
+            var highestWidth = 0;
+
+            //determine highest width among property name cells
+            $('.propertyName').each(function () {
+                if (highestWidth < this.clientWidth) {
+                    highestWidth = this.clientWidth;
+                }
+            });
+
+            //set every propery name cell to highest width
+            $('.propertyName').each(function () {
+                if (highestWidth > this.clientWidth) {
+                    this.style.width = highestWidth + 'px';
+                }
+            });
+        },
+
+        resetChangeLog: function () {
+            auditingLog.currentOffset = 0;
+            if (auditingLog.ulChangeLog != undefined) {
+                auditingLog.ulChangeLog.remove();
+                auditingLog.ulChangeLog = undefined;
+            }
+            auditingLog.getChanges();
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function (event) {
+        auditingLog.init();
+    });
+</script>

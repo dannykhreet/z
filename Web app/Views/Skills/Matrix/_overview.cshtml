@@ -1,0 +1,77 @@
+﻿@model WebApp.ViewModels.SkillsViewModel
+@{
+    Layout = null;
+}
+
+<div class="row no-gutters" id="contentCol">
+    @if (Model.SkillsMatrices != null && Model.SkillsMatrices.Count != 0)
+    {
+        @foreach (WebApp.Models.Skills.SkillsMatrix skillsMatrix in Model.SkillsMatrices)
+        {
+            var id = skillsMatrix.Id;
+
+            <div class="card w-100 results mr-1 my-1" data-id="@id" data-pathids="@skillsMatrix.AreaPathIds?.Replace(" -> ", ",")">
+                <a class="text-muted fs-0 fs-lg-1" asp-controller="skills" asp-action="matrixdetails" asp-route-id="@skillsMatrix.Id">
+                    <div class="card-body p-0">
+                        <div class="col-12 p-1 results1">
+                            <div class="p-1">
+                                <div class="row" data-containertype="matrix_container" data-id="@skillsMatrix.Id">
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <h5 class="mt-3 mt-sm-0">@skillsMatrix.Name</h5>
+                                                <p style="height:20px;">@skillsMatrix.Description</p>
+                                                <p class="fs--1 mb-2 mb-md-2"><span class="badge badge-secondary">@skillsMatrix.AreaPath</span></p>
+                                            </div>
+                                        </div>
+
+                                        <div class="row" style="border-top: 1px solid rgba(0,0,0,.125);height:5px;">
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-12 d-flex justify-content-between flex-column">
+                                                <div class="row">
+                                                    <div class="col-md-2 col-lg-2 text-muted">
+                                                        <small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixId, "Id") ?? "Id"): <strong>@skillsMatrix.Id</strong></small>
+                                                    </div>
+
+                                                    <div class="col-md-2 col-lg-2 text-muted">
+                                                        <small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserGroups, "User groups") ?? "User groups"): <strong>@(skillsMatrix.NumberOfUserGroups)</strong></small>
+                                                    </div>
+
+                                                    <div class="col-md-3 col-lg-3 text-muted">
+                                                        <small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixOperationalSkills, "Operational skills") ?? "Operational skills"): <strong>@(skillsMatrix.NumberOfOperationalSkills)</strong></small>
+                                                    </div>
+
+                                                    <div class="col-md-3 col-lg-3 text-muted">
+                                                        <small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixMandatorySkills, "Mandatory skills") ?? "Mandatory skills"): <strong>@(skillsMatrix.NumberOfMandatorySkills)</strong></small>
+                                                    </div>
+
+                                                    <div class="col-md-1 col-lg-1 text-muted" style="justify-content: flex-end; right: 0">
+                                                        <button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" style="display: flex; right: 0; width: 32px; height: 24px " id="changeMatrixDetails" data-actiontype="change_matrix" data-matrixid="@skillsMatrix.Id" data-matrixname="@skillsMatrix.Name" data-matrixdesc="@skillsMatrix.Description" data-matrixareaid="@(skillsMatrix.AreaId ?? 0)">
+                                                            <i class="fas fa-pencil-alt" style="width: 14px; height: 14px"></i>
+                                                        </button>
+                                                    </div>
+
+                                                    <div class="col-md-1 col-lg-1 text-muted" style="justify-content: flex-end; right: 0">
+                                                        <button class="btn btn-sm mr-2 shadow-sm mt-auto" style="display: flex; right: 0; width: 32px; height: 24px; background-color: rgb(220, 53, 69); color: white " data-actiontype="delete_matrix" data-matrixid="@skillsMatrix.Id">
+                                                            <i class="fas fa-trash" style="width: 14px; height: 14px"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    }
+    else
+    {
+        <partial name="~/Views/Shared/_no_templates_message.cshtml" model="@Model" />
+    }
+</div>

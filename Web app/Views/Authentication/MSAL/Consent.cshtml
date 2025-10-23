@@ -1,0 +1,83 @@
+﻿@model WebApp.ViewModels.Authentication.MSALViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    //pattern="[a-z0-9._%+-]+@@[a-z0-9.-]+\.[a-z]{2,15}$"
+    Layout = "~/Views/Shared/_Layout_auth.cshtml";
+    ViewData["Title"] = Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.ConsentPageTitle, "Consent Page") ?? "Consent Page";
+    var query = (Context.Request.QueryString != null && Context.Request.QueryString.HasValue) ? Context.Request.QueryString.ToString() : "";
+}
+
+<div class="container-fluid">
+    <div class="row mh-100vh">
+        <div class="col-10 col-sm-8 col-md-6 col-lg-6 offset-1 offset-sm-2 offset-md-3 offset-lg-0 align-self-center d-lg-flex align-items-lg-center align-self-lg-stretch p-5 rounded rounded-lg-0 my-5 my-lg-0" style="background-color: #edf2f9;" id="login-block">
+            <div class="m-auto w-lg-75 w-xl-50">
+                <h2 class="text-info font-weight-light mb-5"><img src="~/assets/img/ezGoLogo.png"></h2>
+                <form action="/login@(query)" method="post">
+                    <div class="form-group">
+                        <label class="text-secondary">@(Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.IndentityPlatformConsent, "Indentity platform for giving application (APP) consent.") ?? "Indentity platform for giving application (APP) consent.")</label>
+                        <select id="exernal_choice" class="form-control">
+                            <option value="msal" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.MicrosoftPlatformTitle, "Microsoft identity platform") ?? "Microsoft identity platform")">@(Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.OptionMicrosoftPlatform, "Microsoft identity platform") ?? "Microsoft identity platform")</option>
+                        </select>
+                    </div>
+                    <div class="form-row mt-2">
+                        <div class="col-md-6">&nbsp;</div>
+                        <div class="col-md-6 text-right">
+                            <button type="button" id="SignIn" class="btn btn-success" onclick="signIn()">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.BtnSignIn, "Sign In") ?? "Sign In")
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <div id="card-div" class="col-md-3" style="display:none">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title" id="WelcomeMessage"></h5>
+                                    <div id="profile-div"></div>
+                                    <div>@(Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.ThankYouText, "Thank you.") ?? "Thank you.")</div>
+                                    <div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+        <div class="col-lg-6 d-flex align-items-end" id="bg-block" style="background-image: url('/assets/img/factory_bgr.jpg');background-size: cover;background-position: center center;"></div>
+    </div>
+</div>
+
+
+@section HeaderScripts {
+    <script>const externalRedirectUrl = '@Model.ExternalRedirectUrl.Replace("/login/external", "/login/consent")'</script>
+    <!-- msal.min.js can be used in the place of msal.js; included msal.js to make debug easy -->
+    <script src="https://alcdn.msauth.net/browser/2.13.1/js/msal-browser.js"
+            integrity="sha384-7hwr87O1w6buPsX92CwuRaz/wQzachgOEq+iLHv0ESavynv6rbYwKImSl7wUW3wV"
+            crossorigin="anonymous"></script>
+
+
+    <!-- To help ensure reliability, Microsoft provides a second CDN -->
+    <script type="text/javascript">
+        if (typeof Msal === 'undefined') document.write(unescape("%3Cscript src='https://alcdn.msftauth.net/browser/2.13.1/js/msal-browser.js' type='text/javascript' crossorigin='anonymous' %3E%3C/script%3E"));
+    </script>
+
+    <script type="text/javascript">
+        var UseRedirect = false;
+    </script>
+
+}
+@section Scripts{
+
+    <!-- importing app scripts (load order is important) -->
+    <script type="text/javascript" src="~/js/msal/authConfig.js"></script>
+    <script type="text/javascript" src="~/js/msal/graphConfig.js"></script>
+    <script type="text/javascript" src="~/js/msal/ui.js"></script>
+
+    <!-- <script type="text/javascript" src="./authRedirect.js"></script>   -->
+    <!-- uncomment the above line and comment the line below if you would like to use the redirect flow -->
+    <script type="text/javascript" src="~/js/msal/authPopup.js"></script>
+    <script type="text/javascript" src="~/js/msal/graph.js"></script>
+
+}

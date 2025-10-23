@@ -1,0 +1,951 @@
+﻿@model WebApp.ViewModels.WorkInstructionChangeNotificationsViewModel
+@using EZGO.Api.Models.WorkInstructions
+@using WebApp.Models.WorkInstructions
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = (Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.ReportPageTitle, "Last changed workinstructions") ?? "Last changed workinstructions");
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+
+    var single = new WorkInstructionChangeNotificationViewModel();
+}
+
+@section CSS{
+<style>
+    .my-circle {
+    display: inline-block;
+    border-radius: 60px;
+    padding: 0.8em 1.1em;
+    background-color: #3f903f;
+    color: #fff;
+    }
+
+    .my-circle i {
+    font-size: 20px;
+    }
+
+    .status-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff !important;
+    flex-grow: 0;
+    flex-shrink: 0;
+    }
+
+    .status-icon {
+    display: flex;
+    margin: auto;
+    font-size: 1.3em;
+    }
+
+    #fade-wrapper {
+    display: none;
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 10000;
+    }
+
+    .scale-up {
+    transform: translate(-15px, -140px);
+    width: 200%;
+    transition: all 0.2s ease-in-out;
+    border-radius: 6px !important;
+    }
+
+    #accordionWiChangeNotifications .card .card-header {
+    cursor: pointer;
+    }
+
+    #WiChangeNotificationContainer {
+    height: 400px;
+    }
+
+    .infoText {
+    position: fixed;
+    right: 0;
+    top: 0;
+    margin: 10px;
+    }
+
+    .score {
+    color: #fff;
+    width: 40px;
+    height: 40px;
+    padding: 3px 10px 0px 14px;
+    font-size: 23px;
+    }
+
+    .score-large {
+    color: #fff;
+    width: 40px;
+    height: 40px;
+    padding: 3px 0px 0px 8px;
+    font-size: 23px;
+    }
+
+    .wichangenotificationOngoing {
+    background-color: #93C54B;
+    border-radius: 20px;
+    color: white;
+    width: 80px;
+    padding: 0.2rem 0.5rem 0.2rem 0.5rem;
+    text-align: center;
+    float: right;
+    }
+
+    .ongoingSelected {
+    background-color: white;
+    color: #93C54B;
+    }
+
+    .list-group-item h5 {
+    color: black;
+    font-weight: 400;
+    }
+
+    .list-group-item .fa-calendar-lines-pen {
+    color: #93C54B;
+    }
+
+    #contentCol a.active h5 {
+    color: white;
+    }
+
+    #contentCol a.active i {
+    color: white;
+    }
+
+    #contentCol a.active p {
+    color: white;
+    }
+
+    .editedByUserPicture {
+    min-width: 40px;
+    width: 40px;
+    height: 40px;
+    top: 0px;
+    background-size: cover;
+    border-radius: 50%;
+    position: absolute;
+    }
+
+    .editedByUserOverlay {
+    min-width: 40px;
+    width: 40px;
+    height: 40px;
+    background-size: cover;
+    border-radius: 50%;
+    position: absolute;
+    top: 0px;
+    right: 5px;
+    color: white;
+    font-size: 20px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(147,197,75,.7)
+    }
+
+    .no-border {
+    border: 0px;
+    }
+
+    [id^="WiChangeNotification-"] {
+    border: 0px;
+    border-radius: 0px !important;
+    }
+
+    .stageContainer
+    {
+    border: 0px solid white;
+    border-radius: 10px;
+    }
+
+    .stageHeader {
+    border-radius: 10px 10px 0px 0px;
+    color: white;
+    font-size: 16px;
+    letter-spacing: 1px;
+    }
+
+    .stageBody {
+    border-radius: 0px 0px 10px 10px;
+    }
+
+    .wichangenotificationItem {
+    border-radius: 10px;
+    background-color: white;
+    }
+
+    .stageBody li:first-child {
+    margin-top: 0px !important;
+    }
+
+    .stageBody li:last-child {
+    margin-bottom: 0px !important;
+    }
+
+    .separateWiChangeNotificationItem {
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.07), 1px 2px 2px 1px rgba(0, 0, 0, 0.07), 1px 3px 3px 1px rgba(0, 0, 0, 0.07), 1px 4px 4px 1px rgba(0, 0, 0, 0.07);
+    }
+
+
+
+    .itemEditedByUserPicture {
+    min-width: 40px;
+    width: 40px;
+    height: 40px;
+    background-size: cover;
+    border-radius: 50%;
+    position: absolute;
+    }
+
+    .itemEditedByUserOverlay {
+    min-width: 40px;
+    width: 40px;
+    height: 40px;
+    background-size: cover;
+    border-radius: 50%;
+    position: absolute;
+    top: 0px;
+    right: 5px;
+    color: white;
+    font-size: 20px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(147,197,75,.7)
+    }
+
+    .signedStageInfoOverlay {
+    min-height: 120px;
+    height: 100%;
+    width: 120px;
+    float: left;
+    border-radius: 10px 0px 0px 10px;
+    background-size: cover;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    color: #1ED760;
+    font-size: 80px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(20,20,40,.5)
+    }
+
+    .showExtraStageInfo {
+    font-size: 32px;
+    }
+
+    .shiftNotesEntered {
+    font-size: 32px;
+    color: #93C54B;
+    }
+
+    .stageContainer
+    {
+    border: 0px solid white;
+    border-radius: 10px;
+    }
+
+    .stageHeader {
+    border-radius: 10px 10px 0px 0px;
+    color: white;
+    font-size: 16px;
+    letter-spacing: 1px;
+    }
+
+    .stageBody {
+    border-radius: 0px 0px 10px 10px;
+    }
+
+    .wichangenotificationItem {
+    border-radius: 10px;
+    background-color: white;
+    }
+
+    .stageBody li:first-child {
+    margin-top: 0px !important;
+    }
+
+    .stageBody li:last-child {
+    margin-bottom: 0px !important;
+    }
+
+    .separateWiChangeNotificationItem {
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.07), 1px 2px 2px 1px rgba(0, 0, 0, 0.07), 1px 3px 3px 1px rgba(0, 0, 0, 0.07), 1px 4px 4px 1px rgba(0, 0, 0, 0.07);
+    }
+
+
+
+    .itemEditedByUserPicture {
+    min-width: 40px;
+    width: 40px;
+    height: 40px;
+    background-size: cover;
+    border-radius: 50%;
+    position: absolute;
+    }
+
+    .itemEditedByUserOverlay {
+    min-width: 40px;
+    width: 40px;
+    height: 40px;
+    background-size: cover;
+    border-radius: 50%;
+    position: absolute;
+    top: 0px;
+    right: 5px;
+    color: white;
+    font-size: 20px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(147,197,75,.7)
+    }
+
+    .signedStageInfoOverlay {
+    min-height: 120px;
+    height: 100%;
+    width: 120px;
+    float: left;
+    border-radius: 10px 0px 0px 10px;
+    background-size: cover;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    color: #1ED760;
+    font-size: 60px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(20,20,40,.5)
+    }
+
+    .showExtraStageInfo {
+    font-size: 32px;
+    }
+
+    .shiftNotesEntered {
+    font-size: 32px;
+    color: #93C54B;
+    }
+
+    .modifiedByText {
+        font-size: 18px;
+    }
+
+        .viewedByPicture {
+            min-width: 40px;
+            width: 40px;
+            height: 40px;
+            background-size: cover;
+            border-radius: 50%;
+        }
+
+</style>
+    <style>
+        .WIChangesTable {
+            border: 1px solid #5FD878;
+            border-radius: calc(1rem + 1px);
+            border-collapse: separate;
+            border-spacing: 0px;
+            table-layout: fixed;
+            word-wrap: break-word;
+            width: 100%;
+            max-width: 100%;
+        }
+
+            .WIChangesTable td {
+                border: 1px solid #5FD878;
+                padding: .5rem;
+                vertical-align: top;
+            }
+
+            .WIChangesTable tr:first-child td:first-child {
+                border-radius: 1rem 0 0 0;
+            }
+
+            .WIChangesTable tr:first-child td:last-child {
+                border-radius: 0 1rem 0 0;
+            }
+
+            .WIChangesTable tr:last-child td:last-child {
+                border-radius: 0 0 1rem 0;
+            }
+
+            .WIChangesTable tr:last-child td:first-child {
+                border-radius: 0 0 0 1rem;
+            }
+
+            .WIChangesTable tr:first-child td {
+                background-color: #EFFCF3;
+            }
+
+            .WIChangesTable tr td:first-child {
+                background-color: #EFFCF3;
+            }
+
+
+        .tag-card-change {
+            display: inline-block;
+            width: 9em;
+            color: white;
+            align-content: center;
+            align-items: center;
+        }
+
+        .tag-wrapper-change {
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+            display: flex;
+            height: 2.6em;
+            line-height: 1.1;
+        }
+
+
+        .nav-icon {
+            float: left;
+            display: inline-block;
+            align-self: center;
+        }
+
+        .tag-span-change {
+            text-align: center;
+            align-self: center;
+            display: inline-block;
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+        }
+
+    </style>
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-6">
+                <a asp-controller="workinstructions" asp-action="index" style="display: block"><i class="fa fa-arrow-left"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.WiChangeNotification.BackTitle, "Back to work instructions overview") ?? "Back to work instructions overview")</a>
+                <h1 id="WiChangeNotificationTitle1">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WiChangeNotification.ReportPageTitle, "Last changed Work Instructions") ?? "Last changed Work Instructions")</h1>
+                <div id="changeNotificationshowFiltersButton" class="btn btn-ezgo mb-1 mt-2 mr-1" style="display: none"><span class="pr-2">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.CardTitle, "Filters") ?? "Filters")</span> <i class="fa-solid fa-chevrons-down"></i></div>
+            </div>
+
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                <a asp-controller="wichangenotification" asp-action="details" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto d-none"></a>
+                @if (Model?.ApplicationSettings?.Features != null)
+                {
+                    @if (Model.ApplicationSettings.Features.ExportAdvancedEnabled.HasValue || Model.ApplicationSettings.Features.ExportEnabled.HasValue)
+                    {
+                        @if (Model.ApplicationSettings.Features.WorkInstructions.HasValue && Model.ApplicationSettings.Features.WorkInstructions.Value == true &&
+                             Model.ApplicationSettings.Features.WorkInstructionsChangedNotificationsEnabled.HasValue && Model.ApplicationSettings.Features.WorkInstructionsChangedNotificationsEnabled.Value == true)
+                        {
+                            <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="wichangenotifications" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.ExportTitle, "Export") ?? "Export")"><i class="fas fa-download"></i></button>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="container-fluid">
+        <div class="row" style="height:calc(100vh - 167px);">
+            <div id="changeNotificationsFilters" class="col-4">
+                <div class="card card-filter h-100">
+                    <div class="card-header pb-0">
+                        <h3 class="card-title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.CardTitle, "Filters") ?? "Filters")</h3>
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn" onclick="areaFilter_v2.reset('block')" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body card-filter pt-0">
+                        <partial name="_filters_block" model="Model.Filter" />
+                    </div>
+                </div>
+            </div>
+
+            <div id="changeNotificationsOverview" class="col-8" style="height:calc(100vh - 190px);">
+                <div class="card h-100">
+                    <div id="WiChangeNotificationTitle2" class="card-header h5" style="text-align: center">
+                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.WiChangeNotification.ReportPageTitle, "Last changed Work Instructions") ?? "Last changed Work Instructions")
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div id="nocontent" class="pl-3 pt-3 pb-0 text-muted">
+                            <h4>@(Model?.CmsLanguage?.GetValue(LanguageKeys.WiChangeNotification.NoChangeNotificationsFound, "No Work Instruction change notifications found") ?? "No Work Instruction change notifications found")</h4>
+                        </div>
+
+                        <div id="contentCol" class="list-group h-100" data-container="wichangenotifications">
+                            @if (Model.ChangeNotifications != null)
+                            {
+                                @foreach (WorkInstructionTemplateChangesNotificationModel wiChangeNotification in Model.ChangeNotifications)
+                                {
+                                    {
+                                        single = ViewModelConverters.ConvertToViewModel(wiChangeNotification);
+                                        single.ApplicationSettings = Model.ApplicationSettings;
+                                        single.Timezone = timezone;
+                                        single.Locale = Model?.Locale;
+                                        single.WorkInstruction = Model.WorkInstructions.Where(wi => wi.Id == single.ChangeNotification.WorkInstructionTemplateId).FirstOrDefault();
+                                        single.ModifiedTextValue = (Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.ChangedLabel, "Changed") ?? "Changed");
+                                        single.ByTextValue = (Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.ByLabel, "by") ?? "by");
+                                        single.UsersThatHaveConfirmedThisChangeValue = (Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.UsersThatHaveConfirmedThisChangeValueLabel, "Users that have confirmed viewing these changes") ?? "Users that have confirmed viewing these changes");
+                                    }
+                                    if (single != null && single.WorkInstruction != null)
+                                    {
+                                        <partial name="~/Views/Report/Work Instruction Change Notifications/_wi_change_notification_overview_single.cshtml" model="single" />
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <div class="card-footer" style="text-align:center;">
+                        <span id="load_more_loader" style="margin-top:-10px;"></span>
+                        <div style="text-align:center;">
+                            <a class="btn btn-ezgo" style="width:200px;" data-actiontype="load_more"><i class="fas fa-angle-double-down"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tasklist" class="col-8" style="height:calc(100vh - 188px);display: none"></div>
+        </div>
+    </div>
+</section>
+
+@section Scripts{
+    @if (Model.ApplicationSettings?.Features?.ExportAdvancedEnabled == true || Model.ApplicationSettings?.Features?.ExportEnabled == true)
+    {
+        <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+        <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+    }
+
+    @if (Model.ApplicationSettings?.Features?.AnalyticsEnabled == true)
+    {
+        <script src="~/js/analytics.js"></script>
+        <script>ezgoAnalytics.init('wichangenotification');</script>
+    }
+
+    <script src="/js/areafilter_v2.js"></script>
+    <script>
+        $('document').ready(function () {
+            ezgomediafetcher.preloadImagesAndVideos();
+            ezgomediafetcher.preloadFancyboxAnchors();
+        });
+
+        areaFilter_v2.init('/config/getareatree', '', true);
+
+        $('#nocontent').hide();
+        $('#contentCol').on('filterDone', function () {
+            $('#nocontent').toggle(
+                $('#contentCol div.results:visible').length === 0
+            )
+        });
+
+        function report(companyid, taskcntr) {
+            if (typeof analytics !== 'undefined' && analytics != null) {
+                analytics.logEvent('download_wichangenotification_pdf', { name: 'wichangenotification', companyid: companyid });
+            }
+        }
+
+        function loadTasks(e, id) {
+            $('#tasklist').html('<div class="text-center w-100 pt-5"><img src="/images/factory-loading.gif" class="w-50" /></div>');
+            $('#contentCol a').removeClass('active');
+            $('#contentCol a .wichangenotificationOngoing').removeClass('ongoingSelected');
+            
+            changeNotifications.showDetailSectionWithoutFilter();
+
+            $.get('/report/workinstructionchangenotifications/details/' + id, function (data) {
+                $('#tasklist').html(data);
+                ezgomediafetcher.preloadImagesAndVideos();
+                ezgomediafetcher.preloadFancyboxAnchors();
+            });
+
+            $(e.currentTarget).addClass('active');
+            
+            if ($(e.currentTarget).find('.wichangenotificationOngoing').length) {
+                $(e.currentTarget).find('.wichangenotificationOngoing').addClass('ongoingSelected');
+            }
+        }
+
+        function PrintDiv(divid) {
+            var contents = document.getElementById(divid).innerHTML;
+            var frame1 = document.createElement('iframe');
+            frame1.name = "frame1";
+            frame1.style.position = "absolute";
+            frame1.style.top = "-1000000px";
+            document.body.appendChild(frame1);
+            var frameDoc = frame1.contentWindow ? frame1.contentWindow : frame1.contentDocument.document ? frame1.contentDocument.document : frame1.contentDocument;
+            frameDoc.document.open();
+            frameDoc.document.write('<html><head><title>DIV Contents</title>');
+            frameDoc.document.write('</head><body>');
+            frameDoc.document.write(contents);
+            frameDoc.document.write('</body></html>');
+            frameDoc.document.close();
+            setTimeout(function () {
+                window.frames["frame1"].focus();
+                window.frames["frame1"].print();
+                document.body.removeChild(frame1);
+            }, 500);
+            return false;
+        }
+
+        function PrintWiChangeNotification(id) {
+            var iframe = document.createElement('iframe');
+            iframe.name = "wichangenotification_" + id;
+            iframe.style.position = "absolute";
+            iframe.style.top = "-1000000px";
+            iframe.src = "/pdf/view/0/" + id;
+            document.body.appendChild(iframe);
+
+            setTimeout(function () {
+                window.frames["wichangenotification_" + id].print();
+                document.body.removeChild(iframe);
+            }, 1000);
+
+            return false;
+        }
+
+        var changeNotifications = {
+            _version: '1.0',
+            language: {
+                lastChangeNotifications: '@(Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.ReportPageTitle, "Last changed workinstructions") ?? "Last changed workinstructions")'
+            },
+            offset: 0,
+            nr: 10,
+            nrOfItemsLoaded: 0,
+            areaId: 0,
+            date: '',
+            templateId: 0,
+            notificationAuthorId: 0,
+            selectedWiChangeNotificationId: 0,
+
+            clearItemContainer: function () {
+                $('[data-container="wichangenotifications"]').html('');
+            },
+
+            init: function (startOffset, startNrOfItemsLoaded, nrOfItemsToRetrieve) {
+                if (startOffset != null) {
+                    changeNotifications.offset = startOffset;
+                }
+
+                if (startNrOfItemsLoaded != null) {
+                    changeNotifications.nrOfItemsLoaded = startNrOfItemsLoaded;
+                }
+
+                if (nrOfItemsToRetrieve != null) {
+                    changeNotifications.nr = nrOfItemsToRetrieve;
+                }
+
+                changeNotifications.initHandlers();
+                changeNotifications.showHideMoreButton();
+
+                if (changeNotifications.selectedWiChangeNotificationId > 0 && $(`[data-wichangenotificationid='${changeNotifications.selectedWiChangeNotificationId}']`).length) {
+                    $(`[data-wichangenotificationid='${changeNotifications.selectedWiChangeNotificationId}']`)[0].click();
+                }
+            },
+            initHandlers: function () {
+                $('[data-actiontype="load_more"]').on('click', function () {
+                    changeNotifications.retrieveMore();
+                });
+
+                $('#areatree').on('click', 'a', function () {
+                    var areaDeselected = +$(this).data('id') != areaid;
+                    if (areaDeselected) {
+                        changeNotifications.areaId = null;
+                    }
+                    else {
+                        changeNotifications.areaId = $(this).data('id');
+                    }
+                    changeNotifications.clearDetails();
+
+                    changeNotifications.offset = 0;
+                    changeNotifications.clearItemContainer();
+                    changeNotifications.setLoaderStart('load_more_loader');
+                    changeNotifications.retrieve();
+                });
+
+                $('#notificationAuthorFilter').on('change', function (e) {
+                    changeNotifications.notificationAuthorId = +this.value;
+                    changeNotifications.clearDetails();
+                    //clear results
+                    changeNotifications.offset = 0;
+                    changeNotifications.clearItemContainer();
+                    changeNotifications.setLoaderStart('load_more_loader');
+                    //retrieve
+                    changeNotifications.retrieve();
+                });
+
+                $('[data-action="resetfilters"]').on('click', function () {
+                    const url = window.location.href.split('?')[0];
+
+                    window.history.pushState({}, "", url);
+                    
+                    changeNotifications.templateId = 0;
+                    changeNotifications.selectedWiChangeNotificationId = 0;
+                    changeNotifications.areaId = 0;
+                    changeNotifications.startDate = '';
+                    changeNotifications.endDate = '';
+                    changeNotifications.notificationAuthorId = 0;
+                    changeNotifications.clearDetails();
+
+                    changeNotifications.offset = 0;
+                    changeNotifications.clearItemContainer();
+                    changeNotifications.setLoaderStart('load_more_loader');
+                    changeNotifications.retrieve();
+
+                    $('#filter_datechoice').val('');
+                });
+
+                $('#changeNotificationshowFiltersButton').on('click', function (e) {
+                    changeNotifications.showFilterSectionWithoutDetails();
+                });
+
+                $('#templateFilter').val('default').selectpicker("refresh");
+
+                $('#templateFilter').on('change', function (e) {
+                    changeNotifications.templateId = +this.value.replace('template', '');
+                    changeNotifications.clearDetails();
+
+                    changeNotifications.offset = 0;
+                    changeNotifications.clearItemContainer();
+                    changeNotifications.setLoaderStart('load_more_loader');
+                    changeNotifications.retrieve();
+                });
+
+                //show tooltips of templateFilter options
+                $('button[data-id="templateFilter"]').on('click', function (e) {
+                    $('#templateFilter option').each(function () {
+                        var id = '#' + $(this).attr('data-bs-select');
+                        var title = $(id).attr('title');
+                        if (title == undefined || title == '') {
+                            $(id).attr('title', $(this).attr('title'));
+                        }
+                    });
+                });
+            },
+
+            retrieveMore: function () {
+                if (changeNotifications.offset == null) { changeNotifications.offset = 0 };
+
+                changeNotifications.setLoaderStart('load_more_loader');
+                changeNotifications.retrieve();
+            },
+
+            retrieve: function () {
+                var queryParams = [];
+
+                if (changeNotifications.startDate != '' && changeNotifications.endDate != '' && changeNotifications.startDate != null && changeNotifications.endDate != null) {
+                    queryParams.push('startDate=' + changeNotifications.startDate);
+                    queryParams.push('endDate=' + changeNotifications.endDate);
+                }
+
+                if (changeNotifications.templateId != 0) {
+                    queryParams.push('templateId=' + changeNotifications.templateId);
+                }
+
+                if (changeNotifications.areaId != '' && changeNotifications.areaId != null && changeNotifications.areaId != 0) {
+                    queryParams.push('areaid=' + changeNotifications.areaId);
+                }
+
+                if (changeNotifications.notificationAuthorId != '' && changeNotifications.notificationAuthorId != null && changeNotifications.notificationAuthorId != 0) {
+                    queryParams.push('notificationAuthorId=' + changeNotifications.notificationAuthorId);
+                }
+                
+                if (changeNotifications.nr != 0) {
+                    queryParams.push('nr=' + changeNotifications.nr);
+                }
+
+                if (changeNotifications.offset != 0) {
+                    queryParams.push('offset=' + changeNotifications.offset);
+                }
+
+                if (changeNotifications.mostRecentRequest != null) {
+                    changeNotifications.mostRecentRequest.abort();
+                }
+
+                changeNotifications.mostRecentRequest = $.ajax({
+                    type: "GET",
+                    url: '/report/workinstructionchangenotifications/overview' + (queryParams.length ? '?' + queryParams.join('&') : ''),
+                    success: function (data) {
+                        $('[data-container="wichangenotifications"]').append(data);
+                        changeNotifications.offset = changeNotifications.offset + changeNotifications.nr;
+                        changeNotifications.setLoaderEnd('load_more_loader');
+                        changeNotifications.showHideMoreButton();
+
+                        ezgomediafetcher.preloadImagesAndVideos();
+                        ezgomediafetcher.preloadFancyboxAnchors();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        changeNotifications.setLoaderEnd('load_more_loader');
+                        if (jqXHR.statusText == "abort") {
+                            return;
+                        }
+                        else {
+                            toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        }
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+
+            setLoaderStart: function (elementId) {
+                var loader = document.getElementById(elementId);
+                loader.innerHTML = '<img src="data:image/gif;base64,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" />';
+                changeNotifications.hideMoreButton();
+            },
+
+            setLoaderEnd: function (elementId) {
+                var loader = document.getElementById(elementId);
+                loader.innerHTML = '';
+                changeNotifications.showMoreButton();
+            },
+
+            hideMoreButton: function () {
+                $('[data-actiontype="load_more"]').hide();
+            },
+
+            showMoreButton: function () {
+                $('[data-actiontype="load_more"]').show();
+            },
+
+            showHideMoreButton: function () {
+                let nrOfItems = $('[data-container="wichangenotifications"]').children('[data-containertype="resultitem"]').length;
+                if (nrOfItems == 0) {
+                    changeNotifications.hideMoreButton();
+                    changeNotifications.showNoContent();
+                } else {
+                    changeNotifications.hideNoContent();
+                    if ((nrOfItems % changeNotifications.nrOfItemsLoaded) > 0) {
+                        changeNotifications.hideMoreButton();
+                    } else {
+                        changeNotifications.showMoreButton();
+                    };
+                }
+            },
+            showFilterSectionWithoutDetails: function () {
+                $('#tasklist').hide('fast');
+
+                $('#changeNotificationsOverview').removeClass('col-4');
+                $('#changeNotificationsOverview').addClass('col-8');
+
+                $('#changeNotificationshowFiltersButton').hide();
+                $('#WiChangeNotificationTitle1').show();
+
+                $('#changeNotificationsFilters').show('fast');
+            },
+            showDetailSectionWithoutFilter: function () {
+                $('#changeNotificationsFilters').hide('fast');
+
+                $('#changeNotificationsOverview').removeClass('col-8');
+                $('#changeNotificationsOverview').addClass('col-4');
+
+                $('#WiChangeNotificationTitle1').hide();
+                $('#changeNotificationshowFiltersButton').show();
+
+                $('#tasklist').show('fast');
+            },
+            hideNoContent: function () {
+                $('#nocontent').hide();
+            },
+            
+            showNoContent: function () {
+                $('#nocontent').show();
+            },
+            
+            clearDetails: function () {
+                $('#tasklist').html('');
+            }
+        }
+        changeNotifications.init(@WebApp.Controllers.ReportController.START_NR_OF_ITEMS, @(Model.ChangeNotifications != null ? Model.ChangeNotifications.Count : 0), @WebApp.Controllers.ReportController.MAX_NR_OF_DYNAMIC_ITEMS);
+
+        function downloadPdf(url) {
+            @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+            {
+                @:dataEntry = ezgoAnalytics.dataSpanStart("generate pdf ", "wichangenotification");
+            }
+
+            var newtab = window.open(url, "_blank");
+
+            @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+            {
+                @:newtab.addEventListener("unload", function () { ezgoAnalytics.dataSpanEnd(dataEntry); });
+            }
+        }
+            
+        $('#filter_datechoice').val('');
+
+        $('#filter_datechoice').daterangepicker({
+            showDropdowns: true,
+            autoUpdateInput: false,
+            opens: 'center', drops: 'up',
+            locale: {
+                format: 'DD MMM YYYY',
+                firstDay: 1,
+                cancelLabel: 'Clear'
+            }
+        });
+
+        $('#filter_datechoice').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD MMM YYYY') + ' - ' + picker.endDate.format('DD MMM YYYY'));
+
+            changeNotifications.startDate = picker.startDate.format("DD-MM-YYYY");
+            changeNotifications.endDate = picker.endDate.format("DD-MM-YYYY");
+
+            changeNotifications.clearDetails();
+
+            changeNotifications.offset = 0;
+            changeNotifications.clearItemContainer();
+            changeNotifications.setLoaderStart('load_more_loader');
+            changeNotifications.retrieve();
+
+        });
+
+        $('#filter_datechoice').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+        });
+
+        $('[data-action="cleardatefilter"]').on('click', function () {
+            $('#filter_datechoice').val('');
+            changeNotifications.startDate = '';
+            changeNotifications.endDate = '';
+
+            changeNotifications.clearDetails();
+
+            changeNotifications.offset = 0;
+            changeNotifications.clearItemContainer();
+            changeNotifications.setLoaderStart('load_more_loader');
+            changeNotifications.retrieve();
+        });
+
+
+    </script>
+}

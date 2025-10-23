@@ -1,0 +1,41 @@
+﻿@model BaseViewModel
+<div role="dialog" tabindex="-1" class="modal fade h-100" id="editOpenFieldModal">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content" id="editOpenFieldModalContent">
+            <div class="modal-header">
+                <h4 class="modal-title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.OpenFieldAddEditTitle, "Add/edit open field") ?? "Add/edit open field")</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row form-group">
+                    <div style="display: block; font-weight: 700">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.PropertyTypeTitle, "Property type") ?? "Property type")</div>
+                </div>
+                <div class="row form-group">
+                    <div style="display: block">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.TextBasedTitle, "Text based property") ?? "Text based property")</div>
+                </div>
+                <div class="row form-group" style="display: none">
+                    <label for="modal_openfield_select">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.PropertyTypeTitle, "Property type") ?? "Property type")</label>
+                    <select id="modal_openfield_select" class="form-control" name="modal_openfield_select">
+                        <option value="">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.SelectKindMessage, "Select kind of property") ?? "Select kind of property")</option>
+                        <option value="920" data-datatype="2" selected="selected">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.TextBasedTitle, "Text based property") ?? "Text based property")</option>
+                    </select>
+                </div>
+                <div class="row form-group">
+                    <label for="modal_openfield_name">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.NameDisplayLabelText, "Name or display text") ?? "Name or display text")</label><input type="text" name="modal_openfield_name" id="modal_openfield_name" class="form-control" maxlength="200" />
+                </div>
+                <div class="row form-group d-inline-block">
+                    <label for="modal_openfield_required">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.IsRequiredText, "Is required") ?? "Is required")</label><input type="checkbox" name="modal_openfield_required" id="modal_openfield_required" class="form-control" style="text-align:left; height:20px;" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div id="modal_openfield_message"></div>
+                <button id="btnDeleteOpenField" class="btn btn-danger btn-sm mr-auto" type="button" data-action="delete_close_open_field">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.DeleteButtonTitle, "Delete") ?? "Delete")</button>
+                <!--<button id="btnPreviousOpenField" class="btn btn-light" type="button">Previous</button>-->
+                <button type="button" class="btn btn-ezgo btn-sm" data-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.CloseButtonTitle, "Close") ?? "Close")</button>
+                <!--<button id="btnNextOpenField" class="btn btn-light" type="button">Next</button>-->
+                <button id="btnSaveCloseOpenField" class="btn btn-ezgo btn-sm" type="button" data-action="save_and_close_open_field">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.SaveAndClodeButtonTitle, "Save and Close") ?? "Save and Close")</button>
+                <button id="btnSaveOpenField" class="btn btn-ezgo btn-sm" type="button" data-action="save_open_field">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.SaveButtonTitle, "Save") ?? "Save")</button>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="modal_openfield_tpid" />
+</div>

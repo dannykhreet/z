@@ -1,0 +1,22 @@
+﻿@model List<EZGO.Api.Models.Area>
+
+
+<div data-containertype="area_choice_list" style="">
+    <ul style="@(Model.FirstOrDefault()?.Level == 0 ? "padding-left:0": "")">
+        @foreach (var area in Model)
+        {
+            <li data-id="@area.Id" data-name="@area.Name" data-fullname="@area.FullDisplayName" data-parent="@area.ParentId" data-containertype="area_choice" data-level="@area.Level" style="@(area.Level == 0 ? "display:inline;margin-left:0px;font-size:16px;": "font-size:14px;")" title="@area.FullDisplayName">
+                <div class="area-title" style="border-bottom: 1px solid #C0C0C0;position:relative"><div style="padding:5px;" data-containertype="title" class="fle">@area.Name</div><span style="position:absolute; top:4px; right:5px;font-size:14px;display:none;" data-buttontype="deselect" title="Remove @area.Name">x</span></div>
+                @{
+                    if (area.Children != null && area.Children.Count > 0)
+                    {
+
+                        <partial name="_area_list" model="@area.Children" />
+
+                    }
+                }
+            </li>
+
+        }
+    </ul>
+</div>

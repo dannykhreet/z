@@ -1,0 +1,44 @@
+﻿@model LanguageResourceItemModel
+@{
+
+}
+<form asp-action="CreateResource" data-item="createKey" id="createresourceform">
+    <input type="hidden" asp-for="Guid" />
+    <input type="hidden" asp-for="Locale" />
+
+    <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">New Resource (@Model?.Locale)</h5>
+        @*@(Model?.CmsLanguage.GetValue(LanguageKeys.CmsLanguage.NewResourceTitle, "New Resource ") ?? "New Resource ")*@
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label asp-for="ResourceKey"></label>
+            <input asp-for="ResourceKey" class="form-control" style="text-transform: uppercase;" />
+            <span asp-validation-for="ResourceKey" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Description"></label>
+            <input asp-for="Description" class="form-control" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ResourceValue"></label>
+            <input asp-for="ResourceValue" class="form-control" />
+            <span asp-validation-for="ResourceValue" class="text-danger"></span>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        @*@(Model?.CmsLanguage.GetValue(LanguageKeys.CmsLanguage.BtnClose, "Close") ?? "Close")*@
+        <button type="button" class="btn btn-primary" onclick="savemodal(event)">Save</button>
+        @*@(Model?.CmsLanguage.GetValue(LanguageKeys.CmsLanguage.BtnSave, "Save") ?? "Save")*@
+    </div>
+
+</form>

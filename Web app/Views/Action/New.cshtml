@@ -1,0 +1,805 @@
+﻿@model WebApp.ViewModels.ActionViewModel
+@using EZGO.Api.Models.SapPm
+@{
+    Dictionary<string, string> CmsLanguage = Model?.CmsLanguage;
+    Layout = "_Layout_template";
+    ViewData["Title"] = CmsLanguage?.GetValue(LanguageKeys.Action.EditActionTitle, "Edit Action") ?? "Edit Action";
+}
+
+<style>
+    .addclip {
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .file-dropzone:hover,
+    .file-dropzone.drop-active {
+        background-color: #93c54b1f;
+    }
+
+    input.input-validation-error, textarea.input-validation-error, .input-group.input-validation-error {
+        border-bottom: solid 2px #dc3545;
+    }
+
+    .input-group.input-validation-error {
+        border-bottom-left-radius: .25em;
+        border-bottom-right-radius: .25em;
+    }
+
+    .custom-control-input:checked ~ .custom-control-label::before,
+    .custom-control-input:indeterminate ~ .custom-control-label::before {
+        background-color: #93C54B;
+        border-color: #93c54b1f;
+    }
+
+    .custom-control-input:checked ~ .custom-control-label::before {
+        color: #fff;
+        border-color: #93c54b1f;
+        background-color: #93C54B;
+        box-shadow: none;
+    }
+
+    div.custom-control-right {
+        padding-right: 24px;
+        padding-left: 0;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+        div.custom-control-right .custom-control-label::after {
+            right: -1.5rem;
+            left: auto;
+        }
+
+        div.custom-control-right .custom-control-label::before {
+            right: -2.35rem;
+            left: auto;
+        }
+</style>
+
+<style>
+    .btn-light:not(:disabled):not(.disabled).active, .btn-light:not(:disabled):not(.disabled):active, .show > .btn-light.dropdown-toggle {
+        color: #fff !important;
+        background-color: #93C54B;
+        border-color: #d3d9df;
+    }
+
+    .functionalLocationSelected {
+        background-color: #93C54B;
+    }
+
+    .btn-light.disabled.active {
+        color: #fff !important;
+        background-color: #93C54B;
+        border-color: #d3d9df;
+        opacity: .65;
+        box-shadow: none;
+        cursor: not-allowed;
+    }
+
+</style>
+
+<form asp-controller="action" asp-action="new" id="actionform" enctype="multipart/form-data">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-0">
+                <div class="col-sm-6">
+                    <a id="goBackToActionOverview" href="#" onclick=""><i class="fa fa-arrow-left"></i> @(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsBackToAction, "Back to action overview") ?? "Back to action overview")</a>
+                    <h1>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Action.DetailsActionTitle, "Action details") ?? "Action details")</h1>
+                </div>
+                <div class="col-sm-6 d-flex flex-row-reverse">
+                    <a id="btnSaveAction" onclick="postAction(event)" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" data-tracking="enabled" data-tracking-name="new action" data-tracking-module="action">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.BtnSaveTitle, "Save") ?? "Save")</a>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <section class="content mr-2" id="contentBody" style="height: calc(100vh - 145px); overflow-x: hidden; overflow-y: auto;">
+        <div class="container-fluid">
+            <partial name="_edit_details" model="Model.EditAction" />
+
+            @if (Model.ApplicationSettings?.Features?.TagsEnabled == true)
+            {
+                <div class="col-12 p-0 pb-3">
+                    <div class="card m-0">
+                        <div class="card-header">
+                            <h3 class="card-title">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsMainTitle, "Tags") ?? "Tags")</h3>
+                        </div>
+                        <div class="card-body px-3 pb-3 pt-0">
+                            <partial name="_tags_block" model="Model.Tags" />
+                        </div>
+                    </div>
+                </div>
+                <textarea asp-for="Tags" multiple style="display:none;" id="Tags"></textarea>
+            }
+
+            @if (Model.ApplicationSettings.Features.MarketSapEnabled.HasValue && Model.ApplicationSettings.Features.MarketSapEnabled.Value && Model.NotificationOptions != null)
+            {
+                <div class="sendToSapPmContainer">
+                    <div class="col-12 p-0 pb-3">
+                        <div class="card m-0">
+                            <div class="card-header">
+                                <h3 class="card-title">SAP PM configuration</h3>
+                            </div>
+                            <div class="card-body px-3 pb-3 pt-0">
+                                <div id="sendToSapWarning" style="display: none">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <span class="card-text text-muted">Note: Media files are only stored with this action and are not sent to SAP PM.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="custom-control custom-switch">
+                                    <input name="SendToSapPm" type="checkbox" class="custom-control-input" id="actionSendToSapPm" value="@Model.EditAction.SendToSapPm.ToString().ToLower()">
+                                    <label style="font-weight: 400" class="custom-control-label card-text text-muted" for="actionSendToSapPm">Send to SAP PM</label>
+                                </div>
+
+                                @if (Model.NotificationOptions != null &&
+                                     Model.NotificationOptions.NotificationTypeExpanded != null && Model.NotificationOptions.NotificationTypeExpanded.Count > 0 &&
+                                     Model.NotificationOptions.MaintPriorityExpanded != null && Model.NotificationOptions.MaintPriorityExpanded.Count > 0)
+                                {
+                                    <div id="sendToSapOptions" style="display: none">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <span class="card-text text-muted">Functional location</span>
+                                                <input id="selectedFunctionalLocation" name="SelectedFunctionalLocation" type="hidden" style="display: none" />
+                                                <div class="form-group">
+                                                    <button id="modal_addchange_area_choose_functional_location" type="button" class="btn btn-ezgo btn-sm" onclick="$('#modalSelectFunctionalLocation').modal('show');">Select functional location</button>
+                                                </div>
+                                                <h6 id="selectedFunctionalLocationHeader" style="display: none">Selected functional location:</h6>
+                                                <div id="selectedFunctionalLocationContent"></div>
+                                            </div>
+
+                                            <div class="col-6">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span class="card-text text-muted">Notification title</span>
+                                                        <input type="text" class="form-control form-control-sm" maxlength="40" id="sapNotificationTitle" name="NotificationTitle" value="@(Model.EditAction?.SapPmNotificationConfig?.NotificationTitle ?? "")" @((!string.IsNullOrEmpty(Model.EditAction?.SapPmNotificationConfig?.NotificationTitle) && (Model.EditAction?.AlreadySentToSapPm ?? false)) ? "disabled" : "") placeholder="Enter notification title.." />
+                                                    </div>
+                                                </div>
+                                                <div class="row pt-2">
+                                                    <div class="col-md-12 col-lg-12">
+                                                        <span class="card-text text-muted">Notification type</span>
+                                                        <div class="btn-group btn-group-sm btn-group-toggle pt-1" data-toggle="buttons" style="display:flex;">
+                                                            @foreach (var notificationType in Model.NotificationOptions.NotificationTypeExpanded)
+                                                            {
+                                                                <label class="btn btn-light text-muted" style="flex:1;">
+                                                                    <input type="radio" data-defaultprio="@notificationType.DefaultPrio" name="NotificationType" id="notificationType-@notificationType.Value" value="@notificationType.Value"> @notificationType.Label
+                                                                </label>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row pt-2">
+                                                    <div class="col-md-12 col-lg-12">
+                                                        <span class="card-text text-muted">Priority</span>
+                                                        <div class="btn-group btn-group-sm btn-group-toggle pt-1" data-toggle="buttons" style="display:flex;">
+                                                            @foreach (var maintPriority in Model.NotificationOptions.MaintPriorityExpanded)
+                                                            {
+                                                                <label class="btn btn-light text-muted" style="flex:1;">
+                                                                    <input type="radio" name="MaintPriority" id="maintPriority-@maintPriority.Value" value="@maintPriority.Value"> @maintPriority.Label
+                                                                </label>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    @:No SAP PM notification options found
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <partial name="_edit_media" model="Model.EditAction" />
+            @if (Model?.ApplicationSettings?.Features?.MarketSapEnabled == true)
+            {
+                SapPmFunctionalLocationPickerViewModel sapLocVM = new SapPmFunctionalLocationPickerViewModel() { SapPmLocations = Model.SapPmFunctionalLocations, ApplicationSettings = Model.ApplicationSettings };
+                <partial name="~/Views/Shared/SapFunctionalLocations/_sap_pm_functional_location_picker.cshtml" , model="@sapLocVM" />
+            }
+        </div><!-- /.container-fluid -->
+    </section>
+</form>
+
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="/js/ezgoUtils.js"></script>
+    <script src="/js/ezgolist.js"></script>
+    <script src="/js/sapfunctionallocationpicker.js"></script>
+
+    @if (Model.ApplicationSettings.Features.AnalyticsEnabled.HasValue && Model.ApplicationSettings.Features.AnalyticsEnabled.Value)
+    {
+        <script src="~/js/analytics.js"></script>
+        <script>ezgoAnalytics.init('action');</script>
+    }
+
+    @{
+        bool sapSettingEnabled = (Model.ApplicationSettings.Features.MarketSapEnabled.HasValue && Model.ApplicationSettings.Features.MarketSapEnabled.Value && Model.NotificationOptions != null);
+        bool isSentToSapPm = false;
+        if (sapSettingEnabled)
+        {
+            isSentToSapPm = (Model != null && Model.EditAction != null && Model.EditAction.SendToSapPm == true);
+        }
+    }
+
+    <script>
+        if (@Json.Serialize(sapSettingEnabled)) {
+            //init ui elements for existing action
+            if (@Json.Serialize(isSentToSapPm)) {
+                var sapControlsDisabled = false;
+                function loadAndSelectConfiguredFunctionalLocation(functionalLocationId)
+                {
+                    if (functionalLocationId) {
+                        $.ajax({
+                            type: "GET",
+                            url: '/action/functionallocation/' + functionalLocationId,
+                            success: function (data) {
+                                $('#functionalLocationResults').html(data);
+
+                                $('#functionalLocation-'+functionalLocationId).addClass('functionalLocationSelected');
+
+                                $('#selectedFunctionalLocation').val(functionalLocationId);
+
+                                functionalLocationPicker.selectedFunctionalLocationId = data.id;
+                                functionalLocationPicker.savedFunctionalLocationInfo = {
+                                    functionalLocationName: data.functionalLocationName,
+                                    functionalLocation: data.functionalLocation,
+                                    functionalLocationId: data.id
+                                }
+                                $('#selectedFunctionalLocationContent').html(`${data.functionalLocation} (${data.functionalLocationName})`);
+
+                                sapControlsDisabled = true;
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                if (jqXHR.statusText == "abort") {
+                                    return;
+                                }
+                                else {
+                                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                                }
+                            },
+                            contentType: "application/json; charset=utf-8"
+                        });
+                    }
+                }
+
+                $('#selectedFunctionalLocationHeader').show();
+                $('#sendToSapOptions').show();
+                $('#sendToSapWarning').show();
+
+                $('#actionSendToSapPm').click();
+                $('#actionSendToSapPm').val(true);
+                $('[id^="maintPriority-' + '@(Model.EditAction.SapPmNotificationConfig?.MaintPriority)"]').parent('label').click();
+                $('[id^="notificationType-' + '@(Model.EditAction.SapPmNotificationConfig?.Notificationtype)"]').parent('label').click();
+                $('#sapNotificationTitle').val('@(Model.EditAction.SapPmNotificationConfig?.NotificationTitle)');
+
+                loadAndSelectConfiguredFunctionalLocation(@(Model.EditAction.SapPmNotificationConfig?.FunctionalLocationId));
+
+                if (@Json.Serialize(Model.EditAction.AlreadySentToSapPm)) {
+                    $('#actionSendToSapPm').attr('disabled', true);
+                    $('#functionalLocationSearchBox').attr('disabled', true);
+                    $('#modal_addchange_area_choose_functional_location').attr('hidden', true);
+                    $('[id^="maintPriority-"]').parent('label').addClass('disabled');
+                    $('[id^="notificationType-"]').parent('label').addClass('disabled');
+                }
+            } else {
+                var sapControlsDisabled = false;
+            }
+
+            var marketSapEnabled = true;
+
+            $('#actionSendToSapPm').on('click', function(e) {
+                let sendToSapPm = $(e.currentTarget).is(':checked');
+
+                if (sendToSapPm == true) {
+                    $('#sendToSapOptions').show('fast');
+                    $('#sendToSapWarning').show('fast');
+                    $('#actionSendToSapPm').val(true);
+                }
+                else if (sendToSapPm == false) {
+                    //hide
+                    $('#sendToSapOptions').hide('fast');
+                    $('#sendToSapWarning').hide('fast');
+                    $('#actionSendToSapPm').val(false);
+                }
+            });
+
+            $('#sendToSapOptions').on('click', '[id^="maintPriority-"]', function (e) {
+                if(e.currentTarget) {
+                    if($(e.currentTarget).parent('label').hasClass('active'))
+                    {
+                        $('[id^="maintPriority"]').each(function(index, elem) {
+                            $(elem).parent('label').removeClass('active');
+                            $(elem).attr('checked', false);
+                        });
+                        e.stopPropagation();
+                    }
+                }
+            });
+
+            $('#sendToSapOptions').on('click', '[id^="notificationType-"]', function (e) {
+                if(e.currentTarget) {
+                    if($(e.currentTarget).parent('label').hasClass('active'))
+                    {
+                        $('[id^="notificationType"]').each(function(index, elem) {
+                            $(elem).parent('label').removeClass('active');
+                            $(elem).attr('checked', false);
+                        });
+                        e.stopPropagation();
+                    }
+                    else {
+                        let defaultPrio = $(e.currentTarget).data('defaultprio');
+                        if($('#maintPriority-' + defaultPrio).length) {
+                            $('[id^="maintPriority"]').each(function(index, elem) {
+                                $(elem).parent('label').removeClass('active');
+                                $(elem).attr('checked', false);
+                            });
+                            $('#maintPriority-' + defaultPrio).parent('label').addClass('active');
+                            $('#maintPriority-' + defaultPrio).attr('checked', true);
+                        }
+                    }
+                }
+            });
+
+        } else {
+            var marketSapEnabled = false;
+        }
+    </script>
+
+    <script>
+        $('document').ready(function () {
+            ezgomediafetcher.preloadImagesAndVideos();
+            ezgomediafetcher.preloadFancyboxAnchors();
+            // DueDate
+            var dueDateString = $('#DueDate').prop('value');
+            var dueDateMomentObject = moment(dueDateString, "YYYY/MM/DD"); // 1st argument - string, 2nd argument - format
+            var dueDateObject = dueDateMomentObject.toDate(); // convert moment.js object to Date object
+
+            //Single date picker
+            $('#DueDateInput').daterangepicker({
+                singleDatePicker: true,
+                startDate: isNaN(dueDateObject) ? new Date() : dueDateObject,
+                showDropdowns: true,
+                opens: 'center', drops: 'up',
+                locale: {
+                    format: 'DD-MM-YYYY',
+                    firstDay: 1
+                }
+            }, function (start, end, label) {
+                $('#DueDate').prop('value', start.format('YYYY/MM/DD'));
+            });
+
+            // Resources
+            var strJson = '@Html.Raw(Model.EditAction.UsersJson)';
+            if (strJson.length) {
+                let userarray = JSON.parse(strJson);
+                if (userarray) {
+                    // set values
+                    $('#Resources').val(userarray);
+
+                    // Then refresh
+                    $('#Resources').selectpicker("refresh");
+                }
+            }
+
+            var strJsonAreas = '@Html.Raw(Model.EditAction.AreasJson)';
+            if (strJsonAreas.length) {
+                let areaarray = JSON.parse(strJsonAreas);
+                if (areaarray) {
+                    // set values
+                    $('#ResourcesAreas').val(areaarray);
+
+                    // Then refresh
+                    $('#ResourcesAreas').selectpicker("refresh");
+                }
+            }
+
+            $(document).on('click', '.file-dropzone', function () {
+                $('#File').click();
+            })
+
+            if ($('#DueDate').hasClass('input-validation-error')) {
+                $('#DueDateInput').parent('div').addClass('input-validation-error');
+            };
+
+            $(document).on('focus', 'input', function () {
+                $(this).removeClass('input-validation-error');
+                $(this).parent().removeClass('input-validation-error');
+            });
+
+            $('#Comment').focus();
+            $('.bootstrap-select button .filter-option').addClass('d-flex');
+
+            let actionOverviewLocation = window.location.origin;
+            let localStorageItem = localStorage.getItem('last_action_overview_location');
+            if (localStorageItem != null && localStorageItem != undefined) {
+                actionOverviewLocation += localStorageItem;
+            }
+            else {
+                actionOverviewLocation += '/action?filter=action';
+            }
+            $('#goBackToActionOverview').attr('href', actionOverviewLocation);
+
+            functionalLocationPicker.init();
+            $('#modalSelectFunctionalLocation').on('hidden.bs.modal', function() {
+            if (functionalLocationPicker.savedFunctionalLocationInfo){
+                $('#selectedFunctionalLocationHeader').show();
+                $('#selectedFunctionalLocationContent').html(`${functionalLocationPicker?.savedFunctionalLocationInfo?.functionalLocation} (${functionalLocationPicker?.savedFunctionalLocationInfo?.functionalLocationName})`);
+                $('#selectedFunctionalLocation').val(functionalLocationPicker?.savedFunctionalLocationInfo?.functionalLocationId);
+            } else {
+                functionalLocationPicker?.resetSelectedFunctionalLocation();
+                $('#selectedFunctionalLocationHeader').hide();
+                $('#selectedFunctionalLocationContent').html('');
+                $('#selectedFunctionalLocation').val('');
+            }
+        });
+        });
+
+        const fileDropZone = document.querySelector('.file-dropzone');
+        const maxFiles = 6;
+        const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.mp4|\.mpg|\.mov)$/i;
+        var counter = document.querySelectorAll('.media-list .item').length;
+        var mediacounter = document.querySelectorAll('.media-list .media').length;
+        var videocounter = document.querySelectorAll('.media-list .video').length;
+
+        const events = [
+            'dragenter',
+            'dragleave',
+            'dragover', // to allow drop
+            'drop'
+        ];
+
+        events.forEach(e => {
+            fileDropZone.addEventListener(e, (ev) => {
+                ev.preventDefault();
+                if (ev.type === 'dragenter') {
+                    fileDropZone.classList.add('drop-active');
+                }
+
+                if (ev.type === 'dragleave') {
+                    fileDropZone.classList.remove('drop-active');
+                }
+
+                if (ev.type === 'drop') {
+                    fileDropZone.classList.remove('drop-active');
+                    handleFiles(ev.dataTransfer.files)
+                        .then(values => values.map(tag => {
+
+                            if (counter < maxFiles) {
+                                createPreview(tag);
+                                countMedia();
+                            }
+
+                        }))
+                        .catch(alert);
+                }
+            })
+        })
+
+        window.preview = async function (input) {
+            if (input.files && input.files[0]) {
+                handleFiles(input.files)
+                    .then(values => values.map(tag => {
+                        if (counter < maxFiles) {
+                            createPreview(tag);
+                            countMedia();
+                        }
+                    }))
+                    .then(input.value = "")
+                    .catch(alert);
+            }
+        }
+
+        const generatePreviewBlobData = async function (file) {
+            if(file.type.startsWith('video'))
+            {
+                return new Promise((resolve, reject) => {
+                    var url = URL.createObjectURL(file);
+
+                    if (url.length) {
+                        var result = new Object();
+                        result.url = url;
+                        result.ext = file.name.split('.').pop();
+                        result.type = file.type;
+                        resolve(result);
+                    }
+                    else {
+                        reject(Error("@(Model?.CmsLanguage.GetValue(LanguageKeys.Action.ErrorMessage, "It broke") ?? "It broke")"));
+                    }
+                }).catch(alert);
+            }
+            else {
+                var maxSizeMB = 0.3;
+
+                const options = {
+                    maxWidthOrHeight: 1920,
+                    useWebWorker: true,
+                    maxIteration: 1
+                };
+                //First only resize image
+                var compressedFile = await imageCompression(file, options);
+
+                //Then compress image if necessary
+                while (compressedFile.size / 1024 / 1024 > maxSizeMB) {
+                    options.maxSizeMB = maxSizeMB;
+                    compressedFile = await imageCompression(compressedFile, options);
+                }
+
+                return new Promise((resolve, reject) => {
+                    var url = URL.createObjectURL(compressedFile);
+
+                    if (url.length) {
+                        var result = new Object();
+                        result.url = url;
+                        result.ext = compressedFile.name.split('.').pop();
+                        result.type = compressedFile.type;
+                        resolve(result);
+                    }
+                    else {
+                        reject(Error("@(Model?.CmsLanguage.GetValue(LanguageKeys.Action.ErrorMessage, "It broke") ?? "It broke")"));
+                    }
+                }).catch(alert);
+            }
+        }
+
+        const handleFiles = (_files) => {
+            const files = Array.prototype.slice.call(_files);
+
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                //Do something
+                if (!allowedExtensions.exec(file.name)) {
+                    files.splice(i, 1);
+                }
+            }
+            return Promise.all(files.map(generatePreviewBlobData))
+        }
+
+        function countMedia() {
+            counter = document.querySelectorAll('.media-list .item').length;
+            mediacounter = document.querySelectorAll('.media-list .media').length;
+            videocounter = document.querySelectorAll('.media-list .video').length;
+            if (counter >= maxFiles) {
+                fileDropZone.style.display = 'none';
+            }
+            else {
+                fileDropZone.style.display = 'flex';
+            }
+        }
+
+        const createPreview = (item) => {
+            if (item.type.match('image')) {
+                showImage(item);
+            } else {
+                showVideo(item);
+            }
+        }
+
+        function showImage(item) {
+            var template = document.querySelector('#mediatemplate');
+            var clone = template.content.cloneNode(true);
+            var image = clone.querySelector("img");
+
+            image.src = item.url;
+            image.setAttribute('data-ext', item.ext);
+            image.setAttribute('data-index', mediacounter);
+            image.setAttribute('data-type', item.type);
+            image.setAttribute('data-target', 'image');
+
+            fileDropZone.parentNode.parentNode.insertBefore(clone, fileDropZone.parentNode);
+        }
+
+        function deleteMedia(elem) {
+            $(elem).closest('.actionAttachment').remove();
+
+            //re index all images/videos
+            $('.video').each(function (index, element) {
+                //fancybox anchor href
+                $(element).find('a.card-link')[0].setAttribute('href', `#video${index}`);
+                //img data-index (zero based)
+                $(element).find('img')[0].setAttribute('data-index', index);
+                //video data-index (zero based)
+                $(element).find('video')[0].setAttribute('data-index', index);
+                //video id
+                $(element).find('video')[0].setAttribute('id', `video${index}`);
+
+                //set thumbnail input id and name
+                $(element).find('input')[0].setAttribute('id', `VideoThumbNails_${index}_`);
+                $(element).find('input')[0].setAttribute('name', `VideoThumbNails[${index}]`);
+                //set video input id and name
+                $(element).find('input')[1].setAttribute('id', `Videos_${index}_`);
+                $(element).find('input')[1].setAttribute('name', `Videos[${index}]`);
+            });
+
+            $('.media').each(function (index, element) {
+                //image data-index (zero-based)
+                $(element).find('img')[0].setAttribute('data-index', index);
+
+                //set image input id and name
+                $(element).find('input')[0].setAttribute('id', `Images_${index}_`);
+                $(element).find('input')[0].setAttribute('name', `Images[${index}]`);
+
+            });
+
+            countMedia();
+        }
+
+        function showVideo(item) {
+            var template = document.querySelector('#videotemplate');
+            var clone = template.content.cloneNode(true);
+            var thumbnailImage = clone.querySelector("img");
+            var hl = clone.querySelector("a");
+            hl.setAttribute('href', '#video' + videocounter);
+            var index = videocounter;
+
+            var video = document.createElement('video');
+            video.style.display = "none";
+            video.controls = true;
+            video.src = item.url;
+            video.setAttribute('type', item.type);
+            video.setAttribute('data-ext', item.ext);
+            video.setAttribute('data-target', 'video');
+            video.setAttribute('data-index', index);
+            video.className = 'blob';
+            video.id = 'video' + videocounter;
+            hl.appendChild(video);
+            fileDropZone.parentNode.parentNode.insertBefore(clone, fileDropZone.parentNode);
+            var timeupdate = function () {
+                if (snapImage()) {
+                    video.removeEventListener('timeupdate', timeupdate);
+                    video.pause();
+                }
+            };
+            video.addEventListener('loadeddata', function () {
+                if (snapImage()) {
+                    video.removeEventListener('timeupdate', timeupdate);
+                }
+            });
+            var snapImage = function () {
+                var canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                var image = canvas.toDataURL();
+                var success = image.length > 100000;
+
+                if (success) {
+                    var thumbnailUrl = URL.createObjectURL($.utils.dataURItoBlob(image));
+
+                    thumbnailImage.src = thumbnailUrl;
+                    thumbnailImage.setAttribute('data-index', index);
+                    thumbnailImage.setAttribute('data-ext', 'png');
+                    thumbnailImage.setAttribute('data-target', 'videothumbnail');
+                }
+                return success;
+            };
+
+            video.addEventListener('timeupdate', timeupdate);
+            video.preload = 'metadata';
+            video.src = item.url;
+            //Load video in Safari / IE11
+            video.muted = true;
+            video.playsInline = true;
+            video.play();
+        }
+
+        async function postAction(ev) {
+            ev.preventDefault();
+
+            if(marketSapEnabled && $('#actionSendToSapPm').is(':checked') && !validateSapPmFields())
+            {
+                return;
+            }
+
+            if ($('form#actionform').valid()) {
+                $('body').toggleClass('loaded');
+                let blobs = new Array();
+                blobs = document.querySelectorAll(".blob");
+                const media = Array.prototype.slice.call(blobs);
+                const tasks = media.map(postMedia);
+                const results = await Promise.all(tasks);
+                const tagIds = $('.selected-tag').map(function (_, x) { return x.id }).get();
+                $('#Tags').val(tagIds);
+
+                var frm = $('form#actionform')[0];
+                frm.submit();
+            }
+        }
+
+        function validateSapPmFields() {
+            let sapValidationOk = true;
+            let sapErrorMessages = [];
+            if(!functionalLocationPicker?.savedFunctionalLocationInfo?.functionalLocationId) {
+                //validation error for selected functional location
+                sapValidationOk = false;
+                sapErrorMessages.push('Functional location is mandatory. ');
+            }
+            if($('[id^="maintPriority-"]').parent('.active').length == 0) {
+                //validation error for selected functional location
+                sapValidationOk = false;
+                sapErrorMessages.push('Maintenance priority is mandatory. ');
+            }
+            if($('[id^="notificationType-"]').parent('.active').length == 0) {
+                //validation error for selected functional location
+                sapValidationOk = false;
+                sapErrorMessages.push('Notification type is mandatory. ');
+            }
+            let titleVal = $('#sapNotificationTitle').val();
+            if(titleVal.length == 0) {
+                //validation error for selected functional location
+                sapValidationOk = false;
+                sapErrorMessages.push('Notification title is mandatory. ');
+            }
+            if(sapErrorMessages.length>0) {
+                toastr.error('Send to SAP PM is turned on but some fields are not filled in correctly. <br />' + sapErrorMessages.join(" "));
+            }
+            return sapValidationOk;
+        }
+
+        async function postMedia(spec) {
+            let blob = await fetch(spec.src).then(
+                r => r.blob()
+            );
+
+            var file = new File([blob], $.utils.createUUID() + '.' + spec.dataset.ext);
+            var actionid = $('input#Id').val();
+            var index = spec.dataset.index;
+            var target = spec.dataset.target;
+            var formData = new FormData();
+            formData.append("file", file);
+            formData.append("target", spec.dataset.target);
+            formData.append("blob", spec.src);
+            formData.append("id", actionid);
+
+            var inputs = spec.parentNode.querySelectorAll("input[type=hidden]");
+            var input = inputs[0];
+
+            return fetch('/action/new/media', {
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => (response.text()))
+                .then(path => {
+                    var newPath = String(path).replaceAll('"', '');
+                    spec.classList.remove('blob');
+                    if (target.match('image')) {
+                        input.name = "Images[" + index + "]";
+                        input.id = "Images_" + index + "_";
+                        input.value = newPath;
+                    }
+                    else if (target.match('videothumbnail')) {
+                        input.name = "VideoThumbNails[" + index + "]";
+                        input.id = "VideoThumbNails_" + index + "_";
+                        input.value = newPath;
+                    }
+                    else {
+                        var videoInput = inputs[1];
+                        videoInput.name = "Videos[" + index + "]";
+                        videoInput.id = "Videos_" + index + "_";
+                        videoInput.value = newPath;
+                    }
+                });
+        }
+
+        String.prototype.format = function () {
+            a = this;
+            for (k in arguments) {
+                a = a.replace("{" + k + "}", arguments[k])
+            }
+            return a
+        }
+
+
+    </script>
+
+}

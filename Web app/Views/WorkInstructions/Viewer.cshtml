@@ -1,0 +1,5 @@
+﻿@model WebApp.ViewModels.WorkInstructionsViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.WorkInsctructionTitle, "Work Instructions") ?? "Work Instructions";
+}

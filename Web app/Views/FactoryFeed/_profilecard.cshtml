@@ -1,0 +1,86 @@
+﻿@model FactoryFeedViewModel
+@using System.Security.Claims
+@using WebApp.Models.User
+@{
+    Layout = null;
+    var username = User.Identity.Name;
+    var profileImg = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.UserData)?.Value.ToObjectFromJson<UserProfile>().Picture;
+    var profileImgUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, profileImg);
+    var defaultProfileImg = "/assets/img/user-placeholder.jpg";
+    if (profileImg == null || string.IsNullOrEmpty(profileImg) || profileImg == "emptyprofile")
+    {
+        profileImgUrl = defaultProfileImg;
+    }
+}
+
+<section class="sticky-top">
+    <div class="profile-card-4 text-center mb-3">
+        <img src="/images/media-loading.gif" data-src="@profileImgUrl" class="img img-responsive">
+        <div class="profile-content">
+            <div class="profile-name">
+                @Model.CurrentUser.FirstName @Model.CurrentUser.LastName
+                <p>@Model.CurrentUser.UserName</p>
+            </div>
+            <div class="profile-description">
+                @if (Model.CurrentUser.Role == "basic")
+                {
+                    @(Model?.CmsLanguage.GetValue(LanguageKeys.Filters.RoleBasic, "Basic user") ?? "Basic user")
+                }
+                else if (Model.CurrentUser.Role == "shift_leader")
+                {
+                    @(Model?.CmsLanguage.GetValue(LanguageKeys.Filters.RoleShiftleader, "Shift leader") ?? "Shift leader")
+                }
+                else if (Model.CurrentUser.Role == "manager")
+                {
+                    @(Model?.CmsLanguage.GetValue(LanguageKeys.Filters.RoleManager, "Manager") ?? "Manager")
+                }
+            </div>
+            @if (Model.AdvancedStatsEnabled)
+            {
+                <div class="row d-flex">
+                    <div class="col-4">
+                        <div class="profile-overview">
+                            <p class="mb-0">@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.StatisticsPostsTitle, "Posts") ?? "Posts")</p>
+                            <h4 id="factoryFeedPostsTotal">@Model.PostsTotal</h4>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="profile-overview">
+                            <p class="mb-0">@(Model.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.StatisticsCommentsTitle, "Comments") ?? "Comments")</p>
+                            <h4 id="factoryFeedCommentsTotal">@Model.CommentsTotal</h4>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="profile-overview">
+                            <p class="mb-0">@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.StatisticsLikesTitle, "Likes") ?? "Likes")</p>
+                            <h4 id="factoryFeedLikesTotal">@Model.LikesTotal</h4>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="row d-flex">
+                    <div class="col-4">
+                        <div class="profile-overview">
+                            <p class="mb-0">@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.AuditsTitle, "Audits") ?? "Audits")</p>
+                            <h4>@Model.AuditsTotal</h4>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="profile-overview">
+                            <p class="mb-0">@(Model.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.ChecklistTitle, "Checklists") ?? "Checklists")</p>
+                            <h4>@Model.ChecklistsTotal</h4>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="profile-overview">
+                            <p class="mb-0">@(Model?.CmsLanguage.GetValue(LanguageKeys.FactoryFeed.TasksTitle, "Tasks") ?? "Tasks")</p>
+                            <h4>@Model.TasksTotal</h4>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>

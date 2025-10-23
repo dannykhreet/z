@@ -1,0 +1,114 @@
+﻿@model WebApp.ViewModels.CompanySettingsViewModel
+@section Styles {
+    <style>
+        #label.work-instructions-option .notification-icon {
+            color: #5B9C5A !important;
+        }
+    </style>
+}
+
+
+
+<!-- Right Content Area -->
+<div class="col-9 p-4" style="border-radius: 8px; max-width:100%">
+    <div class="btn-group btn-group-toggle" data-toggle="buttons" style="display: flex; justify-content: space-between;">
+        <!-- Notify Label -->
+        <label id="notify_label" class="btn work-instructions-option @(Model.ApplicationSettings?.Features?.WorkInstructionsChangedNotificationsEnabled == true ? "active" : "")">
+            <input type="radio" name="notify" id="notify" value="notify" @(Model.ApplicationSettings?.Features?.WorkInstructionsChangedNotificationsEnabled == true ? "checked" : "") />
+            <div class="option-content">
+                <i id="notify_icon" class="fa-solid fa-calendar-lines-pen icon notification-icon"></i>
+                <div class="option-text">
+                    <strong>@(Model?.CmsLanguage.GetValue(LanguageKeys.Setting.EnableNotificationsTitle, "Enable notifications") ?? "Enable notifications") </strong><br>
+                    <span>@(Model?.CmsLanguage.GetValue(LanguageKeys.Setting.EnableNotificationsDescription, "Notify users about changes in work instructions") ?? "Notify users about changes in work instructions")</span>
+                </div>
+            </div>
+        </label>
+
+        <!-- Do Not Notify Label -->
+        <label id="do_not_notify_label" class="btn work-instructions-option @(Model.ApplicationSettings?.Features?.WorkInstructionsChangedNotificationsEnabled == false ? "active" : "")">
+            <input type="radio" name="notify" id="donotnotify" value="donotnotify" @(Model.ApplicationSettings?.Features?.WorkInstructionsChangedNotificationsEnabled == false ? "checked" : "") />
+            <div class="option-content">
+                <img id="dispensable_notifications_image" class="icon notification-icon"
+                     src="@(Model.ApplicationSettings?.Features?.WorkInstructionsChangedNotificationsEnabled == false ? "/images/setting/A_Dispensable notifications.svg" : "/images/setting/NA_Dispensable notifications.svg")" />
+                <div class="option-text">
+                    <strong>@(Model?.CmsLanguage.GetValue(LanguageKeys.Setting.DisableNotificationsTitle, "Disable notifications") ?? "Disable notifications") </strong><br>
+                    <span>@(Model?.CmsLanguage.GetValue(LanguageKeys.Setting.DisableNotificationsDescription, "Don't notify users about changes in work instructions") ?? "Don't notify users about changes in work instructions") </span>
+                </div>
+            </div>
+        </label>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        // Debounce timer
+        let debounceTimer;
+
+        // Event handler for label clicks
+        $('.btn-group-toggle').off('click', 'label').on('click', 'label', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Clear previous debounce timer
+            clearTimeout(debounceTimer);
+
+            // Set debounce timer to prevent multiple requests
+            debounceTimer = setTimeout(() => {
+                // Remove active class from all buttons
+                $('.btn-group-toggle label').removeClass('active');
+
+                // Add active class to the clicked button
+                $(this).addClass('active');
+
+                // Determine the selected state and update the UI accordingly
+                let settingValue;
+
+                if ($(this).attr('id') === 'notify_label') {
+                    // Enable notifications selected
+                    settingValue = true;
+                    $('#notify').prop('checked', true);
+                    $('#donotnotify').prop('checked', false);
+                    $('#dispensable_notifications_image').attr('src', '/images/setting/NA_Dispensable notifications.svg');
+                } else if ($(this).attr('id') === 'do_not_notify_label') {
+                    // Dispensable notifications selected
+                    settingValue = false;
+                    $('#notify').prop('checked', false);
+                    $('#donotnotify').prop('checked', true);
+                    $('#dispensable_notifications_image').attr('src', '/images/setting/A_Dispensable notifications.svg');
+                }
+
+                // Send AJAX request to update the setting in the backend
+                updateWorkInstructionChangesStatus(settingValue);
+            }, 300); // Debounce delay
+        });
+
+        // Initialize Work Instructions state properly
+        initializeWorkInstructions();
+
+        function initializeWorkInstructions() {
+            // Remove 'active' class from both labels
+            $('#notify_label').removeClass('active');
+            $('#do_not_notify_label').removeClass('active');
+
+            if ($('#notify').is(':checked')) {
+                $('#notify_label').addClass('active');
+                $('#dispensable_notifications_image').attr('src', '/images/setting/NA_Dispensable notifications.svg');
+            } else if ($('#donotnotify').is(':checked')) {
+                $('#do_not_notify_label').addClass('active');
+                $('#dispensable_notifications_image').attr('src', '/images/setting/A_Dispensable notifications.svg');
+            }
+        }
+
+        function updateWorkInstructionChangesStatus(settingValue) {
+            $.ajax({
+                url: '/CompanySettings/UpdateWorkInstrucationChangesStatus',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(settingValue),
+                success: function (response) {
+                    toastr.success('@(Model?.CmsLanguage.GetValue(LanguageKeys.CompanySetting.NotifyEndUserWorkInstructionChangeDoneCorrectly, "Work instrucation setting updated correctly") ?? "Work instrucation setting updated correctly")');
+                },
+                error: function (xhr, status, error) { }
+            });
+        }
+    });
+</script>

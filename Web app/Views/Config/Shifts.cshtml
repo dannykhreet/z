@@ -1,0 +1,409 @@
+﻿@model WebApp.ViewModels.ConfigViewModel
+@{
+    Dictionary<string, string> CmsLanguage = Model.CmsLanguage;
+    string Locale = Model.Locale ?? "en-US";
+    Layout = null;
+    ViewData["Title"] = CmsLanguage?.GetValue(LanguageKeys.Config.ButtonShifts, "Days, times and shifts") ?? "Days, times and shifts";
+}
+
+@section CSS {
+
+    <style>
+        .card.action:hover {
+            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+        }
+
+        .shifterror {
+            color: red;
+        }
+    </style>
+
+}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-6">
+                <br />
+                <h1>@(CmsLanguage?.GetValue(LanguageKeys.Config.ButtonShifts, "Days, times and shifts") ?? "Days, times and shifts")</h1>
+            </div>
+            <div class="col-sm-6 d-flex  flex-row-reverse">
+                <button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" disabled id="save_shift_btn" onclick="@(Model.DisableMutateShifts ? "return false" : "timeTable.save()")">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonSave, "Save") ?? "Save")</button>
+                <!--<button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" onclick="timeTable.save()">Save</button>-->
+                <!--<a asp-controller="config" asp-action="Index" class="btn btn-ezgo btn-outline btn-sm mr-2 shadow-sm mt-auto">Areas</a>-->
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+
+    <div class="container-fluid">
+        <div class="row" style="height:auto">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        @(CmsLanguage?.GetValue(LanguageKeys.Config.SchedulerTitle, "Shift scheduler") ?? "Shift scheduler")
+                    </div>
+                    <div class="card-body">
+                        <partial name="_days_times_shifts.cshtml" model="Model" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--div class="row">
+            <div class="col-md-12">
+                <div class="card action shadow-none" style="background-color:transparent;border:dashed 1px silver;">
+                    <div class="body p-3 text-center">
+                        <a href="#" class="disabled">+ Add new shift schedule</a>
+                    </div>
+                </div>
+            </div>
+        </div-->
+    </div>
+
+</section>
+
+<div class="modal fade" id="modalAddTimes" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">@(CmsLanguage?.GetValue(LanguageKeys.Config.ButtonAddShift, "Add shift") ?? "Add shift")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group row" data-containertype="shift_day_choice">
+                        <label for="staticEmail" class="col-sm-4 col-form-label">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogDayOfWeekTitle, "Day of week") ?? "Day of week")</label>
+                        <div class="col-sm-8">
+                            <select class="form-control text-capitalize" id="shift_day">
+                                <option value="0">@(((DayOfWeek)1).GetTextTranslation(Locale))</option>
+                                <option value="1">@(((DayOfWeek)2).GetTextTranslation(Locale))</option>
+                                <option value="2">@(((DayOfWeek)3).GetTextTranslation(Locale))</option>
+                                <option value="3">@(((DayOfWeek)4).GetTextTranslation(Locale))</option>
+                                <option value="4">@(((DayOfWeek)5).GetTextTranslation(Locale))</option>
+                                <option value="5">@(((DayOfWeek)6).GetTextTranslation(Locale))</option>
+                                <option value="6">@(((DayOfWeek)0).GetTextTranslation(Locale))</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="staticEmail" class="col-sm-4 col-form-label">@(CmsLanguage?.GetValue(LanguageKeys.Config.SchedulerStartTime, "Start time") ?? "Start time")</label>
+                        <div class="col-sm-8">
+                            <input class="form-control" type="time" data-type="time" data-val="true" data-val-regex="Time is invalid" data-val-regex-pattern="^(0?[1-9]|1[0-2]):[0-5][0-9]\s*[aApP][mM]\s*$" data-val-required="Start time is required" id="startTime" name="StartTime" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.TimeStartPlaceholder, "Time Start") ?? "Time Start")" value="" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputPassword" class="col-sm-4 col-form-label">@(CmsLanguage?.GetValue(LanguageKeys.Config.SchedulerEndTime, "End time") ?? "End time")</label>
+                        <div class="col-sm-8">
+                            <input class="form-control" type="time" data-type="time" data-val="true" data-val-regex="Time is invalid" data-val-regex-pattern="^(0?[1-9]|1[0-2]):[0-5][0-9]\s*[aApP][mM]\s*$" data-val-required="Start time is required" id="endTime" name="EndTime" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.TimeEndPlaceholder, "Time End") ?? "Time End")" value="" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger btn-wm mr-auto" id="modalRemoveShiftButton" data-dismiss="modal" data-actiontype="remove">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonRemove, "Remove") ?? "Remove")</button>
+                <button type="button" class="btn btn-outline btn-sm" data-dismiss="modal">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonCancel, "Cancel") ?? "Cancel")</button>
+                <button id="modalAddShiftButton" type="button" class="btn btn-ezgo btn-sm" data-actiontype="add">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonAdd, "Add") ?? "Add")</button>
+                <button id="modalAddAndNewShiftButton" type="button" class="btn btn-ezgo btn-sm" data-actiontype="add" data-actionsubtype="new">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonAddNew, "Add + New") ?? "Add + New")</button>
+                <button id="modalChangeShiftButton" type="button" class="btn btn-ezgo btn-sm" data-actiontype="change">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonChange, "Change") ?? "Change")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.DisableMutateShifts)
+{
+    <script>
+        setTimeout(function () { toastr.warning('@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.SavingShiftsDisabled, "Saving shifts is currently disabled.") ?? "Saving shifts is currently disabled.")'); }, 1000);
+    </script>
+}
+
+<script>
+    //refactor
+    var timeTable = {
+        element: '#timeTable',
+        timeList: null,
+        currentShift: null,
+        //handlers
+        showAddShiftModal: function (el) {
+            timelist = $(el.currentTarget).parent().parent().children('ul')[0];
+            var currentWeekDayNumber = $(timelist).attr('data-weekdaynumber');
+            $('#startTime').val('');
+            $('#endTime').val('');
+            $('#shift_day').val(currentWeekDayNumber);
+            $('#modalAddShiftButton').show();
+            $('#modalAddAndNewShiftButton').show();
+            $('#modalRemoveShiftButton').hide();
+            $('#modalChangeShiftButton').hide();
+            $('[data-containertype="shift_day_choice"]').show();
+            $('#modalAddTimes').modal('show');
+
+        },
+
+        showChangeShiftModal: function (el) {
+            if (el != null) {
+                timelist = $(el.currentTarget).closest('ul')[0];
+
+                var currentWeekDayNumber = $(timelist).attr('data-weekdaynumber');
+                var starttime = $(el.currentTarget).attr('data-starttime');
+                var id = $(timelist).attr('data-id');
+                var endtime = $(el.currentTarget).attr('data-endtime');
+
+                //TODO refactor
+                var currentShift = {
+                    WeekdayNumber: currentWeekDayNumber,
+                    StartTime: starttime,
+                    EndTime: endtime,
+                    Id: id
+                };
+
+                timeTable.currentShift = currentShift;
+
+                $('#startTime').val(starttime);
+                $('#endTime').val(endtime);
+                $('#shift_day').val(currentWeekDayNumber);
+                $('#modalAddShiftButton').hide();
+                $('#modalAddAndNewShiftButton').hide();
+                $('#modalChangeShiftButton').show();
+                $('#modalRemoveShiftButton').show();
+                $('[data-containertype="shift_day_choice"]').hide();
+                $('#modalAddTimes').modal('show');
+            }
+
+        },
+
+        sort: function () {
+            $('ul[data-autosort="true"]').each(function () {
+                $(this).html($(this).children('li[data-containertype="shiftdata"]').sort(function (a, b) {
+                    return ($(b).attr('data-starttime')) < ($(a).attr('data-starttime')) ? 1 : -1;
+                }));
+            });
+        },
+
+        //data handlers
+        addShift: function (el) {
+
+            var startTime = $('#startTime').val();
+            var endTime = $('#endTime').val();
+            var weeknr = $('#shift_day').val();
+            if ($(timelist).attr('data-weekdaynumber') != $('#shift_day').val()) {
+                //get correct item, weeknr day changed
+                timelist = $('[data-containertype="shiftdaydata"][data-weekdaynumber="' + weeknr + '"]');
+            }
+
+            var elemementHtml = '<li data-containertype="shiftdata" style="cursor: pointer;" data-id="0" data-weekdaynumber="' + weeknr + '" data-starttime="' + startTime + '" data-endtime="' + endTime + '" data-status="added">' + startTime + '-' + endTime + '</li>';
+            $(timelist).append(elemementHtml);
+
+            timeTable.sort();
+
+            if ($(el.currentTarget).attr('data-actionsubtype') == 'new') {
+                $('#startTime').val('');
+                $('#endTime').val('');
+                $('#startTime').focus();
+            } else {
+                $('#modalAddTimes').modal('hide');
+            }
+
+            timeTable.validateShifts();
+        },
+
+
+        changeShift: function () {
+            var startTime = $('#startTime').val();
+            var endTime = $('#endTime').val();
+            var weeknr = $('#shift_day').val();
+            //get original item
+            var shiftli = $('li[data-weekdaynumber="' + timeTable.currentShift.WeekdayNumber + '"][data-starttime="' + timeTable.currentShift.StartTime + '"][data-endtime="' + timeTable.currentShift.EndTime + '"]');
+            if (shiftli != null) {
+
+                shiftli.attr('data-weekdaynumber', weeknr);
+                shiftli.attr('data-starttime', startTime);
+                shiftli.attr('data-endtime', endTime);
+                shiftli.attr('data-status', 'changed');
+                shiftli.text(startTime + '-' + endTime);
+            }
+            timeTable.sort();
+            $('#modalAddTimes').modal('hide');
+
+            timeTable.validateShifts();
+        },
+
+        removeShift: function () {
+            //get original item
+            var shiftli = $('li[data-weekdaynumber="' + timeTable.currentShift.WeekdayNumber + '"][data-starttime="' + timeTable.currentShift.StartTime + '"][data-endtime="' + timeTable.currentShift.EndTime + '"]');
+            if (shiftli != null) {
+                shiftli.attr('data-status', 'removed');
+                shiftli.hide();
+            }
+
+            $('#modalAddTimes').modal('hide');
+
+            timeTable.validateShifts();
+        },
+
+        save: function () {
+
+            if (timeTable.validateShifts()) {
+
+                $('body').toggleClass('loaded');
+
+                var changedItems = $('[data-status="changed"]');
+                var removedItems = $('[data-status="removed"]');
+                var addedItems = $('[data-id="0"][data-status="added"]');
+                var shifts = { ChangedShifts: [], AddedShifts: [], RemovedShifts: [] };
+
+                changedItems.each(function (i, li) {
+                    var shift = { Id: null, Start: null, End: null, Weekday: null };
+                    //console.log(li);
+                    shift.Weekday = parseInt($(li).attr('data-weekdaynumber'));
+                    shift.Start = $(li).attr('data-starttime');
+                    shift.Id = parseInt($(li).attr('data-id'));
+                    shift.End = $(li).attr('data-endtime');
+
+                    shifts.ChangedShifts.push(shift);
+
+                });
+
+                removedItems.each(function (i, li) {
+                    var shift = { Id: null, Start: null, End: null, Weekday: null };
+                    shift.Weekday = parseInt($(li).attr('data-weekdaynumber'));
+                    shift.Start = $(li).attr('data-starttime');
+                    shift.Id = parseInt($(li).attr('data-id'));
+                    shift.End = $(li).attr('data-endtime');
+
+                    shifts.RemovedShifts.push(shift);
+
+                });
+
+                addedItems.each(function (i, li) {
+                    var shift = { Id: null, Start: null, End: null, Weekday: null };
+                    shift.Weekday = parseInt($(li).attr('data-weekdaynumber'));
+                    shift.Start = $(li).attr('data-starttime');
+                    shift.Id = parseInt($(li).attr('data-id'));
+                    shift.End = $(li).attr('data-endtime');
+
+                    shifts.AddedShifts.push(shift);
+
+                });
+
+                //TODO add loader or related;
+
+                $.ajax({
+                    type: "POST",
+                    url: '/config/postshifts',
+                    data: JSON.stringify(shifts),
+                    success: function (data) {
+                        //console.log('done');
+                        setTimeout(() => {
+                            $('body').toggleClass('loaded');
+                            location.reload();
+                        }, 1000)
+                    },
+                    error: function () {
+                        $('body').toggleClass('loaded');
+                        toastr.error('@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.AnErrorOccured, "An error occured") ?? "An error occured")');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            }
+        },
+        validateShifts: function () {
+            $('[data-containertype="shiftdata"]').removeClass('shifterror');
+            $('#save_shift_btn').attr('disabled', true);
+            let everythingIsValid = true;
+            let previous_start_time;
+            let previous_end_time;
+            let current_start_time;
+            let current_end_time;
+            let full_day_shift = false;
+            let full_day_shift_error = false;
+            for (var i = 0; i < 7; i++) {
+                let col = $('[data-containertype="shiftdata"][data-status!="removed"][data-weekdaynumber="' + i.toString() + '"]');
+                full_start = false;
+                full_end = false;
+                full_day_shift = false;
+
+                for (var ic = 0; ic < col.length; ic++) {
+                    let shift = $(col[ic]);
+                    current_start_time = shift.attr('data-starttime');
+                    current_end_time = shift.attr('data-endtime');
+
+                    if (current_start_time == current_end_time) {
+                        full_day_shift = true;
+                    }
+
+                    if (previous_end_time != undefined) {
+                        if ((ic > 0 && previous_end_time > current_start_time) || (ic === 0 && previous_end_time > current_start_time && previous_start_time >= previous_end_time)) {
+                            everythingIsValid = false;
+                            shift.addClass('shifterror');
+                        }
+                    }
+
+                    previous_start_time = current_start_time;
+                    previous_end_time = current_end_time; //set end time for upcoming loop;
+
+                }
+
+                if (col.length > 1 && full_day_shift) {
+                    for (var ic = 0; ic < col.length; ic++) {
+                        let shift = $(col[ic]);
+                        shift.addClass('shifterror');
+                    }
+                    full_day_shift_error = true;
+                    everythingIsValid = false;
+                }
+            }
+            if (everythingIsValid) {
+                timeTable.enableSave();
+            } else {
+                timeTable.disableSave();
+                if (full_day_shift_error) {
+                    toastr.error('@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.WhenUsing24Hour, "When using a [24 hour] shift no other shifts can be planned.") ?? "When using a [24 hour] shift no other shifts can be planned.")');
+                } else {
+                    toastr.error('@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.OverlappingShift, "Overlapping shift. Shift [start time] can not overlap with previous shift [end time].") ?? "Overlapping shift. Shift [start time] can not overlap with previous shift [end time].")');
+                }
+
+            }
+
+            return everythingIsValid;
+
+        },
+        enableSave: function () {
+            $('#save_shift_btn').attr('disabled', false);
+        },
+        disableSave: function () {
+            $('#save_shift_btn').attr('disabled', true);
+        }
+
+    }
+
+    $(document).ready(function () {
+
+        $('a[data-action="new"]').on('click', timeTable.showAddShiftModal);
+        //$('ul').on('click', 'li[data-containertype="shiftdata"]', timeTable.showChangeShiftModal());
+        $('ul').on('click', 'li[data-containertype="shiftdata"]', timeTable.showChangeShiftModal);
+
+        $('#modalAddShiftButton').on('click', timeTable.addShift);
+        $('#modalAddAndNewShiftButton').on('click', timeTable.addShift);
+        $('#modalChangeShiftButton').on('click', timeTable.changeShift);
+        $('#modalRemoveShiftButton').on('click', timeTable.removeShift);
+        $('#modalAddTimes').on('shown.bs.modal', function () {
+            $('#startTime').trigger('focus')
+        })
+
+    });
+
+</script>
+
+<script>
+    function defer(method) {
+        if (window.jQuery) {
+            method();
+        } else {
+            setTimeout(function () { defer(method) }, 50);
+        }
+    }
+    defer(ezgomediafetcher.preloadImagesAndVideos);
+</script>

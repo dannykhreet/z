@@ -1,0 +1,196 @@
+﻿@model WebApp.ViewModels.ActionViewModel
+
+@{
+    Dictionary<string, string> CmsLanguage = Model?.CmsLanguage;
+    Layout = "_Layout_template";
+    ViewData["Title"] = CmsLanguage?.GetValue(LanguageKeys.Comment.DetailsTitle, "Comment details") ?? "Comment details";
+    int taskId = Model.TaskId;
+}
+<style>
+
+    .tag-card {
+        display: flex;
+        width: 9em;
+        color: white;
+        align-content: center;
+        align-items: center;
+    }
+
+    .tag-wrapper {
+        width: 100%;
+        width: -moz-available;
+        width: -webkit-fill-available;
+        display: flex;
+        height: 2.6em;
+        line-height: 1.1;
+    }
+
+    .tag-span {
+        text-align: center;
+        align-self: center;
+        display: inline-block;
+        width: 100%;
+        width: -moz-available;
+        width: -webkit-fill-available;
+    }
+
+
+    .img-container {
+        border-radius: 0.25em;
+        overflow: hidden;
+        width: 100%;
+        @*padding-top: 56.25%; /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
+        padding-top: 66.66%; /* 3:2 Aspect Ratio (divide 2 by 3 = 0.6666)  */
+        *@ padding-top: 75% !important; /* 4:3 Aspect Ratio (divide 3 by 4 = 0.75) */
+        position: relative; /* If you want text inside of it */
+    }
+
+        .img-container > a {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+            .img-container > a > img {
+                object-fit: cover;
+                height: 100%;
+                width: 100%;
+            }
+
+
+
+</style>
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                @{
+                    var returnUrl = "/action?filter=comment";
+                    if(taskId != 0)
+                    {
+                        returnUrl = $"/action/taskactions/{taskId}/null/false";
+                    }
+                }
+                <a id="goBackToActionOverview" href=""><i class="fa fa-arrow-left"></i> @(CmsLanguage?.GetValue(LanguageKeys.Comment.DetailsBackToOverview, "Back to overview") ?? "Back to overview")</a>
+
+                <h1>@(CmsLanguage?.GetValue(LanguageKeys.Comment.DetailsTitle, "Comment details") ?? "Comment details")</h1>
+            </div>
+            <div class="col-sm-6 d-flex  flex-row-reverse">
+
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+
+    <div class="container-fluid">
+
+        <div class="row">
+
+            <div class="col-12" style="height:calc(100vh - 175px);overflow:auto;">
+
+                <div class="card detail">
+                    <div class="card-header">
+                        <h3 class="card-title d-inline-block">@(CmsLanguage?.GetValue(LanguageKeys.Comment.DetailsTitle, "Details") ?? "Details")</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2"><span class="text-muted">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsCommentTitle, "Comment") ?? "Comment"):</span><br />@Model.CurrentComment.CommentText</p>
+                        <p class="mb-2"><span class="text-muted">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsAuthorTitle, "Author") ?? "Author"):</span><br />@Model.CurrentComment.CreatedBy</p>
+
+                        <ul id="datelist" class="list-inline card-group mt-3 itemlist">
+                            <li class="list-inline-item pb-3 pr-3">
+                                <span class="text-muted">@(CmsLanguage?.GetValue(LanguageKeys.Comment.DetailsPostedTitle, "Posted") ?? "Posted"):</span><br />@Model.CurrentComment.CommentDate.ToLocaleLongDateString(Model.Locale)
+                            </li>
+                        </ul>
+
+
+                        @if (Model.CurrentComment.Tags?.Count > 0 && Model.ApplicationSettings?.Features?.TagsEnabled == true)
+                        {
+                            <p class="mb-2">
+                                <span class="text-muted">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsMainTitle, "Tags") ?? "Tags"):</span>
+                                <br />
+                                <div class="row">
+                                    @foreach (var tag in Model.CurrentComment.Tags)
+                                    {
+                                        <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode;">
+                                            <div class="tag-wrapper" style="">
+                                                <i class="nav-icon my-auto ml-2 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                <span class="my-auto mr-2 tag-span">@tag.Name</span>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </p>
+                        }
+                    </div>
+
+                </div>
+
+                @if (Model.CurrentComment.Attachments.Any())
+                {
+                    <!-- Media -->
+                    <div class="card mb-0">
+                        <div class="card-header">
+                            <h3 class="card-title">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsMediaTitle, "Media") ?? "Media")</h3>
+                        </div>
+                        <div class="card-body">
+
+                            <div id="medialist" class="row card-group pt3 itemlist">
+                                @foreach (string img in Model.CurrentComment.Attachments)
+                                {
+                                    var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, img);
+                                    picture = picture.Replace("/media/media", "/media"); //fix for incorrect data in db
+                                    <div class="col-12 col-md-3 col-lg-2 col-xl-2" data-type="image">
+                                        <div class="card h-100">
+
+                                            <div class="card-body img-container p-0 text-center">
+                                                <a class="card-link" href="/images/media-loading.gif" data-href="@picture" data-fancybox="comment" data-caption="@Model.CurrentComment.CommentText">
+                                                    <img loading="lazy" src="/images/media-loading.gif" data-src="@picture" />
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+
+</section>
+
+@section Scripts{
+    <script>
+        if (history.length == 1) {
+            $('#goBackToPreviousPage').hide();
+        }
+
+        function goBack() {
+            history.back();
+        }
+        
+        $('document').ready(function () {
+            ezgomediafetcher.preloadImagesAndVideos();
+            ezgomediafetcher.preloadFancyboxAnchors();
+
+            let actionOverviewLocation = window.location.origin;
+            let localStorageItem = localStorage.getItem('last_action_overview_location');
+            if (localStorageItem != null && localStorageItem != undefined) {
+                actionOverviewLocation += localStorageItem;
+            }
+            else {
+                actionOverviewLocation += '/actions?filter=action';
+            }
+            $('#goBackToActionOverview').attr('href', actionOverviewLocation);
+        });
+    </script>
+}

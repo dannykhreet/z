@@ -1,0 +1,49 @@
+﻿@model WebApp.ViewModels.WorkInstructionChangeNotificationViewModel
+@{
+}
+
+@if (Model != null)
+{
+    if (Model.Timezone == null) { Model.Timezone = TimeZoneInfo.Utc; } //default to UTC, for some reason its empty? should not occur.
+
+    <div class="results" data-containertype="resultitem">
+        <a id="completedWiChangeNotification-@Model.ChangeNotification.Id" class="list-group-item list-group-item-action no-border" data-wichangenotificationid="@Model.ChangeNotification.Id" onclick="loadTasks(event, @Model.ChangeNotification.Id)">
+            <div class="w-100 justify-content-between">
+                
+                <div class="row">
+                    @if (Model != null && Model.ChangeNotification != null) 
+                    {
+                        if(!string.IsNullOrEmpty(Model.ChangeNotification.NotificationComment))
+                        {
+                            <div class="col-9">
+                                <h5 class="mb-2">@Model.WorkInstruction.Name</h5>
+                            </div>
+                            <div class="col-3">
+                                <div class="mb-2 pt-1 pr-2" style="text-align: right"><i style="font-size: 20px" class="fa-solid fa-calendar-lines-pen"></i></div>
+                            </div>
+                        }
+                        else if(Model.WorkInstruction != null)
+                        {
+                            <div class="col-12">
+                                <h5 class="mb-2">@Model.WorkInstruction.Name</h5>
+                            </div>
+                        }
+                    }
+                </div>
+                @{
+                    Model.ChangeNotification.ModifiedAt = DateTime.SpecifyKind(Model.ChangeNotification.ModifiedAt.Value, DateTimeKind.Utc);
+                    DateTime ModifiedAtDate = TimeZoneInfo.ConvertTime(Model.ChangeNotification.ModifiedAt.Value, Model.Timezone);
+                }
+
+                <div class="row">
+                    <div class="col">
+                        <p class="mb-1">@Model.ModifiedTextValue @ModifiedAtDate.ToLocaleFullDateShortTimeString(Model.Locale)</p>
+                        <p class="mb-1">@Model.ByTextValue @Model.ChangeNotification.ModifiedBy</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </a>
+    </div>
+}

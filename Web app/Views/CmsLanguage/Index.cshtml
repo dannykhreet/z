@@ -1,0 +1,241 @@
+﻿@model WebApp.ViewModels.LanguageViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout_template";
+}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>@(Model?.CmsLanguage.GetValue(LanguageKeys.CmsLanguage.ManageLanguagesHeader, "Manage CMS languages") ?? "Manage CMS languages")</h1>
+            </div>
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="languages" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.CmsLanguage.ExportTitle, "Export") ?? "Export")"><i class="fas fa-download"></i></button>
+                <!--<button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="languagesimport" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.CmsLanguage.ExportUpdateTitle, "Export update queries") ?? "Export update queries")"><i class="fas fa-cloud-download-alt"></i></button>-->
+                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.CmsLanguage.ReInitializeStore, "Re-initialize language store") ?? "Re-initialize language store")" data-type="languagereset"><i class="fas fa-language"></i></button>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Model.Language.LanguageCulture</button>
+                        <div class="dropdown-menu" id="locale">
+                            <a asp-controller="CmsLanguage" asp-action="Index" asp-route-locale="nl-NL" class="dropdown-item">nl-NL</a>
+                            <a asp-controller="CmsLanguage" asp-action="Index" asp-route-locale="en-GB" class="dropdown-item">en-GB</a>
+                            <a asp-controller="CmsLanguage" asp-action="Index" asp-route-locale="fr-FR" class="dropdown-item">fr-FR</a>
+                            <a asp-controller="CmsLanguage" asp-action="Index" asp-route-locale="en-US" class="dropdown-item">en-US</a>
+                            <a asp-controller="CmsLanguage" asp-action="Index" asp-route-locale="de-DE" class="dropdown-item">de-DE</a>
+                            <a asp-controller="CmsLanguage" asp-action="Index" asp-route-locale="es-ES" class="dropdown-item">es-ES</a>
+                            <a asp-controller="CmsLanguage" asp-action="Index" asp-route-locale="pt-PT" class="dropdown-item">pt-PT</a>
+                        </div>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Search@(Model?.CmsLanguage.GetValue(LanguageKeys.CmsLanguage.SearchPlaceholder, "Search") ?? "Search")" data-control="search" />
+                </div>
+
+            </div>
+            @*<div class="card-footer">
+                    <div class="card-tools">
+                        <button class="btn btn-success mr-2 btn-sm" data-item="new-key" data-locale="@Model.Language.LanguageCulture" disabled>Add Resource</button>
+                    </div>
+                </div>*@
+        </div>
+    </div>
+</section>
+
+<section class="content" style="max-height:calc(100vh - 243px);overflow:auto;">
+    <div class="container-fluid" id="language_keys">
+
+        <partial name="_language_keys.cshtml" model="Model" />
+
+    </div>
+</section>
+
+<!-- Modal -->
+<div class="modal fade" id="newLanguageKeyModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content" id="newLanguageKeyContent">
+            <partial name="_modal_new_language_key.cshtml" model="null" />
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="editLanguageKeyModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content" id="editLanguageKeyContent">
+            <partial name="_modal_edit_language_key.cshtml" model="null" />
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="modalUpdateLanguages" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">@(Model?.CmsLanguage.GetValue(LanguageKeys.CmsLanguage.ReInitializeStore, "Re-initialize language store") ?? "Re-initialize language store")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="select_languages">@(Model?.CmsLanguage.GetValue(LanguageKeys.CmsLanguage.LanguageText, "Language") ?? "Language")</label>
+                    <select asp-items="@Model.LanguageSelectorItems" class="form-control" id="select_languages"></select>
+                    <div style="text-align:right;margin-top:2px;">
+                        <button id="btn_update" type="button" class="btn btn-ezgo btn-sm" data-actiontype="update">@(Model?.CmsLanguage.GetValue(LanguageKeys.CmsLanguage.BtnUpadate, "Update") ?? "Update")</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn_done" type="button" class="btn btn-ezgo btn-sm" data-actiontype="done">@(Model?.CmsLanguage.GetValue(LanguageKeys.CmsLanguage.BtnDone, "Done") ?? "Done")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+
+    <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+    <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+    <script>
+
+        $(document).ready(function () {
+            ezgomediafetcher.preloadImagesAndVideos();
+            $(document).on('input', "input[data-control='translate']", function () {
+                //console.log($(this));
+                $(this).next("div").find("button[data-control='savebutton']").first().prop("disabled", "").removeClass("btn-outline-secondary").addClass("btn-success");
+                $(this).next("div").find("button[data-control='resetbutton']").prop("disabled", "");
+            });
+
+            $("input[data-control='search']").on('input', function () {
+
+                var search = $(this).val().toLowerCase();
+
+                $("form div.card").each(function () {
+                    if ($(this).html().toLowerCase().indexOf(search) != -1) {
+                        $(this).show();
+                    }
+                    else {
+                        $(this).hide();
+                    }
+                });
+
+            });
+
+            $(document).on('click', 'button[data-item=edit-key], .input-group[data-item=edit-key]', function (event) {
+                event.preventDefault();
+
+                var sender = $(event.currentTarget);
+                var resourceId = sender.data('key-id');
+                var locale = sender.data('locale');
+
+                $.get("/cmslanguage/editresource?locale=" + locale + "&id=" + resourceId, function (data, status) {
+                    $('#editLanguageKeyContent').html(data);
+                    $('#editLanguageKeyModal').modal('show');
+                });
+
+            });
+
+            $('button[data-item="new-key"]').on('click', function (event) {
+                event.preventDefault();
+
+                var sender = $(event.currentTarget);
+                var locale = sender.data('locale');
+
+                $.get("/cmslanguage/createresource?locale=" + locale, function (data, status) {
+                    $('#newLanguageKeyContent').html(data);
+                    $('#newLanguageKeyModal').modal('show');
+                });
+
+            });
+        });
+
+        function loadkeys(locale) {
+            $.get("/cmslanguage/keys?locale=" + locale, function (data) {
+                $('#language_keys').html(data);
+            });
+        }
+
+        function savemodal(event) {
+
+            var btn = $(event.target);
+            var frm = btn.closest('form');
+            var fdata = frm.serialize();
+            var url = frm[0].action;
+            $.post(url, fdata).done(function (data) {
+                var modal = btn.closest('div.modal');
+                modal.modal('hide');
+                if (typeof data !== 'undefined') {
+                    $("input[data-control='search']").val('');
+                    loadkeys($('#Language_LanguageCulture').val());
+                    toastr.success('@(Model.CmsLanguage.GetValue("LANGUAGE_UPDATE_SUCCESS", "You successfully updated this key"))');
+                } else {
+                    toastr.warning('@(Model.CmsLanguage.GetValue("LANGUAGE_UPDATE_FAIL", "Action was not successful"))')
+                }
+            });
+        }
+
+        function save(e) {
+            //    $(e.target).prop('disabled', 'disabled').removeClass("btn-success").addClass("btn-outline-secondary");
+        };
+
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            language.init();
+        });
+
+        var language = {
+            reInitLanguage: function (locale) {
+                $('body').toggleClass('loaded');
+                $.ajax({
+                    type: "POST",
+                    url: '/language/reinit/' + locale,
+                    data: '',
+                    success: function (data) {
+                        $('body').toggleClass('loaded');
+                        toastr.success(':)');
+                        $('#modalUpdateLanguages').modal('hide');
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('body').toggleClass('loaded');
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                        $('#modalUpdateLanguages').modal('hide');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            init: function () {
+                language.initHandlers();
+            },
+            initHandlers: function () {
+                $('[data-type="languagereset"]').on('click', function () {
+                    language.initLanguageReInit();
+                });
+                $('#btn_update').on('click', function () {
+                    language.reInitLanguage($('#select_languages').val());
+                });
+            },
+            initLanguageReInit: function () {
+                $('#modalUpdateLanguages').modal('show');
+            }
+        }
+    </script>
+
+
+
+}

@@ -1,0 +1,257 @@
+.matrix-tooltip {
+     position: relative; 
+}
+
+    /* Tooltip text */
+    .matrix-tooltip .tooltiptext {
+        visibility: hidden;
+        min-width: 150px;
+        background-color: gray;
+        color: #fff;
+        text-align: center;
+        padding: 5px;
+        border-radius: 6px;
+        /* Position the tooltip text */
+        position: absolute;
+        z-index: 1000;
+        top: -5px;
+        left: 110%;
+        font-weight: 400;
+    }
+
+    /* Show the tooltip text when you mouse over the tooltip container */
+    .matrix-tooltip:hover .tooltiptext {
+        visibility: visible;
+    }
+
+    .matrix-tooltip .tooltiptext::after {
+        content: " ";
+        position: absolute;
+        top: 50%;
+        right: 100%; /* To the left of the tooltip */
+        margin-top: -10px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent gray transparent transparent;
+    }
+
+.vertical {
+    -ms-writing-mode: tb-rl;
+    -webkit-writing-mode: vertical-rl;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+}
+
+.rowtitle {
+    vertical-align: middle;
+    text-align: center;
+    border-left: solid 1px rgb(210,210,210);
+    border-right: solid 1px rgb(210,210,210);
+    background-color: #93C54B !important;
+    color: #fff;
+}
+
+.user-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+}
+
+.user-title {
+    vertical-align: bottom;
+    text-align: center;
+    white-space: nowrap;
+    background-color: #fff;
+    border-bottom: solid 1px rgb(210,210,210);
+}
+
+.userOverlay {
+    vertical-align: bottom;
+    text-align: center;
+    white-space: nowrap;
+    background-color: #fff;
+    border-bottom: solid 1px rgb(210,210,210);
+}
+
+.user-title-endcell {
+    border-right: solid 1px rgb(210,210,210);
+}
+
+.spacerow {
+    border-top: solid 1px rgb(210,210,210);
+}
+
+.buttoncell {
+    position: relative;
+    vertical-align: middle;
+    text-align: center;
+    z-index:3;
+}
+
+.buttoncellEmpty {
+    position: relative;
+    vertical-align: middle;
+    text-align: center;
+    z-index: 3;
+}
+
+.buttonendcell {
+    vertical-align: middle;
+    text-align: center;
+    border-right: solid 1px rgb(210,210,210);
+}
+
+.endcell {
+    vertical-align: middle;
+    text-align: center;
+    border-right: solid 1px rgb(210,210,210);
+}
+
+.buttonstartcell {
+    vertical-align: middle;
+    text-align: center;
+    border-left: solid 1px rgb(210,210,210);
+}
+
+.goalcell {
+    vertical-align: middle;
+    text-align: center;
+    border-right: solid 1px rgb(210,210,210);
+}
+
+.skillcell {
+    text-align: right;
+    white-space: nowrap;
+}
+
+    .skillcell div {
+        font-weight: 800;
+    }
+
+    .skillcell small {
+        font-size: 12px;
+    }
+
+.goaldiv {
+    justify-content: space-between;
+    display: flex;
+    min-width: 106px;
+}
+
+    .goaldiv div {
+        min-width: 30px;
+        min-height: 30px;
+        border: solid 1px silver;
+        border-radius: 5px;
+        padding: 4px 2px;
+        margin: 2px;
+    }
+
+.arrowUp {
+    position: absolute;
+    top: -10px;
+    left: 30px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid silver;
+}
+
+.popUp {
+    position: absolute;
+    top: 75px;
+    left: 0px;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: space-around;
+    width: 292px;
+    padding: 5px 15px;
+    border-radius: 30px;
+    box-shadow: 10px 10px 26px -12px rgba(0,0,0,0.34);
+    -webkit-box-shadow: 10px 10px 26px -12px rgba(0,0,0,0.34);
+    -moz-box-shadow: 10px 10px 26px -12px rgba(0,0,0,0.34);
+    animation: bounceIn 0.4s;
+    z-index: 10;
+    border: solid 1px silver;
+}
+
+.popUpThumbs {
+    width: 230px;
+}
+
+.item {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 300;
+    border: solid 1px rgb(210,210,210);
+}
+
+.itemSelected {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 300;
+}
+
+.item:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+}
+
+.hidePopUp {
+    display: none;
+}
+
+@keyframes bounceIn {
+    from, 20%, 40%, 60%, 80%, to {
+        animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+
+    0% {
+        opacity: 0;
+        transform: scale3d(0.3, 0.3, 0.3);
+    }
+
+    20% {
+        transform: scale3d(1.1, 1.1, 1.1);
+    }
+
+    40% {
+        transform: scale3d(0.9, 0.9, 0.9);
+    }
+
+    60% {
+        opacity: 1;
+        transform: scale3d(1.03, 1.03, 1.03);
+    }
+
+    80% {
+        transform: scale3d(0.97, 0.97, 0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale3d(1, 1, 1);
+    }
+}
+
+table tr {
+/*    border-bottom: solid 1px rgb(210,210,210);*/
+}
+
+
+
+.skillsrow {
+    background-color: #fff;
+    border-top: solid 1px rgb(210,210,210);
+}

@@ -1,0 +1,183 @@
+﻿@model LanguageViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout_template";
+}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>@(Model?.CmsLanguage.GetValue(LanguageKeys.Language.HeaderManageAppLanguages, "Manage App languages") ?? "Manage App languages")</h1>
+            </div>
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="languages" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Language.ExportTitle, "Export") ?? "Export")"><i class="fas fa-download"></i></button>
+                <!--<button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="languagesimport" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Language.ExportUpdateTitle, "Export update queries") ?? "Export update queries")"><i class="fas fa-cloud-download-alt"></i></button>-->
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Model?.Language.LanguageCulture</button>
+                        <div class="dropdown-menu">
+                            <a asp-controller="Language" asp-action="Index" asp-route-locale="nl-NL" class="dropdown-item">nl-NL</a>
+                            <a asp-controller="Language" asp-action="Index" asp-route-locale="en-GB" class="dropdown-item">en-GB</a>
+                            <a asp-controller="Language" asp-action="Index" asp-route-locale="fr-FR" class="dropdown-item">fr-FR</a>
+                            <a asp-controller="Language" asp-action="Index" asp-route-locale="en-US" class="dropdown-item">en-US</a>
+                            <a asp-controller="Language" asp-action="Index" asp-route-locale="de-DE" class="dropdown-item">de-DE</a>
+                            <a asp-controller="Language" asp-action="Index" asp-route-locale="es-ES" class="dropdown-item">es-ES</a>
+                            <a asp-controller="Language" asp-action="Index" asp-route-locale="pt-PT" class="dropdown-item">pt-PT</a>
+                        </div>
+                    </div>
+                    <input type="text" class="form-control" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Language.SearchPlaceholder, "Search") ?? "Search")" data-control="search" />
+                </div>
+            </div>
+            @*<div class="card-footer">
+                    <div class="card-tools">
+                        <button class="btn btn-success mr-2 btn-sm" data-item="new-key" data-locale="@Model?.Language.LanguageCulture" disabled>Add Resource</button>
+                    </div>
+                </div>*@
+        </div>
+    </div>
+</section>
+
+<section class="content" style="max-height:calc(100vh - 243px);overflow:auto;">
+    <div class="container-fluid" id="language_keys">
+
+        <partial name="_language_keys.cshtml" model="Model" />
+
+    </div>
+</section>
+
+<!-- Modal -->
+<div class="modal fade" id="newLanguageKeyModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content" id="newLanguageKeyContent">
+            <partial name="_modal_new_language_key.cshtml" model="null" />
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="editLanguageKeyModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content" id="editLanguageKeyContent">
+            <partial name="_modal_edit_language_key.cshtml" model="null" />
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+    <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+    <script>
+
+        $(document).ready(function () {
+            ezgomediafetcher.preloadImagesAndVideos();
+            $("input[data-control='search']").on('input', function () {
+
+                var search = $(this).val().toLowerCase();
+
+                $("form div.card").each(function () {
+                    if ($(this).html().toLowerCase().indexOf(search) != -1) {
+                        $(this).show();
+                    }
+                    else {
+                        $(this).hide();
+                    }
+                });
+
+            });
+
+            $('button[data-item="new-key"]').on('click', function (event) {
+                event.preventDefault();
+
+                var sender = $(event.currentTarget);
+                var locale = sender.data('locale');
+
+                $.get("/language/createresource?locale=" + locale, function (data, status) {
+                    $('#newLanguageKeyContent').html(data);
+                    $('#newLanguageKeyModal').modal('show');
+                });
+
+            });
+
+            $(document).on('input', "input[data-control='translate']", function () {
+                //console.log($(this));
+                $(this).next("div").find("button[data-control='savebutton']").first().prop("disabled", "").removeClass("btn-outline-secondary").addClass("btn-success");
+                $(this).next("div").find("button[data-control='resetbutton']").prop("disabled", "");
+            });
+
+            $(document).on('click', 'button[data-item=edit-key], .input-group[data-item=edit-key]', function (event) {
+                event.preventDefault();
+
+                var sender = $(event.currentTarget);
+                var resourceId = sender.data('key-id');
+                var locale = sender.data('locale');
+
+                $.get("/language/editresource?locale=" + locale + "&id=" + resourceId, function (data, status) {
+                    $('#editLanguageKeyContent').html(data);
+                    $('#editLanguageKeyModal').modal('show');
+                });
+            });
+
+        });
+
+        function loadkeys(locale) {
+            $.get("/language/keys?locale=" + locale, function (data) {
+                $('#language_keys').html(data);
+            });
+        }
+
+        function savemodal(event) {
+
+            var btn = $(event.target);
+            var frm = btn.closest('form');
+            var fdata = frm.serialize();
+            var url = frm[0].action;
+
+            $.post(url, fdata).done(function (data) {
+                var modal = btn.closest('div.modal');
+                modal.modal('hide');
+                if (typeof data !== 'undefined') {
+                    $("input[data-control='search']").val('');
+                    loadkeys($('#Language_LanguageCulture').val());
+                    toastr.success('@(Model.CmsLanguage.GetValue("LANGUAGE_UPDATE_SUCCESS", "You successfully updated this key"))');
+                }
+                else {
+                    toastr.warning('@(Model.CmsLanguage.GetValue("LANGUAGE_UPDATE_FAIL", "Action was not successful"))')
+                }
+            });
+        }
+
+        function save(e) {
+
+            $(e.target).prop('disabled', 'disabled').removeClass("btn-success").addClass("btn-outline-secondary");
+
+        };
+
+        $('.toastrDefaultSuccess').click(function () {
+            toastr.success('Lorem ipsum dolor sit amet, consetetur sadipscing elitr.')
+        });
+        $('.toastrDefaultInfo').click(function () {
+            toastr.info('Lorem ipsum dolor sit amet, consetetur sadipscing elitr.')
+        });
+        $('.toastrDefaultError').click(function () {
+            toastr.error('Lorem ipsum dolor sit amet, consetetur sadipscing elitr.')
+        });
+        $('.toastrDefaultWarning').click(function () {
+            toastr.warning('Lorem ipsum dolor sit amet, consetetur sadipscing elitr.')
+        });
+    </script>
+
+}

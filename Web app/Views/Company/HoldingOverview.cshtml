@@ -1,0 +1,205 @@
+﻿@model WebApp.ViewModels.CompaniesViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout_template";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                &nbsp;
+                <h1 class="m-0 text-dark">Holdings</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6 d-flex flex-row-reverse">
+                @if (Model.EnableHoldingManagement)
+                {
+                    <a class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" href="/company/holding/create">Add new holding</a>
+                }
+
+                <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" title="Company overview" onclick="document.location.href = '/company';"><i class="fas fa-building"></i></button>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+<section class="content">
+
+    <div class="container-fluid">
+
+        <div class="card">
+            <div class="card-header">
+                <h3 id="cardHeader" class="card-title d-none d-sm-inline-block">Holding Overview <span id="counter">&nbsp;</span></h3>
+                <div class="card-tools">
+                    <div class="input-group input-group-sm">
+
+                        <input type="text" id="holdingSearchBox" name="holdingSearchBox" class="form-control float-right" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.SearchPlaceholder, "Search") ?? "Search")" data-boxtype="search">
+
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row pt-1" style="height:calc(100vh - 175px);overflow:auto;">
+
+            <div class="col-lg-12 col-xl-12">
+                <div id="contentBody" style="height: calc(100vh - 245px);overflow:auto;">
+
+                    <div class="row no-gutters" id="contentCol">
+
+                        @if (Model.Holdings != null && Model.Holdings.Count != 0)
+                        {
+                            @foreach(var holding in Model.Holdings.OrderBy(x => x.Name))
+                            {
+                                var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, holding.Picture);
+                                if (string.IsNullOrEmpty(holding.Picture))
+                                {
+                                    picture = @"/assets/img/normal_unavailable_image.png";
+                                }
+                                
+                                <div class="card w-100 results" data-id="@holding.Id" data-containertype="holding_container">
+                                    <div class="row" style="height:50px;margin-top:5px;">
+                                        <div class="col-sm-11 col-md-11 col-lg-11 col-xl-11">
+                                            <div class="col pb-2"><h5 class="mt-3 mt-sm-0" style="padding-left:10px;padding-top:5px;">@holding.Name <span style="font-size:12px;">@(string.IsNullOrEmpty(holding.SecurityGUID) ? Html.Raw("<i class=\"fas fa-exclamation-triangle\" style=\"color: red\" title=\"Security GUID not filled in.\"></i>") : string.Concat("(", holding.SecurityGUID, ")")) (<b>id: @holding.Id)</b></span></h5></div>
+                                        </div>
+                                        <div class="col-sm-1 col-md-1 col-lg-1 col-xl-1" style="text-align:right;">
+                                            <a id="edit_company_btn_@holding.Id" href="/company/holding/details/@holding.Id" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" data-id="@holding.Id" data-actiontype="edit" date-companyname="@holding.Name" title="Edit holding details"><i class="fas fa-edit"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-1 col-md-1 col-lg-1 col-xl-1">
+                                            <div style="text-align:left;">
+                                                <img src="/images/media-loading.gif" data-src="@picture" class="img-fluid" style="max-width:100px;max-height:100px;margin-left: 20px;" loading="lazy" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-11 col-md-11 col-lg-11 col-xl-11">
+                                            <span style="margin-left:20px;font-style:italic">@holding.Description</span>
+                                        </div>   
+                                    </div>
+                                    <div class="row" style="margin-top:5px;">
+                                        @if (Model.Companies.Where(y => y.HoldingId.HasValue && y.HoldingId.Value == holding.Id).Any())
+                                        {
+                                            @foreach (var comp in Model.Companies.Where(y => y.HoldingId.HasValue && y.HoldingId.Value == holding.Id).OrderBy(x => x.Name))
+                                            {
+                                                <div class="col-sm-1 col-md-1 col-lg-1 col-xl-1" style="text-align:right;"><span style="white-space:nowrap">&#9495;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;</span></div>
+                                                <div class="col-sm-11 col-md-11 col-lg-11 col-xl-11" data-containertype="company_name">
+                                                    <div class="col pb-2">
+                                                        @comp.Name 
+                                                        <span style="font-size:11px;">
+                                                        @if (string.IsNullOrEmpty(comp.HoldingCompanySecurityGUID))
+                                                        {
+                                                            <i class="fas fa-exclamation-triangle" style="color: red" title="Security GUID not filled in."></i>
+                                                        } else
+                                                        {
+                                                            if (comp.HoldingCompanySecurityGUID != holding.SecurityGUID)
+                                                            {
+                                                                @Html.Raw(string.Concat("(",comp.HoldingCompanySecurityGUID,") <i class=\"fas fa-exclamation-triangle\" style=\"color: orange\" title=\"Security GUID incorrect.\"></i>"))
+                                                            } else
+                                                            {
+                                                                @string.Concat("(", comp.HoldingCompanySecurityGUID, ")")
+                                                            }
+                                                                
+                                                        }
+                                                        </span>
+                                                        (<a href="/company/details/@comp.Id" target="_company">@comp.Id</a>)
+
+                                                        @if (Model.CompanySettings.Where(x => x.Key == comp.Id) != null)
+                                                        {
+                                                            var item = Model.CompanySettings.Where(x => x.Key == comp.Id).FirstOrDefault();
+                                                            if (item.Value != null)
+                                                            {
+                                                                if (item.Value.Contains("TECH_DATAWAREHOUSE"))
+                                                                {
+                                                                    <i class="fas fa-database" style="color:green" title="DataWarehouse enabled, if company or holding is configured within the DataWarehouse."></i>
+
+                                                                };
+                                                            }
+
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }
+                                                
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <partial name="~/Views/Shared/_no_templates_message.cshtml" model="@Model" />
+                        }
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts{
+
+    <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+    <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+    <script>
+
+        $(document).ready(function () {
+            ezgomediafetcher.preloadImagesAndVideos();
+            holding.init();
+        });
+
+        var holding = {
+
+            clear: function () {
+            },
+            init: function () {
+                holding.setHandlers();
+                holding.clear();
+            },
+            search: function (searchText) {
+                if (searchText != null && searchText != '') {
+                    $('[data-containertype="holding_container"]').hide();
+                    $($('[data-containertype="company_name"]:icontains(' + searchText + ')')).parents('[data-containertype="holding_container"]').show();
+                } else {
+                    $('[data-containertype="holding_container"]').show();
+                }
+            },
+            setHandlers: function () {
+                $('#holdingSearchBox').on('keyup', function () {
+                    holding.search($(this).val());
+                });
+            }
+        };
+
+        jQuery.expr[":"].icontains = jQuery.expr.createPseudo(function (arg) {
+            return function (elem) {
+                return jQuery(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+            };
+        });
+    </script>
+
+    @if (Model.Holdings != null)
+    {
+        <script>
+            var holdingCollection = JSON.parse('@Html.Raw(Model.Holdings.ToJsonFromObject())');
+        </script>
+
+    }
+    else
+    {
+        <script>
+            var holdingCollection = {};
+        </script>
+    }
+
+
+}

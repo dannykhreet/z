@@ -1,0 +1,29 @@
+﻿@model List<SapPmLocation>
+
+@using EZGO.Api.Models.SapPm;
+
+@if (Model != null && Model.Count > 0)
+{
+    @foreach (var functionalLocation in Model)
+    {
+        @if (functionalLocation != null)
+        {
+            <div id="functionalLocation-@functionalLocation.Id" data-id="@functionalLocation.Id" class="p-2 m-1" style="border: 2px solid black; border-radius: 5px; cursor: pointer; user-select:none">
+                <div class="row">
+                    <div class="col">
+                        <h3 class="card-title" style="font-weight: 600">@functionalLocation.FunctionalLocation</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <span class="card-text text-muted">@functionalLocation.FunctionalLocationName</span>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
+else
+{
+    @:No functional locations found
+}

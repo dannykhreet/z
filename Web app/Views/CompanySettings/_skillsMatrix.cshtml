@@ -1,0 +1,100 @@
+﻿@model WebApp.ViewModels.CompanySettingsViewModel
+
+<!-- Right Content Area -->
+<div class="col-9 p-4" style="border-radius: 8px; max-width:100%">
+    <div class="btn-group btn-group-toggle" data-toggle="buttons" style="display: flex; justify-content: space-between;">
+        <!-- Use Round Down -->
+        <label id="RoundDown_label" class="btn work-instructions-option @(Model.ApplicationSettings?.Features?.EnableMatrixScoreStandard == false ? "active" : "")">
+            <input type="radio" name="RoundDown" id="RoundDown" value="RoundDown" @(Model.ApplicationSettings?.Features?.EnableMatrixScoreStandard == false ? "checked" : "") />
+            <div class="option-content">
+                <i id="RoundDown_icon" class="fa-solid fa-arrow-down-from-line"></i>
+                <div class="option-text">
+                    <strong>Round down</strong><br>
+                    <span>Score of your assessment will be always round down.</span>
+                </div>
+            </div>
+        </label>
+
+        <!-- Use Standard Round  -->
+        <label id="do_not_RoundDown_label" class="btn work-instructions-option @(Model.ApplicationSettings?.Features?.EnableMatrixScoreStandard == true ? "active" : "")">
+            <input type="radio" name="RoundDown" id="donotRoundDown" value="donotRoundDown" @(Model.ApplicationSettings?.Features?.EnableMatrixScoreStandard == true ? "checked" : "") />
+            <div class="option-content">
+                <i id="RoundDown_icon" class="fa-solid fa-arrows-from-line"></i>
+                <div class="option-text">
+                    <strong>Standard rounding</strong><br>
+                    <span>Scores below or equal to 0.5 round down, while those above round up.</span>
+                </div>
+            </div>
+        </label>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        // Debounce timer
+        let debounceTimer;
+
+        // Event handler for label clicks
+        $('.btn-group-toggle').off('click', 'label').on('click', 'label', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Clear previous debounce timer
+            clearTimeout(debounceTimer);
+
+            // Set debounce timer to prevent multiple requests
+            debounceTimer = setTimeout(() => {
+                // Remove active class from all buttons
+                $('.btn-group-toggle label').removeClass('active');
+
+                // Add active class to the clicked button
+                $(this).addClass('active');
+
+                // Determine the selected state and update the UI accordingly
+                let settingValue;
+
+                if ($(this).attr('id') === 'RoundDown_label') {
+                    // Enable notifications selected
+                    settingValue = false;
+                    $('#RoundDown').prop('checked', false);
+                    $('#donotRoundDown').prop('checked', true);
+                } else if ($(this).attr('id') === 'do_not_RoundDown_label') {
+                    // Dispensable notifications selected
+                    settingValue = true;
+                    $('#RoundDown').prop('checked', true);
+                    $('#donotRoundDown').prop('checked', false);
+                }
+
+                // Send AJAX request to update the setting in the backend
+                updateWorkInstructionChangesStatus(settingValue);
+            }, 300); // Debounce delay
+        });
+
+        // Initialize Work Instructions state properly
+        initializeWorkInstructions();
+
+        function initializeWorkInstructions() {
+            // Remove 'active' class from both labels
+            $('#RoundDown_label').removeClass('active');
+            $('#do_not_RoundDown_label').removeClass('active');
+
+            if ($('#RoundDown').is(':checked')) {
+                $('#RoundDown_label').addClass('active');
+            } else if ($('#donotRoundDown').is(':checked')) {
+                $('#do_not_RoundDown_label').addClass('active');
+            }
+        }
+
+        function updateWorkInstructionChangesStatus(settingValue) {
+            $.ajax({
+                url: '/CompanySettings/UpdateSkillMatrixChangeScoreStyle',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(settingValue),
+                success: function (response) {
+                    toastr.success('@(Model?.CmsLanguage.GetValue(LanguageKeys.CompanySetting.NotifyEndUserSkillMatrixChangeDoneCorrectly, "Skill matrix setting updated correctly") ?? "Skill matrix setting updated correctly")');
+                },
+                error: function (xhr, status, error) { }
+            });
+        }
+    });
+</script>

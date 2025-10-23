@@ -1,0 +1,45 @@
+﻿@model WebApp.ViewModels.DashboardViewModel
+
+@{
+    Dictionary<string, string> CmsLanguage = Model?.CmsLanguage ?? new Dictionary<string, string>();
+}
+
+<div class="card h-100">
+    <div class="card-header pb-4 d-flex">
+        <h3 class="card-title" style="width:85%">@(CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsActionCompletedTitle, "Most recent actions") ?? "Most recent actions")</h3>
+        <a href="/action?filter=action" class="float-right" style="width:15%">@(CmsLanguage?.GetValue(LanguageKeys.Dashboard.ShowAll, "Show all") ?? "Show all")</a>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Actions != null && Model.Actions.Any())
+        {
+            foreach (var (action, index) in Model.Actions.Select((value, i) => (value, i)))
+            {
+                <a asp-controller="action" asp-action="details" asp-route-id="@action.Id" class="card" style="box-shadow:none;margin-bottom:0px;">
+                    <div class="card-header p-0">
+                        <div class="row no-gutters">
+                            <div class="col-md-12">
+                                <div class="card-body p-1 ml-3">
+                                    <h5 class="card-title">@action.Comment</h5>
+                                    <p class="card-text p-0 m-0">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsAuthorTitle, "Author") ?? "Author"): @(action.CreatedBy)</p>
+
+                                    <p class="card-text p-0 m-0">
+                                        <span class="text-muted">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsStartedTitle, "Started") ?? "Started"): @(action.CreatedAt.ToLocaleLongDateString(Model.Locale))</span>
+                                    </p>
+
+                                    <p class="card-text p-0 m-0">
+                                        <span class="text-muted">@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsDuedateTitle, "Due date") ?? "Due date"): @(action.DueDate.ToLocaleLongDateString(Model.Locale))</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <hr style="padding:2px;margin:2px;" />
+            }
+        }
+        else
+        {
+            <p class="card-text p-4">@(CmsLanguage?.GetValue(LanguageKeys.Dashboard.NoDataView, "There is no data to view.") ?? "There is no data to view.")</p>
+        }
+    </div>
+</div>

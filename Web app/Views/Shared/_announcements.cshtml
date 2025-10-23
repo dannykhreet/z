@@ -1,0 +1,23 @@
+﻿@model WebApp.ViewModels.AnnouncementViewModel
+
+@if (Model != null) { 
+    foreach (WebApp.Models.Announcements.AnnouncementModel announcement in Model.Announcements)
+    {
+
+        int monthNumber = announcement.Date.Month;
+        string imageUri = string.Concat("/assets/img/announcement/", monthNumber.ToString("00"), ".jpg");
+        string description = announcement.Description;
+        description = description.Replace("\n\r", "<br />");
+        description = description.Replace("\n", "<br />");
+        description = description.Replace("\r", "<br />");
+
+        <div class="announcement">
+            <h3 class="announcement-title">@announcement.Title</h3>
+            <p class="announcement-date">@announcement.Date.ToLongDateString()</p>
+            <img alt="release-img" class="announcement-image" src="@imageUri" />
+            <p class="announcement-description">
+                @Html.Raw(description)
+            </p>
+        </div>
+    }
+}

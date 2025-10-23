@@ -1,0 +1,29 @@
+﻿@model WebApp.ViewModels.WorkInstructionChangeNotificationsViewModel
+@using EZGO.Api.Models.WorkInstructions
+@using WebApp.Models.Checklist
+@using WebApp.Models.WorkInstructions
+
+@if (Model.ChangeNotifications != null && Model.ChangeNotifications.Count > 0)
+{
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+    var single = new WorkInstructionChangeNotificationViewModel();
+
+    @foreach (WorkInstructionTemplateChangesNotificationModel changeNotification in Model.ChangeNotifications)
+    {
+        {
+            single = ViewModelConverters.ConvertToViewModel(changeNotification);
+            single.ApplicationSettings = Model.ApplicationSettings;
+            single.Timezone = timezone;
+            single.Locale = Model?.Locale;
+            single.WorkInstruction = Model.WorkInstructions.Where(wi => wi.Id == single.ChangeNotification.WorkInstructionTemplateId).FirstOrDefault();
+            single.ModifiedTextValue = (Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.ChangedLabel, "Changed") ?? "Changed");
+            single.ByTextValue = (Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.ByLabel, "by") ?? "by");
+            single.UsersThatHaveConfirmedThisChangeValue = (Model.CmsLanguage.GetValueOrDefault(LanguageKeys.WiChangeNotification.UsersThatHaveConfirmedThisChangeValueLabel, "Users that have confirmed viewing these changes") ?? "Users that have confirmed viewing these changes");
+        }
+        if (single != null && single.WorkInstruction != null)
+        {
+            <partial name="~/Views/Report/Work Instruction Change Notifications/_wi_change_notification_overview_single.cshtml" model="single" />
+        }
+    }
+}

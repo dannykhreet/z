@@ -1,0 +1,68 @@
+﻿@model WebApp.ViewModels.CompletedSkillAssessmentSingleViewModel
+@{
+    var areaPathIds = "";// Model.AreaPathIds != null ? Model.AreaPathIds.Replace(" -> ", ",") : "";
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+}
+
+<div class="results" data-pathids="@areaPathIds" data-assessor="@Model.AssessorId" data-assessee="@Model.CompletedForId" data-containertype="resultitem">
+    <a href="#" class="completedAssessmentOverviewElement list-group-item list-group-item-action" data-assessmentid="@Model.Id" onclick="loadTasks(event, @Model.Id)">
+        <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1" style="font-weight: 800">@Model.Name</h5>
+        </div>
+
+        <div>
+            @if (Model.IsCompleted == true && Model.EndDate.HasValue)
+            {
+                <div class="py-1">@Model.CompletedTextValue: <div class="inline-bold">@Model.CompletedFor</div></div>
+            }
+            else
+            {
+                <div class="py-1">Started for: <div class="inline-bold">@Model.CompletedFor</div></div>
+            }
+
+            @if (Model.Assessors != null && Model.Assessors.Count > 0)
+            {
+                <div class="py-1">
+                    Assessors: <div class="inline-bold">@(string.Join(", ", Model.Assessors.Select(a => a.Name)))</div>
+                </div>
+            }
+            else
+            {
+                <div class="py-1">
+                    Assessor: <div class="inline-bold">@(string.IsNullOrEmpty(Model.Assessor) ? "Unknown" : Model.Assessor)</div>
+                </div>
+            }
+
+            @if (Model.StartDate.HasValue)
+            {
+                DateTime StartDate = TimeZoneInfo.ConvertTime(Model.StartDate.Value, timezone);
+                <div class="py-1">
+                    Started: <div class="inline-bold">@StartDate.ToString("dddd, MMMM d, yyyy, HH:mm")</div>
+                </div>
+            }
+            else if(Model.CreatedAt.HasValue)
+            {
+                DateTime CreatedDate = TimeZoneInfo.ConvertTime(Model.CreatedAt.Value, timezone);
+                <div class="py-1">
+                    Created: <div class="inline-bold">@CreatedDate.ToString("dddd, MMMM d, yyyy, HH:mm")</div>
+                </div>
+            }
+
+            <div class="pt-1">
+                Ended: 
+                @if (Model.IsCompleted == true && Model.EndDate.HasValue)
+                {
+                    DateTime EndDate = TimeZoneInfo.ConvertTime(Model.EndDate.Value, timezone);
+
+                    <div class="inline-bold">@EndDate.ToString("dddd, MMMM d, yyyy, HH:mm")</div>
+                }
+                else if (!Model.IsCompleted)
+                {
+                    <div class="inline-bold">-</div>
+                }
+            </div>
+        </div>
+    </a>
+</div>

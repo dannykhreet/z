@@ -1,0 +1,500 @@
+﻿@model PdfWorkInstructionChangeNotificationViewModel
+@using WebApp.Logic.Services;
+@using WebApp.Helpers
+@{
+    Layout = null;
+
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Work instruction @Model.WorkInstruction.Name</title>
+    <link rel="stylesheet" href="/css/pdf.css" />
+    <partial name="_pdfCss" /> @*above link doesnt work on docker for some reason*@
+    <!-- ezgomediafetcher -->
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1337.0.min.js"></script>
+    <script src="~/js/ezgomediafetcher.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/plugins/fontawesome-pro-6.5.2-web/css/all.min.css" />
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1337.0.min.js"></script>
+    <script src="/js/ezgomediafetcher.js"></script>
+
+    <style>
+        body {
+            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,'Noto Sans Malayalam','Noto Sans KR','Noto Sans Thai',"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+        }
+        
+        hr {
+            border-top: 2px solid #8E8E8E7F;
+        }
+        
+        h1, h5 {
+            color: black;
+            font-weight: 600;
+        }
+
+        p {
+            color: black;
+        }
+
+        strong {
+            font-weight: 600;
+        }
+
+        * {
+            -webkit-print-color-adjust: exact !important; /* Chrome, Safari 6 – 15.3, Edge */
+            color-adjust: exact !important; /* Firefox 48 – 96 */
+            print-color-adjust: exact !important; /* Firefox 97+, Safari 15.4+ */
+        }
+
+        .overviewtext {
+            display: inline-block;
+            font-size: 16px;
+        }
+
+        .overview-cell {
+            display: inline-block;
+        }
+
+        .stepstext {
+        }
+
+        .steptitle {
+            padding: 0rem 1rem 1rem 1rem;
+            box-sizing: border-box;
+        }
+
+        .informationtext {
+            vertical-align: top;
+            padding-left: 1rem;
+        }
+
+        .overlaytop {
+            position: absolute;
+            padding: 0px;
+            margin: 0px;
+            top: 0;
+            left: 0;
+            width: 3em;
+            height: 3em;
+            line-height: 3em;
+            vertical-align: middle;
+            text-align: center;
+            background: #E07200;
+            color: white;
+        }
+
+        .overlaybottom {
+            position: absolute;
+            padding: 0px;
+            margin: 0px;
+            left: 0;
+            bottom: 0;
+            width: 2em;
+            height: 2em;
+            line-height: 2em;
+            vertical-align: middle;
+            text-align: center;
+            background: black;
+            color: white;
+        }
+
+        .fancyshadow {
+            /*box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;*/
+            box-shadow: rgb(0 0 0 / 10%) 0px 0px 5px 1px;
+            /*display: inline-block;*/
+        }
+
+        .autosize {
+            width: 1%;
+            white-space: nowrap !important;
+        }
+
+        .avoid-break-steps tr {
+            page-break-inside: avoid;
+        }
+
+        .avoid-break {
+            page-break-inside: avoid;
+        }
+
+        .avoid-break-before {
+            page-break-before: avoid;
+        }
+
+        .avoid-break-after {
+            page-break-after: avoid;
+        }
+
+        .step-instruction-description {
+            width: 30%;
+            height: 100%;
+            font-size: 15px;
+            vertical-align: top;
+            text-overflow: ellipsis;
+            float: left;
+            min-height: 5rem;
+            box-sizing: border-box;
+            padding: 0rem 1rem;
+            overflow-wrap: break-word;
+        }
+
+        .alternatingcolors:nth-child(even) {
+            background: #f7f6fb;
+        }
+
+        <!-- Tags -->
+        .card {
+            position: relative;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: #ffffff;
+            background-clip: border-box;
+            border: 0 solid rgba(0, 0, 0, 0.125);
+            border-radius: 0.25rem;
+        }
+
+        .tag-card {
+            display: inline-block;
+            width: 9em;
+            color: white;
+            align-content: center;
+            align-items: center;
+        }
+
+        .tag-wrapper {
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+            display: flex;
+            height: 2.6em;
+            line-height: 1.1;
+        }
+
+        .tag-span {
+            text-align: center;
+            align-self: center;
+            display: inline-block;
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+        }
+
+        .nav-icon {
+            float: left;
+            display: inline-block;
+        }
+        .card {
+            box-shadow: none;
+            border-radius: 10px;
+        }
+
+        .vertical-space-between-evenly {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .item-container {
+            position: relative;
+            display: block;
+            vertical-align: top;
+        }
+
+        .image-wrapper {
+            width: 100%;
+            min-width: 245px;
+        }
+
+        .image-wrapper img {
+            max-height: 100%;
+            max-width: 245px;
+            min-width: 245px;
+        }
+
+        .step-image-wrapper {
+            width: 100%;
+        }
+
+        .step-image-wrapper img {
+            height: 200px;
+            max-height: 200px;
+            min-height: 200px;
+            width: 100%;
+            max-width: 100%;
+            min-width: 100%;
+            object-fit: cover;
+        }
+
+        .tag {
+            padding:4px;
+            margin:2px;
+            border-radius: 0.25rem;
+            font-size: 12px;
+            display: inline-block;
+            font-weight: bolder;
+            color: #FFFFFF
+        }
+
+        .tag-wrapper {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        .property {
+            position: relative;
+            display: inline-block;
+            margin-left: 2px;
+            height: 100px;
+            width: 100px;
+            overflow: hidden;
+        }
+
+        .property-wrapper {
+            display: table;
+        }
+
+        .property-title {
+            margin-top: 2px;
+            width: 100px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bolder;
+            height: 25px;
+            vertical-align: middle;
+            line-height: normal;
+            display: inline-table;
+            overflow: hidden;
+        }
+
+        .property-value {
+            width: 100px;
+            text-align: center;
+            font-size: 10px;
+            height: 50px;
+            vertical-align: middle;
+            line-height: normal;
+            display: inline-table;
+            overflow: hidden;
+        }
+
+        .property-date {
+            width: 100px;
+            text-align: center;
+            font-size: 10px;
+            height: 10px;
+            vertical-align: middle;
+            line-height: normal;
+            display: inline-table;
+            overflow: hidden;
+        }
+
+
+        .modifiedByText {
+            font-size: 18px;
+        }
+
+        .viewedByPicture {
+            min-width: 40px;
+            width: 40px;
+            height: 40px;
+            background-size: cover;
+            border-radius: 50%;
+        }
+
+    </style>
+    <style>
+        .WIChangesTable {
+            border: 1px solid #5FD878;
+            border-radius: calc(1rem + 1px);
+            border-collapse: separate;
+            border-spacing: 0px;
+            table-layout: fixed;
+            word-wrap: break-word;
+            width: 100%;
+            max-width: 100%;
+        }
+
+            .WIChangesTable td {
+                border: 1px solid #5FD878;
+                padding: .5rem;
+                vertical-align: top;
+            }
+
+            .WIChangesTable tr:first-child td:first-child {
+                border-radius: 1rem 0 0 0;
+            }
+
+            .WIChangesTable tr:first-child td:last-child {
+                border-radius: 0 1rem 0 0;
+            }
+
+            .WIChangesTable tr:last-child td:last-child {
+                border-radius: 0 0 1rem 0;
+            }
+
+            .WIChangesTable tr:last-child td:first-child {
+                border-radius: 0 0 0 1rem;
+            }
+
+            .WIChangesTable tr:first-child td {
+                background-color: #EFFCF3;
+            }
+
+            .WIChangesTable tr td:first-child {
+                background-color: #EFFCF3;
+            }
+
+
+        .tag-card-change {
+            display: inline-block;
+            width: 9em;
+            color: white;
+            align-content: center;
+            align-items: center;
+        }
+
+        .tag-wrapper-change {
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+            display: flex;
+            height: 2.6em;
+            line-height: 1.1;
+        }
+
+
+        .nav-icon {
+            float: left;
+            display: inline-block;
+            align-self: center;
+        }
+
+        .tag-span-change {
+            text-align: center;
+            align-self: center;
+            display: inline-block;
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+        }
+
+    </style>
+    </style>
+</head>
+<body>
+    <div class="">
+        <div class="pb-1 pl-3">
+            <h5 style="color: #90C345">@Model.WorkInstruction.Name</h5>
+        </div>
+
+        <div class="p-3" style="">
+
+            @{
+                DateTime ModifiedAtDate = TimeZoneInfo.ConvertTime(Model.ChangeNotification.ModifiedAt.Value, timezone);
+            }
+
+            <div class="row">
+                <div class="col">
+                    <p class="mb-1 modifiedByText">@(Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.ChangedLabel, "Changed") ?? "Changed") <strong>@ModifiedAtDate.ToLocaleFullDateShortTimeString(Model.Locale)</strong> @(Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.ByLabel, "by") ?? "by") <strong>@Model.ChangeNotification.ModifiedBy</strong></p>
+                </div>
+            </div>
+            <div class="py-2">
+                <div class="row">
+                    <div class="col">
+                        <partial name="_wi_changed_table.cshtml" model="Model" />
+                    </div>
+                </div>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.ChangeNotification.NotificationComment))
+            {
+                <h5>@(Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.NoteToChangeLabel, "Note to change") ?? "Note to change")</h5>
+                <p class="p-2" style="border: 1px solid black; border-radius: 5px">@Model.ChangeNotification.NotificationComment</p>
+            }
+
+            @if (Model.ChangeNotification.NotificationViewedStats != null && Model.ChangeNotification.NotificationViewedStats.Count() > 0)
+            {
+                <h5>@(Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.UsersThatHaveConfirmedThisChangeValueLabel, "Users that have confirmed viewing these changes") ?? "Users that have confirmed viewing these changes")</h5>
+                @foreach (var notificationViewedStat in Model.ChangeNotification.NotificationViewedStats)
+                {
+                    DateTime ViewedAtDate = TimeZoneInfo.ConvertTime(notificationViewedStat.ViewedAt.Value, timezone);
+
+                    var viewedByPicture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                    if (!string.IsNullOrEmpty(notificationViewedStat.ViewedUser.Picture))
+                    {
+                        viewedByPicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, notificationViewedStat.ViewedUser.Picture);
+                    }
+                    <div class="row py-2">
+                        <div class="col-auto">
+                            <img class="viewedByPicture" data-src="@viewedByPicture" />
+                        </div>
+                        <div class="col" style="display: flex; align-self: center">
+                            <div>@notificationViewedStat.ViewedUser.Name&nbsp;<strong>@(Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.SeenOnLabel, "Seen on") ?? "Seen on")</strong>&nbsp;@ViewedAtDate.ToLocaleFullDateShortTimeString(Model.Locale)</div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+        </div>
+
+    <script>
+        ezgomediafetcher.preloadImagesAndVideos();
+
+        
+        var wiChangeNotificationImgs = document.images,
+            wiChangeNotificationImgsLength = wiChangeNotificationImgs.length,
+            wiChangeNotificationImgsCounter = 0,
+            wiChangeNotificationImgsLoaded = false,
+            wiChangeNotificationImgsCheckerInterval = null;
+
+        [].forEach.call(wiChangeNotificationImgs, function (img) {
+            if (img.complete && $(img).attr('src') != undefined && ($(img).attr('src').includes('normal_unavailable_image.png') || $(img).attr('src').startsWith('blob:')))
+                incrementCounter();
+            else
+                img.addEventListener('load', incrementCounter, false);
+        });
+
+        function incrementCounter() {
+            wiChangeNotificationImgsCounter++;
+            if (wiChangeNotificationImgsCounter === wiChangeNotificationImgsLength) {
+                wiChangeNotificationImgsLoaded = true
+            }
+        }
+
+        window.onload = function () {
+            wiChangeNotificationImgsCheckerInterval = setInterval(() => {
+                if (!wiChangeNotificationImgsLoaded) {
+                    //do nothing
+                }
+                else {
+                    clearInterval(wiChangeNotificationImgsCheckerInterval);
+                    setTimeout(() => {
+                        window.print();
+                    });
+                    setTimeout(function () { window.close(); }, 2000);
+                }
+
+            }, 1000);
+        }
+
+        if(wiChangeNotificationImgs.length == 0) {
+            wiChangeNotificationImgsLoaded = true;
+        }
+    </script>
+</body>
+</html>

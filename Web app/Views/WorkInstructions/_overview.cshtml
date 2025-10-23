@@ -1,0 +1,165 @@
+﻿@model WebApp.ViewModels.WorkInstructionsViewModel
+@using EZGO.Api.Models.Enumerations;
+@{
+    Layout = null;
+}
+
+<div class="row no-gutters" id="contentCol">
+    @if (Model.WorkInstructionTemplates != null && Model.WorkInstructionTemplates.Count != 0)
+    {
+        @foreach (WebApp.Models.WorkInstructions.WorkInstructionTemplate workInstruction in Model.WorkInstructionTemplates)
+        {
+            var id = workInstruction.Id;
+            var instructions = workInstruction.NumberOfInstructionItems;
+            var hasImage = !string.IsNullOrEmpty(workInstruction.Picture) ? "true" : "false";
+            var areaPathIds = workInstruction.AreaPathIds != null ? workInstruction.AreaPathIds.Replace(" -> ", ",") : "";
+            var tagsList = new List<int>();
+            if (workInstruction.Tags != null && workInstruction.Tags.Count > 0)
+            {
+                tagsList.AddRange(workInstruction.Tags.Select(t => t.Id));
+            }
+
+            if (workInstruction.InstructionItems != null && workInstruction.InstructionItems.Count > 0)
+            {
+                foreach (var item in workInstruction.InstructionItems)
+                {
+                    if (item.Tags != null && item.Tags.Count > 0)
+                    {
+                        tagsList.AddRange(item.Tags.Select(t => t.Id));
+                    }
+                }
+            }
+
+            var uniqueTags = String.Join(',', tagsList.Distinct());
+            var wiRole = "";
+            if (!string.IsNullOrEmpty(workInstruction.Role) && workInstruction.WorkInstructionType == InstructionTypeEnum.BasicInstruction)
+            {
+                switch (workInstruction.Role.ToString().ToLower())
+                {
+                    case "0":
+                        wiRole = "basic";
+                        break;
+                    case "1":
+                        wiRole = "manager";
+                        break;
+                    case "2":
+                        wiRole = "shift_leader";
+                        break;
+                    default:
+                        wiRole = "";
+                        break;
+                }
+            }
+            <div class="card w-100 results mr-1 my-1"
+                 data-id="@id"
+                 data-role="@(wiRole)"
+                 data-instructions="@instructions"
+                 data-hasimage="@hasImage"
+                 data-pathids="@areaPathIds"
+                 data-workinstructiontype="@((int)workInstruction.WorkInstructionType)"
+                 data-tags="@uniqueTags">
+                <div class="card-body p-0">
+                    @{
+                        var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, workInstruction.Picture);
+                        if (string.IsNullOrEmpty(workInstruction.Picture))
+                        {
+                            picture = @"/assets/img/normal_unavailable_image.png";
+                        }
+                    }
+
+                    <a class="text-muted fs-0 fs-lg-1" asp-controller="workinstructions" asp-action="details" asp-route-id="@workInstruction.Id">
+                        <div class="col-12 p-1 results1">
+                            <div class="p-1">
+                                <div class="row" data-containertype="workinstruction_container" data-id="@workInstruction.Id">
+                                    <div class="col-sm-5 col-md-3 col-lg-3 col-xl-2">
+                                        <img src="/images/media-loading.gif" data-src="@picture" loading="lazy" class="img-fluid" />
+                                    </div>
+                                    <div class="col-sm-7 col-md-8">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <h5 class="mt-3 mt-sm-0">@workInstruction.Name</h5>
+                                                <p class="fs--1 mb-2 mb-md-3"><span class="badge badge-secondary">@workInstruction.AreaPath</span></p>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-12 d-flex justify-content-between flex-column">
+                                                <div class="row">
+                                                    <div class="col-md-6 col-lg-3 text-muted">
+                                                        <small>
+                                                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TemplateId, "Id") ?? "Id"): <strong>@workInstruction.Id</strong>
+                                                        </small>
+                                                    </div>
+
+                                                    <div class="col-md-6 col-lg-3 text-muted">
+                                                        <small>
+                                                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ItemsTitle, "Items") ?? "Items"):<strong>@instructions</strong>
+                                                        </small>
+                                                    </div>
+
+                                                    <div class="col-md-6 col-lg-3 text-muted">
+                                                        <small>
+                                                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.WorkInstructionTypeTitle, "Type") ?? "Type"):
+                                                            @if (workInstruction.WorkInstructionType == InstructionTypeEnum.BasicInstruction)
+                                                            {
+                                                                <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.BasicInstructionType, "Basic instruction") ?? "Basic instruction")</strong>
+                                                            }
+                                                            else if (workInstruction.WorkInstructionType == InstructionTypeEnum.SkillInstruction)
+                                                            {
+                                                                <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.AssessmentInstructionType, "Assessment instruction") ?? "Assessment instruction")</strong>
+                                                            }
+                                                        </small>
+                                                    </div>
+
+                                                    @if (workInstruction.WorkInstructionType == InstructionTypeEnum.BasicInstruction)
+                                                    {
+                                                        var roleName = "";
+                                                        switch (workInstruction.Role)
+                                                        {
+                                                            case "0":
+                                                                roleName = "basic";
+                                                                break;
+                                                            case "1":
+                                                                roleName = "manager";
+                                                                break;
+                                                            case "2":
+                                                                roleName = "shift_leader";
+                                                                break;
+                                                            default:
+                                                                roleName = "basic";
+                                                                break;
+                                                        }
+                                                        @:<div class="col-md-6 col-lg-3 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TemplateRoleTitle, "Role") ?? "Role"):<strong>@roleName</strong></small></div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        @if (workInstruction.Tags?.Count > 0 && Model.ApplicationSettings?.Features?.TagsEnabled == true)
+                                        {
+                                            <div class="row">
+                                                @foreach (var tag in workInstruction.Tags)
+                                                {
+                                                    <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                                                        <div class="tag-wrapper" style="color:white;">
+                                                            <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                            <span class="my-1 ml-1 mr-3 tag-span" style="font-size:.78rem;">@tag.Name</span>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <partial name="~/Views/Shared/_no_templates_message.cshtml" model="@Model" />
+    }
+</div>

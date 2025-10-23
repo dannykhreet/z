@@ -1,0 +1,120 @@
+﻿@model SapPmFunctionalLocationPickerViewModel
+
+<style>
+    #functionalLocationMainList {
+        list-style-type: none;
+        padding: 0px;
+    }
+
+    .functionalLocationList {
+        list-style-type: none;
+        padding: 0px;
+    }
+
+    .functionalLocationHeader {
+        background-color: #F9FCF6;
+    }
+
+    .functionalLocationExpand {
+        color: #1ED760;
+        font-size: 22px;
+    }
+
+    .locationSelectionDisabled {
+        color: black;
+        background-color: yellow;
+    }
+
+    .level1 {
+        background-color: rgb(217, 235, 192);
+    }
+
+    .level2 {
+        background-color: rgb(227, 240, 210);
+    }
+
+    .level3 {
+        background-color: rgb(239, 247, 228);
+    }
+
+    .level0 {
+        background-color: rgb(249, 252, 246);
+    }
+
+    .functionalLocationSelectElement {
+
+    }
+        /* old classes that give a border the same as the bg color so when selecting functional location it doesnt "jump" */
+        /* .functionalLocationSelectElement.level1 {
+            border: 3px solid rgb(217, 235, 192);
+        }
+
+        .functionalLocationSelectElement.level2 {
+            border: 3px solid rgb(227, 240, 210);
+        }
+
+        .functionalLocationSelectElement.level3 {
+            border: 3px solid rgb(239, 247, 228);
+        }
+
+        .functionalLocationSelectElement.level0 {
+            border: 3px solid rgb(249, 252, 246);
+        } */
+
+        .functionalLocationSelectElement.locationSelected {
+            border: 3px solid rgb(30, 215, 96);
+        }
+
+        .functionalLocationSelectElement.markedfordeletion {
+            /* border: 3px solid yellow; */
+            background-color: yellow;
+        }
+
+</style>
+
+
+<div class="modal fade" id="modalSelectFunctionalLocation" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_addchange_title">Select functional location</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="selectFunctionalLocationModalBody">
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <input type="text" class="form-control" name="functionalLocationSearchBox" id="functionalLocationSearchBox" placeholder="Search...">
+                    </div>
+                </div>
+                <ul id="functionalLocationMainList" style="user-select:none; max-height: 65vh; overflow-y: scroll">
+                    <li class="functionalLocationHeader">
+                        <div class="row m-0 p-0">
+                            <div class="col-4 py-2" style="align-self: center">Functional location</div>
+                            <div class="col-8 py-2" style="align-self: center">Functional location name</div>
+                        </div>
+                    </li>
+
+                    @if (Model.SapPmLocations != null && Model.SapPmLocations.Count > 0)
+                    {
+                        var locations = new List<SapPmLocationViewModel>();
+                        foreach (var functionalLocation in Model.SapPmLocations)
+                        {
+                            locations.Add(new SapPmLocationViewModel()
+                            {
+                                SapPmFunctionalLocation = functionalLocation,
+                                ApplicationSettings = Model.ApplicationSettings,
+                                IndentationLevel = 1
+                            });
+                        }
+                        <partial name="_functional_locations.cshtml" model="@locations" />
+                    }
+                </ul>
+            </div>
+            <div class="modal-footer" style="text-align: center">
+                <button id="modal_select_functional_location_save_button" type="button" class="btn btn-ezgo btn-sm @(Model.DisableMutateArea.HasValue && Model.DisableMutateArea.Value ? "disabled" : "") mx-auto" data-actiontype="change" onclick="functionalLocationPicker.saveSelectedFunctionalLocationId()">Select</button>
+            </div>
+        </div>
+    </div>
+</div>

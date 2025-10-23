@@ -1,0 +1,24 @@
+﻿@model WebApp.ViewModels.CompletedSkillAssessmentsViewModel
+@using WebApp.Models.Skills
+
+@if (Model.CompletedAssessments != null)
+{
+    <input type="text" value="@Model.CompletedAssessments.Count" id="assessmentCounter" style="display: none" />
+    if (Model.CompletedAssessments.Count > 0)
+    {
+        var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+        TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+        var single = new WebApp.ViewModels.CompletedSkillAssessmentSingleViewModel();
+        @foreach (SkillAssessment completedSkillAssessment in Model.CompletedAssessments)
+        {
+            {
+                single = ViewModelConverters.ConvertToViewModel(completedSkillAssessment);
+                single.CompletedTextValue = Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.CompletedFor, "Completed for") ?? "Completed for";
+                single.Timezone = timezone;
+                single.Locale = Model?.Locale;
+            }
+            <partial name="~/Views/Report/SkillAssessments/_completed_skillassessment.cshtml" model="single" />
+        }
+
+    }
+}

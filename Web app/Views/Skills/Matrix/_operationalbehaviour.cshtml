@@ -1,0 +1,118 @@
+﻿@model WebApp.ViewModels.SkillsViewModel
+@using WebApp.Logic
+@{
+    Layout = null;
+}
+
+@{
+    int colspan = 0;
+}
+
+<!-- Matrix display (User Groups and User Skills both added!) -->
+@{
+    bool isHeader = true;
+}
+
+@if (Model.CurrentSkillsMatrix.OperationalBehaviours != null && Model.ApplicationSettings.Features.SkillMatrixOperationalBehaviour != null && Model.ApplicationSettings.Features.SkillMatrixOperationalBehaviour.Value)
+{
+    //score range for the operational behaviour metrics
+    double[] operationalBehaviourRanges = { 0.2, 0.6, 1.0, 1.2 };
+    //score range for act of deviations metric (percentage of thumbs down with action or comment by user)
+    double[] actOnDeviationsRanges = { 0.2, 0.4, 0.6, 0.8 };
+    double[] OBRanges;
+
+    @foreach (var skillset in Model.CurrentSkillsMatrix.OperationalBehaviours.OrderBy(s => s.TechnicalUid))
+    {
+        <tr class="skillsrow operationalbehaviour">
+            @if (isHeader)
+            {
+                <td class="rowtitle" rowspan="@Model.CurrentSkillsMatrix.OperationalBehaviours.Count()"><span class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OperationalBehavior, "Operational behavior") ?? "Operational behavior")</span></td>
+                isHeader = false;
+            }
+
+            <td class="goalcell"></td>
+            <td class="endcell skillcell matrixoperationalbehaviour" data-name="@skillset.Name" data-description="@skillset.Description" title="@skillset.Name">
+                <div>@skillset.Name</div>
+                <small>@skillset.Description</small>
+            </td>
+
+            @foreach (var usergroup in Model.CurrentSkillsMatrix.UserGroups)
+            {
+                var peopleTechnicalUid = skillset.TechnicalUid.Substring(0, 6) + "PEOPLE_" + skillset.TechnicalUid.Substring(6, skillset.TechnicalUid.Length - 6);
+                var total = Model.CurrentSkillsMatrix.MatrixTotals.Where(m => m.TechnicalUid == skillset.TechnicalUid).FirstOrDefault();
+                var totalPeople = Model.CurrentSkillsMatrix.MatrixTotals.Where(m => m.TechnicalUid == (peopleTechnicalUid)).FirstOrDefault();
+
+                @if (usergroup.Users.Count == 0)
+                {
+                    <td style="background: #f1f3f1"></td>
+                }
+                else
+                {
+                    foreach (var userprofile in usergroup.Users)
+                    {
+                        var score = -1;
+                        double valueCalculatedScore = -1;
+                        @if (skillset.Values != null)
+                        {
+                            var found = skillset.Values.Where(m => m.UserId.Equals(userprofile.UserProfileId));
+                            if (found != null && found.Any())
+                            {
+                                score = found.FirstOrDefault().ScoreOrNumber;
+                            }
+                        }
+
+                        //calculate score
+                        if (score > 0)
+                        {
+                            valueCalculatedScore = (score / ((double)(total?.Values.FirstOrDefault().ScoreOrNumber ?? 1.0d) / (double)(totalPeople?.Values.FirstOrDefault().ScoreOrNumber ?? 1.0d)));
+
+                            if (skillset.TechnicalUid == "S5_NR_ACT_ON_DEVIATIONS")
+                            {
+                                valueCalculatedScore /= 100.0d;
+                            }
+                        }
+                        else
+                        {
+                            valueCalculatedScore = 0;
+                        }
+
+
+                        if (skillset.TechnicalUid == "S5_NR_ACT_ON_DEVIATIONS")
+                        {
+                            OBRanges = actOnDeviationsRanges;
+                        }
+                        else
+                        {
+                            OBRanges = operationalBehaviourRanges;
+                        }
+
+                        if (valueCalculatedScore > OBRanges[3])
+                        {
+                            <td class="buttoncell"><button style="cursor: default; " class="btn circlebtn king" type="button" data-popup="grade" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.CircleBtnKingTitle, "The King with score") ?? "The King with score"): @score"></button></td>
+                        }
+                        else if (valueCalculatedScore <= OBRanges[3] && valueCalculatedScore > OBRanges[2])
+                        {
+                            <td class="buttoncell"><button style="cursor: default; " class="btn circlebtn champion" type="button" data-popup="grade" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.CircleBtnChampionTitle, "Champion with score") ?? "Champion with score"): @score"></button></td>
+                        }
+                        else if (valueCalculatedScore <= OBRanges[2] && valueCalculatedScore > OBRanges[1])
+                        {
+                            <td class="buttoncell"><button style="cursor: default; " class="btn circlebtn spoton" type="button" data-popup="grade" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.CircleBtnSpotOnTitle, "Spot On with score") ?? "Spot On with score"): @score"></button></td>
+                        }
+                        else if (valueCalculatedScore <= OBRanges[1] && valueCalculatedScore > OBRanges[0])
+                        {
+                            <td class="buttoncell"><button style="cursor: default; " class="btn circlebtn risingstar" type="button" data-popup="grade" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.CircleBtnRisingStarTitle, "Rising Star with score") ?? "Rising Star with score"): @score"></button></td>
+                        }
+                        else if (valueCalculatedScore <= OBRanges[0] && valueCalculatedScore > 0)
+                        {
+                            <td class="buttoncell"><button style="cursor: default; " class="btn circlebtn powerup" type="button" data-popup="grade" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.CircleBtnPowerUpTitle, "Power Up with score") ?? "Power Up with score"): @score"></button></td>
+                        }
+                        else
+                        {
+                            <td class="buttoncell"><div style="cursor: default;" class="btn circlebtn" type="button" data-popup="grade" title="@(score == -1 ? "No score or data available." : string.Concat("Score: ", score))"></div></td>
+                        }
+                    }
+                }
+            }
+        </tr>
+    }
+}

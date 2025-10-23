@@ -1,0 +1,937 @@
+﻿@model WebApp.ViewModels.DashboardViewModel
+
+@{
+    Layout = "_Layout_template";
+    ViewData["Title"] = Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.Title, "Dashboard") ?? "Dashboard";
+    var taskCounterTypes = new[] { "tasktemplates_month", "tasktemplates_norecurrency", "tasktemplates_shifts", "tasktemplates_week", "tasktemplates_dynamicday", "tasktemplates_periodday" };
+    var TaskTotalCount = Model?.CompanyTotals?.Where(m => taskCounterTypes.Contains(m.Type))?.Sum(m => m.CountNr) ?? 0;
+}
+
+@section CSS{
+    <script>
+        var isRtl = false;
+        const arabicLanguageRegExDashboard = /language=['"]*ar[a-zA-Z-azA-Z]*['"]*/i;
+        const arabicLanguageFoundDashboard = document.cookie.match(arabicLanguageRegExDashboard);
+        if (arabicLanguageFoundDashboard != null) {
+            isRtl = true;
+        }
+    </script>
+
+    <style>
+        .my-circle {
+            display: inline-block;
+            border-radius: 60px;
+            padding: 0.8em 1.1em;
+            background-color: #3f903f;
+            color: #fff;
+        }
+
+            .my-circle i {
+                font-size: 20px;
+            }
+        
+            .float-right {
+                text-align: right;
+            }
+
+        .status-circle {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff !important;
+            flex-grow: 0;
+            flex-shrink: 0;
+        }
+
+        .status-icon {
+            display: flex;
+            margin: auto;
+            font-size: 15px;
+        }
+
+        #fade-wrapper {
+            display: none;
+            position: fixed;
+            height: 100vh;
+            width: 100vw;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 10000;
+        }
+
+        .scale-up {
+            transform: translate(-15px, -140px);
+            width: 200%;
+            transition: all 0.2s ease-in-out;
+            border-radius: 6px !important;
+            left: 10px;
+        }
+
+        #accordionChecklists .card .card-header {
+            cursor: pointer;
+        }
+
+        #completedChecklistContainer {
+            height: 400px;
+        }
+
+        .infoText {
+            position: fixed;
+            right: 0;
+            top: 0;
+        }
+
+        .score-large {
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            padding: 3px 0px 0px 8px;
+            font-size: 23px;
+        }
+
+        span.score {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+        }
+
+        .small-box {
+            border-radius: 10px;
+        }
+
+        .small-box-footer {
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .list-group-item {
+            border: none;
+        }
+
+        [id^=pictureProofData-] {
+            z-index: 10001 !important;
+        }
+    </style>
+}
+
+<div style="height:calc(100vh - 98px);overflow:auto;">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    &nbsp;
+                    <h1 class="m-0 text-dark">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.Title, "Dashboard") ?? "Dashboard")</h1>
+                </div>
+
+                <div class="col-sm-6 d-flex flex-row-reverse">
+                    @if (Model != null && Model?.ShowNocNavigation == true)
+                    {
+                        <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" title="NOC" onclick="document.location.href = '/tools/noc/overview';"><i class="fa-solid fa-network-wired"></i></button>
+                    }
+                    @if (Model != null && Model?.IsAdminCompany == true)
+                    {
+                        <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" data-export="companyoverview" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.DownloadCompanyManagementOverviewTitle, "Download Company Management Overview") ?? "Download Company Management Overview")"><i class="fas fa-download"></i></button>
+                        <button class="btn btn-secondary btn-sm btn-outline mr-2 shadow-sm mt-auto" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Dashboard.CompanyManagementOverview, "Company Management Overview") ?? "Company Management Overview")" onclick="document.location.href = '/company/reports';"><i class="fas fa-chart-area"></i></button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <section class="content" style="height:calc(100vh - 185px);overflow:auto;">
+        <div class="container-fluid">
+            @if (Model != null && Model?.IsAdminCompany == true)
+            {
+                <!-- ADMIN COMPANY VIEW -->
+                <div class="row pt-2">
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.CompanyNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsCompanies, "Companies") ?? "Companies")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-building fas-icon"></i>
+                            </div>
+
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.HoldingNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsHoldings, "Holdings") ?? "Holdings")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-building fas-icon"></i>
+                            </div>
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.AreaNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsAreas, "Areas") ?? "Areas")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-map-signs fas-icon"></i>
+                            </div>
+
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.UserNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsUsers, "Users") ?? "Users")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-user-friends fas-icon"></i>
+                            </div>
+
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.AnnounceNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsAnnouncements, "Announcements") ?? "Announcements")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-bullhorn fas-icon"></i>
+                            </div>
+
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.FactoryFeedMessagesNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsFactoryFeedMessages, "Factoryfeed messages") ?? "Factoryfeed messages")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-comment-alt fas-icon"></i>
+                            </div>
+
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.AuditNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsAudits, "Audits") ?? "Audits")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-signature fas-icon"></i>
+                            </div>
+
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.AuditTemplateNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsAuditTemplates, "Audit templates") ?? "Audit templates")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-signature fas-icon"></i>
+                            </div>
+
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.ChecklistNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsChecklists, "Checklists") ?? "Checklists")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-check-double fas-icon"></i>
+                            </div>
+
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.ChecklistTemplateNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsChecklistTemplates, "Checklist templates") ?? "Checklist templates")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-check-double fas-icon"></i>
+                            </div>
+
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.TasksNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsTasks, "Tasks") ?? "Tasks")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-clipboard-check fas-icon"></i>
+                            </div>
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.TaskTemplateNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsTaskTemplates, "Task templates") ?? "Task templates")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-clipboard-check fas-icon"></i>
+                            </div>
+
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.ActionsNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsActions, "Actions") ?? "Actions")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-bolt-lightning fas-icon"></i>
+                            </div>
+
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.ActionCommentNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsActionComments, "Actions comments") ?? "Actions comments")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-bolt-lightning fas-icon"></i>
+                            </div>
+
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.AssessmentNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsAssessments, "Assessments") ?? "Assessments")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-graduation-cap fas-icon"></i>
+                            </div>
+
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.AssessmentTemplateNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsAssessmentTemplates, "Assesment templates") ?? "Assessment templates")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-graduation-cap fas-icon"></i>
+                            </div>
+
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.MatricesNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsMatrices, "Matrices") ?? "Matrices")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-border-none fas-icon"></i>
+                            </div>
+
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <a class="small-box bg-light">
+                            <!-- small box -->
+                            <div class="inner">
+                                <h3 class="text-muted">@(Model?.StatisticTotals?.WorkInstructionNr)</h3>
+
+                                <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AdminStatsWorkInstructions, "Workinstructions") ?? "Workinstructions")</p>
+                            </div>
+
+                            <div class="icon">
+                                <i class="fas fa-hard-hat fas-icon"></i>
+                            </div>
+
+                            <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                <i class="fab fa-battle-net"></i>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            }
+            else if(Model != null)
+            {
+                <!-- NORMAL VIEW -->
+                @if (Model?.ApplicationSettings?.Features != null)
+                {
+                    <!-- FIRST ROW -->
+                    <div class="row pt-2">
+                        @if (Model?.ApplicationSettings?.Features?.ChecklistsEnabled == true)
+                        {
+                            <div class="col-lg-3 col-6">
+                                <a class="small-box bg-light" asp-controller="checklist" asp-action="index" data-tracking="enabled" data-tracking-name="checklist tile">
+                                    <div class="inner">
+                                        <h3 class="text-muted">@(Model?.CompanyTotals?.Where(m => m.Type.Equals("checklisttemplates")).FirstOrDefault()?.CountNr)</h3>
+
+                                        <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsChecklistTitle, "Checklist templates") ?? "Checklist templates")</p>
+                                    </div>
+
+                                    <div class="icon">
+                                        <i class="fas fa-check-double fas-icon"></i>
+                                    </div>
+
+                                    <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsChecklistShowTitle, "Show checklist templates") ?? "Show checklist templates") <i class="fas fa-arrow-circle-right"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+
+                        @if (Model?.ApplicationSettings?.Features?.TasksEnabled == true)
+                        {
+                            <div class="col-lg-3 col-6">
+                                <!-- small box -->
+                                <a class="small-box bg-light" asp-controller="Task" asp-action="Index" data-tracking="enabled" data-tracking-name="task tile">
+                                    <div class="inner">
+                                        <h3 class="text-muted">@TaskTotalCount</h3>
+                                        <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsTaskTitle, "Task templates") ?? "Task templates")</p>
+                                    </div>
+
+                                    <div class="icon">
+                                        <i class="fas fa-clipboard-check fas-icon"></i>
+                                    </div>
+
+                                    <div class="small-box-footer secondary-bg-color" style="color:#fff !important;">
+                                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsTaskShowTitle, "Show task templates") ?? "Show task templates") <i class="fas fa-arrow-circle-right"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+
+                        @if (Model?.ApplicationSettings?.Features?.AuditsEnabled == true)
+                        {
+                            <div class="col-lg-3 col-6">
+                                <!-- small box -->
+                                <a asp-controller="Audit" asp-action="Index" class="small-box bg-light" data-tracking="enabled" data-tracking-name="audit tile">
+                                    <div class="inner">
+                                        <h3 class="text-muted">@Model?.CompanyTotals?.Where(m => m.Type.Equals("audittemplates")).FirstOrDefault()?.CountNr</h3>
+                                        <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsAuditTitle, "Audit templates") ?? "Audit templates")</p>
+                                    </div>
+
+                                    <div class="icon">
+                                        <i class="fas fa-signature fas-icon"></i>
+                                    </div>
+
+                                    <div class="small-box-footer secondary-bg-color" style="color:#fff !important;">
+                                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsAuditShowTitle, "Show audit templates") ?? "Show audit templates") <i class="fas fa-arrow-circle-right"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+
+                        @if (Model?.ApplicationSettings?.Features?.ActionsEnabled == true)
+                        {
+                            <div class="col-lg-3 col-6">
+                                <!-- small box -->
+                                <a href="/action?filter=open" class="small-box bg-light" data-tracking="enabled" data-tracking-name="action tile">
+                                    <div class="inner">
+                                        <h3 class="text-muted">@Model?.CompanyTotals?.Where(m => m.Type.Equals("actions_unresolved")).FirstOrDefault()?.CountNr</h3>
+                                        <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsActionTitle, "Open actions") ?? "Open actions")</p>
+                                    </div>
+
+                                    <div class="icon">
+                                        <i class="fas fa-bolt-lightning fas-icon"></i>
+                                    </div>
+
+                                    <div asp-controller="Action" asp-action="Index" class="small-box-footer secondary-bg-color" style="color:#fff !important;">
+                                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsActionShowTitle, "Show actions") ?? "Show actions") <i class="fas fa-arrow-circle-right"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- SECOND ROW -->
+                    <div class="row">
+                        @if (Model?.ApplicationSettings?.Features?.WorkInstructions == true)
+                        {
+                            <!--Work instructions-->
+                            <div class="col-lg-3 col-6">
+                                <!-- small box -->
+                                <a class="small-box bg-light" href="/workinstructions?filter=basicinstructions" data-tracking="enabled" data-tracking-name="workinstructions tile">
+                                    <div class="inner">
+                                        <h3 class="text-muted">@(Model?.CompanyTotals?.Where(x => x.Type.Equals("workinstructions_basic")).Any() == true ? Model?.CompanyTotals?.Where(m => m.Type.Equals("workinstructions_basic")).FirstOrDefault()?.CountNr : 0)</h3>
+
+                                        <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.WorkInstructionTemplatedText, "Work instruction templates") ?? "Work instruction templates")</p>
+                                    </div>
+
+                                    <div class="icon">
+                                        <i class="fas fa-hard-hat fas-icon"></i>
+                                    </div>
+
+                                    <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.ShowWorkInstructionTemplatesText, "Show work instruction templates") ?? "Show work instruction templates") <i class="fas fa-arrow-circle-right"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+
+                        @if (Model?.ApplicationSettings?.Features?.SkillAssessments == true)
+                        {
+                            <!-- Skill assessments -->
+                            <div class="col-lg-3 col-6">
+                                <!-- small box -->
+                                <a class="small-box bg-light" href="/skillassessments" data-tracking="enabled" data-tracking-name="skillassessments tile">
+                                    <div class="inner">
+                                        <h3 class="text-muted">@(Model?.CompanyTotals?.Where(x => x.Type.Equals("assessmenttemplates")).Any() == true ? Model?.CompanyTotals?.Where(m => m.Type.Equals("assessmenttemplates")).FirstOrDefault()?.CountNr : 0)</h3>
+
+                                        <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AssessmentTemplatesText, "Assessment templates") ?? "Assessment templates")</p>
+                                    </div>
+
+                                    <div class="icon">
+                                        <i class="fas fa-graduation-cap fas-icon"></i>
+                                    </div>
+
+                                    <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.ShowAssessmentTemplatesText, "Show assessment templates") ?? "Show assessment templates") <i class="fas fa-arrow-circle-right"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+
+                        @if (Model?.ApplicationSettings?.Features?.WorkInstructions == true && Model?.ApplicationSettings?.Features?.SkillAssessments == true)
+                        {
+                            <!-- Work instructions (assessment instructions) -->
+                            <div class="col-lg-3 col-6">
+                                <!-- small box -->
+                                <a class="small-box bg-light" href="/workinstructions?filter=assessmentinstructions" data-tracking="enabled" data-tracking-name="assessment instructions tile">
+                                    <div class="inner">
+                                        <h3 class="text-muted">@(Model?.CompanyTotals?.Where(x => x.Type.Equals("workinstructions_skill")).Any() == true ? Model?.CompanyTotals?.Where(m => m.Type.Equals("workinstructions_skill")).FirstOrDefault()?.CountNr : 0)</h3>
+
+                                        <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.AssessmentInstructionTemplatesText, "Assessment instruction templates") ?? "Assessment instruction templates")</p>
+                                    </div>
+
+                                    <div class="icon">
+                                        <i class="fas fa-graduation-cap fas-icon"></i>
+                                    </div>
+
+                                    <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.ShowAssessmentInstructionTemplatesText, "Show assessment instruction templates") ?? "Show assessment instruction templates") <i class="fas fa-arrow-circle-right"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+
+                        @if (Model?.ApplicationSettings?.Features?.SkillMatrix == true)
+                        {
+                            <!-- Skill matrices -->
+                            <div class="col-lg-3 col-6">
+                                <!-- small box -->
+                                <a class="small-box bg-light" href="/skillsmatrices" data-tracking="enabled" data-tracking-name="skillsmatrices tile">
+                                    <div class="inner">
+                                        <h3 class="text-muted">@(Model?.CompanyTotals?.Where(x => x.Type.Equals("matrices")).Any() == true ? Model?.CompanyTotals?.Where(m => m.Type.Equals("matrices")).FirstOrDefault()?.CountNr : 0)</h3>
+
+                                        <p class="text-muted">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.MatricesText, "Matrices") ?? "Matrices")</p>
+                                    </div>
+
+                                    <div class="icon">
+                                        <i class="fas fa-border-none fas-icon"></i>
+                                    </div>
+
+                                    <div class="small-box-footer secondary-bg-color text-white" style="color:#fff !important;">
+                                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.ShowMatricesText, "Show matrices") ?? "Show matrices") <i class="fas fa-arrow-circle-right"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                }
+
+                <!-- COMPLETED ITEMS ROW -->
+                <div id="dashboardCompletedItems" class="row card-group pb-3">
+                    @if (Model?.ApplicationSettings?.Features?.ChecklistsEnabled == true)
+                    {
+                        <div id="dashboardCompletedChecklists" class="col-md-3">
+                            <div class="card h-100">
+                                <div class="card-header pb-4 d-flex">
+                                    <h3 class="card-title" style="width:85%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsChecklistCompletedTitle, "Last completed checklists") ?? "Last completed checklists")</h3>
+                                    <a href="/report/checklist/completed" class="float-right" style="width:15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.ShowAll, "Show all") ?? "Show all")</a>
+                                </div>
+
+                                <div style="display: flex; align-items: center; justify-content: center">
+                                    <img id="ezfeedLoader" style="width: 100px; height: 100px" src="/images/feed-loading.gif" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model?.ApplicationSettings?.Features?.TasksEnabled == true)
+                    {
+                        <div id="dashboardCompletedTasks" class="col-md-3">
+                            <div class="card h-100">
+                                <div class="card-header pb-4 d-flex">
+                                    <h3 class="card-title" style="width:85%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsTaskCompletedTitle, "Last completed tasks") ?? "Last completed tasks")</h3>
+                                    <a href="/report/task/completed" class="float-right" style="width:15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.ShowAll, "Show all") ?? "Show all")</a>
+                                </div>
+
+                                <div style="display: flex; align-items: center; justify-content: center">
+                                    <img id="ezfeedLoader" style="width: 100px; height: 100px" src="/images/feed-loading.gif" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model?.ApplicationSettings?.Features?.AuditsEnabled == true)
+                    {
+                        <div id="dashboardCompletedAudits" class="col-md-3">
+                            <div class="card h-100">
+                                <div class="card-header pb-4 d-flex">
+                                    <h3 class="card-title" style="width:85%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsAuditCompletedTitle, "Last completed audits") ?? "Last completed audits")</h3>
+                                    <a href="/report/audit/completed" class="float-right" style="width:15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.ShowAll, "Show all") ?? "Show all")</a>
+                                </div>
+
+                                <div style="display: flex; align-items: center; justify-content: center">
+                                    <img id="ezfeedLoader" style="width: 100px; height: 100px" src="/images/feed-loading.gif" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model?.ApplicationSettings?.Features?.ActionsEnabled == true)
+                    {
+                        <div id="dashboardActions" class="col-md-3">
+                            <div class="card h-100">
+                                <div class="card-header pb-4 d-flex">
+                                    <h3 class="card-title" style="width:85%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.StatsActionCompletedTitle, "Most recent actions") ?? "Most recent actions")</h3>
+                                    <a href="/action?filter=action" class="float-right" style="width:15%">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Dashboard.ShowAll, "Show all") ?? "Show all")</a>
+                                </div>
+
+                                <div style="display: flex; align-items: center; justify-content: center">
+                                    <img id="ezfeedLoader" style="width: 100px; height: 100px" src="/images/feed-loading.gif" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+        </div><!-- /.container-fluid -->
+    </section>
+</div>
+
+@section Scripts{
+    @if (Model != null && Model?.IsAdminCompany == true)
+    {
+        <script src="/js/export.js?@(DateTime.Now.ToString("ddMMyyyyHHmmss"))"></script>
+        <partial name="~/Views/Shared/_export_language_settings.cshtml" model="@Model" />
+    }
+
+    <script>
+        var isRtl = false;
+        const arabicLanguageRegEx2 = /language=['"]*ar[a-zA-Z-azA-Z]*['"]*/i;
+        const arabicLanguageFound2 = document.cookie.match(arabicLanguageRegEx2);
+        if (arabicLanguageFound2 != null) {
+            if (document.getElementById('cardTitle') != null) {
+                document.getElementById('cardTitle').style = "float:right";
+            }
+            if (document.getElementById('cardTools') != null) {
+                document.getElementById('cardTools').style = "float:left";
+            }
+            var elements = document.getElementsByClassName('fas-icon');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].setAttribute('style', 'left:15px!important;right:auto');
+            }
+        }
+        else {
+            var elements = document.getElementsByClassName('fas-icon');
+            if (document.getElementById('cardTitle') != null) {
+                document.getElementById('cardTitle').style = "float:left";
+            }
+            if (document.getElementById('cardTools') != null) {
+                document.getElementById('cardTools').style = "float:right";
+            }
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].setAttribute('style', 'right:15px!important;left:auto');
+            }
+        }
+    </script>
+
+    @if (Model != null && Model?.ApplicationSettings?.Features?.AnalyticsEnabled == true)
+    {
+        <script src="~/js/analytics.js"></script>
+        <script>ezgoAnalytics.init('dashboard');</script>
+    }
+
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                type: "GET",
+                url: '/dashboardcompleted/audits',
+                success: function (data) {
+                    $('#dashboardCompletedAudits').html(data);
+
+                    $('#accordionAudits').on('show.bs.collapse', function (el) {
+                        //console.log(el);
+                        $(el.target).parent()
+                            .css('background-color', '#93C54B')
+                            .css('border', 'dashed 2px #93C54B');
+                        ;
+                        $('.infoText').show();
+                        $(el.target).parent().find('.card-header').css('color', '#fff !important');
+                        $(el.target).parent().css('z-index', '10000').addClass('scale-up');
+                        $('#fade-wrapper').fadeIn();
+                    });
+
+                    $('#accordionAudits').on('hide.bs.collapse', function (el) {
+                        $(el.target).parent()
+                            .css('background-color', '')
+                            .css('border', 'none');
+                        $('.infoText').hide();
+                        $(el.target).parent().find('.card-header').css('color', '');
+                        $(el.target).parent().css('z-index', '1').removeClass('scale-up');
+                        $('#fade-wrapper').fadeOut();
+                    });
+
+                    $('[id^="collapseChecklist"]').on('shown.bs.collapse', function() {
+                        ezgomediafetcher.preloadVisibleImagesAndVideos();
+                    });
+
+                    $('.lastCompletedList').scroll(function () {
+                        ezgomediafetcher.preloadVisibleImagesAndVideos();
+                    });
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                }
+            });
+
+            $.ajax({
+                type: "GET",
+                url: '/dashboardcompleted/checklists',
+                success: function (data) {
+                    $('#dashboardCompletedChecklists').html(data);
+
+                    $('#accordionChecklists').on('show.bs.collapse', function (el) {
+                        //console.log(el);
+                        $(el.target).parent()
+                            .css('background-color', '#93C54B')
+                            .css('border', 'dashed 2px #93C54B');
+                        ;
+                        $('.infoText').show();
+                        $(el.target).parent().find('.card-header').css('color', '#fff !important');
+                        $(el.target).parent().css('z-index', '10000').addClass('scale-up');
+                        $('#fade-wrapper').fadeIn();
+                    });
+
+                    $('#accordionChecklists').on('hide.bs.collapse', function (el) {
+                        $(el.target).parent()
+                            .css('background-color', '')
+                            .css('border', 'none');
+                        $('.infoText').hide();
+                        $(el.target).parent().find('.card-header').css('color', '');
+                        $(el.target).parent().css('z-index', '1').removeClass('scale-up');
+                        $('#fade-wrapper').fadeOut();
+                    });
+
+                    $('[id^="collapseChecklist"]').on('shown.bs.collapse', function() {
+                        ezgomediafetcher.preloadVisibleImagesAndVideos();
+                    });
+
+                    $('.lastCompletedList').scroll(function () {
+                        ezgomediafetcher.preloadVisibleImagesAndVideos();
+                    });
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                }
+            });
+
+            $.ajax({
+                type: "GET",
+                url: '/dashboardcompleted/tasks',
+                success: function (data) {
+                    $('#dashboardCompletedTasks').html(data);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                }
+            });
+
+            $.ajax({
+                type: "GET",
+                url: '/dashboard/actions',
+                success: function (data) {
+                    $('#dashboardActions').html(data);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                }
+            });
+
+            $('[data-toggle="popover"]').popover();
+        });
+
+        $('body').css('overflow', 'auto');
+        $('.infoText').hide();
+
+        function popover(el) {
+            var data = $('#' + $(el).data('target'));
+            $('#popupitem-' + $(el).data('target')).popover({
+                container: 'body',
+                content: '<div style="width:400px;">' + data.html() + '</div>',
+                html: true
+            });
+        }
+
+        function PrintCompletedItem(id, type) {
+            var iframe = document.createElement('iframe');
+            iframe.name = "printitem_" + id;
+            iframe.style.position = "absolute";
+            iframe.style.top = "-1000000px";
+            iframe.src = "/pdf/view/" + type + "/" + id;
+            document.body.appendChild(iframe);
+
+            setTimeout(function () {
+                window.frames["printitem_" + id].print();
+                document.body.removeChild(iframe);
+            }, 1000);
+
+            return false;
+        }
+        
+        ezgomediafetcher.preloadVisibleImagesAndVideos();
+    </script>
+}

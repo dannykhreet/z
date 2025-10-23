@@ -1,0 +1,41 @@
+﻿@model BaseViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<script>
+        EZGOExportLanguages.ChecklistAuditsTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.ChecklistAndAuditsTitle, "Checklists and audits") ?? "Checklists and audits")';// 'Checklists and audits';
+        EZGOExportLanguages.ChecklistsAuditsTemplatesTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.ChecklistAndAuditTemplatesTitle, "Checklist- and audit-templates") ?? "Checklist- and audit-templates")';//'Checklist- and audit-templates';
+        EZGOExportLanguages.TaskTemplatesTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.TaskTemplatesTitle, "Task templates") ?? "Task templates")';//'Task templates';
+        EZGOExportLanguages.TaskTemplatesTitleFormItemsText = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.ExportAllActiveTaskTemplatesText, "Export all active tasktemplates") ?? "Export all active tasktemplates")';//'Export all active tasktemplates';
+        EZGOExportLanguages.TasksTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.TaskTitle, "Task tasks") ?? "Task tasks")';//'Task tasks';
+        EZGOExportLanguages.TaskPropertiesTitle ='@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.TaskPropertiesTitle, "Value registration") ?? "Value registration")';// 'Value registration';
+        EZGOExportLanguages.AuditTaskPropertiesTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.AuditTaskPropertiesTitle, "Value registration") ?? "Value registration")';//'Value registration';
+        EZGOExportLanguages.ChecklistTaskPropertiesTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.ChecklistTaskPropertiesTitle, "Value registration") ?? "Value registration")';//'Value registration';
+        EZGOExportLanguages.ChecklistsTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.ChecklistsTitle, "Checklists") ?? "Checklists")';//'Checklists';
+        EZGOExportLanguages.AuditsTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.AuditsTitle, "Audits") ?? "Audits")';//'Audits';
+        EZGOExportLanguages.AuditTemplatesTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.AuditTemplatesTitle, "Audit templates") ?? "Audit templates")';//'Audit templates';
+        EZGOExportLanguages.AuditTemplatesFormItemsText = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.AuditTemplatesText, "Export all active audittemplates") ?? "Export all active audittemplates")';//'Export all active audittemplates';
+        EZGOExportLanguages.ChecklistTemplatesTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.ChecklistsTemplateTitle, "Checklist templates") ?? "Checklist templates")';//'Checklist templates';
+        EZGOExportLanguages.ChecklistTemplatesFormItemsText = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.ChecklistsTemplateText, "Export all active checklisttemplates") ?? "Export all active checklisttemplates")';//'Export all active checklisttemplates';
+    EZGOExportLanguages.WorkInstructionTemplatesTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.WorkInstructionTemplateTitle, "WI templates") ?? "WI templates")';//'WI templates';
+    EZGOExportLanguages.WorkInstructionTemplatesFormItemsText = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.WorkInstructionTemplateText, "Export all active workinstructiontemplates") ?? "Export all active workinstructiontemplates")';//'Export all active workinstructiontemplates';
+        EZGOExportLanguages.LanguagesTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.LanguagesTitle, "Export translations") ?? "Export translations")';//'Export translations';
+        EZGOExportLanguages.LanguagesFormItemsText = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.LanguagesText, "Export all language translations") ?? "Export all language translations")';//'Export all language translations';
+        EZGOExportLanguages.LanguagesImportTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.LanguagesImportTitle, "Import translations") ?? "Import translations")';//'Import translations';
+        EZGOExportLanguages.LanguagesImportFormItemsText = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.LanguagesImportText, "Export language translations updates for import.") ?? "Export language translations updates for import.")';//'Export language translations updates for import.';
+        EZGOExportLanguages.CompanyOverviewTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.CompanyTitle, "Company overview") ?? "Company overview")';//'Company overview';
+        EZGOExportLanguages.ActionsTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.ActionsTitle, "Actions") ?? "Actions")';//'Actions';
+        EZGOExportLanguages.ExportButtonTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.ExportButtonTitle, "Export") ?? "Export")';//'Export';
+        EZGOExportLanguages.ValidationStartEarlierThanEndMessage = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.ValidationDateTitle, "Start date must be earlier than the end date") ?? "Start date must be earlier than the end date")';//'Start date must be earlier than the end date';
+        EZGOExportLanguages.ValidationStartTimeEarlierThanEndMessage = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.ValidationTimeTitle, "Start time must be earlier than the end date") ?? "Start time must be earlier than the end date")';//'Start time must be earlier than the end date';
+        EZGOExportLanguages.BusyMessage = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.BusyMessage, "Busy with getting your file...") ?? "Busy with getting your file...")';//'Busy with getting your file...';
+        EZGOExportLanguages.DoneMessage = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.DoneMessage, "Done!") ?? "Done!")';//'Done!';
+        EZGOExportLanguages.StartDateTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.StartDateTitle, "Start date") ?? "Start date")';//'Start date';
+        EZGOExportLanguages.EndDateTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.EndDateTitle, "End date") ?? "End date")';//'End date';
+    EZGOExportLanguages.AssessmentsTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.SkillAssessmentsTitle, "Skill assessments") ?? "Skill assessments")';
+    EZGOExportLanguages.AssessmentTemplatesTitle = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.SkillAssessmentTemplatesTitle, "Skill assessment templates") ?? "Skill assessment templates")';
+    EZGOExportLanguages.AssessmentTemplatesFormItemsText = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Exports.SkillAssessmentTemplatesText, "Export all active assessmenttemplates") ?? "Export all active assessmenttemplates")';//'Export all active assessmenttemplates';
+</script>

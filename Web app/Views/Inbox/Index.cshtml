@@ -1,0 +1,255 @@
+﻿@using EZGO.Api.Models.Enumerations;
+@model WebApp.ViewModels.InboxViewModel
+@{
+    Dictionary<string, string> CmsLanguage = Model.CmsLanguage;
+    Layout = "_Layout_template";
+    ViewData["Title"] = "Inbox";  //translation
+}
+
+@section CSS{
+    <style>
+        #contentBody .card {
+            border: solid 1px transparent;
+            transition: transform .2s; /* Animation */
+        }
+
+        .icon {
+            display: flex;
+            margin: auto .3em;
+        }
+
+        .custom-control-input:checked,
+        .custom-control-input:checked ~ .custom-control-label::before {
+            color: #fff;
+            border-color: #93c54b1f;
+            background-color: #93C54B;
+            box-shadow: none;
+        }
+
+        .custom-switch .custom-control-input:disabled:checked ~ .custom-control-label::before {
+            background-color: rgba(147,197,75,.5);
+        }
+
+        .width-available {
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+        }
+
+        div.custom-control-right {
+            padding-right: 24px;
+            padding-left: 0;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+            div.custom-control-right .custom-control-label::after {
+                right: -1.5rem;
+                left: auto;
+            }
+
+            div.custom-control-right .custom-control-label::before {
+                right: -2.35rem;
+                left: auto;
+            }
+
+        .inbox-list-item {
+            padding: 15px 30px;
+        }
+
+        .badge-inbox-list-item {
+            color: black;
+            background-color: #eeeeee;
+            font-size: 1rem;
+        }
+
+        .list-group-item.active .badge-inbox-list-item {
+            color: #93C54B;
+            background-color: #eeeeee;
+        }
+
+        .inbox-item-description {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-left: 0.4em;
+            font-size: 1rem;
+        }
+
+        .details-header-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .details-header-time {
+            font-weight: 100;
+            font-size: unset;
+        }
+
+        .details-body {
+            font-size: 1rem;
+        }
+    </style>
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-0">
+            <div class="col-sm-12">
+                <a href="#" onclick="history.back()"><i class="fa fa-arrow-left"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Inbox.NavBackTitle, "Back to previous") ?? "Back to previous")</a>
+                <h1>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Inbox.InboxTitle, "Inbox for template sharing") ?? "Inbox for template sharing")</h1>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row pt-1">
+            <!-- INBOX -->
+            <div class="col-4" style="margin-bottom: 16px">
+                <div class="card py-0" style="height: calc(100vh - 189px);">
+
+                    <div class="card-header d-flex">
+                        <h3 class="card-title">
+                            @if (Model.InboxItems.Count < 1)
+                            {
+                                <span id="counter">
+                                    @(Model?.CmsLanguage?.GetValue(LanguageKeys.Inbox.EmptyInboxMessage, "There are no templates currently shared in your inbox.") ?? "There are no templates currently shared in your inbox.")
+                                </span>
+                            }
+                            else
+                            {
+                                <span id="counter">
+                                    @(Model?.CmsLanguage?.GetValue(LanguageKeys.Inbox.InboxMessage, "Your recent messages.") ?? "Your recent messages.")
+                                </span>
+                            }
+                        </h3>
+                    </div>
+
+                    <div id="inbox-items" class="card-body p-0 d-flex overflow-auto">
+                        <div id="inbox-item-list" style="width:100%;">
+                            @foreach (var item in Model.InboxItems)
+                            {
+                                <a href="#" class="inbox-list-item list-group-item list-group-item-action" onclick="inbox.setItemActive(this, @item.Id)" data-templateid="@item.Id" data-object="@item.ToJsonFromObject()">
+                                    <div class="badge badge-inbox-list-item">@item.FromCompanyName</div>
+                                    <div class="time-ago float-right">@item.TimeAgo</div>
+                                    <div class="inbox-item-description">@(string.Format(Model?.CmsLanguage?.GetValue(LanguageKeys.Inbox.Shared, "Shared a {0} \"{1}\"") ?? "Shared a {0} \"{1}\"", @item.TemplateType, @item.Name))</div>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-8">
+                <div class="card p-4" id="inbox-details" style="width:100%; display:none;">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-baseline">
+                            <div class="details-header-title">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.Inbox.From, "FROM") ?? "FROM"): <span class="details-company-name">Company Name</span>
+                            </div>
+                            <div class="details-header-time text-muted"></div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="details-body">
+                            <p>
+                                @(Html.Raw(string.Format(Model?.CmsLanguage?.GetValue(LanguageKeys.Inbox.SharedTemplateMessageGreeting, "Hello {0},") ?? "Hello {0},", "<span class=\"details-user-name\">user</span>").Replace("\n", "<br>")))
+                            </p>
+                            <p>
+                                @(Html.Raw(string.Format(Model?.CmsLanguage?.GetValue(LanguageKeys.Inbox.SharedTemplateMessageBody, "I'd like to inform you that a {0} titled \"{1}\" has been shared with you by a colleague from {2}.\nYou can preview the template and make any necessary edits.\nOnce you're happy with it, just click \"save\" to add it to your templates.") ?? "I'd like to inform you that a {0} titled \"{1}\" has been shared with you by a colleague from {2}.\nYou can preview the template and make any necessary edits.\nOnce you're happy with it, just click \"save\" to add it to your templates.", "<span class=\"details-template-type\">template type</span>", "<span class=\"details-template-name\">template name</span>", "<span class=\"details-company-name\">Company Name</span>").Replace("\n", "<br>")))
+                            </p>
+                            <p>
+                                @(Html.Raw(string.Format(Model?.CmsLanguage?.GetValue(LanguageKeys.Inbox.SharedTemplateMessageClosing, "Best regards,\n{0}") ?? "Best regards,\n{0}", "<span class=\"details-company-name\">Company Name</span>").Replace("\n", "<br>")))
+                            </p>
+                        </div>
+                        <button id="btnReject" class="btn btn-danger mr-4" onclick="">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Inbox.Reject, "Reject") ?? "Reject")</button>
+                        <a id="btnPreview" class="btn btn-ezgo" href="">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Inbox.Preview, "Preview") ?? "Preview")</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts{
+    <script src="/js/ezgoUtils.js"></script>
+
+    <script>
+        ezgomediafetcher.preloadImagesAndVideos();
+    </script>
+
+    <script>
+        var inbox = {
+            setItemActive: function (clicked, id) {
+                $('.inbox-list-item').each(function (index, element) {
+                    element.classList.remove('active');
+                })
+                clicked.classList.add('active');
+
+                inbox.fillDetails(clicked.dataset.object);
+                $('#inbox-details').show();
+            },
+
+            deleteDialogue: function (id) {
+                $.fn.dialogue({
+                    content: $("<p />").text('Delete this shared template?'),
+                    closeIcon: true,
+                    buttons: [{
+                        text: "Yes",
+                        id: $.utils.createUUID(),
+                        click: function ($modal) {
+                            console.log(id);
+                            inbox.deleteItem(id);
+                            $modal.dismiss();
+                        }
+                    },
+                    {
+                        text: "No",
+                        id: $.utils.createUUID(),
+                        click: function ($modal) {
+                            $modal.dismiss();
+                        }
+                    }]
+                });
+            },
+
+            deleteItem: function (id) {
+                $('#btnPreview').prop("disabled", true);
+                $('#btnReject').prop("disabled", true);
+
+                $.ajax({
+                    type: "POST",
+                    url: '/inbox/delete/' + id,
+                    success: function (data) {
+                        toastr.success('Inbox item deleted');
+                        location.reload();
+                    },
+                    error: function (ex) {
+                        toastr.error('Could not delete inbox item');
+                        $('#btnPreview').prop("disabled", false);
+                        $('#btnReject').prop("disabled", false);
+                    }
+                });
+            },
+
+            fillDetails: function (itemJSON) {
+                item = JSON.parse(itemJSON);
+                $('#btnPreview').attr("href", "/" + item.ListType + "/shared/" + item.Id);
+                $('#btnReject').attr("onclick", "inbox.deleteDialogue(" + item.Id + ")");
+
+                $('.details-company-name').text(item.FromCompanyName);
+                $('.details-user-name').text('@(Model.CurrentUser.FirstName)');
+                $('.details-template-type').text(item.TemplateType);
+                $('.details-template-name').text(item.Name);
+
+                var date = new Date(item.CreatedAt + "Z");
+                const options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+                var sendDate = date.toLocaleString(undefined, options);
+                $('.details-header-time').text(sendDate);
+            }
+        }
+    </script>
+}

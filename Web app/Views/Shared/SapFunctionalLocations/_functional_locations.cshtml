@@ -1,0 +1,12 @@
+﻿@model List<SapPmLocationViewModel>
+@using EZGO.Api.Models.SapPm
+
+@if(Model != null && Model.Count > 0)
+{
+    <ul class="functionalLocationList">
+    @foreach(var functionalLocation in Model)
+    {
+        <partial name="_functional_location.cshtml" model="@functionalLocation" />
+    }
+    </ul>
+}

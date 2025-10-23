@@ -1,0 +1,148 @@
+﻿/* Global button styles */
+
+.text-sm .btn {
+    font-size: .875rem;
+}
+
+.circlebtn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: inline-block;
+    /*    color: #fff;*/
+    border: 1px solid rgb(210,210,210);
+    font-size: 22px !important;
+    outline: 0 !important;
+}
+
+    .circlebtn:hover {
+        cursor: pointer;
+        transform: scale(1.15);
+        /*        color: #fff;*/
+    }
+
+    .circlebtn i {
+        font-size: 22px;
+    }
+
+
+/* End global button styles */
+
+
+
+/* Button flavours */
+
+.btn-green {
+    background-color: #ddf7dd;
+    border-color: #008000;
+    color: #008000;
+}
+
+.btn-red {
+    background-color: #ffeaea;
+    font-size: 22px !important;
+    font-weight: 400;
+    border-color: #cb0000;
+    color: #cb0000;
+}
+
+.btn-clear {
+    background-color: #ffffff;
+    font-size: 22px;
+    font-weight: 400;
+    border-color: rgb(210,210,210);
+    color: #ff4500;
+}
+
+.btn-orangered {
+    background-color: #ffe4da;
+    font-size: 22px;
+    font-weight: 400;
+    border-color: #ff4500;
+    color: #ff4500;
+}
+
+.btn-orange {
+    background-color: #fff0d4;
+    font-size: 22px;
+    font-weight: 400;
+    border-color: #ffa500;
+    color: #ffa500;
+}
+
+.btn-orangegreen {
+    background-color: #f2f5dd;
+    font-size: 22px;
+    font-weight: 400;
+    border-color: #8da304;
+    color: #8da304;
+}
+
+.btn-border-green {
+    border: solid 1px #abd28e;
+    border-radius: 50%;
+    background-color: #fff;
+    font-size: 22px;
+    font-weight: 400;
+}
+
+/* Button flavours */
+
+
+
+/* Operational behaviour icons */
+
+.king {
+    background: url("/images/icons/v2/king.png") center / 26px no-repeat, #ddf7dd;
+    border-color: #5eaf5e;
+}
+
+.champion {
+    background: url("/images/icons/v2/champion.png") center / 26px no-repeat, #f2f5dd;
+    border-color: #8da304;
+}
+
+.spoton {
+    background: url("/images/icons/v2/spoton.png") center / 26px no-repeat, #fff0d4;
+    border-color: #ffa500;
+}
+
+.risingstar {
+    background: url("/images/icons/v2/risingstar.png") center / 26px no-repeat, #ffe4da;
+    border-color: #ff4500;
+}
+
+.powerup {
+    background: url("/images/icons/v2/powerup.png") center / 26px no-repeat, #ffeaea;
+    border-color: #cb0000;
+}
+
+.thumbsup {
+    background: url("/images/icons/v2/thumbsup.png") center / 26px no-repeat, #ddf7dd;
+    border-color: #5eaf5e;
+}
+
+.thumbsdown {
+    background: url("/images/icons/v2/thumbsdown.png") center / 26px no-repeat, #ffeaea;
+    border-color: #cb0000;
+}
+
+.warning {
+    background: url("/images/icons/v2/warning.png") center / 26px no-repeat, #fff0d4;
+    border-color: #ffa500;
+}
+
+.warning-icon {
+    background-image: url("/images/icons/v2/warning.png");
+    background-size: 26px 26px;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+/* End operational behaviour icons */
+
+
+/* prevent buttons to have an click event on the content of a button, but always have the button event. */
+button > * {
+    pointer-events: none;
+}

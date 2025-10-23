@@ -1,0 +1,303 @@
+﻿@model WebApp.ViewModels.RawSchedulerViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout_template";
+}
+
+<style>
+    .report-content {
+        width: 100%;
+        background-color: white;
+        border-bottom: 1px solid rgba(0,0,0,.125);
+        padding: .75rem 1.25rem;
+        position: relative;
+        border-top-left-radius: .25rem;
+        border-top-right-radius: .25rem;
+        box-shadow: 0 0 1px rgb(0 0 0 / 13%), 0 1px 3px rgb(0 0 0 / 20%);
+        margin-bottom: 1rem;
+    }
+
+    .report-table {
+        width: 100%;
+    }
+
+        .report-table thead th {
+            padding: 5px;
+        }
+
+        .report-table thead tr {
+            border-bottom: 2px solid #808080;
+            height: 60px;
+        }
+
+    .report-table-size-content {
+        width: 6%
+    }
+
+    .report-table tbody td {
+        padding: 5px;
+    }
+
+    .report-table tbody tr {
+        height: 60px;
+        border-bottom: 1px solid #4444443d;
+    }
+
+    .report-table-vertical-title {
+        font-weight: bolder;
+        width: 400px !important;
+    }
+
+    .report-table-vertical-id {
+        font-style: italic;
+        width: 50px !important;
+    }
+
+    .report-vertical {
+        -ms-writing-mode: tb-rl;
+        -webkit-writing-mode: vertical-rl;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        white-space: nowrap;
+    }
+
+    .report-bottom {
+        vertical-align: bottom;
+    }
+
+    .report-center {
+        text-align: center;
+    }
+
+
+
+
+</style>
+
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                &nbsp;
+                <h1 class="m-0 text-dark">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.HeaderScheduler, "Scheduler") ?? "Scheduler")</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6 d-flex flex-row-reverse">
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+<section class="content">
+
+    <div class="container-fluid">
+
+        <div class="card">
+            <div class="card-header">
+                <h3 id="cardHeader" class="card-title d-none d-sm-inline-block">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.HeaderSchedulerInUTC, "Scheduler in UTC for ") ?? "Scheduler in UTC for ")@DateTime.Now.ToString("MMMM").ToUpper() <span id="counter">&nbsp;</span></h3>
+                <div class="card-tools">
+                    <div class="input-group input-group-sm">
+                        @*<select class="form-control" id="raw_viewer_company" name="raw_viewer_company">
+            @foreach (var company in Model.Companies)
+            {
+                @if (Model.ChoosenCompanyId == company.Id)
+                {
+                    <option value="@company.Id" selected>@company.Name (@company.Id)</option>
+                }
+                else
+                {
+                    <option value="@company.Id">@company.Name (@company.Id)</option>
+                }
+
+            }
+        </select>
+        <select class="form-control" id="raw_viewer_type" name="raw_viewer_type">
+            <option value="tasks">Tasks</option>
+            <option value="audits">Audits</option>
+            <option value="checklists">Checklists</option>
+        </select>
+        <input type="datetime-local" id="raw_viewer_start" name="raw_viewer_start" class="form-control float-right" style="width:270px;" value="@Model.ChoosenStartDateTime.ToString("yyyy-MM-ddTHH:mm")">
+        <input type="datetime-local" id="raw_viewer_end" name="raw_viewer_end" class="form-control float-right" style="width:270px;" value="@Model.ChoosenEndDateTime.ToString("yyyy-MM-ddTHH:mm")">
+        <div class="input-group-append">
+            <button type="button" class="btn btn-default" id="btn_get_data"><i class="fas fa-arrow-alt-circle-down"></i></button>
+        </div>
+        &nbsp;
+        <input type="text" id="rawviewerSearchBox" name="rawviewerSearchBox" class="form-control float-right" placeholder="Search">
+
+        <div class="input-group-append">
+            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+        </div>*@
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <style>
+            .schedule_calendar_height { height: 100%; }
+            .schedule_calendar_hour_row { line-height:0px;min-height: 24px; height: 27px; vertical-align: top; overflow:hidden; cursor: pointer}
+            .schedule_calendar_day_nr { position:absolute;top:0px;right:0px;background-color:white;color:darkred;z-index:99;margin:2px;font-weight:bolder;}
+            .schedule_calendar_item {  line-height:0px; vertical-align: top; display:inline-block; font-size: 4px; height:8px; width: 8px; cursor: pointer; margin-left:1px; margin-top:1px; margin-top:1px;}
+            .schedule_calendar_time_container { height:100%; position:relative;}
+            .schedule_calendar_time_first { position:absolute;top:1px;right:1px;font-size:11px;font-weight:bolder; color:#808080 }
+            .schedule_calendar_time_last { position:absolute;bottom:1px;right:1px;font-size:11px;font-weight:bolder; color:#808080 }
+
+            table, th, td {
+                border: 1px solid #a3a3a3;
+            }
+        </style>
+        <div class="report-content" style="height: calc(100vh - 245px);overflow:auto;">
+            <div id="report_container" style="margin:5px;">
+                <table width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="2%">&nbsp;</th>
+                            <th width="14%">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.MondayText, "Monday") ?? "Monday")</th>
+                            <th width="14%">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.TuesdayText, "Tuesday") ?? "Tuesday")</th>
+                            <th width="14%">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.WednesdayText, "Wednesday") ?? "Wednesday")</th>
+                            <th width="14%">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.ThursdayText, "Thursday") ?? "Thursday")</th>
+                            <th width="14%">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.FridayText, "Friday") ?? "Friday")</th>
+                            <th width="14%">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.SaturdayText, "Saturday") ?? "Saturday")</th>
+                            <th width="14%">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.SundayText, "Sunday") ?? "Sunday")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                     @{
+                        var currentMonthDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                        var lastDayInMonth = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
+
+                        var startColSpan = currentMonthDate.DayOfWeek == DayOfWeek.Monday ? 0 : currentMonthDate.DayOfWeek == DayOfWeek.Sunday ? 6 : (Convert.ToInt32(currentMonthDate.DayOfWeek) - 1);
+
+                        var currentDate = currentMonthDate;
+
+
+                        for (var i = 0; i < lastDayInMonth; i++)
+                        {
+                            currentDate = currentMonthDate.AddDays(i);
+                            if (currentDate.DayOfWeek == DayOfWeek.Monday || currentDate.Day == 1)
+                            {
+                                @Html.Raw("<tr class=\"schedule_calendar_height\">");
+
+                                <td class="schedule_calendar_height" style="position:relative">
+                                    
+                                        <div class="schedule_calendar_time_first"><span>00:00</span></div>
+                                        <div class="schedule_calendar_time_last"><span>23:59</span></div>
+                                    
+                                </td>
+                            }
+
+                            if(startColSpan > 0)
+                            {
+                                <td colspan="@startColSpan">&nbsp;</td>
+                            }
+
+                            <td data-day="@currentDate.Day" data-dayofweek="@Convert.ToInt32(currentDate.DayOfWeek)" class="schedule_calendar_height">
+                                <div style="position:relative;">
+                                    <div class="schedule_calendar_day_nr"><span>@currentDate.Day</span></div>
+                                </div>
+                                <div style="margin:0px;padding:0px;vertical-align:top;">
+                                    @{
+                                        var currentDay = Model.Schedule.Days.Where(x => x.DayNumber == Convert.ToInt32(currentDate.DayOfWeek)).FirstOrDefault();
+
+                                        if (currentDay != null && currentDay.ScheduleItems != null)
+                                        {
+                                            for (var h = 0; h < 24; h++)
+                                            {
+                                                <div data-containertype="day_hour" data-day="@currentDate.Day" data-dayofweek="@Convert.ToInt32(currentDate.DayOfWeek)" data-hour="@h" class="schedule_calendar_hour_row" style="@(h % 2 == 0 && h != 0 ? "border-top: 1px solid #C3C3C3;" : "border-top: 1px solid #E2E2E2;")" title="@h.ToString("00"):00 UTC ~ @((h + 1).ToString("00")):00 UTC">
+                                                    @{
+                                                        var currentDayItems = currentDay.ScheduleItems.Where(x => x.StartTime.Split(":")[0] == h.ToString("00"));
+                                                        if (currentDayItems != null && currentDayItems.Any())
+                                                        {
+                                                            foreach (var item in currentDayItems.OrderBy(y => y.StartTime).ToList())
+                                                            {<span data-containertype="day_hour_value" style="background-color: @item.Color;" class="schedule_calendar_item" data-color="@item.Color" data-title="@item.Title" data-starttime="@item.StartTime" data-endtime="@item.EndTime" data-description="@item.Description" data-type="@item.ItemType" title="@item.StartTime - @item.EndTime | @item.Title : @item.Description (@item.ItemType)">.</span>}
+                                                        }
+                                                    }
+                                                </div>
+                                            }
+                                        }
+                                    }
+                                </div>
+                            </td>
+
+                            @if (currentDate.DayOfWeek == DayOfWeek.Sunday || currentDate.Day == lastDayInMonth)
+                            {
+                                @Html.Raw("</tr>");
+                            }
+
+                            startColSpan = 0;
+                        }
+
+                    }
+                    </tbody>
+                </table>
+               @*<partial name="~/Views/RawViewer/_report_table.cshtml" model="@Model" />*@
+
+            </div>
+        </div>
+     
+    </div>
+
+</section>
+
+
+<div class="modal fade" id="modalDayHour" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_day_hour_title">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.HourTitle, "Hour") ?? "Hour")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="max-height:600px; overflow: auto">
+                <div id="modal_data_container">
+
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancel_holdings_btn" class="btn btn-info btn-sm" data-dismiss="modal" data-actiontype="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.BtnClose, "Close") ?? "Close")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+
+    <script>
+        var rawSchedule = {
+            init: function () {
+                rawSchedule.initHandlers();
+            },
+            initHandlers: function () {
+                $('[data-containertype="day_hour"]').on('click', function () { rawSchedule.showDayHourTooltip(this); })
+            },
+            showDayHourTooltip: function (initiator) {
+                if (initiator != null) {
+                    $('#modalDayHour').modal('show');
+                    var foundChildren = $(initiator).children('[data-containertype="day_hour_value"]');
+                    var body = '';
+                    for (var i = 0; i < foundChildren.length; i++) {
+                        var foundChild = $(foundChildren[i]);
+                        body = body + '<div class="row" style="position:relative;text-align:middle;vertical-align:middle; margin-bottom:5px; border-bottom: 1px solid #C0C0C0"><div style="margin-top:2px; margin-bottom:4px; background-color: ' + foundChild.attr('data-color') + '; height:20px; width: 20px; font-size: 2px; display: inline-block;">&nbsp;</div><span style="margin-left:5px;">' + foundChild.attr('title') + '</span></div>'
+                    }
+                    $('#modal_data_container').html(body);
+                }
+            }
+
+        }
+
+        rawSchedule.init();
+
+
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+
+            ezgomediafetcher.preloadImagesAndVideos();
+        })
+    </script>
+
+}

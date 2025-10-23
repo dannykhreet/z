@@ -1,0 +1,215 @@
+﻿@model WebApp.ViewModels.DatawarehouseToolsViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout_template";
+}
+
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <a href="/datawarehouse/tools">Back to datawarehouse tools</a>
+                <h1 class="m-0 text-dark">Datawarehouse Tools</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6 d-flex flex-row-reverse">
+
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+
+<section class="content">
+
+    <div class="container-fluid">
+
+        <div class="card">
+            <div class="card-header">
+                <h3 id="cardHeader" class="card-title d-none d-sm-inline-block">Tools overview<span id="counter">&nbsp;</span></h3>
+                <div class="card-tools">
+                    <div class="input-group input-group-sm">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Export data from EZGO to DW</div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <select class="form-control" id="tools_holding" name="tools_holding">
+                        <option value="0" title="">No specific holding</option>
+                        @foreach (var holding in Model.Holdings)
+                        {
+                            <option value="@holding.Id">@holding.Name (@holding.Id)</option>
+
+                        }
+                    </select>
+                    <select class="form-control" id="tools_company" name="tools_company">
+                        <option value="0" title="">No specific company</option>
+                        @foreach (var company in Model.Companies)
+                        {
+                            if (company.Id == 136) {
+                                <option value="@company.Id" selected>@company.Name (@company.Id)</option>
+                            } else
+                            {
+                                <option value="@company.Id">@company.Name (@company.Id)</option>
+                            }
+
+                        }
+                    </select>
+                    <input class="form-control" type="text" id="tools_from_date" name="tools_from_date" title="From date" placeholder="From date" value="2023-01-01" />
+                    <input class="form-control" type="text" id="tools_to_date" name="tools_to_date" title="To date" placeholder="To date" value="2023-02-01" />
+                    <input class="form-control" type="text" id="tools_timeout_in_seconds" name="tools_timeout_in_seconds" placeholder="Timout between calls in seconds" value="60000"/>
+                    <select class="form-control" id="tools_interval_in_minutes" name="tools_interval_in_minutes">
+                        <option value="1440" title="">1 day</option>
+                        <option value="10" title="">10 minutes</option>
+                        <option value="60" title="">1 hour</option>
+                        <option value="360" title="">6 hours</option>
+                        <option value="720" title="">12 hours</option>
+                    </select>
+                    <button id="start_export" name="start_export">Start</button>&nbsp;&nbsp;<span id="run_message_active" style="color:green;font-weight:bolder;"></span>
+                    <textarea style="height: 300px;" class="form-control" id="tools_output_result" name="tools_output_result"></textarea>
+                    <br />  <br />
+                    <i>Note: format dates: yyyy-MM-ddTHH:mm:ss, based on local time representing the UtC date (so if you start on 00:00 you will need to add 01:00 as time if your in CET in the winter).</i><br />
+                    <i>Note: timeout, don't go below 60000 (1 minute) due to performance issues.</i><br />
+                    <i>Note: use specific ranges that are controllable (e.g. don't do an entire year, but pick a day, or week, or maybe month but nothing more than that.).</i><br />
+                    <i>Note: only use when asked, don't use when you do not know what you are doing.</i><br />
+                </div>
+            </div>
+        </div>
+
+        <div class="row pt-1" style="height:calc(100vh - 175px);overflow:auto;">
+            <div class="col-lg-12 col-xl-12">
+                <div id="contentBody" style="height: calc(100vh - 245px);overflow:auto;">
+    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+@section Scripts{
+    <script>
+        const timer = ms => new Promise(res => setTimeout(res, ms))
+
+        async function StartRun() {
+            $('#run_message_active').text('RUNNING');
+            dwToolsManualExportImport.company_id = $('#tools_company').val();
+            dwToolsManualExportImport.holding_id = $('#tools_holding').val();
+            dwToolsManualExportImport.start_date = $('#tools_from_date').val();
+            dwToolsManualExportImport.start_time = '00:00:00';
+            dwToolsManualExportImport.end_date = $('#tools_to_date').val();
+            dwToolsManualExportImport.end_time = '00:00:00';
+            dwToolsManualExportImport.interval_in_minutes = $('#tools_interval_in_minutes').val();
+            dwToolsManualExportImport.timeout = $('#tools_timeout_in_seconds').val();
+
+            let endDate = new Date(dwToolsManualExportImport.end_date); //determine end date for loop 'up until end date';
+            let currentStartDate = new Date(dwToolsManualExportImport.start_date);
+            let currentEndDate = new Date(dwToolsManualExportImport.start_date);
+
+            currentEndDate = new Date(currentStartDate.getTime() + parseInt(dwToolsManualExportImport.interval_in_minutes)*60000);
+
+            const offset = currentStartDate.getTimezoneOffset();
+
+            console.log(currentStartDate);//push to log for validations
+            console.log(currentEndDate);//push to log for validations
+
+            while (currentEndDate <= endDate) {
+                postStartDateTime =  new Date(currentStartDate.getTime() - (offset*60*1000)).toISOString().replace('.000Z',''); //hande js offset, kill format, kill possible weird interpretation of js datetimes
+                postEndDateTime = new Date(currentEndDate.getTime() - (offset*60*1000)).toISOString().replace('.000Z',''); //hande js offset, kill format, kill possible weird interpretation of js datetimes
+
+                forcedNonJsStartDateTime =  postStartDateTime.split('T')[0] + 'T' + postStartDateTime.split('T')[1]; //reset, should be correct already
+                forcedNonJsEndDateTime = postEndDateTime.split('T')[0] + 'T' + postEndDateTime.split('T')[1]; //reset, should be correct already
+
+                dwToolsManualExportImport.exportImport(dwToolsManualExportImport.company_id, dwToolsManualExportImport.holding_id, forcedNonJsStartDateTime, forcedNonJsEndDateTime, '');
+                //determine next round of dates for import
+                currentStartDate = currentEndDate;
+                console.log(currentStartDate); //push to log for validations
+                currentEndDate = new Date(currentEndDate.getTime() + parseInt(dwToolsManualExportImport.interval_in_minutes)*60000); //date.getTime() + minutes*60000
+                console.log(currentEndDate); //push to log for validations
+                await timer(parseInt(dwToolsManualExportImport.timeout)); //....holdon a minute or so.
+            }
+
+             $('#run_message_active').text('DONE');
+        }
+
+        var dwToolsManualExportImport = {
+            run: false,
+            start_date: null,
+            end_date: null,
+            start_time: null,
+            end_time: null,
+            company_id: null,
+            holding_id: null,
+            interval_in_days: null,
+            interval_in_minutes: null,
+            timeout: null,
+            init: function() {
+                dwToolsManualExportImport.initHandlers();
+            },
+            initHandlers: function() {
+                $('#start_export').on('click', function () {
+                    StartRun();
+                });
+            },
+            generateGuid: function() {
+                $.ajax({
+                    type: "GET",
+                    url: '/company/holding/generateguid',
+                    success: function (data) {
+                        if (data != null) {
+                            $('#user_appid').val(JSON.parse(data));
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            exportImport: function (companyid, holdingid, startat, endat, storedprocedure) {
+                toastr.remove();
+
+                let dwData = {
+                    CompanyId: parseInt(companyid),
+                    HoldingId: parseInt(holdingid),
+                    StartAt: startat,
+                    EndAt: endat,
+                    ProcedureName: storedprocedure
+                };
+
+                console.log(dwData); //push to console for checking
+
+                toastr.success('starting run<br />' + dwData.StartAt + '<br />' + dwData.EndAt);
+                $.ajax({
+                    type: "POST",
+                    url: '/datawarehouse/migrations/manual',
+                    data: JSON.stringify(dwData),
+                    success: function (data) {
+                        toastr.success('run ended.');
+                        console.log(data); //push raw data to console for checking when running
+                        $('#tools_output_result').val('\r\n' + JSON.stringify(dwData) + ':' + (data.includes('[true]') ? 'data synced' : 'no data') + $('#tools_output_result').val());
+                        //toastr.remove();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+        }
+
+        dwToolsManualExportImport.init();
+        ezgomediafetcher.preloadImagesAndVideos();
+    </script>
+}

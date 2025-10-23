@@ -1,0 +1,55 @@
+﻿/* Tooltip container */
+.ezgo-tooltip {
+    position: absolute;
+    display: inline-block;
+/*    border-bottom: 1px dotted black;*/
+}
+
+.ezgo-tooltip-text {
+    position: fixed;
+    z-index: 1;
+}
+
+    /* Tooltip text */
+    .ezgo-tooltip .tooltiptext {
+        visibility: hidden;
+        min-width: 150px;
+        background-color: gray;
+        color: #fff;
+        text-align: center;
+        padding: 5px;
+        border-radius: 6px;
+        /* Position the tooltip text - see examples below! */
+        position: absolute;
+        z-index: 1;
+        top: -26px;
+        left: 50px;
+    }
+
+    /* Show the tooltip text when you mouse over the tooltip container */
+    .ezgo-tooltip:hover .tooltiptext {
+        visibility: visible;
+    }
+
+    .ezgo-tooltip .tooltiptext::after {
+        content: " ";
+        position: absolute;
+        top: 50%;
+        right: 100%; /* To the left of the tooltip */
+        margin-top: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent gray transparent transparent;
+    }
+
+.text-ezgo {
+    color: #93C54B!important;
+}
+
+.card-ezgo:not(.card-outline) > .card-header, .card-warning:not(.card-outline) > .card-header a {
+    color: #ffffff;
+}
+
+.card-ezgo:not(.card-outline) > .card-header {
+    background-color: #93C54B;
+}

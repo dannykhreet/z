@@ -1,0 +1,102 @@
+﻿@model WebApp.ViewModels.MarketplaceViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = Model?.CmsLanguage.GetValue(LanguageKeys.Marketplace.MarketplaceTitle, "Marketplace") ?? "Marketplace";
+}
+
+<div class="container" style="height:100%; max-width: 100%; overflow-y: scroll">
+    <div class="row">
+        <div class="col">
+            <h1 class="m-0 text-dark">@(Model?.CmsLanguage.GetValue(LanguageKeys.Marketplace.Title, "Marketplace") ?? "Marketplace")</h1>
+            <p>@(Model?.CmsLanguage.GetValue(LanguageKeys.Marketplace.FeaturesAndProductivityAndIntegrationsTitle, "Features | Productivity | Integrations") ?? "Features | Productivity | Integrations")</p>
+        </div>
+    </div>
+    <div class="row pt-4">
+        @foreach (var marketplaceItem in Model.MarketPlaceItems)
+        {
+            <div class="col-md-4 col-lg-4 pb-4">
+                <div class="card">
+                    <img class="card-img-top w-100 d-block" src="@marketplaceItem.Picture" >
+                    <div class="card-body" style="min-height: 16em; height: auto">
+                        <h5>@marketplaceItem.Name</h5>
+                        <p>@marketplaceItem.Description</p>
+                        <a class="card-link btn btn-ezgo" data-id="1" data-name="@marketplaceItem.Name" data-description="@marketplaceItem.Description" data-image="@marketplaceItem.Picture" onclick="loadModal(this)" style="position: absolute; bottom: 1.5em">@(Model?.CmsLanguage.GetValue(LanguageKeys.Marketplace.RequestInformationTitle, "Request information") ?? "Request information")</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<div class="modal fade" role="dialog" tabindex="-1" id="explain-modal">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="sticky-top text-center">
+                            <img id="popupImage" style="width: 100%;margin-top: -36px;margin-bottom: -26px;">
+                            <h5 id="popupTitle"></h5>
+                            <p id="popupDescription"></p>
+                            <form id="requestInfoForm">
+                                <div class="form-group pt-0">
+                                    @Html.AntiForgeryToken()
+                                    <input id="emailFrom" class="form-control" type="email" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Marketplace.YourEmailPlaceholder, "Your email address") ?? "Your email address")" required>
+                                    <div id="emailFromValidationWarning" class="invalid-feedback" style="text-align: left">
+                                        @(Model?.CmsLanguage.GetValue(LanguageKeys.Marketplace.ProvideValidEmailText, "Please provide a valid email address.") ?? "Please provide a valid email address.")
+                                    </div>
+                                    <textarea id="requestInfoDescription" class="form-control mt-2" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Marketplace.CommentsPlaceholder, "Comments (optional)") ?? "Comments (optional)")" rows="4"></textarea>
+                                    <a class="btn btn-ezgo btn-block mt-2" href="#" data-target="#explain-modal" onclick="sendEmail()">@(Model?.CmsLanguage.GetValue(LanguageKeys.Marketplace.SendRequestText, "Send request") ?? "Send request")</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <script>
+
+
+    function loadModal(e) {
+        $('#emailFromValidationWarning').hide();
+
+        var title = $(e).data("name");
+        var description = $(e).data("description");
+        var img = $(e).data("image");
+        $('#popupTitle').html(title);
+        $('#popupDescription').html(description);
+        $('#popupImage').attr('src', img);
+        $('#emailFrom').val('');
+        $('#requestInfoDescription').val('');
+
+        $('#explain-modal').modal('show');
+    };
+
+    function sendEmail(emailFrom, requestInfoTitle, requestInfoDescription) {
+        if ($('#emailFrom').val() == '' || !$('#emailFrom').val().includes('@Html.Raw("@")')) {
+            $('#emailFromValidationWarning').show();
+            return;
+        }
+        $('#emailFromValidationWarning').hide();
+        $.ajax({
+            type: "POST",
+            url: `/marketplace/sendemail`,
+            data: {
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').attr('value'),
+                emailFrom: $("#emailFrom").val(),
+                requestInfoTitle: $('#popupTitle').text(),
+                requestInfoDescription: $("#requestInfoDescription").val()
+            },
+            success: function (data) {
+                //console.log("Email sent!");
+                toastr.success('@(Model?.CmsLanguage.GetValue(LanguageKeys.Marketplace.EmailSent, "Email sent") ?? "Email sent")');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                //console.log("Error sending email")
+                toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+            }
+        })
+        $('#explain-modal').modal('hide');
+    };
+    </script>

@@ -1,0 +1,146 @@
+﻿@model WebApp.Models.Checklist.CompletedChecklistTaskModel
+
+@if(Model?.EditedByUsers != null)
+{
+    @if(Model.EditedByUsers.Count == 1)
+    {
+        <div class="mr-2" style="position: relative; height: auto; position: relative; display: flex; justify-content: center; align-items: center; width: 50px">
+            @{
+            var editedByPicture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+            if (!string.IsNullOrEmpty(Model.EditedByUsers[0].Picture))
+            {
+                editedByPicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.EditedByUsers[0].Picture);
+            }
+            }
+            <img class="itemEditedByUserPicture" src="/images/media-loading.gif" data-src="@editedByPicture" style="right: 5px"></img>
+        </div>
+    }
+    else if(Model.EditedByUsers.Count == 2)
+    {
+        <div class="mr-2" style="position: relative; height: auto; position: relative; display: flex; justify-content: center; align-items: center; width: 80px">
+            @{
+                var editedByPicture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(Model.EditedByUsers[0].Picture))
+                {
+                    editedByPicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.EditedByUsers[0].Picture);
+                }
+            }
+            <img class="itemEditedByUserPicture" src="/images/media-loading.gif" data-src="@editedByPicture" style="right: 35px"></img>
+            @{
+                var editedByPicture2 = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(Model.EditedByUsers[1].Picture))
+                {
+                    editedByPicture2 = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.EditedByUsers[1].Picture);
+                }
+            }
+            <img class="itemEditedByUserPicture" src="/images/media-loading.gif" data-src="@editedByPicture2" style="right: 5px"></img>
+        </div>
+    }
+    else if (Model.EditedByUsers.Count == 3)
+    {
+        <div class="mr-2" style="position: relative; height: auto; position: relative; display: flex; justify-content: center; align-items: center; width: 110px">
+            @{
+                var editedByPicture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(Model.EditedByUsers[0].Picture))
+                {
+                    editedByPicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.EditedByUsers[0].Picture);
+                }
+            }
+            <img class="itemEditedByUserPicture" src="/images/media-loading.gif" data-src="@editedByPicture" style="right: 65px"></img>
+            @{
+                var editedByPicture2 = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(Model.EditedByUsers[1].Picture))
+                {
+                    editedByPicture2 = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.EditedByUsers[1].Picture);
+                }
+            }
+            <img class="itemEditedByUserPicture" src="/images/media-loading.gif" data-src="@editedByPicture2" style="right: 35px"></img>
+            @{
+                var editedByPicture3 = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(Model.EditedByUsers[2].Picture))
+                {
+                    editedByPicture3 = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.EditedByUsers[2].Picture);
+                }
+            }
+            <img class="itemEditedByUserPicture" src="/images/media-loading.gif" data-src="@editedByPicture3" style="right: 5px"></img>
+        </div>
+    }
+    else if (Model.EditedByUsers.Count == 4)
+    {
+        <div class="mr-2" style="position: relative; height: auto; position: relative; display: flex; justify-content: center; align-items: center; width: 140px">
+            @{
+                var editedByPicture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(Model.EditedByUsers[0].Picture))
+                {
+                    editedByPicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.EditedByUsers[0].Picture);
+                }
+            }
+            <img class="itemEditedByUserPicture" src="/images/media-loading.gif" data-src="@editedByPicture" style="right: 95px"></img>
+            @{
+                var editedByPicture2 = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(Model.EditedByUsers[1].Picture))
+                {
+                    editedByPicture2 = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.EditedByUsers[1].Picture);
+                }
+            }
+            <img class="itemEditedByUserPicture" src="/images/media-loading.gif" data-src="@editedByPicture2" style="right: 65px"></img>
+            @{
+                var editedByPicture3 = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(Model.EditedByUsers[2].Picture))
+                {
+                    editedByPicture3 = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.EditedByUsers[2].Picture);
+                }
+            }
+            <img class="itemEditedByUserPicture" src="/images/media-loading.gif" data-src="@editedByPicture3" style="right: 35px"></img>
+            @{
+                var editedByPicture4 = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(Model.EditedByUsers[3].Picture))
+                {
+                    editedByPicture4 = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.EditedByUsers[3].Picture);
+                }
+            }
+            <img class="itemEditedByUserPicture" src="/images/media-loading.gif" data-src="@editedByPicture4" style="right: 5px"></img>
+        </div>
+    }
+    else if(Model.EditedByUsers.Count > 4)
+    {
+        <div class="mr-2" style="position: relative; height: auto; position: relative; display: flex; justify-content: center; align-items: center; width: 140px">
+            @{
+                var editedByPicture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(Model.EditedByUsers[0].Picture))
+                {
+                    editedByPicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.EditedByUsers[0].Picture);
+                }
+            }
+            <img class="itemEditedByUserPicture" src="/images/media-loading.gif" data-src="@editedByPicture" style="right: 95px"></img>
+            @{
+                var editedByPicture2 = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(Model.EditedByUsers[1].Picture))
+                {
+                    editedByPicture2 = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.EditedByUsers[1].Picture);
+                }
+            }
+            <img class="itemEditedByUserPicture" src="/images/media-loading.gif" data-src="@editedByPicture2" style="right: 65px"></img>
+            @{
+                var editedByPicture3 = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(Model.EditedByUsers[2].Picture))
+                {
+                    editedByPicture3 = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.EditedByUsers[2].Picture);
+                }
+            }
+            <img class="itemEditedByUserPicture" src="/images/media-loading.gif" data-src="@editedByPicture3" style="right: 35px"></img>
+            @{
+                var editedByPicture4 = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(Model.EditedByUsers[3].Picture))
+                {
+                    editedByPicture4 = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.EditedByUsers[3].Picture);
+                }
+            }
+            <img class="itemEditedByUserPicture" src="/images/media-loading.gif" data-src="@editedByPicture4" style="right: 5px"></img>
+            <div class="itemEditedByUserOverlay">
+                +@(Model.EditedByUsers.Count - 4)
+            </div>
+
+        </div>
+    }
+}

@@ -1,0 +1,543 @@
+﻿@model PdfAuditTemplateViewModel
+@using WebApp.Logic.Services;
+@using WebApp.Helpers
+@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>@(Model?.CmsLanguage.GetValue(LanguageKeys.PdfAuditTemplate.AuditTemplate, "Audit template") ?? "Audit template") @Model.AuditTemplate.Name</title>
+    <link rel="stylesheet" href="/css/pdf.css" />
+    <partial name="_pdfCss" /> @*above link doesnt work on docker for some reason*@
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/plugins/fontawesome-pro-6.5.2-web/css/all.min.css" />
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1337.0.min.js"></script>
+    <script src="/js/ezgomediafetcher.js"></script>
+
+    <style>
+        table {
+        table-layout: fixed;
+        border-collapse: separate;
+        border-spacing: 0px;
+        padding: 0px;
+        margin: 0px;
+        }
+
+        td {
+        color: #3d3c41;
+        background-size: 100% 100%;
+        background-position-x: 0;
+        background-position-y: 0;
+        overflow: hidden;
+        word-wrap: break-word;
+        }
+
+        .overviewtext {
+        font-size: 18px;
+        padding-left: 2rem;
+        padding-top: 0.3rem;
+        padding-bottom: 0.3rem;
+        vertical-align: top;
+        }
+
+        .stepstext {
+        }
+
+        .informationtext {
+        vertical-align: top;
+        padding-left: 1rem;
+        }
+
+        .overlaytop {
+        position: absolute;
+        padding: 0px;
+        margin: 0px;
+        top: 0;
+        left: 0;
+        width: 3em;
+        height: 3em;
+        line-height: 3em;
+        vertical-align: middle;
+        text-align: center;
+        background: #24A552;
+        color: white;
+        }
+
+        .overlaybottom {
+        position: absolute;
+        padding: 0px;
+        margin: 0px;
+        left: 0;
+        bottom: 0;
+        width: 2em;
+        height: 2em;
+        line-height: 2em;
+        vertical-align: middle;
+        text-align: center;
+        background: black;
+        color: white;
+        }
+
+        .fancyshadow {
+        box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+        }
+
+        tr:nth-child(even).alternatingcolors {
+        background: #FFF
+        }
+
+        tr:nth-child(odd).alternatingcolors {
+        background: #f7f6fb
+        }
+
+        .autosize {
+        width: 1%;
+        white-space: nowrap !important;
+        }
+
+        .step-instruction-description {
+        width: 30%;
+        height: 100%;
+        font-size: 15px;
+        vertical-align: top;
+        text-overflow: ellipsis;
+        float: left;
+        min-height: 5rem;
+        box-sizing: border-box;
+        padding: 0rem 1rem;
+        overflow-wrap: break-word;
+        }
+
+        <!-- Tags -->
+        .card {
+        position: relative;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #ffffff;
+        background-clip: border-box;
+        border: 0 solid rgba(0, 0, 0, 0.125);
+        border-radius: 0.25rem;
+        }
+
+        .tag-card {
+        display: inline-block;
+        width: 9em;
+        color: white;
+        align-content: center;
+        align-items: center;
+        }
+
+        .tag-wrapper {
+        width: 100%;
+        width: -moz-available;
+        width: -webkit-fill-available;
+        display: flex;
+        height: 2.6em;
+        line-height: 1.1;
+        }
+
+        .tag-span {
+        text-align: center;
+        align-self: center;
+        display: inline-block;
+        width: 100%;
+        width: -moz-available;
+        width: -webkit-fill-available;
+        }
+
+        .nav-icon {
+        float: left;
+        display: inline-block;
+        }
+        .card {
+        box-shadow: none;
+        border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <partial name="_header.cshtml" model="@("AUDIT TEMPLATE")" />
+    <!-- Root div -->
+    <div style="padding: 1rem">
+        <!-- Overview section -->
+        <table style="width: 100%; height: auto; margin-bottom: 1rem; page-break-inside: avoid;">
+            @{
+                var pictureUrl = Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(Model.AuditTemplate.Picture))
+                {
+                    pictureUrl = MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.AuditTemplate.Picture);
+                }
+                <!-- Overview image and title -->
+                <tr style="width: 100%">
+                    <td rowspan=7 colspan=2 style="vertical-align: top; padding-top: 1rem">
+                        <div class="imageWrapper">
+                            <img data-src="@pictureUrl" @*style="width: 100%; object-fit: cover; object-position: center; max-height: 300px"*@ />
+                        </div>
+                    </td>
+                    <td colspan=2 class="overviewtext" style="text-transform: uppercase; font-size: 27px; padding-top: 2rem; padding-bottom: 1rem; padding-left: 2rem"><strong style="color: #24A552">@Model.AuditTemplate.Name</strong></td>
+                </tr>
+            }
+            <!-- Overview ID -->
+            <tr>
+                <td class="overviewtext"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditTemplate.AuditId, "Audit ID") ?? "Audit ID"): </strong></td>
+                <td style="font-size: 18px; vertical-align: top">@Model.AuditTemplate.Id</td>
+            </tr>
+            <!-- Overview Role -->
+            <tr>
+                <td class="overviewtext"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditTemplate.Role, "Role") ?? "Role"): </strong></td>
+                @if (Model.AuditTemplate.Role.ToLower().Equals("basic"))
+                {
+                    <td style="font-size: 18px; vertical-align: top">@(Model?.CmsLanguage?.GetValue(LanguageKeys.User.Basic, "Basic user") ?? "Basic user")</td>
+                }
+                else if (Model.AuditTemplate.Role.ToLower().Equals("shift_leader"))
+                {
+                    <td style="font-size: 18px; vertical-align: top">@(Model?.CmsLanguage?.GetValue(LanguageKeys.User.ShiftLeader, "Shift leader") ?? "Shift leader")</td>
+                }
+                else if (Model.AuditTemplate.Role.ToLower().Equals("manager"))
+                {
+                    <td style="font-size: 18px; vertical-align: top">@(Model?.CmsLanguage?.GetValue(LanguageKeys.User.Manager, "Manager") ?? "Manager")</td>
+                }
+            </tr>
+            <!-- Overview Signature(s) -->
+            <tr>
+                <td class="overviewtext"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditTemplate.Signatures, "Signature(s)") ?? "Signature(s)"): </strong></td>
+                <td style="font-size: 18px; vertical-align: top;">
+                    @if (@Model.AuditTemplate.IsDoubleSignatureRequired)
+                    {<span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.OptionTwoSignature, "Two signatures") ?? "Two signatures")</span> }
+                    else if (@Model.AuditTemplate.IsSignatureRequired)
+                    { <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.OptionOneSignature, "One signature") ?? "One signature")</span> }
+                    else
+                    { <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.OptionNone, "None") ?? "None")</span>}
+                </td>
+            </tr>
+            <!-- Overview Scoring system -->
+            <tr>
+                <td class="overviewtext"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditTemplate.ScoringSystem, "Scoring system") ?? "Scoring system"): </strong></td>
+
+                @if (Model.AuditTemplate.ScoreType == "score")
+                {
+                    <td style="font-size: 18px; vertical-align: top">
+                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.ScoringCustomTitle, $"Custom Scoring" ?? $"Custom Scoring")) | @($"{Model.AuditTemplate.MinScore} - {Model.AuditTemplate.MaxScore}")
+                    </td>
+
+                }
+                else if (Model.AuditTemplate.ScoreType == "thumbs")
+                {
+                    <td style="font-size: 18px; vertical-align: top">
+                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.ScoringThumbsTitle, $"Thumbs" ?? $"Thumbs"))
+                    </td>
+                }
+            </tr>
+
+            <!-- Overview areas -->
+            <tr>
+                <td class="overviewtext" style="vertical-align: top !important"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditTemplate.Areas, "Areas") ?? "Areas"): </strong></td>
+                <td style="font-size: 18px; vertical-align: top !important">@Model.AuditArea.FullDisplayName</td>
+            </tr>
+
+            @if (Model != null && Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null && Model.ApplicationSettings.Features.RequiredProof.Value)
+            {
+                <tr>
+                    <td class="overviewtext overview-cell" style="vertical-align: top !important"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.PictureProofTitle, "Picture Proof") ?? "Picture Proof"): </strong></td>
+                    <td class="overview-cell" style="font-size: 18px; vertical-align: top !important">
+                        @if (Model.AuditTemplate.TaskTemplates != null)
+                        {
+                            if (Model.AuditTemplate.TaskTemplates.All(t => t.HasPictureProof))
+                            {
+                                @:Yes
+                            }
+                            else if (Model.AuditTemplate.TaskTemplates.Any(t => t.HasPictureProof))
+                            {
+                                @:Partially
+                            }
+                            else
+                            {
+                                @:No
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </table>
+        <!-- Tags section -->
+        @if (Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null &&
+            Model.ApplicationSettings.Features.TagsEnabled.HasValue && Model.ApplicationSettings.Features.TagsEnabled.Value &&
+            Model.AuditTemplate.Tags != null)
+        {
+            foreach (var tag in Model.AuditTemplate.Tags)
+            {
+                <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; margin: 0.25rem">
+                    <div class="tag-wrapper" style="">
+                        <i style="margin-top: auto; margin-bottom: auto; margin-left: 0.5rem; margin-right: 0px" class="nav-icon my-auto ml-2 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                        <span style="margin-top: auto; margin-bottom: auto; margin-right: 0.5rem" class="my-auto mr-2 tag-span">@tag.Name</span>
+                    </div>
+                </div>
+            }
+        }
+        <!-- Steps section -->
+        @if (Model?.AuditTemplate.TaskTemplates != null)
+        {
+            @foreach (var taskTemplate in Model.AuditTemplate.TaskTemplates)
+            {
+                <!-- Root steps table -->
+                <!-- Removing "page-break-inside: avoid" from this table would reintroduce the white space bug, so dont remove this css style! -->
+                <div style="width: 100%; height: 100%; margin-top: 1rem; margin-right: 1rem; page-break-inside: avoid" class="fancyshadow">
+                    @if(Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null &&
+                       Model.ApplicationSettings.Features.TagsEnabled.HasValue && Model.ApplicationSettings.Features.TagsEnabled.Value &&
+                       taskTemplate.Tags != null)
+                    {
+                        @foreach (var tag in taskTemplate.Tags)
+                        {
+                            <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; margin: 0.25rem">
+                                <div class="tag-wrapper" style="">
+                                    <i style="margin-top: auto; margin-bottom: auto; margin-left: 0.5rem; margin-right: 0px" class="nav-icon my-auto ml-2 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                    <span style="margin-top: auto; margin-bottom: auto; margin-right: 0.5rem" class="my-auto mr-2 tag-span">@tag.Name</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    @{
+                        string mediaImageUrl = Constants.General.ImageUnavailableUrl;
+                        if (!string.IsNullOrEmpty(taskTemplate.Picture))
+                        {
+                            mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, taskTemplate.Picture);
+                        }
+                        if (!string.IsNullOrEmpty(taskTemplate.VideoThumbnail))
+                        {
+                            mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, taskTemplate.VideoThumbnail);
+                        }
+                        <!-- Steps table -->
+                        <div style="display: table; width: auto; height: 100%; padding: 1rem 0rem 1rem 1rem; page-break-inside: avoid">
+                            <div style="display: table-row;">
+                                <!-- Step image and number overlay-->
+                                <div rowspan=4 style="display:table-cell; position: relative; width: 28%; background: #F7F7F7; vertical-align: top;">
+                                    <div class="imageWrapper">
+                                        <img class="background-image" data-src="@mediaImageUrl"  />
+                                    </div>
+                                    <div class="overlaytop"><h1 style="margin: 0; padding: 0">@(Model.AuditTemplate.TaskTemplates.IndexOf(taskTemplate) + 1)</h1></div>
+                                </div>
+                                <!-- Step title-->
+
+                                <div style="display:table-cell">
+                                    <div style="display:table-row"><div class="stepstext" style="display:table-cell; font-size: 20px; padding-left: 1rem; padding-right: 1rem; padding-bottom: 1rem"><strong style="color: #24A552">@taskTemplate.Name</strong></div></div>
+                                    <div style="display:table-row"><div class="stepstext" style="display:table-cell; font-size: 15px; padding-left: 1rem; padding-right: 1rem; padding-bottom: 1rem; text-overflow: ellipsis"> @taskTemplate.Description</div></div>
+                                </div>
+                                <!-- Root Information td -->
+                                <div style="display: table-cell; background-color: #24A552; width: 28%" valign="top">
+                                    <!-- Information table -->
+                                    <table style="width: 100%; height: 100%; color: white; position: relative; margin-left: 1rem">
+                                        <tr>
+                                            <td class="informationtext" style="font-size: 20px; padding-top: 1rem; padding-bottom: 1rem; padding-left: 1rem; padding-right: 1rem; color: white">
+                                                <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditTemplate.InformationTitle, "Information") ?? "Information")</strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="informationtext" style="font-size: 15px; color: white">
+                                                <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditTemplate.InformationProperties, "Properties") ?? "Properties"): </strong>
+                                            </td>
+                                        </tr>
+                                        @if (taskTemplate.Properties != null && taskTemplate.Properties.Count > 0)
+                                        {
+                                            @foreach (var property in taskTemplate.Properties)
+                                            {
+                                                <tr><td class="informationtext" style="height: auto; line-height: 1.2em; font-size: 15px; font-weight: lighter; color: white; padding-left: 1rem; padding-right: 1rem; word-wrap: break-word !important">@property.ToPropertyString() @(property.IsRequired.HasValue && property.IsRequired.Value ? "(Required)" : "")</td></tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr><td style="height: auto; line-height: 1.2em; font-size: 15px; font-weight: lighter; color: white; padding-left: 1rem; padding-right: 1rem; word-wrap: break-word !important">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.OptionNone, "None") ?? "None")</td></tr>
+                                        }
+
+
+                                        @if (Model != null && Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null && Model.ApplicationSettings.Features.RequiredProof.Value)
+                                        {
+                                            <tr>
+                                                <td class="informationtext" style="height: auto; line-height: 1.2em; font-size: 15px; font-weight: lighter; color: white; padding-left: 1rem; padding-right: 1rem; word-wrap: break-word !important"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.PictureProofTitle, "Picture Proof") ?? "Picture Proof"): </strong>@(taskTemplate.HasPictureProof ? "Yes" : "No")</td>
+                                            </tr>
+                                        }
+                                        <tr><td class="informationtext" style="height: 100%; color: white; vertical-align: bottom !important"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditTemplate.InformationQuestionweight, "Question weight") ?? "Question weight"): </strong>@taskTemplate.Weight</td></tr>
+                                        <tr>
+                                            <td class="informationtext" style="font-size: 15px; color: white; padding-bottom: 1rem">
+                                                <strong>@(Model?.CmsLanguage.GetValue(LanguageKeys.PdfAuditTemplate.Instructions, "Instructions:") ?? "Instructions:") </strong>
+                                                @if (taskTemplate.Steps != null && taskTemplate.Steps.Count > 0)
+                                                {
+                                                    <span style="font-size: 15px; font-weight: lighter">@taskTemplate.StepsCount steps</span>
+                                                }
+                                                else if (!string.IsNullOrEmpty(taskTemplate.DescriptionFile))
+                                                {
+                                                    <span style="font-size: 15px; font-weight: lighter">Pdf</span>
+                                                }
+                                                else
+                                                {
+                                                    <span style="font-size: 15px; font-weight: lighter">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.OptionNone, "None") ?? "None")</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Steps instructions -->
+                        @if (taskTemplate.Steps?.Count > 0)
+                        {
+                            <!-- Steps instructions table -->
+                            <div class="avoid-break-steps" style="background-color: #F7F7F7; width: 100%; border-spacing: 1em; ">
+                                @for (int i = 0; i < taskTemplate.Steps.Count; i++)
+                                {
+                                    var stepAUrl = Constants.General.ImageUnavailableUrl;
+                                    if (!string.IsNullOrEmpty(taskTemplate.Steps[i].Picture))
+                                    {
+                                        stepAUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, taskTemplate.Steps[i].Picture);
+                                    }
+                                    if (!string.IsNullOrEmpty(taskTemplate.Steps[i].VideoThumbnail))
+                                    {
+                                        stepAUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, taskTemplate.Steps[i].VideoThumbnail);
+                                    }
+
+                                    <!-- Two step instructions will be displayed next to each other.
+                                    If i is even, open new parent div. This div must be closed when i is odd. -->
+                                    if (i % 2 == 0)
+                                    {
+                                        @:<div class="avoid-break" style="overflow:hidden;height:100%;padding:1em;">
+                                    }
+
+                                    <!-- Step instruction image and number overlay -->
+                                    <div style="width: 20%; height: 100%; vertical-align: top; position: relative; background: #F7F7F7; float:left;">
+                                        <div style="position: relative;">
+                                            <div class="imageWrapper"><img @*class="background-image avoid-break"*@ data-src="@stepAUrl" @*style="width: 100%; object-fit: cover; object-position: center; max-height: 150px; vertical-align: bottom"*@ /></div>
+                                            <div class="overlaybottom"><h3 style="margin: 0; padding: 0;">@(i + 1)</h3></div>
+                                        </div>
+                                    </div>
+                                    <!-- Step instruction description -->
+                                    <div class="stepstext step-instruction-description">@taskTemplate.Steps[i].Description</div>
+
+                                    <!-- Add empty space for layout purposes if the previous step was the last step and there is space for another step -->
+                                    @if (i % 2 == 0 && i == taskTemplate.Steps.Count - 1)
+                                    {
+                                        <div style="width: 20%; height: 5rem"></div>
+                                        <div style="width: 30%; height: 5rem; font-size: 15px"></div>
+                                    }
+
+                                    <!-- Close parent div when i is odd or when the last instruction step is reached -->
+                                    if (i % 2 != 0 || i == taskTemplate.Steps.Count - 1)
+                                    {
+                                        @:</div>
+                                    }
+
+                                }
+                            </div>
+                        }
+
+                    }
+                </div>
+            }
+        }
+
+        <!-- Open fields -->
+        @if (Model?.AuditTemplate.OpenFieldsProperties != null)
+        {
+            <!-- Open fields table -->
+            <div class="avoid-break" style="padding-top: 1rem;">
+                <div class="fancyshadow print-friendly" style="width: 50%; white-space: nowrap; height: auto; margin-top: 1rem; /*margin-bottom: 1rem;*/ table-layout: auto;">
+                    <div>
+                        <div id="autosize" style="text-transform: uppercase; background-color: #24A552; font-size: 24px; padding-left: 2rem; padding-right: 2rem; line-height: 2em; width: fit-content;">
+                            <strong style="color: white">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditTemplate.OpenFieldsTitle, "Open fields") ?? "Open fields")</strong>
+                        </div>
+                        <div style="width: 100%"></div>
+                    </div>
+                    <div>
+                        <div>
+                            <div class="openfields-table">
+                                <div class="openfields-row">
+                                    <div class="openfields-cell" style="font-size: 18px; padding-left: 1rem; line-height: 1.6em;"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditTemplate.OpenFieldsColumnHeader, "Name") ?? "Name")</strong></div>
+                                </div>
+                                @foreach (var openField in Model.AuditTemplate.OpenFieldsProperties)
+                                {
+                                    <div class="alternatingcolors openfields-row">
+                                        <div class="openfields-cell" style="font-size: 18px; padding-left: 1rem; padding-right: 1rem; vertical-align: middle; line-height: 1.6em; float: left; width: 50%">
+                                            <span>@openField.TitleDisplay</span>
+                                        </div>
+                                        @if (openField.IsRequired.HasValue && openField.IsRequired.Value)
+                                        {
+                                            <div class="openfields-cell" style="font-size: 18px; vertical-align: middle; line-height: 1.6em">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditTemplate.OpenFieldsRequired, "Required") ?? "Required")</div>
+                                        }
+                                        else
+                                        {
+                                            <div class="openfields-cell" style="font-size: 18px; height: 1.6em;"></div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        }
+    </div>
+    <partial name="_footer.cshtml" model="@("#24a552")" />
+    
+    <script>
+        var auditImgs = document.images,
+            auditImgsLength = auditImgs.length,
+            auditImgsCounter = 0,
+            auditImgsLoaded = false,
+            auditImgsCheckerInterval = null;
+
+        $(auditImgs).each(function(index, img) {
+            if (img.complete && $(img).attr('src') != undefined && ($(img).attr('src').includes('normal_unavailable_image.png') || $(img).attr('src').startsWith('blob:')))
+            {
+                incrementCounter();
+            }
+            else
+            {
+                console.log(img);
+                console.log(img.complete);
+                img.addEventListener('load', incrementCounter, false);
+            }
+        })
+
+        function incrementCounter() {
+            auditImgsCounter++;
+            if (auditImgsCounter === auditImgsLength) {
+                auditImgsLoaded = true
+            }
+        }
+
+        function checkAuditImgsLoaded() {
+            if (!auditImgsLoaded) {
+                //do nothing
+                console.log("waiting for images to load");
+            }
+            else {
+                clearInterval(auditImgsCheckerInterval);
+                setTimeout(() => {
+                    window.print();
+                });
+                setTimeout(function () { window.close(); }, 2000);
+            }
+        }
+        
+        checkAuditImgsLoaded();
+        window.onload = function () {
+            auditImgsCheckerInterval = setInterval(() => {
+                checkAuditImgsLoaded();
+
+            }, 1000);
+        }
+
+        ezgomediafetcher.preloadImagesAndVideos();
+</script>
+</body>
+</html>

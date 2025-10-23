@@ -1,0 +1,736 @@
+﻿@model WebApp.ViewModels.CompletedChecklistTaskViewModel
+@using WebApp.Models.Checklist
+@using System.Text
+@{
+    var tz = User.FindFirst(System.Security.Claims.ClaimTypes.Country)?.Value ?? "Europe/Amsterdam";
+    TimeZoneInfo timezone = TZConvert.EzFindTimeZoneInfoById(tz);
+    
+    string getIconColor(string state)
+    {
+        switch (state.ToLower())
+        {
+            case "ok":
+                return "bg-green";
+            case "not ok":
+                return "bg-red";
+            case "skipped":
+                return "bg-warning";
+            default:
+                return "bg-lightGray";
+        }
+    }
+
+    string getIcon(string state)
+    {
+        switch (state.ToLower())
+        {
+            case "ok":
+                return "fa-thumbs-up status-icon";
+            case "not ok":
+                return "fa-thumbs-down status-icon";
+            case "skipped":
+                return "fa-forward status-icon";
+            default:
+                return "fa-question";
+        }
+    }
+}
+
+<div class="card h-100">
+    <div class="card-header pb-1 pl-3">
+        <h5>@Model.Checklist.Name</h5>
+    </div>
+
+    <div class="card-body p-0" style="height:calc(100vh - 377px);">
+        <ul id="completedChecklistContainer" class="list-group h-100">
+
+            @if (Model.Checklist.Tags?.Count > 0 && Model.ApplicationSettings?.Features?.TagsEnabled == true)
+            {
+                <li class="row m-1 pl-1">
+                    @foreach (var tag in Model.Checklist.Tags)
+                    {
+                        <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                            <div class="tag-wrapper" style="color:white;">
+                                <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                <span class="my-1 ml-1 mr-3 tag-span" style="font-size:.78rem;">@tag.Name</span>
+                            </div>
+                        </div>
+                    }
+                </li>
+            }
+            @if (Model.Checklist.OpenFieldsProperties?.Any() == true)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center" style="padding: .50rem .75rem;background-color: #BDBEBF; border: none">
+                    <div class="row w-100">
+                        @foreach (var openfield in Model.Checklist.OpenFieldsProperties)
+                        {
+                            <div class="col-6">@openfield.TitleDisplay: @Model.Checklist.OpenFieldsPropertyUserValues.Where(m => m.TemplatePropertyId.Equals(openfield.Id)).FirstOrDefault()?.UserValueString @(openfield.IsRequired.HasValue && openfield.IsRequired.Value ? "*" : "")</div>
+                        }
+                    </div>
+                </li>
+            }
+            @if(Model?.ApplicationSettings?.Features?.ChecklistStagesEnabled != null && Model.ApplicationSettings.Features.ChecklistStagesEnabled.Value == true && Model.Checklist.Stages != null && Model.Checklist.Stages.Count > 0)
+            {
+                foreach(var stage in Model.Checklist.Stages)
+                {
+                    var stageTasks = Model.Checklist.Tasks.Where(t => stage.TaskIds != null && stage.TaskIds.Contains(t.Id)).ToList();
+                    var stageHeaderStatusColor = stage.Status == "done" ? "#93C54B" : "#364C59";
+                    var stageBodyStatusColor = stage.Status == "done" ? "#E4F0D2" : "#BDD3E0";
+                    var expandStageTags = (Model?.ApplicationSettings?.Features?.TagsEnabled != null && Model.ApplicationSettings.Features.TagsEnabled.Value == true && stage.Tags != null && stage.Tags.Count > 0);
+                    var tagsOnClickHandler = expandStageTags ? ("expandStageTagsInformation(" + stage.Id + ")") : "";
+                    var expandStageTagsCursorStyle = expandStageTags ? "cursor: pointer" : "cursor: default";
+
+                    <div class="stageContainer mt-2 mb-2">
+                        <div class="stageHeader px-3" onclick="@tagsOnClickHandler" style="position: relative; background-color: @stageHeaderStatusColor; @expandStageTagsCursorStyle">
+
+
+                            @if (expandStageTags)
+                            {
+                                <div id="showExtraStageTagsInfo-@stage.Id" style="position: absolute; width: 20px; right: 10px; bottom: 5px; display: inline-block">
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                            }
+                            <div class="row" style="min-height: 32px; align-content: center">
+                                <div class="col">
+
+                                    @if ((stage.Signatures != null && stage.Signatures.Count > 0) && (stage.BlockNextStagesUntilCompletion && stage.LockStageAfterCompletion))
+                                    {
+                                        <div class="px-1" style="display: inline-block">
+                                            <i class="fa-solid fa-signature"></i>
+                                        </div>
+
+                                        <div class="px-1" style="display: inline-block">
+                                            <i class="fa-solid fa-lock"></i>
+                                        </div>
+                                    }
+                                    else if (stage.BlockNextStagesUntilCompletion && stage.LockStageAfterCompletion)
+                                    {
+                                        <div class="px-1" style="display: inline-block">
+                                            <i class="fa-solid fa-lock"></i>
+                                        </div>
+                                    }
+                                    else if (stage.Signatures != null && stage.Signatures.Count > 0)
+                                    {
+                                        <div class="px-1" style="display: inline-block">
+                                            <i class="fa-solid fa-signature"></i>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="px-1" style="display: inline-block">
+                                            <i class="fa-regular fa-lightbulb-on"></i>
+                                        </div>
+                                    }
+                                    <div class="px-1" style="display: inline-block">
+                                    @stage.Name &nbsp;
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div style="display: inline-block; width: 20px">
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (expandStageTags)
+                            {
+                                <div id="stageTags-@stage.Id" class="row" style="display: none">
+                                    <div class="col">
+                                        <div class="row" style="letter-spacing: 0px">
+                                            @foreach (var tag in stage.Tags)
+                                            {
+                                                <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                                                    <div class="tag-wrapper" style="color:white;">
+                                                        <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                        <span class="my-1 ml-1 mr-3 tag-span" style="font-size:.78rem;">@tag.Name</span>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div style="display: inline-block; width: 20px">
+                                        </div>
+                                    </div>
+                                </div>
+
+                            }
+                        </div>
+                        <div class="stageBody p-2" style="background-color: @stageBodyStatusColor">
+                            @foreach (var completedTask in stageTasks)
+                            {
+                                <li class="d-flex justify-content-between checklistItem mb-2 mt-2 linkableChecklistItem" data-id="@completedTask.Id" style="padding: 0px;align-items: stretch">
+                                    <!-- Media display -->
+                                    @{
+                                        var picture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                                        if (!string.IsNullOrEmpty(completedTask.Picture))
+                                        {
+                                            var imgUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, completedTask.Picture);
+
+                                            <a href="/images/media-loading.gif" data-href="@imgUrl" data-fancybox="completedtasks" data-caption="@completedTask.Name" style="min-height: 100%">
+                                                <img style="object-fit: cover; object-position: center; min-height: 120px; height: 100%; width: 120px; float: left;border-radius: 10px 0px 0px 10px;" loading="lazy" src="/images/media-loading.gif" data-src="@imgUrl" />
+                                            </a>
+                                        }
+                                        else if (!string.IsNullOrEmpty(completedTask.VideoThumbnail))
+                                        {
+                                            var thumbnailUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, completedTask.VideoThumbnail);
+                                            var videoUrl = completedTask.Video;
+                                            if (!videoUrl.StartsWith("https:"))
+                                            {
+                                                videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, completedTask.Video);
+                                            }
+
+                                            <a href="#itemVideo-@(completedTask.Id)" data-fancybox="postImageFancybox-@completedTask.Id">
+                                                <img style="object-fit: cover; object-position: center; min-height: 120px; height: 100%; width: 120px; float: left;border-radius: 10px 0px 0px 10px;" loading="lazy" src="/images/media-loading.gif" data-src="@thumbnailUrl" />
+                                            </a>
+
+                                            <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="itemVideo-@(completedTask.Id)" style="display:none;">
+                                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                            </video>
+                                        }
+                                        else
+                                        {
+                                            <a href="/images/media-loading.gif" data-href="@picture" data-fancybox="completedtasks" data-caption="@completedTask.Name">
+                                                <img style="object-fit: cover; object-position: center; min-height: 120px; height: 100%; width: 120px; float: left;border-radius: 10px 0px 0px 10px;" loading="lazy" src="/images/media-loading.gif" data-src="@picture" />
+                                            </a>
+                                        }
+                                    }
+
+                                    <div class="mx-2 p-2" style="width: 100%; align-self: center;">
+                                        <h5 style="float:left;clear:left;position:relative;font-weight: 600">@completedTask.Name</h5>
+                                        @if (Model.ApplicationSettings.Features.ChecklistsTransferableEnabled == true && completedTask.Signature != null && !completedTask.Signature.SignedBy.IsNullOrEmpty())
+                                        {
+                                            <span style="float:left;clear:left;position:relative;color:#495057">
+                                                Marked on @TimeZoneInfo.ConvertTime(completedTask.Signature.SignedAt.Value, timezone).ToLocaleFullDateShortTimeString(Model.Locale) by @completedTask.Signature.SignedBy @*TODO TRANSLATE*@
+                                            </span>
+                                        }
+                                        <span style="float:left;clear:left;position:relative;">
+                                            @if (Model.EnablePropertyTiles)
+                                            {
+                                                <partial name="~/Views/Shared/_property_tiles.cshtml" model="@(new SharedTaskViewModel() { SharedTaskModel = completedTask, Locale = Model.Locale})" />
+                                            }
+                                            else
+                                            {
+                                                @(WebApp.Helpers.CompletedItemDisplayHelpers.GetPropertiesAsString(completedTask, timezone, Model.Locale))
+                                            }
+                                        </span>
+                                        @if (completedTask.Tags?.Count > 0 && Model.ApplicationSettings?.Features?.TagsEnabled == true)
+                                        {
+                                            <div class="row" style="float:left;clear:left;position:relative;">
+                                                @foreach (var tag in completedTask.Tags)
+                                                {
+                                                    <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                                                        <div class="tag-wrapper" style="color:white;">
+                                                            <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                            <span class="my-1 ml-1 mr-3 tag-span" style="font-size:.78rem;">@tag.Name</span>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                    @if (completedTask.EditedByUsers != null && completedTask.EditedByUsers.Count > 0)
+                                    {
+                                        <div style="display: flex">
+                                            <partial name="~/Views/Report/Checklist/_completed_checklist_item_edited_by_users.cshtml" model="completedTask" />
+                                        </div>
+                                    }
+                                    @if (completedTask.ActionsCount > 0 || completedTask.CommentCount > 0)
+                                    {
+                                        <div style="align-self: center">
+                                            <a href="/action/taskactions/@completedTask.Id/@completedTask.TemplateId/true" class="status-circle bg-warning ml-auto mr-3"><i class="fa fa-bolt-lightning status-icon"></i></a>
+                                        </div>
+                                    }
+
+                                    @if (completedTask.PictureProof != null)
+                                    {
+                                        <div style="align-self: center">
+                                            <a onclick="showPictureProofData(@completedTask.Id)" style="background-color: lightgray; cursor: pointer" class="status-circle mr-3"><i class="fas fa-camera status-icon"></i></a>
+                                        </div>
+                                    }
+                                    <div style="align-self: center">
+                                        <span class="status-circle mr-3 @getIconColor(completedTask.Status)"><i class="fa @getIcon(completedTask.Status)" title="@completedTask.Status"></i></span>
+                                    </div>
+                                </li>
+
+                            
+                            }
+
+
+                            @if(stage.Status == "done" && stage.Signatures != null && stage.Signatures.Count>0)
+                            {
+                                var displayExpandButton = ((stage.UseShiftNotes && !string.IsNullOrEmpty(stage.ShiftNotes)) || (stage.Signatures != null && stage.Signatures.Where(s => !string.IsNullOrEmpty(s.SignatureImage)).Count() > 0));
+                                var onclickHandler = displayExpandButton ? ("expandStageInformation(" + stage.Id + ")") : "";
+                                var expandStageInfoCursorStyle = displayExpandButton ? "cursor: pointer" : "cursor: default";
+
+                                var signedStageOverlayIcon = "fa-solid fa-check";
+                                if(stage.Signatures != null && stage.Signatures.Where(s => !string.IsNullOrEmpty(s.SignatureImage)).Count() > 0)
+                                {
+                                    signedStageOverlayIcon = "fa-solid fa-signature";
+                                }
+                                <li class="d-flex checklistItem mb-2 mt-2" onclick="@onclickHandler" style="position: relative; flex-direction: column; @expandStageInfoCursorStyle">
+                                    @if (displayExpandButton)
+                                    {
+                                        <div id="showExtraStageInfo-@stage.Id" class="showExtraStageInfo" style="position: absolute; width: 40px; right: 20px; bottom: 40px; vertical-align: middle; text-align: center;">
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </div>
+                                    }
+                                    <div class="d-flex justify-content-between" style="padding: 0px;align-items: stretch; position: relative; ">
+
+                                        <img src="/images/signStageImage.png" style="object-fit: cover; object-position: center; min-height: 120px; height: 100%; width: 120px; float: left;border-radius: 10px 0px 0px 10px;" loading="lazy" />
+
+                                        <div class="signedStageInfoOverlay">
+                                            <i class="@signedStageOverlayIcon"></i>
+                                        </div>
+
+                                        @if (stage.Signatures != null && stage.Signatures.Count > 0)
+                                        {
+                                            var stageModel = stage.ToJsonFromObject().ToObjectFromJson<StageModel>();
+                                            stageModel.ApplicationSettings = Model.ApplicationSettings;
+                                            <div class="pl-2" style="display: flex">
+                                                <partial name="~/Views/Report/Checklist/_completed_checklist_stage_edited_by_users.cshtml" model="stageModel" />
+                                            </div>
+
+                                            <div style="display: flex; flex-direction: column;justify-content: center;font-size: 1rem">
+                                                @foreach(var signature in stage.Signatures)
+                                                {
+                                                    <div style="display: flex; flex-direction: row">
+                                                        <div class="px-2" style="align-self: center">
+                                                            @TimeZoneInfo.ConvertTime(signature.SignedAt.Value, timezone).ToLocaleGeneralDateShortTimeString(Model.Locale)
+                                                        </div>
+                                                        <div class="px-2" style="align-self: center; font-weight: 600">
+                                                            @signature.SignedBy
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                        <div style="margin-left: auto"></div>
+                                        @if(stage.UseShiftNotes && !string.IsNullOrEmpty(stage.ShiftNotes))
+                                        {
+                                            <div class="shiftNotesEntered pr-3" style="align-self: center">
+                                                <i class="fa-solid fa-calendar-lines-pen"></i>
+                                            </div>
+                                        }
+
+                                        @if (displayExpandButton)
+                                        {
+                                            <div style="width: 60px">&nbsp;</div>
+                                        }
+                                    </div>
+
+                                    @if (displayExpandButton)
+                                    {
+                                        <div id="extraStageInfo-@stage.Id" class="row p-2" style="display: none">
+                                        
+                                            @if(stage.UseShiftNotes && !string.IsNullOrEmpty(stage.ShiftNotes) && stage.Signatures.Where(s => !string.IsNullOrEmpty(s.SignatureImage)).Count() > 0)
+                                            {
+                                                if (stage.Signatures.Count == 1)
+                                                {
+                                                    var signaturePicture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                                                    if (!string.IsNullOrEmpty(stage.Signatures[0].SignatureImage))
+                                                    {
+                                                        signaturePicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, stage.Signatures[0].SignatureImage);
+                                                    }
+                                                    <div class="col-3" style="text-align: center">
+                                                        <img src="/images/media-loading.gif" data-src="@signaturePicture" style="width:100px;margin: auto" class="d-block"  />
+                                                        <div>@stage.Signatures[0].SignedBy</div>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        @stage.ShiftNotes
+
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <div style="display: inline-block; width: 60px">&nbsp;</div>
+                                                    </div>
+                                                }
+                                                else if(stage.Signatures.Count == 2)
+                                                {
+                                                    var signaturePicture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                                                    if (!string.IsNullOrEmpty(stage.Signatures[0].SignatureImage))
+                                                    {
+                                                        signaturePicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, stage.Signatures[0].SignatureImage);
+                                                    }
+                                                    <div class="col-3" style="text-align: center">
+                                                        <img src="/images/media-loading.gif" data-src="@signaturePicture" style="width:100px;margin: auto" class="d-block"  />
+                                                        <div>@stage.Signatures[0].SignedBy</div>
+                                                    </div>
+                                                    var signaturePicture2 = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                                                    if (!string.IsNullOrEmpty(stage.Signatures[1].SignatureImage))
+                                                    {
+                                                        signaturePicture2 = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, stage.Signatures[1].SignatureImage);
+                                                    }
+                                                    <div class="col-3" style="text-align: center">
+                                                        <img src="/images/media-loading.gif" data-src="@signaturePicture2" style="width:100px;margin: auto" class="d-block"  />
+                                                        <div>@stage.Signatures[1].SignedBy</div>
+                                                    </div>
+                                                    <div class="col-5">
+                                                        @stage.ShiftNotes
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <div style="display: inline-block; width: 60px">&nbsp;</div>
+                                                    </div>
+                                                }
+                                            }
+                                            else if(stage.UseShiftNotes && !string.IsNullOrEmpty(stage.ShiftNotes))
+                                            {
+                                                <div class="col-11">
+                                                    @stage.ShiftNotes
+                                                </div>
+                                                    <div class="col-auto">
+                                                        <div style="display: inline-block; width: 60px">&nbsp;</div>
+                                                    </div>
+                                            }
+                                            else if (stage.Signatures.Where(s => !string.IsNullOrEmpty(s.SignatureImage)).Count() > 0)
+                                            {
+                                                if (stage.Signatures.Count == 1)
+                                                {
+                                                    var signaturePicture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                                                    if (!string.IsNullOrEmpty(stage.Signatures[0].SignatureImage))
+                                                    {
+                                                        signaturePicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, stage.Signatures[0].SignatureImage);
+                                                    }
+                                                    <div class="col-11" style="text-align: center">
+                                                        <img src="/images/media-loading.gif" data-src="@signaturePicture" style="width:100px;margin: auto" class="d-block"  />
+                                                        <div>@stage.Signatures[0].SignedBy</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <div style="display: inline-block; width: 60px">&nbsp;</div>
+                                                    </div>
+                                                }
+                                                else if(stage.Signatures.Count == 2)
+                                                {
+                                                    var signaturePicture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                                                    if (!string.IsNullOrEmpty(stage.Signatures[0].SignatureImage))
+                                                    {
+                                                        signaturePicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, stage.Signatures[0].SignatureImage);
+                                                    }
+                                                    <div class="col-6" style="text-align: center">
+                                                        <img src="/images/media-loading.gif" data-src="@signaturePicture" style="width:100px;margin: auto" class="d-block"  />
+                                                        <div>@stage.Signatures[0].SignedBy</div>
+                                                    </div>
+                                                    var signaturePicture2 = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                                                    if (!string.IsNullOrEmpty(stage.Signatures[1].SignatureImage))
+                                                    {
+                                                        signaturePicture2 = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, stage.Signatures[1].SignatureImage);
+                                                    }
+                                                    <div class="col-5" style="text-align: center">
+                                                        <img src="/images/media-loading.gif" data-src="@signaturePicture2" style="width:100px;margin: auto" class="d-block"  />
+                                                        <div>@stage.Signatures[1].SignedBy</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <div style="display: inline-block; width: 60px">&nbsp;</div>
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
+                                    }
+                                </li>
+                            }
+
+                        </div>
+                    </div>
+                }
+
+                @foreach(var completedTask in Model.Checklist.Tasks.Where(t => Model.Checklist.Stages.Where(s => s.TaskIds != null && s.TaskIds.Contains(t.Id)).Count() == 0).ToList())
+                {
+                    <li class="d-flex justify-content-between separateChecklistItem linkableChecklistItem m-2" data-id="@completedTask.Id" style="padding: 0px;align-items: stretch">
+                        <!-- Media display -->
+                        @{
+                            var picture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                            if (!string.IsNullOrEmpty(completedTask.Picture))
+                            {
+                                var imgUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, completedTask.Picture);
+
+                                <a href="/images/media-loading.gif" data-href="@imgUrl" data-fancybox="completedtasks" data-caption="@completedTask.Name" style="min-height: 100%">
+                                    <img style="object-fit: cover; object-position: center; min-height: 120px; height: 100%; width: 120px; float: left;border-radius: 10px 0px 0px 10px;" loading="lazy" src="/images/media-loading.gif" data-src="@imgUrl" />
+                                </a>
+                            }
+                            else if (!string.IsNullOrEmpty(completedTask.VideoThumbnail))
+                            {
+                                var thumbnailUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, completedTask.VideoThumbnail);
+                                var videoUrl = completedTask.Video;
+                                if (!videoUrl.StartsWith("https:"))
+                                {
+                                    videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, completedTask.Video);
+                                }
+
+                                <a href="#itemVideo-@(completedTask.Id)" data-fancybox="postImageFancybox-@completedTask.Id">
+                                    <img style="object-fit: cover; object-position: center; min-height: 120px; height: 100%; width: 120px; float: left;border-radius: 10px 0px 0px 10px;" loading="lazy" src="/images/media-loading.gif" data-src="@thumbnailUrl" />
+                                </a>
+
+                                <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="itemVideo-@(completedTask.Id)" style="display:none;">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            }
+                            else
+                            {
+                                <a href="/images/media-loading.gif" data-href="@picture" data-fancybox="completedtasks" data-caption="@completedTask.Name">
+                                    <img style="object-fit: cover; object-position: center; min-height: 120px; height: 100%; width: 120px; float: left;border-radius: 10px 0px 0px 10px;" loading="lazy" src="/images/media-loading.gif" data-src="@picture" />
+                                </a>
+                            }
+                        }
+
+                        <div class="mx-2 p-2" style="width: 100%; align-self: center;">
+                            <h5 style="float:left;clear:left;position:relative;font-weight: 600">@completedTask.Name</h5>
+                            @if (Model.ApplicationSettings.Features.ChecklistsTransferableEnabled == true && completedTask.Signature != null && !completedTask.Signature.SignedBy.IsNullOrEmpty())
+                            {
+                                <span style="float:left;clear:left;position:relative;color:#495057">
+                                    Marked on @TimeZoneInfo.ConvertTime(completedTask.Signature.SignedAt.Value, timezone).ToLocaleFullDateShortTimeString(Model.Locale) by @completedTask.Signature.SignedBy @*TODO TRANSLATE*@
+                                </span>
+                            }
+                            <span style="float:left;clear:left;position:relative;">
+                                @if (Model.EnablePropertyTiles)
+                                {
+                                    <partial name="~/Views/Shared/_property_tiles.cshtml" model="@(new SharedTaskViewModel() { SharedTaskModel = completedTask, Locale = Model.Locale})" />
+                                }
+                                else
+                                {
+                                    @(WebApp.Helpers.CompletedItemDisplayHelpers.GetPropertiesAsString(completedTask, timezone, Model.Locale))
+                                }
+                            </span>
+                            @if (completedTask.Tags?.Count > 0 && Model.ApplicationSettings?.Features?.TagsEnabled == true)
+                            {
+                                <div class="row" style="float:left;clear:left;position:relative;">
+                                    @foreach (var tag in completedTask.Tags)
+                                    {
+                                        <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                                            <div class="tag-wrapper" style="color:white;">
+                                                <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                <span class="my-1 ml-1 mr-3 tag-span" style="font-size:.78rem;">@tag.Name</span>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        @if (completedTask.EditedByUsers != null && completedTask.EditedByUsers.Count > 0)
+                        {
+                            <div style="display: flex">
+                                <partial name="~/Views/Report/Checklist/_completed_checklist_item_edited_by_users.cshtml" model="completedTask" />
+                            </div>
+                        }
+                        @if (completedTask.ActionsCount > 0 || completedTask.CommentCount > 0)
+                        {
+                            <div style="align-self: center">
+                                <a href="/action/taskactions/@completedTask.Id/@completedTask.TemplateId/true" class="status-circle bg-warning ml-auto mr-3"><i class="fa fa-bolt-lightning status-icon"></i></a>
+                            </div>
+                        }
+
+                        @if (completedTask.PictureProof != null)
+                        {
+                            <div style="align-self: center">
+                                <a onclick="showPictureProofData(@completedTask.Id)" style="background-color: lightgray; cursor: pointer" class="status-circle mr-3"><i class="fas fa-camera status-icon"></i></a>
+                            </div>
+                        }
+                        <div style="align-self: center">
+                            <span class="status-circle mr-3 @getIconColor(completedTask.Status)"><i class="fa @getIcon(completedTask.Status)" title="@completedTask.Status"></i></span>
+                        </div>
+                    </li>
+
+                }
+            }
+            else if (Model.Checklist.Tasks != null)
+            {
+                @foreach (var completedTask in Model.Checklist.Tasks)
+                {
+                    <li class="d-flex justify-content-between separateChecklistItem linkableChecklistItem m-2" data-id="@completedTask.Id" style="padding: 0px;align-items: stretch">
+                        <!-- Media display -->
+                        @{
+                            var picture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                            if (!string.IsNullOrEmpty(completedTask.Picture))
+                            {
+                                var imgUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, completedTask.Picture);
+
+                                <a href="/images/media-loading.gif" data-href="@imgUrl" data-fancybox="completedtasks" data-caption="@completedTask.Name" style="min-height: 100%">
+                                    <img style="object-fit: cover; object-position: center; min-height: 120px; height: 100%; width: 120px; float: left;border-radius: 10px 0px 0px 10px;" loading="lazy" src="/images/media-loading.gif" data-src="@imgUrl" />
+                                </a>
+                            }
+                            else if (!string.IsNullOrEmpty(completedTask.VideoThumbnail))
+                            {
+                                var thumbnailUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, completedTask.VideoThumbnail);
+                                var videoUrl = completedTask.Video;
+                                if (!videoUrl.StartsWith("https:"))
+                                {
+                                    videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, completedTask.Video);
+                                }
+
+                                <a href="#itemVideo-@(completedTask.Id)" data-fancybox="postImageFancybox-@completedTask.Id">
+                                    <img style="object-fit: cover; object-position: center; min-height: 120px; height: 100%; width: 120px; float: left;border-radius: 10px 0px 0px 10px;" loading="lazy" src="/images/media-loading.gif" data-src="@thumbnailUrl" />
+                                </a>
+
+                                <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="itemVideo-@(completedTask.Id)" style="display:none;">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            }
+                            else
+                            {
+                                <a href="/images/media-loading.gif" data-href="@picture" data-fancybox="completedtasks" data-caption="@completedTask.Name">
+                                    <img style="object-fit: cover; object-position: center; min-height: 120px; height: 100%; width: 120px; float: left;border-radius: 10px 0px 0px 10px;" loading="lazy" src="/images/media-loading.gif" data-src="@picture" />
+                                </a>
+                            }
+                        }
+
+                        <div class="mx-2 p-2" style="width: 100%; align-self: center;">
+                            <h5 style="float:left;clear:left;position:relative;font-weight: 600">@completedTask.Name</h5>
+                            @if (Model.ApplicationSettings.Features.ChecklistsTransferableEnabled == true && completedTask.Signature != null && !completedTask.Signature.SignedBy.IsNullOrEmpty())
+                            {
+                                <span style="float:left;clear:left;position:relative;color:#495057">
+                                    Marked on @TimeZoneInfo.ConvertTime(completedTask.Signature.SignedAt.Value, timezone).ToLocaleFullDateShortTimeString(Model.Locale) by @completedTask.Signature.SignedBy @*TODO TRANSLATE*@
+                                </span>
+                            }
+                            <span style="float:left;clear:left;position:relative;">
+                                @if (Model.EnablePropertyTiles)
+                                {
+                                    <partial name="~/Views/Shared/_property_tiles.cshtml" model="@(new SharedTaskViewModel() { SharedTaskModel = completedTask, Locale = Model.Locale})" />
+                                }
+                                else
+                                {
+                                    @(WebApp.Helpers.CompletedItemDisplayHelpers.GetPropertiesAsString(completedTask, timezone, Model.Locale))
+                                }
+                            </span>
+                            @if (completedTask.Tags?.Count > 0 && Model.ApplicationSettings?.Features?.TagsEnabled == true)
+                            {
+                                <div class="row" style="float:left;clear:left;position:relative;">
+                                    @foreach (var tag in completedTask.Tags)
+                                    {
+                                        <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                                            <div class="tag-wrapper" style="color:white;">
+                                                <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                <span class="my-1 ml-1 mr-3 tag-span" style="font-size:.78rem;">@tag.Name</span>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        @if (completedTask.EditedByUsers != null && completedTask.EditedByUsers.Count > 0)
+                        {
+                            <div style="display: flex">
+                                <partial name="~/Views/Report/Checklist/_completed_checklist_item_edited_by_users.cshtml" model="completedTask" />
+                            </div>
+                        }
+                        @if (completedTask.ActionsCount > 0 || completedTask.CommentCount > 0)
+                        {
+                            <div style="align-self: center">
+                                <a href="/action/taskactions/@completedTask.Id/@completedTask.TemplateId/true" class="status-circle bg-warning ml-auto mr-3"><i class="fa fa-bolt-lightning status-icon"></i></a>
+                            </div>
+                        }
+
+                        @if (completedTask.PictureProof != null)
+                        {
+                            <div style="align-self: center">
+                                <a onclick="showPictureProofData(@completedTask.Id)" style="background-color: lightgray; cursor: pointer" class="status-circle mr-3"><i class="fas fa-camera status-icon"></i></a>
+                            </div>
+                        }
+                        <div style="align-self: center">
+                            <span class="status-circle mr-3 @getIconColor(completedTask.Status)"><i class="fa @getIcon(completedTask.Status)" title="@completedTask.Status"></i></span>
+                        </div>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+
+    <div class="card-footer p-0 pt-1 pb-3 text-center" style="background-color: transparent;">
+        <div class="row">
+            <div class="col">
+                @if (Model.Checklist.Signatures != null && Model.Checklist.Signatures.Count > 0)
+                {
+                    <div class="row">
+                        @{
+                            var signatureColClass = Model.Checklist.Signatures.Count == 1 ? "col-12" : "col-6";
+                        }
+                    @foreach (var signature in Model.Checklist.Signatures)
+                    {
+                        var sigpic = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, signature.SignatureImage);
+
+                        <div class="@signatureColClass float-left pl-3" style="text-align: center">
+                            @if (!string.IsNullOrEmpty(signature.SignatureImage))
+                            {
+                                <img src="/images/media-loading.gif" data-src="@sigpic" style="width:150px;margin: auto" class="d-block"  />
+                            }
+                            else {
+                                <i class="fa-solid fa-signature d-block" style="font-size:60px;color:#93C54B;margin: auto"></i>
+                            }
+                            <span class="d-inline-block" style="width:100px;">@signature.SignedBy</span>
+                        </div>
+                    }
+                    </div>
+                }
+            </div>
+            <div class="col-auto">
+                <span class="float-right m-3">
+                    @if (Model.EnableRemovalOfObject)
+                    {
+                        <a class="btn btn-sm btn-ezgo mt-3 float-right" style="margin-left:5px;" title="Remove checklist template. Note, this can not be undone." data-action="set_checklist_inactive" data-name="@Model.Checklist.Name" data-id="@Model.Checklist.Id"><i class="fa-solid fa-trash"></i></a>
+                    }
+                    @if (Model.EnableInBrowserPdfPrint)
+                    {
+                        <a href="javascript:void(0);" onclick="window.open('/pdf/viewer/completedchecklist/@(Model.Checklist.Id)', '_blank', 'toolbar=no,top=10,left=10,width=' + (screen.availWidth-10) + ',height=' + (screen.availHeight-10) + '');" class="btn btn-sm btn-ezgo mt-3 float-right"><i class="fa fa-print"></i></a>
+                    }
+                    else
+                    {
+                        <a href="/pdf/render/1/@(Model.Checklist.Id)" class="btn btn-sm btn-ezgo mt-3 float-right"><i class="fa fa-print"></i></a>
+                    }
+                </span>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Checklist.Tasks != null)
+    {
+        foreach (var completedTask in Model.Checklist.Tasks)
+        {
+            @if (completedTask.PictureProof != null)
+            {
+                DateTime ppProofTaken = TimeZoneInfo.ConvertTime(completedTask.PictureProof.ProofTakenUtc, timezone);
+
+                <div role="dialog" tabindex="-1" class="modal fade h-100" data-backdrop="static" id="pictureProofData-@completedTask.Id">
+                    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.PictureProofTitle, "Picture Proof") ?? "Picture Proof")</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+
+                            <div class="modal-body" style="display: flex; justify-content: center">
+                                <div id="pictureProofBody">
+                                    <h5>
+                                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.PictureProofTitle, "Picture Proof") ?? "Picture Proof") @(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.TakenAt, "taken at") ?? "taken at") @TimeZoneInfo.ConvertTime(completedTask.PictureProof.ProofTakenUtc, timezone).ToString()
+                                    </h5>
+                                    @foreach (var ppMedia in completedTask.PictureProof.Media)
+                                    {
+                                        DateTime ppPictureTaken = TimeZoneInfo.ConvertTime(ppMedia.PictureTakenUtc, timezone);
+                                        var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, ppMedia.UriPart);
+                                        <div style="height: 80px">
+
+                                            <a href="/images/media-loading.gif" data-href="@picture" data-fancybox="items-@completedTask.Id" data-caption="">
+                                                <img class="mr-1" style="object-fit: cover; object-position: center; height: 70px; width: 80px; float: left;" src="/images/media-loading.gif" data-src="@picture"  />
+                                            </a>
+                                            <p class="pl-2">@(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.PictureProofItem, "Picture Proof item") ?? "Picture Proof item") @ppMedia.ItemName @(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.TakenBy, "taken by") ?? "taken by") @ppMedia.UserFullName @(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.At, "at") ?? "at") @ppPictureTaken.ToLongDateString() @TimeZoneInfo.ConvertTime(ppMedia.PictureTakenUtc, timezone).ToString()</p>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    }
+</div>
+
+<script>
+    function showPictureProofData(taskId) {
+        $(`#pictureProofData-${taskId}`).modal('show');
+    }
+</script>

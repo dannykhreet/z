@@ -1,0 +1,603 @@
+﻿@using EZGO.Api.Models.WorkInstructions
+@model WebApp.ViewModels.PdfWorkInstructionChangeNotificationViewModel
+@{
+    Layout = null;
+}
+@if (Model.ChangeNotification.NotificationData != null && Model.ChangeNotification.NotificationData.Count > 0)
+{
+    <table id="WIChangesTable" class="WIChangesTable">
+        <tr>
+            <td>
+            </td>
+            <td>
+                @(Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.OldLabel, "Old") ?? "Old")
+            </td>
+            <td>
+                @(Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.NewLabel, "New") ?? "New")
+            </td>
+        </tr>
+        @foreach (var change in Model.ChangeNotification.NotificationData)
+        {
+            if (change.PropertyName == "Tags")
+            {
+                var oldTagIds = new List<int>();
+                var newTagIds = new List<int>();
+
+                if (change.OldValue.StartsWith("[") && change.OldValue.EndsWith("]"))
+                {
+                    oldTagIds = change.OldValue.ToObjectFromJson<List<int>>();
+                }
+                if (change.NewValue.StartsWith("[") && change.NewValue.EndsWith("]"))
+                {
+                    newTagIds = change.NewValue.ToObjectFromJson<List<int>>();
+                }
+                var oldTags = new List<EZGO.Api.Models.Tags.Tag>();
+                var newTags = new List<EZGO.Api.Models.Tags.Tag>();
+                if (Model.Tags != null)
+                {
+                    oldTags = Model.Tags.Where(t => oldTagIds.Contains(t.Id)).ToList();
+                    newTags = Model.Tags.Where(t => newTagIds.Contains(t.Id)).ToList();
+                }
+                <tr>
+                    <td>
+                        @(Model.CmsLanguage.GetValue(change.TranslationKey, change.PropertyName) ?? change.PropertyName)
+                    </td>
+                    <td>
+                        @if (oldTags?.Count > 0 && Model.ApplicationSettings.Features?.TagsEnabled == true)
+                        {
+                            <div class="row">
+                                @foreach (var tag in oldTags)
+                                {
+                                    <div class="card column m-1 tag-card-change" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                                        <div class="tag-wrapper-change" style="color:white;">
+                                            <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                            <span class="my-1 ml-1 mr-3 tag-span-change" style="font-size:.78rem;">@tag.Name</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </td>
+                    <td>
+                        @if (newTags?.Count > 0 && Model.ApplicationSettings.Features?.TagsEnabled == true)
+                        {
+                            <div class="row">
+                                @foreach (var tag in newTags)
+                                {
+                                    <div class="card column m-1 tag-card-change" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                                        <div class="tag-wrapper-change" style="color:white;">
+                                            <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                            <span class="my-1 ml-1 mr-3 tag-span-change" style="font-size:.78rem;">@tag.Name</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+            else if (change.PropertyName == "AreaId")
+            {
+                <tr>
+                    <td>
+                        @(Model.CmsLanguage.GetValue(change.TranslationKey, change.PropertyName) ?? change.PropertyName)
+                    </td>
+                    @{
+                        if (int.TryParse(change.OldValue, out var oldAreaId) && int.TryParse(change.NewValue, out var newAreaId))
+                        {
+                            var oldArea = Model.Areas.Where(a => a.Id == Convert.ToInt32(change.OldValue)).FirstOrDefault();
+                            var newArea = Model.Areas.Where(a => a.Id == Convert.ToInt32(change.NewValue)).FirstOrDefault();
+                            <td>
+                                @if (oldArea == null)
+                                {
+                                    @(Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.AreaNotFoundLabel, "Area not found") ?? "Area not found")
+                                }
+                                else
+                                {
+                                    @oldArea.FullDisplayName
+                                }
+                            </td>
+                            <td>
+                                @if (newArea == null)
+                                {
+                                    @(Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.AreaNotFoundLabel, "Area not found") ?? "Area not found")
+                                }
+                                else
+                                {
+                                    @newArea.FullDisplayName
+                                }
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                @change.OldValue
+                            </td>
+                            <td>
+                                @change.NewValue
+                            </td>
+                        }
+                    }
+                </tr>
+            }
+            else if (change.PropertyName == "Media")
+            {
+                var oldPicture = "";
+                var newPicture = "";
+
+                if (change.OldValue.StartsWith("[") && change.OldValue.EndsWith("]"))
+                {
+                    oldPicture = change.OldValue.ToObjectFromJson<List<string>>().FirstOrDefault();
+                }
+                if (change.NewValue.StartsWith("[") && change.NewValue.EndsWith("]"))
+                {
+                    newPicture = change.NewValue.ToObjectFromJson<List<string>>().FirstOrDefault();
+                }
+
+                <tr>
+                    <td>
+                        @(Model.CmsLanguage.GetValue(change.TranslationKey, change.PropertyName) ?? change.PropertyName)
+                    </td>
+                    @if (string.IsNullOrEmpty(oldPicture))
+                    {
+                        <td>
+                            @(Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.NoPictureLabel, "No picture") ?? "No picture")
+                        </td>
+                    }
+                    else if (oldPicture.StartsWith("blob"))
+                    {
+
+                        <td>
+                            <img class="img-fluid" src="@oldPicture" />
+                        </td>
+                    }
+                    else
+                    {
+                        var picture = oldPicture;
+                        if (picture != null && !picture.StartsWith("https"))
+                        {
+                            picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, oldPicture);
+                        }
+
+                        <td>
+                            <img class="img-fluid" data-src="@picture" />
+                        </td>
+                    }
+
+                    @if (string.IsNullOrEmpty(newPicture))
+                    {
+                        <td>
+                            @(Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.NoPictureLabel, "No picture") ?? "No picture")
+                        </td>
+                    }
+                    else if (newPicture.StartsWith("blob"))
+                    {
+
+                        <td>
+                            <img class="img-fluid" src="@newPicture" />
+                        </td>
+                    }
+                    else
+                    {
+                        var picture = newPicture;
+                        if (picture != null && !picture.StartsWith("https"))
+                        {
+                            picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, newPicture);
+                        }
+
+                        <td>
+                            <img class="img-fluid" data-src="@picture" />
+                        </td>
+                    }
+                </tr>
+            }
+            else if (change.PropertyName.StartsWith("InstructionItem"))
+            {
+                try
+                {
+                    InstructionItemTemplate oldInstructionItem = null;
+                    @if (!string.IsNullOrEmpty(change.OldValue))
+                    {
+                        oldInstructionItem = change.OldValue.ToObjectFromJson<InstructionItemTemplate>();
+                    }
+                    InstructionItemTemplate newInstructionItem = null;
+                    @if (!string.IsNullOrEmpty(change.NewValue))
+                    {
+                        newInstructionItem = change.NewValue.ToObjectFromJson<InstructionItemTemplate>();
+                    }
+                    <tr>
+                        <td>Instruction item with id @(Convert.ToInt32(change.PropertyName.Substring(15, change.PropertyName.Length - 15).ToString()))</td>
+                        <td>
+                            @if (oldInstructionItem != null)
+                            {
+                                @if (oldInstructionItem.InstructionTemplateId != 0)
+                                {
+                                    <div>Instruction template id: @oldInstructionItem.InstructionTemplateId</div>
+                                }
+                                @if (oldInstructionItem.AssessmentTemplateId != 0)
+                                {
+                                    <div>Assessment template id: @oldInstructionItem.AssessmentTemplateId</div>
+                                }
+                                @if (!string.IsNullOrEmpty(oldInstructionItem.Name))
+                                {
+                                    <div>Name: @oldInstructionItem.Name</div>
+                                }
+                                @if (!string.IsNullOrEmpty(oldInstructionItem.Description))
+                                {
+                                    <div>Description: @oldInstructionItem.Description</div>
+                                }
+                                @if (oldInstructionItem.Media != null && oldInstructionItem.Media.Count > 0)
+                                {
+                                    var oldPicture = oldInstructionItem.Media.FirstOrDefault();
+
+                                    @if (string.IsNullOrEmpty(oldPicture))
+                                    {
+                                        <div>
+                                            Media: @(Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.NoPictureLabel, "No picture") ?? "No picture")
+                                        </div>
+                                    }
+                                    else if (oldPicture.StartsWith("blob"))
+                                    {
+
+                                        <div>
+                                            Media: <img class="img-fluid" src="@oldPicture" />
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        var picture = oldPicture;
+                                        if (picture != null && !picture.StartsWith("https"))
+                                        {
+                                            picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, oldPicture);
+                                        }
+
+                                        <div>
+                                            Media:
+                                            <img class="img-fluid" data-src="@picture" />
+                                        </div>
+                                    }
+                                }
+                                else if (!string.IsNullOrEmpty(oldInstructionItem.Picture))
+                                {
+                                    var oldPicture = oldInstructionItem.Picture;
+
+                                    @if (string.IsNullOrEmpty(oldPicture))
+                                    {
+                                        <div>
+                                            Picture: @(Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.NoPictureLabel, "No picture") ?? "No picture")
+                                        </div>
+                                    }
+                                    else if (oldPicture.StartsWith("blob"))
+                                    {
+
+                                        <div>
+                                            Picture: <img class="img-fluid" src="@oldPicture" />
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        var picture = oldPicture;
+                                        if (picture != null && !picture.StartsWith("https"))
+                                        {
+                                            picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, oldPicture);
+                                        }
+
+                                        <div>
+                                            Picture:
+                                            <img class="img-fluid" data-src="@picture" />
+                                        </div>
+                                    }
+                                }
+                                else if (!string.IsNullOrEmpty(oldInstructionItem.Video))
+                                {
+                                    var videourl = oldInstructionItem.Video;
+
+                                    @if (string.IsNullOrEmpty(videourl))
+                                    {
+                                        <div class="row">
+                                            <div class="col-12" data-type="image">
+                                                <div class="card h-100">
+                                                    <div class="card-body img-container p-0">
+                                                        Video:
+                                                        <a class="card-link" href="#video_old_@oldInstructionItem.Index" data-fancybox="changenotification">
+                                                            <video style="width: 100%" loading="lazy" src="/images/media-loading.gif" data-src="@videourl" />
+                                                        </a>
+
+                                                        <video src="/images/media-loading.mp4" data-src="@videourl" controls id="video_old_@oldInstructionItem.Index" style="display:none;">
+                                                            @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                                        </video>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else if (videourl.StartsWith("blob"))
+                                    {
+                                        <div class="row">
+                                            <div class="col-12" data-type="image">
+                                                <div class="card h-100">
+                                                    <div class="card-body img-container p-0">
+                                                        Video:
+                                                        <a class="card-link" href="#video_old_@oldInstructionItem.Index" data-fancybox="changenotification">
+                                                            <video style="width: 100%" loading="lazy" src="@videourl" />
+                                                        </a>
+
+                                                        <video src="@videourl" controls id="video_old_@oldInstructionItem.Index" style="display:none;">
+                                                            @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                                        </video>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        if (!videourl.StartsWith("https"))
+                                        {
+                                            videourl = AppUrlsResolver.Video(oldInstructionItem.Video);
+                                        }
+                                        <div class="row">
+                                            <div class="col-12" data-type="image">
+                                                <div class="card h-100">
+                                                    <div class="card-body img-container p-0">
+                                                        Video:
+                                                        <a class="card-link" href="#video_old_@oldInstructionItem.Index" data-fancybox="changenotification">
+                                                            <video style="width: 100%" loading="lazy" src="/images/media-loading.mp4" data-src="@videourl" />
+                                                        </a>
+
+                                                        <video src="/images/media-loading.mp4" data-src="@videourl" controls id="video_old_@oldInstructionItem.Index" style="display:none;">
+                                                            @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                                        </video>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else if (!string.IsNullOrEmpty(oldInstructionItem.VideoThumbnail))
+                                {
+                                    <div>Video thumbnail: @oldInstructionItem.VideoThumbnail</div>
+                                }
+                                @if (oldInstructionItem.Attachments != null && oldInstructionItem.Attachments.Count > 0)
+                                {
+                                    <div>Attachment: @oldInstructionItem.Attachments.First().AttachmentType, @oldInstructionItem.Attachments.First().Uri</div>
+                                }
+                                @if (oldInstructionItem.Index != 0)
+                                {
+                                    <div>Index: @oldInstructionItem.Index</div>
+                                }
+                                @if (oldInstructionItem.Tags != null && oldInstructionItem.Tags.Count > 0 && Model.ApplicationSettings.Features?.TagsEnabled == true)
+                                {
+                                    <div class="row">
+                                        Tags:
+                                        @foreach (var tag in oldInstructionItem.Tags)
+                                        {
+                                            <div class="card column m-1 tag-card-change" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                                                <div class="tag-wrapper-change" style="color:white;">
+                                                    <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                    <span class="my-1 ml-1 mr-3 tag-span-change" style="font-size:.78rem;">@tag.Name</span>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                @:-
+                            }
+                        </td>
+                        <td>
+                            @if (newInstructionItem != null)
+                            {
+                                @if (newInstructionItem.InstructionTemplateId != 0)
+                                {
+                                    <div>Instruction template id: @newInstructionItem.InstructionTemplateId</div>
+                                }
+                                @if (newInstructionItem.AssessmentTemplateId != 0)
+                                {
+                                    <div>Assessment template id: @newInstructionItem.AssessmentTemplateId</div>
+                                }
+                                @if (!string.IsNullOrEmpty(newInstructionItem.Name))
+                                {
+                                    <div>Name: @newInstructionItem.Name</div>
+                                }
+                                @if (!string.IsNullOrEmpty(newInstructionItem.Description))
+                                {
+                                    <div>Description: @newInstructionItem.Description</div>
+                                }
+                                @if (newInstructionItem.Media != null && newInstructionItem.Media.Count > 0)
+                                {
+                                    var newPicture = newInstructionItem.Media.FirstOrDefault();
+
+                                    @if (string.IsNullOrEmpty(newPicture))
+                                    {
+                                        <div>
+                                            Media:
+                                            @(Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.NoPictureLabel, "No picture") ?? "No picture")
+                                        </div>
+                                    }
+                                    else if (newPicture.StartsWith("blob"))
+                                    {
+
+                                        <div>
+                                            Media:
+                                            <img class="img-fluid" src="@newPicture" />
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        var picture = newPicture;
+                                        if (picture != null && !picture.StartsWith("https"))
+                                        {
+                                            picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, newPicture);
+                                        }
+
+                                        <div>
+                                            Media:
+                                            <img class="img-fluid" data-src="@picture" />
+                                        </div>
+                                    }
+                                }
+                                else if (!string.IsNullOrEmpty(newInstructionItem.Picture))
+                                {
+                                    var newPicture = newInstructionItem.Picture;
+
+                                    @if (string.IsNullOrEmpty(newPicture))
+                                    {
+                                        <div>
+                                            Picture:
+                                            @(Model.CmsLanguage.GetValue(LanguageKeys.WiChangeNotification.NoPictureLabel, "No picture") ?? "No picture")
+                                        </div>
+                                    }
+                                    else if (newPicture.StartsWith("blob"))
+                                    {
+
+                                        <div>
+                                            Picture:
+                                            <img class="img-fluid" src="@newPicture" />
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        var picture = newPicture;
+                                        if (picture != null && !picture.StartsWith("https"))
+                                        {
+                                            picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, newPicture);
+                                        }
+
+                                        <div>
+                                            Picture:
+                                            <img class="img-fluid" data-src="@picture" />
+                                        </div>
+                                    }
+                                }
+                                else if (!string.IsNullOrEmpty(newInstructionItem.Video))
+                                {
+                                    var videourl = newInstructionItem.Video;
+
+                                    @if (string.IsNullOrEmpty(videourl))
+                                    {
+                                        <div class="row">
+                                            <div class="col-12" data-type="image">
+                                                <div class="card h-100">
+                                                    <div class="card-body img-container p-0">
+                                                        Video:
+                                                        <a class="card-link" href="#video_new_@newInstructionItem.Index" data-fancybox="changenotification">
+                                                            <video style="width: 100%" loading="lazy" src="/images/media-loading.gif" data-src="@videourl" />
+                                                        </a>
+
+                                                        <video src="/images/media-loading.mp4" data-src="@videourl" controls id="video_new_@newInstructionItem.Index" style="display:none;">
+                                                            @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                                        </video>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else if (videourl.StartsWith("blob"))
+                                    {
+                                        <div class="row">
+                                            <div class="col-12" data-type="image">
+                                                <div class="card h-100">
+                                                    <div class="card-body img-container p-0">
+                                                        Video:
+                                                        <a class="card-link" href="#video_new_@newInstructionItem.Index" data-fancybox="changenotification">
+                                                            <video style="width: 100%" loading="lazy" src="@videourl" />
+                                                        </a>
+
+                                                        <video src="@videourl" controls id="video_new_@newInstructionItem.Index" style="display:none;">
+                                                            @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                                        </video>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        if (!videourl.StartsWith("https"))
+                                        {
+                                            videourl = AppUrlsResolver.Video(newInstructionItem.Video);
+                                        }
+                                        <div class="row">
+                                            <div class="col-12" data-type="image">
+                                                <div class="card h-100">
+                                                    <div class="card-body img-container p-0">
+                                                        Video:
+                                                        <a class="card-link" href="#video_new_@newInstructionItem.Index" data-fancybox="changenotification">
+                                                            <video style="width: 100%" loading="lazy" src="/images/media-loading.mp4" data-src="@videourl" />
+                                                        </a>
+
+                                                        <video src="/images/media-loading.mp4" data-src="@videourl" controls id="video_new_@newInstructionItem.Index" style="display:none;">
+                                                            @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                                        </video>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else if (!string.IsNullOrEmpty(newInstructionItem.VideoThumbnail))
+                                {
+                                    <div>Video thumbnail: @newInstructionItem.VideoThumbnail</div>
+                                }
+                                @if (newInstructionItem.Attachments != null && newInstructionItem.Attachments.Count > 0)
+                                {
+                                    <div>Attachment: @newInstructionItem.Attachments.First().AttachmentType, @newInstructionItem.Attachments.First().Uri</div>
+                                }
+                                @if (newInstructionItem.Index != 0)
+                                {
+                                    <div>Index: @newInstructionItem.Index</div>
+                                }
+                                @if (newInstructionItem.Tags != null && newInstructionItem.Tags.Count > 0 && Model.ApplicationSettings.Features?.TagsEnabled == true)
+                                {
+                                    <div class="row">
+                                        Tags:
+                                        @foreach (var tag in newInstructionItem.Tags)
+                                        {
+                                            <div class="card column m-1 tag-card-change" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                                                <div class="tag-wrapper-change" style="color:white;">
+                                                    <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                    <span class="my-1 ml-1 mr-3 tag-span-change" style="font-size:.78rem;">@tag.Name</span>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                @:-
+                            }
+                        </td>
+                    </tr>
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+            else
+            {
+                <tr>
+                    <td>
+                        @(Model.CmsLanguage.GetValue(change.TranslationKey, change.PropertyName) ?? change.PropertyName)
+                    </td>
+                    <td>
+                        @change.OldValue
+                    </td>
+                    <td>
+                        @change.NewValue
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+}
+else
+{
+    <h3>
+        No changes detected
+    </h3>
+}

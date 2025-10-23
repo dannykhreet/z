@@ -1,0 +1,113 @@
+﻿@model WebApp.ViewModels.AuditViewModel
+@{
+    Layout = null;
+}
+
+@if (Model != null && Model.AuditTemplates != null)
+{
+    <input type="text" value="@Model.AuditTemplates.Count" id="auditTemplatesCounter" style="display: none" />
+    if (Model.AuditTemplates.Count != 0)
+    {
+        @foreach (WebApp.Models.Audit.AuditTemplateModel auditTemplate in Model.AuditTemplates)
+        {
+            var id = auditTemplate.Id;
+            var instructions = 0;
+            if (auditTemplate.TaskTemplates != null)
+            {
+                instructions = auditTemplate.TaskTemplates.Sum(item => item.StepsCount) +
+                                                                           auditTemplate.TaskTemplates.Where(item => item.DescriptionFile != null || (item.Attachments != null && item.Attachments.Count > 0)).Count() +
+                                                                           auditTemplate.TaskTemplates.Where(item => item.WorkInstructionRelations != null && item.WorkInstructionRelations.Count > 0).Count();
+            }
+            var hasImage = !string.IsNullOrEmpty(auditTemplate.Picture) ? "true" : "false";
+            var areaPathIds = auditTemplate.AreaPathIds != null ? auditTemplate.AreaPathIds.Replace(" -> ", ",") : "";
+            var tagsList = new List<int>();
+            if (auditTemplate.Tags != null && auditTemplate.Tags.Count > 0)
+            {
+                tagsList.AddRange(auditTemplate.Tags.Select(t => t.Id));
+            }
+
+            if (auditTemplate.TaskTemplates != null && auditTemplate.TaskTemplates.Count > 0)
+            {
+                foreach (var item in auditTemplate.TaskTemplates)
+                {
+                    if (item.Tags != null && item.Tags.Count > 0)
+                    {
+                        tagsList.AddRange(item.Tags.Select(t => t.Id));
+                    }
+                }
+            }
+
+            var uniqueTags = String.Join(',', tagsList.Distinct());
+            <div class="card w-100 results mr-1 my-1" data-id="@id"
+            data-role="@auditTemplate.Role"
+            data-instructions="@instructions"
+            data-hasimage="@hasImage"
+            data-pathids="@areaPathIds"
+            data-tags="@uniqueTags">
+                <div class="card-body p-0">
+                    @{
+                        var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, auditTemplate.Picture);
+                        if (string.IsNullOrEmpty(auditTemplate.Picture))
+                        {
+                            picture = @"/assets/img/normal_unavailable_image.png";
+                        }
+                    }
+
+                    <a class="text-muted fs-0 fs-lg-1" asp-controller="audit" asp-action="details" asp-route-id="@auditTemplate.Id">
+                        <div class="col-12 p-1">
+                            <div class="p-1">
+                                <div class="row" data-containertype="audit_container" data-id="@auditTemplate.Id">
+                                    <div class="col-sm-5 col-md-3 col-lg-3 col-xl-2">
+                                        <img src="/images/media-loading.gif" data-src="@picture" loading="lazy" class="img-fluid" />
+                                    </div>
+
+                                    <div class="col-sm-7 col-md-8">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <h5 class="mt-3 mt-sm-0">@auditTemplate.Name</h5>
+                                                <p class="fs--1 mb-2 mb-md-3"><span class="badge badge-secondary">@auditTemplate.AreaPath</span></p>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-12 d-flex justify-content-between flex-column">
+                                                <div class="row">
+                                                    <div class="col-md-6 col-lg-3 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TemplateId, "Id") ?? "Id"): <strong>@auditTemplate.Id</strong></small></div>
+                                                    <div class="col-md-6 col-lg-3 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.ItemsTitle, "Items") ?? "Items"): <strong>@auditTemplate?.TaskTemplates?.Count()</strong></small></div>
+                                                    <div class="col-md-6 col-lg-3 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.InstructionDialogTitle, "Instructions") ?? "Instructions"): <strong>@instructions</strong></small></div>
+                                                    <div class="col-md-6 col-lg-3 text-muted"><small>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.TemplateRoleTitle, "Role") ?? "Role"): <strong>@(auditTemplate.Role != null ? auditTemplate.Role.Replace("_", " ") : "")</strong></small></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        @if (auditTemplate.Tags?.Count > 0 && Model.ApplicationSettings?.Features?.TagsEnabled == true)
+                                        {
+                                            <div class="row">
+                                                @foreach (var tag in auditTemplate.Tags)
+                                                {
+                                                    <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; border-radius: .5em;">
+                                                        <div class="tag-wrapper" style="color:white;">
+                                                            <i class="nav-icon my-1 ml-3 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                            <span class="my-1 ml-1 mr-3 tag-span" style="font-size:.78rem;">@tag.Name</span>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+
+    }
+    else
+    {
+        <div id="noAuditTemplatesFound" style="display: none">
+            <partial name="~/Views/Shared/_no_templates_message.cshtml" model="@Model" />
+        </div>
+    }
+}

@@ -1,0 +1,41 @@
+﻿@model WebApp.Models.Checklist.StageModel
+@using EZGO.Api.Models.Basic
+@if(Model?.Signatures != null)
+{
+
+    var signatureUsers = Model?.Signatures.Select(s => new UserBasic() { Id = s.SignedById.HasValue ? s.SignedById.Value : 0, Name = s.SignedBy, Picture = s.SignedByPicture }).ToList();
+    @if(signatureUsers.Count() == 1)
+    {
+        <div class="pr-2" style="position: relative; height: auto; position: relative; display: flex; justify-content: center; align-items: center; width: 50px">
+            @{
+            var editedByPicture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+            if (!string.IsNullOrEmpty(signatureUsers[0].Picture))
+            {
+                editedByPicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, signatureUsers[0].Picture);
+            }
+            }
+            <img class="itemEditedByUserPicture" src="/images/media-loading.gif" data-src="@editedByPicture" style="right: 5px"></img>
+        </div>
+    }
+    else if(signatureUsers.Count == 2)
+    {
+        <div class="pr-2" style="position: relative; height: auto; position: relative; display: flex; justify-content: center; align-items: center; width: 80px">
+            @{
+                var editedByPicture = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(signatureUsers[0].Picture))
+                {
+                    editedByPicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, signatureUsers[0].Picture);
+                }
+            }
+            <img class="itemEditedByUserPicture" src="/images/media-loading.gif" data-src="@editedByPicture" style="right: 35px"></img>
+            @{
+                var editedByPicture2 = WebApp.Logic.Constants.General.ImageUnavailableUrl;
+                if (!string.IsNullOrEmpty(signatureUsers[1].Picture))
+                {
+                    editedByPicture2 = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, signatureUsers[1].Picture);
+                }
+            }
+            <img class="itemEditedByUserPicture" src="/images/media-loading.gif" data-src="@editedByPicture2" style="right: 5px"></img>
+        </div>
+    }
+}

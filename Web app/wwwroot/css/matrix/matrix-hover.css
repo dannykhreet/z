@@ -1,0 +1,38 @@
+* {
+    box-sizing: border-box;
+}*
+
+table {
+    overflow: hidden;
+}
+
+td, th {
+    border: 0px solid #999;
+    padding: 5px;
+    position: relative;
+}
+
+td.buttoncell:hover::before  {
+    background-color: rgba(147,197,75,0.15) !important;
+    content: '';
+    height: 100%;
+    left: -5000px;
+    position: absolute;
+    top: 0;
+    width: 10000px;
+    z-index: -1;
+    pointer-events: none;
+
+}
+
+td.buttoncell:hover::after  {
+    background-color: rgba(147,197,75,0.15) !important;
+    content: '';
+    height: 10000px;
+    left: 0;
+    position: absolute;
+    top: -5000px;
+    width: 100%;
+    z-index: -2;
+    pointer-events: none;
+}

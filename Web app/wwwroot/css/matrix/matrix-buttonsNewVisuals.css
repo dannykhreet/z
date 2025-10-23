@@ -1,0 +1,183 @@
+﻿/* Global button styles */
+
+.text-sm .btn {
+    font-size: .875rem;
+}
+
+.circlebtn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: inline-block;
+    /*    color: #fff;*/
+    border: 1px solid rgb(210,210,210);
+    font-size: 22px !important;
+    outline: 0 !important;
+}
+
+    .circlebtn:hover {
+        cursor: pointer;
+        transform: scale(1.15);
+        /*        color: #fff;*/
+    }
+
+.btn-thumbs-green i {
+    font-size: 22px;
+}
+
+.btn-thumbs-orange i {
+    font-size: 22px;
+}
+
+.btn-thumbs-red i {
+    font-size: 22px;
+}
+
+
+/* End global button styles */
+
+
+
+/* Button flavours */
+
+.btn-green {
+    background-color: #28a745;
+    font-size: 22px;
+    font-weight: 400;
+    border-color: #28a745;
+    color: white;
+}
+
+.btn-red {
+    background-color: #dc3545;
+    font-size: 22px;
+    font-weight: 400;
+    border-color: #dc3545;
+    color: white;
+}
+
+.btn-clear {
+    background-color: #ffffff;
+    font-size: 22px;
+    font-weight: 400;
+    border-color: rgb(210,210,210);
+    color: #ff4500;
+}
+
+.btn-orangered {
+    background-color: #EE7B26;
+    font-size: 22px;
+    font-weight: 400;
+    border-color: #EE7B26;
+    color: white;
+}
+
+.btn-orange {
+    background-color: #ffc107;
+    font-size: 22px;
+    font-weight: 400;
+    border-color: #ffc107;
+    color: white;
+}
+
+.btn-orangegreen {
+    background-color: #94B426;
+    font-size: 22px;
+    font-weight: 400;
+    border-color: #94B426;
+    color: white;
+}
+
+.btn-border-green {
+    border: solid 1px #abd28e;
+    border-radius: 50%;
+    background-color: #fff;
+    font-size: 22px;
+    font-weight: 400;
+}
+
+/* Button flavours */
+
+
+/* Thumbs button flavours */
+.btn-thumbs-green {
+    background-color: #28a745;
+    border-color: #28a745;
+    font-size: 22px;
+    font-weight: 400;
+    color: white;
+}
+
+.btn-thumbs-red {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    font-size: 22px;
+    font-weight: 400;
+    color: white;
+}
+
+.btn-thumbs-orange {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    font-size: 22px;
+    font-weight: 400;
+    color: white;
+}
+/* End Thumbs button flavours */
+
+/* Operational behaviour icons */
+
+.king {
+    background: url("/images/icons/v2/king.png") center / 26px no-repeat, #ddf7dd;
+    border-color: #5eaf5e;
+}
+
+.champion {
+    background: url("/images/icons/v2/champion.png") center / 26px no-repeat, #f2f5dd;
+    border-color: #8da304;
+}
+
+.spoton {
+    background: url("/images/icons/v2/spoton.png") center / 26px no-repeat, #fff0d4;
+    border-color: #ffa500;
+}
+
+.risingstar {
+    background: url("/images/icons/v2/risingstar.png") center / 26px no-repeat, #ffe4da;
+    border-color: #ff4500;
+}
+
+.powerup {
+    background: url("/images/icons/v2/powerup.png") center / 26px no-repeat, #ffeaea;
+    border-color: #cb0000;
+}
+
+.thumbsup {
+    background: url("/images/icons/v2/thumbsup.png") center / 26px no-repeat, #ddf7dd;
+    border-color: #5eaf5e;
+}
+
+.thumbsdown {
+    background: url("/images/icons/v2/thumbsdown.png") center / 26px no-repeat, #ffeaea;
+    border-color: #cb0000;
+}
+
+.warning {
+    background: url("/images/icons/v2/warning.png") center / 26px no-repeat, #fff0d4;
+    border-color: #ffa500;
+}
+
+.warning-icon {
+    background-image: url("/images/icons/v2/warning.png");
+    background-size: 26px 26px;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+/* End operational behaviour icons */
+
+
+/* prevent buttons to have an click event on the content of a button, but always have the button event. */
+button > * {
+    pointer-events: none;
+}

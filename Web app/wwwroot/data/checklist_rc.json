@@ -1,0 +1,62 @@
+﻿{
+  "Id": 3826,
+  "Name": "My first checklist",
+  "Picture": "lists/3826/b084f0b9-27ab-4325-89ea-7285e5f07c56.jpg",
+  "AreaId": 5487,
+  "IsDoubleSignatureRequired": false,
+  "IsSignatureRequired": false,
+  "Role": "basic",
+  "CompanyId": 423,
+  "HasIncompleteChecklists": false,
+  "TaskTemplates": [
+    {
+      "Id": 52834,
+      "Name": "First checklist item",
+      "CompanyId": 423,
+      "Picture": "tasks/52834/13af4db3-a498-40ab-a9c9-87e8f0af9f3d.jpg",
+      "Description": "First checklist item description",
+      "Type": "checklist",
+      "Weight": 0.0,
+      "ActionsCount": 0,
+      "StepsCount": 3,
+      "Steps": [
+        {
+          "Id": 29128,
+          "Description": "1: First step",
+          "Picture": "steps/29128/662e6973-a2fb-4206-8db2-5477fd1eae2e.jpeg",
+          "TaskTemplateId": 52834,
+          "Index": 1
+        },
+        {
+          "Id": 29129,
+          "Description": "2: Second step",
+          "Picture": "steps/29129/356c973e-ba1a-44d8-a513-551d988f09ea.jpeg",
+          "TaskTemplateId": 52834,
+          "Index": 2
+        },
+        {
+          "Id": 29130,
+          "Description": "3: Video",
+          "TaskTemplateId": 52834,
+          "Index": 3,
+          "Video": "https://s3.eu-central-1.amazonaws.com/ezfactory-media-acceptance/media/steps/29130/44b20ca3-87cc-464d-8b3a-271e8c1d0234.mp4",
+          "VideoThumbnail": "steps/29130/264ac780-90d4-450d-827c-8d894f7cb52b.png"
+        }
+      ]
+    },
+    {
+      "Id": 52835,
+      "Name": "Second checklist item",
+      "CompanyId": 423,
+      "Description": "Second checklist item description",
+      "DescriptionFile": "task_descriptions/52835/820716c5-fd96-42a0-9cd3-3e57b13e7b5d.pdf",
+      "Type": "checklist",
+      "Video": "https://s3.eu-central-1.amazonaws.com/ezfactory-media-acceptance/media/tasks/52835/ec9ad98e-3f3e-48ff-8b5a-2fc9123d03a4.mp4",
+      "VideoThumbnail": "tasks/52835/1f3f1b06-2e15-4a5f-9bec-97f383d4fb19.png",
+      "Weight": 0.0,
+      "ActionsCount": 0,
+      "StepsCount": 0,
+      "Steps": []
+    }
+  ]
+}

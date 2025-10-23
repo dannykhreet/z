@@ -1,0 +1,1096 @@
+﻿@model WebApp.Models.FactoryFeed.FactoryFeedItemModel
+@using WebApp.Models.FactoryFeed
+
+@using System.Security.Claims
+@using WebApp.Models.User
+@using System.Globalization
+
+@if(Model.Media != null && Model.Media.Any() && Model.Media.FirstOrDefault() != null) {
+    <div id="postMediaContainer-@Model.Id">
+        @if (Model.Media.Count == 1)
+        {
+            var attachment = Model.Media.First()?.Uri ?? "";
+
+            if (attachment.ToLower().EndsWith(".mp4") || attachment.ToLower().EndsWith(".mov"))
+            {
+                var videoUrl = attachment;
+
+                if (!attachment.ToLower().StartsWith("https:"))
+                {
+                    videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, attachment);
+                }
+
+                <div id="postVideoContainer-@Model.Id">
+                    <a href="#postVideo-@(Model.Id)-0" data-fancybox="postImageFancybox-@Model.Id">
+                        <video controls style="max-width: 100%" src="/images/media-loading.mp4" data-src="@videoUrl">
+                            @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                        </video>
+                    </a>
+                    <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-0" style="display:none;">
+                        @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                    </video>
+                </div>
+            }
+            else if (attachment.ToLower().EndsWith(".pdf"))
+            {
+                var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, attachment);
+
+                <div id="postPdfContainer-@Model.Id">
+                    <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                        <div class="row">
+                            <div class="col-10 p-0 factoryFeedPdfBG" style="background-color: #E6E6E6"></div>
+                            <div class="col-2 p-0">
+                                <div class="pdfTriangle"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 p-0 factoryFeedPdfBG" style="text-align: center">
+                                <img class="factoryFeedPdfLogo" src="/images/logo-green.png" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 factoryFeedPdfBottomSection">
+                                PDF
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+            else
+            {
+                var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, attachment);
+                <div id="postImageContainer-@Model.Id">
+                    <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                        <img class="card-img w-100 d-block rounded-0" src="/images/media-loading.gif" data-src="@imageUrl" />
+                    </a>
+                </div>
+            }
+        }
+        else if (Model.Media.Count == 2)
+        {
+            <br />
+            <div class="row">
+                @for (int i = 0; i < Model.Media.Count; i++)
+                {
+                    @if (Model.Media[i].Uri.ToLower().EndsWith(".mp4") || Model.Media[i].Uri.ToLower().EndsWith(".mov"))
+                    {
+                        var videoUrl = Model.Media[i].Uri;
+
+                        if (!Model.Media[i].Uri.ToLower().StartsWith("https:"))
+                        {
+                            videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Media[i].Uri);
+                        }
+
+                        <div class="col-6" style="height: 150px;">
+                            <div id="postVideoContainer-@Model.Id-@i">
+                                <a href="#postVideo-@(Model.Id)-@i" data-fancybox="postImageFancybox-@Model.Id">
+                                    <video style="max-width: 100%; width: 100%; object-fit: cover; height: 150px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                        @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                    </video>
+                                </a>
+
+                                <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-@i" style="display:none;">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </div>
+                        </div>
+                    }
+                    else if (Model.Media[i].Uri.ToLower().EndsWith(".pdf"))
+                    {
+
+                        var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, Model.Media[i].Uri);
+
+                        <div id="postPdfContainer-@Model.Id-@i" class="col-6 px-2">
+                            <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                                <div class="row">
+                                    <div class="col-9 p-0 factoryFeedPdfBGMedium" style="background-color: #E6E6E6"></div>
+                                    <div class="col-3 p-0">
+                                        <div class="pdfTriangleMedium"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 p-0 factoryFeedPdfBGMedium" style="text-align: center">
+                                        <img class="factoryFeedPdfLogoMedium" src="/images/logo-green.png" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 factoryFeedPdfBottomSectionMedium">
+                                        PDF
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Media[i].Uri);
+                        <div class="col-6" style="height: 150px;">
+                            <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                                <div id="postImageContainer-@Model.Id-@i">
+                                    <img class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 150px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                                </div>
+                            </a>
+                        </div>
+                    }
+                }
+            </div>
+        }
+        else if (Model.Media.Count == 3)
+        {
+            <br />
+            <div class="row">
+                @if (Model.Media[0].Uri.ToLower().EndsWith(".mp4") || Model.Media[0].Uri.ToLower().EndsWith(".mov"))
+                {
+                    var videoUrl = Model.Media[0].Uri;
+
+                    if (!Model.Media[0].Uri.ToLower().StartsWith("https:"))
+                    {
+                        videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Media[0].Uri);
+                    }
+
+                    <div class="col-8" style="height: 250px;">
+                        <div id="postVideoContainer-@Model.Id-0">
+                            <a href="#postVideo-@(Model.Id)-0" data-fancybox="postImageFancybox-@Model.Id">
+                                <video style="max-width: 100%; width: 100%; object-fit: cover; height: 250px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </a>
+
+                            <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-0" style="display:none;">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                            </video>
+                        </div>
+                    </div>
+                }
+                else if (Model.Media[0].Uri.ToLower().EndsWith(".pdf"))
+                {
+
+                    var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, Model.Media[0].Uri);
+
+                    <div id="postPdfContainer-@Model.Id-0" class="col-8 pt-0 pb-3 px-3">
+                        <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                            <div class="row">
+                                <div class="col-9 p-0 factoryFeedPdfBG" style="background-color: #E6E6E6"></div>
+                                <div class="col-3 p-0">
+                                    <div class="pdfTriangle"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 p-0 factoryFeedPdfBG" style="text-align: center">
+                                    <img class="factoryFeedPdfLogo" src="/images/logo-green.png" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 factoryFeedPdfBottomSection">
+                                    PDF
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Media[0].Uri);
+                    <div class="col-8" style="height: 250px;">
+                        <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                            <div id="postImageContainer-@Model.Id-0">
+                                <img class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 250px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                            </div>
+                        </a>
+                    </div>
+                }
+                <div class="col-4" style="height: 250px;">
+                    @if (Model.Media[1].Uri.ToLower().EndsWith(".mp4") || Model.Media[1].Uri.ToLower().EndsWith(".mov"))
+                    {
+                        var videoUrl = Model.Media[1].Uri;
+
+                        if (!Model.Media[1].Uri.ToLower().StartsWith("https:"))
+                        {
+                            videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Media[1].Uri);
+                        }
+
+                        <div id="postVideoContainer-@Model.Id-1" class="mb-1">
+                            <a href="#postVideo-@(Model.Id)-1" data-fancybox="postImageFancybox-@Model.Id">
+                                <video style="max-width: 100%; width: 100%; object-fit: cover; height: 123px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </a>
+
+                            <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-1" style="display:none;">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                            </video>
+                        </div>
+                    }
+                    else if (Model.Media[1].Uri.ToLower().EndsWith(".pdf"))
+                    {
+
+                        var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, Model.Media[1].Uri);
+
+                        <div id="postPdfContainer-@Model.Id-1" class="pt-0 pb-1 px-2">
+                            <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                                <div class="row">
+                                    <div class="col-9 p-0 factoryFeedPdfBGSmall" style="background-color: #E6E6E6"></div>
+                                    <div class="col-3 p-0">
+                                        <div class="pdfTriangleSmall"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 p-0 factoryFeedPdfBGSmall" style="text-align: center">
+                                        <img class="factoryFeedPdfLogoSmall" src="/images/logo-green.png" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 factoryFeedPdfBottomSectionSmall">
+                                        PDF
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Media[1].Uri);
+                        <div id="postImageContainer-@Model.Id-1" class="mb-1">
+                            <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                                <img class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 123px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                            </a>
+                        </div>
+                    }
+                    @if (Model.Media[2].Uri.ToLower().EndsWith(".mp4") || Model.Media[2].Uri.ToLower().EndsWith(".mov"))
+                    {
+                        var videoUrl = Model.Media[2].Uri;
+
+                        if (!Model.Media[2].Uri.ToLower().StartsWith("https:"))
+                        {
+                            videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Media[2].Uri);
+                        }
+
+                        <div id="postVideoContainer-@Model.Id-2">
+                            <a href="#postVideo-@(Model.Id)-2" data-fancybox="postImageFancybox-@Model.Id">
+                                <video style="max-width: 100%; width: 100%; object-fit: cover; height: 123px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </a>
+
+                            <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-2" style="display:none;">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                            </video>
+                        </div>
+                    }
+                    else if (Model.Media[2].Uri.ToLower().EndsWith(".pdf"))
+                    {
+
+                        var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, Model.Media[2].Uri);
+
+                        <div id="postPdfContainer-@Model.Id-2" class="px-2 pb-0 pt-1">
+                            <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                                <div class="row">
+                                    <div class="col-9 p-0 factoryFeedPdfBGSmall" style="background-color: #E6E6E6"></div>
+                                    <div class="col-3 p-0">
+                                        <div class="pdfTriangleSmall"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 p-0 factoryFeedPdfBGSmall" style="text-align: center">
+                                        <img class="factoryFeedPdfLogoSmall" src="/images/logo-green.png" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 factoryFeedPdfBottomSectionSmall">
+                                        PDF
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Media[2].Uri);
+                        <div id="postImageContainer-@Model.Id-2">
+                            <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                                <img class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 123px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else if (Model.Media.Count > 3)
+        {
+            <br />
+            <div class="row">
+                @if (Model.Media[0].Uri.ToLower().EndsWith(".mp4") || Model.Media[0].Uri.ToLower().EndsWith(".mov"))
+                {
+                    var videoUrl = Model.Media[0].Uri;
+
+                    if (!Model.Media[0].Uri.ToLower().StartsWith("https:"))
+                    {
+                        videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Media[0].Uri);
+                    }
+
+                    <div class="col-8" style="height: 250px;">
+                        <div id="postVideoContainer-@Model.Id-0">
+                            <a href="#postVideo-@(Model.Id)-0" data-fancybox="postImageFancybox-@Model.Id">
+                                <video style="max-width: 100%; width: 100%; object-fit: cover; height: 250px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </a>
+
+                            <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-0" style="display:none;">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                            </video>
+                        </div>
+                    </div>
+                }
+                else if (Model.Media[0].Uri.ToLower().EndsWith(".pdf"))
+                {
+
+                    var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, Model.Media[0].Uri);
+
+                    <div id="postPdfContainer-@Model.Id-0" class="col-8 pt-0 pb-3 px-3">
+                        <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                            <div class="row">
+                                <div class="col-9 p-0 factoryFeedPdfBG" style="background-color: #E6E6E6"></div>
+                                <div class="col-3 p-0">
+                                    <div class="pdfTriangle"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 p-0 factoryFeedPdfBG" style="text-align: center">
+                                    <img class="factoryFeedPdfLogo" src="/images/logo-green.png" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 factoryFeedPdfBottomSection">
+                                    PDF
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Media[0].Uri);
+                    <div class="col-8" style="height: 250px;">
+                        <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                            <div id="postImageContainer-@Model.Id-0">
+                                <img class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 250px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                            </div>
+                        </a>
+                    </div>
+                }
+                <div class="col-4" style="height: 250px;">
+                    @if (Model.Media[1].Uri.ToLower().EndsWith(".mp4") || Model.Media[1].Uri.ToLower().EndsWith(".mov"))
+                    {
+                        var videoUrl = Model.Media[1].Uri;
+
+                        if (!Model.Media[1].Uri.ToLower().StartsWith("https:"))
+                        {
+                            videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Media[1].Uri);
+                        }
+
+                        <div id="postVideoContainer-@Model.Id-1" class="">
+                            <a href="#postVideo-@(Model.Id)-1" data-fancybox="postImageFancybox-@Model.Id">
+                                <video style="max-width: 100%; width: 100%; object-fit: cover; height: 123px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </a>
+
+                            <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-1" style="display:none;">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                            </video>
+                        </div>
+                    }
+                    else if (Model.Media[1].Uri.ToLower().EndsWith(".pdf"))
+                    {
+
+                        var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, Model.Media[1].Uri);
+
+                        <div id="postPdfContainer-@Model.Id-1" class="pt-0 pb-1 px-2">
+                            <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                                <div class="row">
+                                    <div class="col-9 p-0 factoryFeedPdfBGSmall" style="background-color: #E6E6E6"></div>
+                                    <div class="col-3 p-0">
+                                        <div class="pdfTriangleSmall"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 p-0 factoryFeedPdfBGSmall" style="text-align: center">
+                                        <img class="factoryFeedPdfLogoSmall" src="/images/logo-green.png" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 factoryFeedPdfBottomSectionSmall">
+                                        PDF
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Media[1].Uri);
+                        <div id="postImageContainer-@Model.Id-1" class="mb-1">
+                            <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                                <img class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 123px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                            </a>
+                        </div>
+                    }
+                    @if (Model.Media[2].Uri.ToLower().EndsWith(".mp4") || Model.Media[2].Uri.ToLower().EndsWith(".mov"))
+                    {
+                        var videoUrl = Model.Media[2].Uri;
+
+                        if (!Model.Media[2].Uri.ToLower().StartsWith("https:"))
+                        {
+                            videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Media[2].Uri);
+                        }
+
+                        <div id="postVideoContainer-@Model.Id-2" style="position: relative">
+                            <a href="#postVideo-@(Model.Id)-2" data-fancybox="postImageFancybox-@Model.Id">
+                                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; color: white; font-size: 36px; font-weight: 800; z-index: 2; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,.5)">
+                                    +@(Model.Media.Count - 3)
+                                </div>
+                                <video style="max-width: 100%; width: 100%; object-fit: cover; height: 123px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </a>
+
+                            <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-2" style="display:none;">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                            </video>
+                        </div>
+                    }
+                    else if (Model.Media[2].Uri.ToLower().EndsWith(".pdf"))
+                    {
+
+                        var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, Model.Media[2].Uri);
+
+                        <div id="postPdfContainer-@Model.Id-2" class="px-2 pb-0 pt-1" style="position: relative">
+                            <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; color: white; font-size: 36px; font-weight: 800; z-index: 2; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,.5)">
+                                    +@(Model.Media.Count - 3)
+                                </div>
+                                <div class="row">
+                                    <div class="col-9 p-0 factoryFeedPdfBGSmall" style="background-color: #E6E6E6"></div>
+                                    <div class="col-3 p-0">
+                                        <div class="pdfTriangleSmall"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 p-0 factoryFeedPdfBGSmall" style="text-align: center">
+                                        <img class="factoryFeedPdfLogoSmall" src="/images/logo-green.png" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 factoryFeedPdfBottomSectionSmall">
+                                        PDF
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Media[2].Uri);
+                        <div id="postImageContainer-@Model.Id-2" style="position: relative">
+                            <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; color: white; font-size: 36px; font-weight: 800; z-index: 2; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,.5)">
+                                    +@(Model.Media.Count - 3)
+                                </div>
+                                <img class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 123px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                            </a>
+                        </div>
+                    }
+                </div>
+                @for (int i = 3; i < Model.Media.Count; i++)
+                {
+                    if (Model.Media[i].Uri.ToLower().EndsWith(".mp4") || Model.Media[i].Uri.ToLower().EndsWith(".mov"))
+                    {
+                        var videoUrl = Model.Media[i].Uri;
+
+                        if (!Model.Media[i].Uri.ToLower().StartsWith("https:"))
+                        {
+                            videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Media[i].Uri);
+                        }
+
+                        <div id="postVideoContainer-@Model.Id-@i" style="display: none">
+                            <a href="#postVideo-@(Model.Id)-@i" data-fancybox="postImageFancybox-@Model.Id">
+                                <video style="max-width: 100%" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </a>
+
+                            <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-@i" style="display:none;">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                            </video>
+                        </div>
+                    }
+                    else if (Model.Media[i].Uri.ToLower().EndsWith(".pdf"))
+                    {
+
+                        var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, Model.Media[i].Uri);
+
+                        <div id="postPdfContainer-@Model.Id-@i" style="display: none">
+                            <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe" , "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Media[i].Uri);
+                        <div id="postImageContainer-@Model.Id-@i" style="display: none">
+                            <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                                <img class="card-img w-100 d-block rounded-0" src="/images/media-loading.gif" data-src="@imageUrl" />
+                            </a>
+                        </div>
+                    }
+                }
+            </div>
+        }
+    </div>
+}
+else if (Model.Attachments != null && Model.Attachments.Any() && Model.Attachments.FirstOrDefault() != null)
+{
+    <div id="postMediaContainer-@Model.Id">
+        @if (Model.Attachments.Count == 1)
+        {
+            var attachment = Model.Attachments.First();
+
+            if (attachment.ToLower().EndsWith(".mp4") || attachment.ToLower().EndsWith(".mov"))
+            {
+                var videoUrl = attachment;
+
+                if (!attachment.ToLower().StartsWith("https:"))
+                {
+                    videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, attachment);
+                }
+
+                <div id="postVideoContainer-@Model.Id">
+                    <a href="#postVideo-@(Model.Id)-0" data-fancybox="postImageFancybox-@Model.Id">
+                        <video controls style="max-width: 100%" src="/images/media-loading.mp4" data-src="@videoUrl">
+                            @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                        </video>
+                    </a>
+                    <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-0" style="display:none;">
+                        @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                    </video>
+                </div>
+            }
+            else if (attachment.ToLower().EndsWith(".pdf"))
+            {
+                var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, attachment);
+
+                <div id="postPdfContainer-@Model.Id">
+                    <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                        <div class="row">
+                            <div class="col-10 p-0 factoryFeedPdfBG" style="background-color: #E6E6E6"></div>
+                            <div class="col-2 p-0">
+                                <div class="pdfTriangle"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 p-0 factoryFeedPdfBG" style="text-align: center">
+                                <img class="factoryFeedPdfLogo" src="/images/logo-green.png" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 factoryFeedPdfBottomSection">
+                                PDF
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+            else
+            {
+                var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, attachment);
+                <div id="postImageContainer-@Model.Id">
+                    <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                        <img class="card-img w-100 d-block rounded-0" src="/images/media-loading.gif" data-src="@imageUrl" />
+                    </a>
+                </div>
+            }
+        }
+        else if (Model.Attachments.Count == 2)
+        {
+            <br />
+            <div class="row">
+                @for (int i = 0; i < Model.Attachments.Count; i++)
+                {
+                    @if (Model.Attachments[i].ToLower().EndsWith(".mp4") || Model.Attachments[i].ToLower().EndsWith(".mov"))
+                    {
+                        var videoUrl = Model.Attachments[i];
+
+                        if (!Model.Attachments[i].ToLower().StartsWith("https:"))
+                        {
+                            videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Attachments[i]);
+                        }
+
+                        <div class="col-6" style="height: 150px;">
+                            <div id="postVideoContainer-@Model.Id-@i">
+                                <a href="#postVideo-@(Model.Id)-@i" data-fancybox="postImageFancybox-@Model.Id">
+                                    <video style="max-width: 100%; width: 100%; object-fit: cover; height: 150px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                        @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                    </video>
+                                </a>
+
+                                <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-@i" style="display:none;">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </div>
+                        </div>
+                    }
+                    else if (Model.Attachments[i].ToLower().EndsWith(".pdf"))
+                    {
+
+                        var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, Model.Attachments[i]);
+
+                        <div id="postPdfContainer-@Model.Id-@i" class="col-6 px-2">
+                            <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                                <div class="row">
+                                    <div class="col-9 p-0 factoryFeedPdfBGMedium" style="background-color: #E6E6E6"></div>
+                                    <div class="col-3 p-0">
+                                        <div class="pdfTriangleMedium"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 p-0 factoryFeedPdfBGMedium" style="text-align: center">
+                                        <img class="factoryFeedPdfLogoMedium" src="/images/logo-green.png" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 factoryFeedPdfBottomSectionMedium">
+                                        PDF
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Attachments[i]);
+                        <div class="col-6" style="height: 150px;">
+                            <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                                <div id="postImageContainer-@Model.Id-@i">
+                                    <img class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 150px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                                </div>
+                            </a>
+                        </div>
+                    }
+                }
+            </div>
+        }
+        else if (Model.Attachments.Count == 3)
+        {
+            <br />
+            <div class="row">
+                @if (Model.Attachments[0].ToLower().EndsWith(".mp4") || Model.Attachments[0].ToLower().EndsWith(".mov"))
+                {
+                    var videoUrl = Model.Attachments[0];
+
+                    if (!Model.Attachments[0].ToLower().StartsWith("https:"))
+                    {
+                        videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Attachments[0]);
+                    }
+
+                    <div class="col-8" style="height: 250px;">
+                        <div id="postVideoContainer-@Model.Id-0">
+                            <a href="#postVideo-@(Model.Id)-0" data-fancybox="postImageFancybox-@Model.Id">
+                                <video style="max-width: 100%; width: 100%; object-fit: cover; height: 250px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </a>
+
+                            <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-0" style="display:none;">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                            </video>
+                        </div>
+                    </div>
+                }
+                else if (Model.Attachments[0].ToLower().EndsWith(".pdf"))
+                {
+
+                    var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, Model.Attachments[0]);
+
+                    <div id="postPdfContainer-@Model.Id-0" class="col-8 pt-0 pb-3 px-3">
+                        <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                            <div class="row">
+                                <div class="col-9 p-0 factoryFeedPdfBG" style="background-color: #E6E6E6"></div>
+                                <div class="col-3 p-0">
+                                    <div class="pdfTriangle"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 p-0 factoryFeedPdfBG" style="text-align: center">
+                                    <img class="factoryFeedPdfLogo" src="/images/logo-green.png" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 factoryFeedPdfBottomSection">
+                                    PDF
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Attachments[0]);
+                    <div class="col-8" style="height: 250px;">
+                        <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                            <div id="postImageContainer-@Model.Id-0">
+                                <img class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 250px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                            </div>
+                        </a>
+                    </div>
+                }
+                <div class="col-4" style="height: 250px;">
+                    @if (Model.Attachments[1].ToLower().EndsWith(".mp4") || Model.Attachments[1].ToLower().EndsWith(".mov"))
+                    {
+                        var videoUrl = Model.Attachments[1];
+
+                        if (!Model.Attachments[1].ToLower().StartsWith("https:"))
+                        {
+                            videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Attachments[1]);
+                        }
+
+                        <div id="postVideoContainer-@Model.Id-1" class="mb-1">
+                            <a href="#postVideo-@(Model.Id)-1" data-fancybox="postImageFancybox-@Model.Id">
+                                <video style="max-width: 100%; width: 100%; object-fit: cover; height: 123px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </a>
+
+                            <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-1" style="display:none;">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                            </video>
+                        </div>
+                    }
+                    else if (Model.Attachments[1].ToLower().EndsWith(".pdf"))
+                    {
+
+                        var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, Model.Attachments[1]);
+
+                        <div id="postPdfContainer-@Model.Id-1" class="pt-0 pb-1 px-2">
+                            <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                                <div class="row">
+                                    <div class="col-9 p-0 factoryFeedPdfBGSmall" style="background-color: #E6E6E6"></div>
+                                    <div class="col-3 p-0">
+                                        <div class="pdfTriangleSmall"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 p-0 factoryFeedPdfBGSmall" style="text-align: center">
+                                        <img class="factoryFeedPdfLogoSmall" src="/images/logo-green.png" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 factoryFeedPdfBottomSectionSmall">
+                                        PDF
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Attachments[1]);
+                        <div id="postImageContainer-@Model.Id-1" class="mb-1">
+                            <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                                <img class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 123px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                            </a>
+                        </div>
+                    }
+                    @if (Model.Attachments[2].ToLower().EndsWith(".mp4") || Model.Attachments[2].ToLower().EndsWith(".mov"))
+                    {
+                        var videoUrl = Model.Attachments[2];
+
+                        if (!Model.Attachments[2].ToLower().StartsWith("https:"))
+                        {
+                            videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Attachments[2]);
+                        }
+
+                        <div id="postVideoContainer-@Model.Id-2">
+                            <a href="#postVideo-@(Model.Id)-2" data-fancybox="postImageFancybox-@Model.Id">
+                                <video style="max-width: 100%; width: 100%; object-fit: cover; height: 123px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </a>
+
+                            <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-2" style="display:none;">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                            </video>
+                        </div>
+                    }
+                    else if (Model.Attachments[2].ToLower().EndsWith(".pdf"))
+                    {
+
+                        var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, Model.Attachments[2]);
+
+                        <div id="postPdfContainer-@Model.Id-2" class="px-2 pb-0 pt-1">
+                            <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                                <div class="row">
+                                    <div class="col-9 p-0 factoryFeedPdfBGSmall" style="background-color: #E6E6E6"></div>
+                                    <div class="col-3 p-0">
+                                        <div class="pdfTriangleSmall"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 p-0 factoryFeedPdfBGSmall" style="text-align: center">
+                                        <img class="factoryFeedPdfLogoSmall" src="/images/logo-green.png" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 factoryFeedPdfBottomSectionSmall">
+                                        PDF
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Attachments[2]);
+                        <div id="postImageContainer-@Model.Id-2">
+                            <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                                <img class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 123px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else if (Model.Attachments.Count > 3)
+        {
+            <br />
+            <div class="row">
+                @if (Model.Attachments[0].ToLower().EndsWith(".mp4") || Model.Attachments[0].ToLower().EndsWith(".mov"))
+                {
+                    var videoUrl = Model.Attachments[0];
+
+                    if (!Model.Attachments[0].ToLower().StartsWith("https:"))
+                    {
+                        videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Attachments[0]);
+                    }
+
+                    <div class="col-8" style="height: 250px;">
+                        <div id="postVideoContainer-@Model.Id-0">
+                            <a href="#postVideo-@(Model.Id)-0" data-fancybox="postImageFancybox-@Model.Id">
+                                <video style="max-width: 100%; width: 100%; object-fit: cover; height: 250px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </a>
+
+                            <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-0" style="display:none;">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                            </video>
+                        </div>
+                    </div>
+                }
+                else if (Model.Attachments[0].ToLower().EndsWith(".pdf"))
+                {
+
+                    var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, Model.Attachments[0]);
+
+                    <div id="postPdfContainer-@Model.Id-0" class="col-8 pt-0 pb-3 px-3">
+                        <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                            <div class="row">
+                                <div class="col-9 p-0 factoryFeedPdfBG" style="background-color: #E6E6E6"></div>
+                                <div class="col-3 p-0">
+                                    <div class="pdfTriangle"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 p-0 factoryFeedPdfBG" style="text-align: center">
+                                    <img class="factoryFeedPdfLogo" src="/images/logo-green.png" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 factoryFeedPdfBottomSection">
+                                    PDF
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Attachments[0]);
+                    <div class="col-8" style="height: 250px;">
+                        <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                            <div id="postImageContainer-@Model.Id-0">
+                                <img class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 250px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                            </div>
+                        </a>
+                    </div>
+                }
+                <div class="col-4" style="height: 250px;">
+                    @if (Model.Attachments[1].ToLower().EndsWith(".mp4") || Model.Attachments[1].ToLower().EndsWith(".mov"))
+                    {
+                        var videoUrl = Model.Attachments[1];
+
+                        if (!Model.Attachments[1].ToLower().StartsWith("https:"))
+                        {
+                            videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Attachments[1]);
+                        }
+
+                        <div id="postVideoContainer-@Model.Id-1" class="">
+                            <a href="#postVideo-@(Model.Id)-1" data-fancybox="postImageFancybox-@Model.Id">
+                                <video style="max-width: 100%; width: 100%; object-fit: cover; height: 123px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </a>
+
+                            <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-1" style="display:none;">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                            </video>
+                        </div>
+                    }
+                    else if (Model.Attachments[1].ToLower().EndsWith(".pdf"))
+                    {
+
+                        var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, Model.Attachments[1]);
+
+                        <div id="postPdfContainer-@Model.Id-1" class="pt-0 pb-1 px-2">
+                            <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                                <div class="row">
+                                    <div class="col-9 p-0 factoryFeedPdfBGSmall" style="background-color: #E6E6E6"></div>
+                                    <div class="col-3 p-0">
+                                        <div class="pdfTriangleSmall"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 p-0 factoryFeedPdfBGSmall" style="text-align: center">
+                                        <img class="factoryFeedPdfLogoSmall" src="/images/logo-green.png" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 factoryFeedPdfBottomSectionSmall">
+                                        PDF
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Attachments[1]);
+                        <div id="postImageContainer-@Model.Id-1" class="mb-1">
+                            <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                                <img class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 123px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                            </a>
+                        </div>
+                    }
+                    @if (Model.Attachments[2].ToLower().EndsWith(".mp4") || Model.Attachments[2].ToLower().EndsWith(".mov"))
+                    {
+                        var videoUrl = Model.Attachments[2];
+
+                        if (!Model.Attachments[2].ToLower().StartsWith("https:"))
+                        {
+                            videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Attachments[2]);
+                        }
+
+                        <div id="postVideoContainer-@Model.Id-2" style="position: relative">
+                            <a href="#postVideo-@(Model.Id)-2" data-fancybox="postImageFancybox-@Model.Id">
+                                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; color: white; font-size: 36px; font-weight: 800; z-index: 2; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,.5)">
+                                    +@(Model.Attachments.Count-3)
+                                </div>
+                                <video style="max-width: 100%; width: 100%; object-fit: cover; height: 123px" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </a>
+
+                            <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-2" style="display:none;">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                            </video>
+                        </div>
+                    }
+                    else if (Model.Attachments[2].ToLower().EndsWith(".pdf"))
+                    {
+
+                        var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, Model.Attachments[2]);
+
+                        <div id="postPdfContainer-@Model.Id-2" class="px-2 pb-0 pt-1" style="position: relative">
+                            <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe", "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; color: white; font-size: 36px; font-weight: 800; z-index: 2; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,.5)">
+                                    +@(Model.Attachments.Count - 3)
+                                </div>
+                                <div class="row">
+                                    <div class="col-9 p-0 factoryFeedPdfBGSmall" style="background-color: #E6E6E6"></div>
+                                    <div class="col-3 p-0">
+                                        <div class="pdfTriangleSmall"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 p-0 factoryFeedPdfBGSmall" style="text-align: center">
+                                        <img class="factoryFeedPdfLogoSmall" src="/images/logo-green.png" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 factoryFeedPdfBottomSectionSmall">
+                                        PDF
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Attachments[2]);
+                        <div id="postImageContainer-@Model.Id-2" style="position: relative">
+                            <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; color: white; font-size: 36px; font-weight: 800; z-index: 2; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,.5)">
+                                    +@(Model.Attachments.Count-3)
+                                </div>
+                                <img class="card-img w-100 d-block rounded-0" style="object-fit: cover; height: 123px" src="/images/media-loading.gif" data-src="@imageUrl" />
+                            </a>
+                        </div>
+                    }
+                </div>
+                @for (int i = 3; i < Model.Attachments.Count; i++)
+                {
+                    if (Model.Attachments[i].ToLower().EndsWith(".mp4") || Model.Attachments[i].ToLower().EndsWith(".mov"))
+                    {
+                        var videoUrl = Model.Attachments[i];
+
+                        if (!Model.Attachments[i].ToLower().StartsWith("https:"))
+                        {
+                            videoUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Attachments[i]);
+                        }
+
+                        <div id="postVideoContainer-@Model.Id-@i" style="display: none">
+                            <a href="#postVideo-@(Model.Id)-@i" data-fancybox="postImageFancybox-@Model.Id">
+                                <video style="max-width: 100%" src="/images/media-loading.mp4" data-src="@videoUrl">
+                                    @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                                </video>
+                            </a>
+
+                            <video src="/images/media-loading.mp4" data-src="@videoUrl" controls id="postVideo-@(Model.Id)-@i" style="display:none;">
+                                @(Model?.CmsLanguage.GetValue(LanguageKeys.FrameWork.BrowserNoSupporForHTML5, "Your browser doesn't support HTML5 video tag.") ?? "Your browser doesn't support HTML5 video tag.")
+                            </video>
+                        </div>
+                    }
+                    else if (Model.Attachments[i].ToLower().EndsWith(".pdf"))
+                    {
+
+                        var pdfUrl = WebApp.Helpers.MediaHelpers.GetMediaFileUrl(Model.ApplicationSettings, Model.Attachments[i]);
+
+                        <div id="postPdfContainer-@Model.Id-@i" style="display: none">
+                            <a href="/images/media-loading.gif" data-href="@pdfUrl" data-fancybox="postImageFancybox-@Model.Id" data-type="iframe" data-options='{ "type" : "iframe" , "iframe" : { "preload" : false, "css" : { "width" : "75%" } } } '>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        var imageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Attachments[i]);
+                        <div id="postImageContainer-@Model.Id-@i" style="display: none">
+                            <a href="/images/media-loading.gif" data-href="@imageUrl" data-fancybox="postImageFancybox-@Model.Id">
+                                <img class="card-img w-100 d-block rounded-0" src="/images/media-loading.gif" data-src="@imageUrl" />
+                            </a>
+                        </div>
+                    }
+                }
+            </div>
+        }
+    </div>
+}

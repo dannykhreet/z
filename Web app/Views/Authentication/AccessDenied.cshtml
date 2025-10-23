@@ -1,0 +1,21 @@
+﻿@model WebApp.ViewModels.AuthenticationViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout_auth.cshtml";
+    ViewData["Title"] = Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.LoginPageTitle, "Login Page") ?? "Login Page";
+}
+
+    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div style="width: 50%;">
+            <div class="card shadow">
+                <div class="card-header" style="height:auto;">
+                    <i class="fas fa-exclamation-circle float-right" style="font-size: 42px;color: var(--danger);"></i>
+                    <h5 class="mb-0 text-white" style="line-height: 42px;">@(Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.AccessDeniedText, "Access denied") ?? "Access denied")</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">@(Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.InsufficientRightsText, "It seems that you have insufficient rights to make use of this portal. Please contact your manager if you believe you should have access to this system.") ?? "It seems that you have insufficient rights to make use of this portal. Please contact your manager if you believe you should have access to this system.")</p>
+                    <a class="card-link" asp-controller="Authentication" asp-action="login">@(Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.ClickLoginPageLink, "Click here to navigate back to the login page") ?? "Click here to navigate back to the login page")</a>
+                </div>
+            </div>
+        </div>
+    </div>

@@ -1,0 +1,396 @@
+﻿@model PdfAssessmentTemplateViewModel
+@using WebApp.Helpers
+@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>@(Model?.CmsLanguage.GetValue(LanguageKeys.PdfAuditTemplate.Title, "Audit template") ?? "Audit template") @Model.AssessmentTemplate.Name</title>
+    <link rel="stylesheet" href="/css/pdf.css" />
+    <partial name="_pdfCss" /> @*above link doesnt work on docker for some reason*@
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/plugins/fontawesome-pro-6.5.2-web/css/all.min.css" />
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1337.0.min.js"></script>
+    <script src="/js/ezgomediafetcher.js"></script>
+
+    <style>
+        table {
+            table-layout: fixed;
+            border-collapse: separate;
+            border-spacing: 0px;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        td {
+            color: #3d3c41;
+            background-size: 100% 100%;
+            background-position-x: 0;
+            background-position-y: 0;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+
+        .overviewtext {
+            font-size: 18px;
+            padding-left: 2rem;
+            padding-top: 0.3rem;
+            padding-bottom: 0.3rem;
+            vertical-align: top;
+        }
+
+        .stepstext {
+        }
+
+        .informationtext {
+            vertical-align: top;
+            padding-left: 1rem;
+        }
+
+        .overlaytop {
+            position: absolute;
+            padding: 0px;
+            margin: 0px;
+            top: 0;
+            left: 0;
+            width: 3em;
+            height: 3em;
+            line-height: 3em;
+            vertical-align: middle;
+            text-align: center;
+            background: #00ffff;
+            color: white;
+        }
+
+        .overlaybottom {
+            position: absolute;
+            padding: 0px;
+            margin: 0px;
+            left: 0;
+            bottom: 0;
+            width: 2em;
+            height: 2em;
+            line-height: 2em;
+            vertical-align: middle;
+            text-align: center;
+            background: black;
+            color: white;
+        }
+
+        .fancyshadow {
+            box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+        }
+
+        tr:nth-child(even).alternatingcolors {
+            background: #FFF
+        }
+
+        tr:nth-child(odd).alternatingcolors {
+            background: #f7f6fb
+        }
+
+        .autosize {
+            width: 1%;
+            white-space: nowrap !important;
+        }
+
+        <!-- Tags -->
+        .card {
+            position: relative;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: #ffffff;
+            background-clip: border-box;
+            border: 0 solid rgba(0, 0, 0, 0.125);
+            border-radius: 0.25rem;
+        }
+
+        .tag-card {
+            display: inline-block;
+            width: 9em;
+            color: white;
+            align-content: center;
+            align-items: center;
+        }
+
+        .tag-wrapper {
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+            display: flex;
+            height: 2.6em;
+            line-height: 1.1;
+        }
+
+        .tag-span {
+            text-align: center;
+            align-self: center;
+            display: inline-block;
+            width: 100%;
+            width: -moz-available;
+            width: -webkit-fill-available;
+        }
+
+        .nav-icon {
+            float: left;
+            display: inline-block;
+        }
+
+        .card {
+            box-shadow: none;
+            border-radius: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <partial name="_header.cshtml" model="@("ASSESSMENT TEMPLATE")" />
+    <!-- Root table with one td -->
+    <table style="width: 100%; height: 100%;">
+        <!-- Root tr with one td -->
+        <tr>
+            <!-- Root td -->
+            <td style="padding: 1rem">
+                <!-- Overview section -->
+                <table style="width: 100%; height: auto; margin-bottom: 1rem; page-break-inside: avoid;">
+                    @{
+                        var pictureUrl = Constants.General.ImageUnavailableUrl;
+                        if (!string.IsNullOrEmpty(Model.AssessmentTemplate.Picture))
+                        {
+                            pictureUrl = MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.AssessmentTemplate.Picture);
+                        }
+                        <!-- Overview image and title -->
+                        <tr style="width: 100%">
+                            <td rowspan=6 colspan=2 style="vertical-align: top; padding-top: 1rem">
+                                <div class="imageWrapper" @*style="max-height: 300px"*@>
+                                    <img data-src="@pictureUrl" @*style="width: 100%; object-fit: cover; object-position: center; max-height: 300px"*@ />
+                                </div>
+                            </td>
+                            <td colspan=2 class="overviewtext" style="text-transform: uppercase; font-size: 27px; padding-top: 2rem; padding-bottom: 1rem; padding-left: 2rem"><strong style="color: #00ffff">@Model.AssessmentTemplate.Name</strong></td>
+                        </tr>
+                    }
+                    <!-- Overview ID -->
+                    <tr>
+                        <td class="overviewtext"><strong>@(Model?.CmsLanguage.GetValue(LanguageKeys.PdfAssessment.TemplateId, "Assessment template id:") ?? "Assessment template id:") </strong></td>
+                        <td style="font-size: 18px; vertical-align: top">@Model.AssessmentTemplate.Id</td>
+                    </tr>
+                    <!-- Overview Signature(s) -->
+                    <tr>
+                        <td class="overviewtext"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditTemplate.Signatures, "Signature(s)") ?? "Signature(s)"): </strong></td>
+                        <td style="font-size: 18px; vertical-align: top;">
+                            @if (@Model.AssessmentTemplate.SignatureType == EZGO.Api.Models.Enumerations.RequiredSignatureTypeEnum.TwoSignatureRequired)
+                            {<span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.OptionTwoSignature, "Two signatures") ?? "Two signatures")</span> }
+                            else if (@Model.AssessmentTemplate.SignatureType == EZGO.Api.Models.Enumerations.RequiredSignatureTypeEnum.OneSignatureRequired)
+                            { <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.OptionOneSignature, "One signature") ?? "One signature")</span> }
+                            else
+                            { <span>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.OptionNone, "None") ?? "None")</span>}
+                        </td>
+                    </tr>
+
+                    <!-- Overview areas -->
+                    <tr>
+                        <td class="overviewtext" style="vertical-align: top !important"><strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.PdfAuditTemplate.Areas, "Areas") ?? "Areas"): </strong></td>
+                        <td style="font-size: 18px; vertical-align: top !important">@Model.AssessmentArea.FullDisplayName</td>
+                    </tr>
+                </table>
+                <!-- Tags section -->
+                @if (Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null &&
+                     Model.ApplicationSettings.Features.TagsEnabled.HasValue && Model.ApplicationSettings.Features.TagsEnabled.Value &&
+                     Model.AssessmentTemplate.Tags != null)
+                {
+                    foreach (var tag in Model.AssessmentTemplate.Tags)
+                    {
+                        <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; margin: 0.25rem">
+                            <div class="tag-wrapper" style="">
+                                <i style="margin-top: auto; margin-bottom: auto; margin-left: 0.5rem; margin-right: 0px" class="nav-icon my-auto ml-2 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                <span style="margin-top: auto; margin-bottom: auto; margin-right: 0.5rem" class="my-auto mr-2 tag-span">@tag.Name</span>
+                            </div>
+                        </div>
+                    }
+                }
+                <!-- Steps section -->
+                @if (Model?.AssessmentTemplate.SkillInstructions != null)
+                {
+                    @foreach (var skillInstruction in Model.AssessmentTemplate.SkillInstructions)
+                    {
+                        <!-- Root steps table -->
+                        <!-- Removing "page-break-inside: avoid" from this table would reintroduce the white space bug, so dont remove this css style! -->
+                        <table style="width: 100%; height: 100%; margin-top: 1rem; margin-right: 1rem; page-break-inside: avoid" class="fancyshadow">
+                        @if(Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null &&
+                            Model.ApplicationSettings.Features.TagsEnabled.HasValue && Model.ApplicationSettings.Features.TagsEnabled.Value &&
+                            skillInstruction.Tags != null)
+                        {
+                            <tr>
+                                <td>
+                                    @foreach (var tag in skillInstruction.Tags)
+                                    {
+                                        <div class="card column m-1 tag-card" style="background-color: @tag.ColorCode; margin: 0.25rem; max-width: 20%">
+                                            <div class="tag-wrapper" style="">
+                                                <i style="margin-top: auto; margin-bottom: auto; margin-left: 0.5rem; margin-right: 0px" class="nav-icon my-auto ml-2 mr-0 @(!String.IsNullOrEmpty(tag.IconStyle) ? "fa-" + tag.IconStyle : "fa-solid") @(!String.IsNullOrEmpty(tag.IconName) ? "fa-" + tag.IconName : "fa-question")"></i>
+                                                <span style="margin-top: auto; margin-bottom: auto; margin-right: 0.5rem" class="my-auto mr-2 tag-span">@tag.Name</span>
+                                            </div>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                            <tr>
+                                <td>
+                                    @{
+                                        string mediaImageUrl = Constants.General.ImageUnavailableUrl;
+                                        if (!string.IsNullOrEmpty(skillInstruction.Picture))
+                                        {
+                                            mediaImageUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, skillInstruction.Picture);
+                                        }
+                                        <!-- Steps table -->
+                                        <table style="width: 100%; height: 100%; padding: 1rem 0rem 1rem 1rem; page-break-inside: avoid">
+                                            <tr>
+                                                <!-- Step image and number overlay-->
+                                                <td rowspan=4 style="position: relative; width: 28%; background: #F7F7F7; vertical-align: top;">
+                                                    <div class="imageWrapper" @*style="max-height: 200px"*@>
+                                                        <img class="background-image" data-src="@mediaImageUrl" @*style="width: 100%; object-fit: cover; object-position: center; max-height: 200px"*@ />
+                                                    </div>
+                                                    <div class="overlaytop"><h1 style="margin: 0; padding: 0">@(Model.AssessmentTemplate.SkillInstructions.IndexOf(skillInstruction) + 1)</h1></div>
+                                                </td>
+                                                <!-- Step title-->
+                                                <td colspan=2 class="stepstext" style="font-size: 20px; padding-left: 1rem; padding-right: 1rem; padding-bottom: 1rem"><strong style="color: #00ffff">@skillInstruction.Name</strong></td>
+                                                
+                                            </tr>
+                                            <tr>
+                                                <!-- Step description -->
+                                                <td rowspan=2 colspan=2 class="stepstext" style="font-size: 15px; padding-left: 1rem; padding-right: 1rem; padding-bottom: 1rem; text-overflow: ellipsis"> @skillInstruction.Description</td>
+                                            </tr>
+                                        </table>
+                                        <!-- Steps instructions -->
+                                        @if (skillInstruction.InstructionItems?.Count > 0)
+                                        {
+                                            <!-- Steps instructions table -->
+                                            <table style="background-color: #F7F7F7; width: 100%; border-spacing: 1rem; page-break-inside: avoid">
+                                                @for (int i = 0; i < skillInstruction.InstructionItems.Count; i += 2)
+                                                {
+                                                    var stepAUrl = Constants.General.ImageUnavailableUrl;
+                                                    if (!string.IsNullOrEmpty(skillInstruction.InstructionItems[i].Picture))
+                                                    {
+                                                        stepAUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, skillInstruction.InstructionItems[i].Picture);
+                                                    }
+
+                                                    <tr>
+                                                        <!-- Step instruction image and number overlay -->
+                                                        <td style="width: 20%; height: 5rem; vertical-align: top; position: relative; background: #F7F7F7">
+                                                            <div style="position: relative;">
+                                                                <div class="imageWrapper" @*style="max-height: 150px;"*@>
+                                                                    <img class="background-image" data-src="@stepAUrl" @*style="width: 100%; object-fit: cover; object-position: center; max-height: 150px; vertical-align: bottom"*@ />
+                                                                </div>
+                                                                <div class="overlaybottom"><h3 style="margin: 0; padding: 0;">@(i + 1)</h3></div>
+                                                            </div>
+                                                        </td>
+                                                        <!-- Step instruction description -->
+                                                        <td style="width: 30%; height: 5rem; font-size: 15px; vertical-align: top; text-overflow: ellipsis" class="stepstext">@skillInstruction.InstructionItems[i].Description</td>
+
+                                                        <!-- Render two instructions per for loop -->
+                                                        @if (i < skillInstruction.InstructionItems.Count - 1)
+                                                        {
+                                                            var stepBUrl = Constants.General.ImageUnavailableUrl;
+                                                            if (!string.IsNullOrEmpty(skillInstruction.InstructionItems[i + 1].Picture))
+                                                            {
+                                                                stepBUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, skillInstruction.InstructionItems[i + 1].Picture);
+                                                            }
+                                                            <!-- Step instruction B image and number overlay -->
+                                                            <td style="width: 20%; height: 5rem; vertical-align: top; position: relative; background: #F7F7F7 ">
+                                                                <div style="position: relative;">
+                                                                    <div class="imageWrapper" @*style="max-height: 150px;"*@>
+                                                                        <img class="background-image" data-src="@stepBUrl" @*style="width: 100%; object-fit: cover; object-position: center; max-height: 150px; vertical-align: bottom"*@ />
+                                                                    </div>
+                                                                        <div class="overlaybottom"><h3 style="margin: 0; padding: 0;">@(i + 2)</h3></div>
+                                                                    </div>
+                                                            </td>
+                                                            <!-- Step instruction B description -->
+                                                            <td style="width: 30%; height: 5rem; font-size: 15px; vertical-align: top; text-overflow: ellipsis" class="stepstext">@skillInstruction.InstructionItems[i + 1].Description</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td style="width: 20%; height: 5rem "></td>
+                                                            <td style="width: 30%; height: 5rem; font-size: 15px"></td>
+                                                        }
+                                                    </tr>
+                                                }
+                                            </table>
+                                        }
+
+                                    }
+                                </td>
+                            </tr>
+                        </table>
+                    }
+                }
+
+            </td>
+        </tr>
+    </table>
+    <partial name="_footer.cshtml" model="@("#00ffff")" />
+
+    <script>
+        var assessmentImgs = document.images,
+            assessmentImgsLength = assessmentImgs.length,
+            assessmentImgsCounter = 0,
+            assessmentImgsLoaded = false,
+            assessmentImgsCheckerInterval = null;
+
+        $(assessmentImgs).each(function(index, img) {
+            if (img.complete && $(img).attr('src') != undefined && ($(img).attr('src').includes('normal_unavailable_image.png') || $(img).attr('src').startsWith('blob:')))
+            {
+                incrementCounter();
+            }
+            else
+            {
+                console.log(img);
+                console.log(img.complete);
+                img.addEventListener('load', incrementCounter, false);
+            }
+        })
+
+        function incrementCounter() {
+            assessmentImgsCounter++;
+            if (assessmentImgsCounter === assessmentImgsLength) {
+                assessmentImgsLoaded = true
+            }
+        }
+
+        function checkAssessmentImgsLoaded() {
+            if (!assessmentImgsLoaded) {
+                //do nothing
+                console.log("waiting for images to load");
+            }
+            else {
+                clearInterval(assessmentImgsCheckerInterval);
+                setTimeout(() => {
+                    window.print();
+                });
+                setTimeout(function () { window.close(); }, 2000);
+            }
+        }
+
+        checkAssessmentImgsLoaded();
+        window.onload = function () {
+            assessmentImgsCheckerInterval = setInterval(() => {
+                checkAssessmentImgsLoaded();
+
+            }, 1000);
+        }
+
+        ezgomediafetcher.preloadImagesAndVideos();
+    </script>
+</body>
+
+</html>

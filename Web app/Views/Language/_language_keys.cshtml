@@ -1,0 +1,41 @@
+﻿@model LanguageViewModel
+
+<form asp-action="Index">
+
+    <input type="hidden" asp-for="@Model.Filter.Module" />
+    <input type="hidden" asp-for="@Model.PageTitle" />
+
+    <input type="hidden" asp-for="@Model.Language.Language" />
+    <input type="hidden" asp-for="@Model.Language.LanguageCulture" />
+    <input type="hidden" asp-for="@Model.Language.LanguageIso" />
+
+    @for (int i = 0; i < Model.Language.ResourceItems.Count; i++)
+    {
+        <input type="hidden" asp-for="Language.ResourceItems[i].Locale" value="@Model.Language.LanguageCulture" />
+        <input type="hidden" asp-for="Language.ResourceItems[i].Guid" />
+        <input type="hidden" asp-for="Language.ResourceItems[i].ResourceKey" />
+        <input type="hidden" asp-for="Language.ResourceItems[i].Description" />
+
+        <div class="card">
+            <div class="card-header">@Model.Language.ResourceItems[i].ResourceKey</div>
+            <div class="card-body">
+                <div class="input-group input-group-sm" data-item="edit-key" data-key-id="@Model.Language.ResourceItems[i].Guid" data-locale="@Model.Language.LanguageCulture">
+
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">@Model.Language.ResourceItems[i].Description</span>
+                    </div>
+
+                    <input asp-for="Language.ResourceItems[i].ResourceValue" type="text" class="form-control" data-control="translate" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Language.TranslationPlaceholder, "translation") ?? "translation")" aria-label="Translated value" aria-describedby="button-addon4">
+
+                    <div class="input-group-append" id="button-addon4">
+                        @*<button class="btn btn-outline-secondary" onclick="save(event)" data-control="savebutton" disabled type="submit">Save</button>
+                <button class="btn btn-outline-secondary" data-control="resetbutton" disabled type="button">Reset</button>*@
+                        <button class="btn btn-outline-secondary" data-item="edit-key" data-key-id="@Model.Language.ResourceItems[i].Guid" data-locale="@Model.Language.LanguageCulture">@(Model?.CmsLanguage.GetValue(LanguageKeys.Language.BtnEdit, "Edit") ?? "Edit")</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+
+</form>
