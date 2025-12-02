@@ -1252,7 +1252,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AddOrChangeSkillTitle, "Add or Change Skill (Operational or Mandatory)") ?? "Add or Change Skill (Operational or Mandatory)")</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -1396,7 +1396,7 @@
 
             <div class="modal-footer">
                 <button id="btnDeleteUserSkill" type="button" class="btn btn-danger btn-sm" disabled>Delete</button>
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
                 <button type="button" class="btn btn-ezgo btn-sm" data-action="update" id="skill_update_matrix" disabled>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnUpdate, "Update") ?? "Update")</button>
             </div>
         </div>
@@ -1409,7 +1409,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AddOrChangeUserGroupsTitle, "Add or Change user groups") ?? "Add or Change user groups")</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-actiontype="close_modal">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" data-actiontype="close_modal">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -1540,7 +1540,7 @@
 
             <div class="modal-footer">
                 <button id="btnDeleteUserGroup" type="button" class="btn btn-danger btn-sm" disabled>Delete</button>
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
                 <button type="button" class="btn btn-ezgo btn-sm" data-action="update">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnUpdate, "Update") ?? "Update")</button>
             </div>
         </div>
@@ -1553,7 +1553,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendTitle, "Matrix legend") ?? "Matrix legend")</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -1667,7 +1667,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
             </div>
         </div>
     </div>
@@ -1679,7 +1679,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="UserSkillValuesModalTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkills, "User skills") ?? "User skills")</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -1705,7 +1705,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
             </div>
         </div>
     </div>
@@ -1717,7 +1717,7 @@
         <div class="modal-content" style="background-color: #f1f3f1">
             <div class="modal-header">
                 <h4 class="modal-title" id="ChangeSkillOrderTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ChangeSkillOrder, "Change skill order") ?? "Change skill order")</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -1758,7 +1758,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
                 <button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" id="save_indices">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.BtnSave, "Save") ?? "Save")</button>
             </div>
         </div>

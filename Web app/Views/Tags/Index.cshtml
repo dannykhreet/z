@@ -332,7 +332,7 @@
                                         id="save_tag_groups_button"
                                         class="btn btn-ezgo btn-sm"
                                         style="float:right;"
-                                        data-dismiss="modal"
+                                        data-bs-dismiss="modal"
                                         onclick="saveTagGroups()">
                                         @(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.BtnSave, "Save") ?? "Save")
                                     </button>
@@ -467,7 +467,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modal-title"></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -566,7 +566,7 @@
                 <button type="button"
                         id="delete_btn"
                         class="btn btn-danger btn-sm mr-auto"
-                        data-dismiss="modal"
+                        data-bs-dismiss="modal"
                         onclick="deleteTag()"
                         data-toggle="tooltip"
                         data-placement="bottom">
@@ -576,14 +576,14 @@
                 <button type="button"
                         id="cancel_btn"
                         class="btn btn-outline-ezgo btn-sm"
-                        data-dismiss="modal">
+                        data-bs-dismiss="modal">
                     @(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.BtnCancel, "Cancel") ?? "Cancel")
                 </button>
 
                 <button type="button"
                         id="save_tag_button"
                         class="btn btn-ezgo btn-sm"
-                        data-dismiss="modal"
+                        data-bs-dismiss="modal"
                         onclick="saveTag()">
                     @(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.BtnSave, "Save") ?? "Save")
                 </button>
@@ -1035,6 +1035,7 @@
         $('#modalAddTag').keydown(function (event) {
             if (event.keyCode == 13) {
                 $('#save_tag_button').trigger("click");
+                event.preventDefault();
             }
         })
 

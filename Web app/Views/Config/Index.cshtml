@@ -203,7 +203,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="staticBackdropLabel">@(CmsLanguage?.GetValue(LanguageKeys.Config.ButtonSetRoleNames, "Set role names") ?? "Set role names")</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -243,7 +243,7 @@
                             </ul>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary d-none" data-dismiss="modal">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonCancel, "Close") ?? "Close")</button>
+                            <button type="button" class="btn btn-secondary d-none" data-bs-dismiss="modal">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonCancel, "Close") ?? "Close")</button>
                             <button type="button" class="btn btn-ezgo" id="btn_save_roles" onclick="areaChart.saveRoles();">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonSave, "Save") ?? "Save")</button>
                         </div>
                     </div>
@@ -255,7 +255,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modal_addchange_title">@(CmsLanguage?.GetValue(LanguageKeys.Config.AreaModalTitleText, "Area") ?? "Area")</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -308,7 +308,7 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" id="modal_addchange_area_cancel_button" class="btn btn-outline btn-sm" data-dismiss="modal">@(CmsLanguage?.GetValue(LanguageKeys.Config.AreaModalCancelButton, "Cancel") ?? "Cancel")</button>
+                            <button type="button" id="modal_addchange_area_cancel_button" class="btn btn-outline btn-sm" data-bs-dismiss="modal">@(CmsLanguage?.GetValue(LanguageKeys.Config.AreaModalCancelButton, "Cancel") ?? "Cancel")</button>
                             <button id="modal_addchange_area_save_button" type="button" class="btn btn-ezgo btn-sm @(Model.DisableMutateArea ? "disabled" : "")" data-actiontype="change">@(CmsLanguage?.GetValue(LanguageKeys.Config.AreaModalSaveButton, "Save") ?? "Save")</button>
                         </div>
                     </div>
@@ -326,7 +326,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modal_details_title">@(CmsLanguage?.GetValue(LanguageKeys.Config.AreaDetailsModalTitle, "Details") ?? "Details")</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -380,7 +380,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modal_remove_title">@(CmsLanguage?.GetValue(LanguageKeys.Config.AreaModalTitleText, "Area") ?? "Area")</</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -389,7 +389,7 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" id="modal_remove_area_cancel_button" class="btn btn-outline btn-sm" data-dismiss="modal">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonCancel, "Cancel") ?? "Cancel")</button>
+                            <button type="button" id="modal_remove_area_cancel_button" class="btn btn-outline btn-sm" data-bs-dismiss="modal">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonCancel, "Cancel") ?? "Cancel")</button>
                             <button id="modal_remove_area_button" type="button" class="btn btn-danger btn-sm @(Model.DisableMutateArea ? "disabled" : "")" data-actiontype="delete">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonRemove, "Remove") ?? "Remove")</button>
                         </div>
                     </div>
@@ -397,7 +397,7 @@
             </div>
 
             <!-- Right Column (Main Content Area) -->
-            <div class="col-10 right-column full-height">
+            <div id="configurationContainer" class="col-10 right-column full-height">
 
                 <div id="main-content-area" class="main-content-area">
                     @await Html.PartialAsync("_workingareas_chart")

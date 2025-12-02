@@ -68,7 +68,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="staticBackdropLabel">@(CmsLanguage?.GetValue(LanguageKeys.Config.ButtonAddShift, "Add shift") ?? "Add shift")</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -103,8 +103,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-danger btn-wm mr-auto" id="modalRemoveShiftButton" data-dismiss="modal" data-actiontype="remove">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonRemove, "Remove") ?? "Remove")</button>
-                <button type="button" class="btn btn-outline btn-sm" data-dismiss="modal">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonCancel, "Cancel") ?? "Cancel")</button>
+                <button type="button" class="btn btn-outline-danger btn-wm mr-auto" id="modalRemoveShiftButton" data-bs-dismiss="modal" data-actiontype="remove">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonRemove, "Remove") ?? "Remove")</button>
+                <button type="button" class="btn btn-outline btn-sm" data-bs-dismiss="modal">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonCancel, "Cancel") ?? "Cancel")</button>
                 <button id="modalAddShiftButton" type="button" class="btn btn-ezgo btn-sm" data-actiontype="add">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonAdd, "Add") ?? "Add")</button>
                 <button id="modalAddAndNewShiftButton" type="button" class="btn btn-ezgo btn-sm" data-actiontype="add" data-actionsubtype="new">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonAddNew, "Add + New") ?? "Add + New")</button>
                 <button id="modalChangeShiftButton" type="button" class="btn btn-ezgo btn-sm" data-actiontype="change">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonChange, "Change") ?? "Change")</button>

@@ -45,7 +45,7 @@
                                         @(Model?.CmsLanguage.GetValue(LanguageKeys.Marketplace.ProvideValidEmailText, "Please provide a valid email address.") ?? "Please provide a valid email address.")
                                     </div>
                                     <textarea id="requestInfoDescription" class="form-control mt-2" placeholder="@(Model?.CmsLanguage.GetValue(LanguageKeys.Marketplace.CommentsPlaceholder, "Comments (optional)") ?? "Comments (optional)")" rows="4"></textarea>
-                                    <a class="btn btn-ezgo btn-block mt-2" href="#" data-target="#explain-modal" onclick="sendEmail()">@(Model?.CmsLanguage.GetValue(LanguageKeys.Marketplace.SendRequestText, "Send request") ?? "Send request")</a>
+                                    <a class="btn btn-ezgo btn-block mt-2" href="#" data-bs-target="#explain-modal" onclick="sendEmail()">@(Model?.CmsLanguage.GetValue(LanguageKeys.Marketplace.SendRequestText, "Send request") ?? "Send request")</a>
                                 </div>
                             </form>
                         </div>

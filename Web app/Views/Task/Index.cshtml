@@ -17,9 +17,6 @@
                 border: solid 1px #93c54b;
                 box-shadow: 0 .425rem .75rem rgba(0,0,0,.075) !important;
                 color: #93c54b !important;
-                transform: scale(1.010);
-                margin-left: 5px;
-                left: 5px;
             }
 
             #contentBody .results a:hover {
@@ -145,7 +142,7 @@
 
                                     <div class="input-group-append">
                                         <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
-                                        <button type="button" class="btn btn-default d-block d-xl-none" data-toggle="collapse" data-target=".collapseFilter"><i class="fas fa-filter"></i></button>
+                                        <button type="button" class="btn btn-default d-block d-xl-none" data-bs-toggle="collapse" data-bs-target=".collapseFilter"><i class="fas fa-filter"></i></button>
                                         <button type="button" class="btn btn-default d-xl-none" onclick="areaFilter_v2.reset('block'); ezgoTaskTemplatesOverview.resetFilters()" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
                                     </div>
                                 </div>
@@ -190,7 +187,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="exampleModalLongTitle">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagsFiltering, "Tags filtering") ?? "Tags filtering")</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -211,7 +208,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
             </div>
         </div>
     </div>
@@ -223,7 +220,7 @@
         <div class="modal-content" style="overflow-y: scroll">
             <div class="modal-header">
                 <h4 class="modal-title" id="exampleModalLongTitle">Filter area</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -245,7 +242,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
             </div>
         </div>
     </div>
@@ -586,8 +583,8 @@
                 });
 
                 $('#roleFilterInline').on('change', function (e) {
-                    $('#roleFilter').selectpicker('val', $('#roleFilterInline').val());
-                    $('#roleFilter').selectpicker('refresh');
+                    $('#roleFilter').val($('#roleFilterInline').val());
+                    $('#roleFilter').trigger('change');
                     $('#roleFilter').trigger('change');
                 });
 
@@ -607,8 +604,8 @@
                 });
 
                 $('#recurrenceFilterInline').on('change', function (e) {
-                    $('#recurrenceFilter').selectpicker('val', $('#recurrenceFilterInline').val());
-                    $('#recurrenceFilter').selectpicker('refresh');
+                    $('#recurrenceFilter').val($('#recurrenceFilterInline').val());
+                    $('#recurrenceFilter').trigger('change');
                     $('#recurrenceFilter').trigger('change');
                 });
 
@@ -635,8 +632,8 @@
                 });
 
                 $('#instructionFilterInline').on('change', function (e) {
-                    $('#instructionFilter').selectpicker('val', $('#instructionFilterInline').val());
-                    $('#instructionFilter').selectpicker('refresh');
+                    $('#instructionFilter').val($('#instructionFilterInline').val());
+                    $('#instructionFilter').trigger('change');
                     $('#instructionFilter').trigger('change');
                 });
 
@@ -663,8 +660,8 @@
                 });
 
                 $('#imageFilterInline').on('change', function (e) {
-                    $('#imageFilter').selectpicker('val', $('#imageFilterInline').val());
-                    $('#imageFilter').selectpicker('refresh');
+                    $('#imageFilter').val($('#imageFilterInline').val());
+                    $('#imageFilter').trigger('change');
                     $('#imageFilter').trigger('change');
                 });
 
@@ -691,8 +688,8 @@
                 });
 
                 $('#videoFilterInline').on('change', function (e) {
-                    $('#videoFilter').selectpicker('val', $('#videoFilterInline').val());
-                    $('#videoFilter').selectpicker('refresh');
+                    $('#videoFilter').val($('#videoFilterInline').val());
+                    $('#videoFilter').trigger('change');
                     $('#videoFilter').trigger('change');
                 });
             }
@@ -782,32 +779,32 @@
                     //rolesfilter init
                     if ($('#roleFilter')[0] != null) {
                         if (ezgoTaskTemplatesOverview.filters.roles != null && Object.prototype.toString.call(ezgoTaskTemplatesOverview.filters.roles) === "[object String]") {
-                            $('#roleFilter').selectpicker('val', ezgoTaskTemplatesOverview.filters.roles.split(','));
-                            $('#roleFilterInline').selectpicker('val', ezgoTaskTemplatesOverview.filters.roles.split(','));
+                            $('#roleFilter').val(ezgoTaskTemplatesOverview.filters.roles.split(','));
+                            $('#roleFilterInline').val(ezgoTaskTemplatesOverview.filters.roles.split(','));
                         }
                         else if (ezgoTaskTemplatesOverview.filters.roles != null && Array.isArray(ezgoTaskTemplatesOverview.filters.roles)) {
-                            $('#roleFilter').selectpicker('val', ezgoTaskTemplatesOverview.filters.roles);
-                            $('#roleFilterInline').selectpicker('val', ezgoTaskTemplatesOverview.filters.roles);
+                            $('#roleFilter').val(ezgoTaskTemplatesOverview.filters.roles);
+                            $('#roleFilterInline').val(ezgoTaskTemplatesOverview.filters.roles);
                         }
                     }
 
                     //instructions attached init
                     if ($("#instructionFilter")[0] != null && ezgoTaskTemplatesOverview.filters.instructionsAttached != null) {
-                        $("#instructionFilter").val(ezgoTaskTemplatesOverview.filters.instructionsAttached.toString()).selectpicker("refresh");
-                        $("#instructionFilterInline").val(ezgoTaskTemplatesOverview.filters.instructionsAttached.toString()).selectpicker("refresh");
+                        $("#instructionFilter").val(ezgoTaskTemplatesOverview.filters.instructionsAttached.toString()).trigger('change');
+                        $("#instructionFilterInline").val(ezgoTaskTemplatesOverview.filters.instructionsAttached.toString()).trigger('change');
                     }
 
                     //photo attached
                     if ($("#imageFilter")[0] != null && ezgoTaskTemplatesOverview.filters.photosAttached != null) {
-                        $("#imageFilter").val(ezgoTaskTemplatesOverview.filters.photosAttached.toString()).selectpicker("refresh");
-                        $("#imageFilterInline").val(ezgoTaskTemplatesOverview.filters.photosAttached.toString()).selectpicker("refresh");
+                        $("#imageFilter").val(ezgoTaskTemplatesOverview.filters.photosAttached.toString()).trigger('change');
+                        $("#imageFilterInline").val(ezgoTaskTemplatesOverview.filters.photosAttached.toString()).trigger('change');
                     }
 
 
                     //video attached
                     if ($("#videoFilter")[0] != null && ezgoTaskTemplatesOverview.filters.videosAttached != null) {
-                        $("#videoFilter").val(ezgoTaskTemplatesOverview.filters.videosAttached.toString()).selectpicker("refresh");
-                        $("#videoFilterInline").val(ezgoTaskTemplatesOverview.filters.videosAttached.toString()).selectpicker("refresh");
+                        $("#videoFilter").val(ezgoTaskTemplatesOverview.filters.videosAttached.toString()).trigger('change');
+                        $("#videoFilterInline").val(ezgoTaskTemplatesOverview.filters.videosAttached.toString()).trigger('change');
                     }
                 }
             }

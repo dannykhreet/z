@@ -80,7 +80,7 @@
             <!-- /.card-header -->
             <div class="card-body">
                 <div class="form-group mb-0">
-                    <select id="Resources" name="resources" class="form-control form-control-sm selectpicker" multiple data-live-search="true" title="@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsResourcesTitleUsers, "Resource Users") ?? "Resource Users")">
+                    <select id="Resources" name="resources" class="form-control form-control-sm select2" multiple  title="@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsResourcesTitleUsers, "Resource Users") ?? "Resource Users")">
                         @foreach (UserBasicModel user in Model.ResourcesUsers)
                         {
                             <option value="@user.Id">@user.Name</option>
@@ -89,7 +89,7 @@
                 </div>
                 <br />
                 <div class="form-group mb-0">
-                    <select id="ResourcesAreas" name="resourcesareas" class="form-control form-control-sm selectpicker" multiple data-live-search="true" title="@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsResourcesTitleAreas, "Resource Areas") ?? "Resource Areas")">
+                    <select id="ResourcesAreas" name="resourcesareas" class="form-control form-control-sm select2" multiple title="@(CmsLanguage?.GetValue(LanguageKeys.Action.DetailsResourcesTitleAreas, "Resource Areas") ?? "Resource Areas")">
                         @foreach (AreaBasicModel area in Model.ResourcesAreas.OrderBy(o => o.FullDisplayName).ToList())
                         {
                             <option value="@area.Id" title="@area.Name">@area.FullDisplayName</option>

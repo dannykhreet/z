@@ -38,7 +38,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modal_addchange_title">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.CompanySettingsNameTitle, "Company settings") ?? "Company settings") <span id="company_settings_title_name"></span></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -168,7 +168,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" id="cancel_companysetting_btn" class="btn btn-info btn-sm" data-dismiss="modal" data-actiontype="close">
+                <button type="button" id="cancel_companysetting_btn" class="btn btn-info btn-sm" data-bs-dismiss="modal" data-actiontype="close">
                     @(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnClose, "Close") ?? "Close")
                 </button>
             </div>
@@ -183,7 +183,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Delete Company</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -224,7 +224,7 @@
 
             <div class="modal-footer">
                 <button id="btn_delete_company" data-actiontype="confirmdelete" class="btn btn-danger btn-sm">Confirm delete</button>
-                <button type="button" id="closedelete" class="btn btn-info btn-sm" data-dismiss="modal" data-actiontype="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" id="closedelete" class="btn btn-info btn-sm" data-bs-dismiss="modal" data-actiontype="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnClose, "Close") ?? "Close")</button>
             </div>
 
             <input type="hidden" id="hidden_deletecompanyid" id="hidden_deletecompanyid" />
@@ -349,6 +349,25 @@
                                     </div>
 
                                     <div style="position:absolute; bottom:2px; right:5px; text-align:right;">
+                                        @if(company.Holding != null)
+                                        {
+                                            @if (string.IsNullOrEmpty(company.HoldingCompanySecurityGUID))
+                                            {
+                                                <i class="fas fa-exclamation-triangle" style="color: red" title="Security GUID not filled in."></i>
+                                            }
+                                            else
+                                            {
+                                                if (company.HoldingCompanySecurityGUID != company.Holding.SecurityGUID)
+                                                {
+                                                    @Html.Raw(string.Concat("(", company.HoldingCompanySecurityGUID, ") <i class=\"fas fa-exclamation-triangle\" style=\"color: orange\" title=\"Security GUID incorrect.\"></i>"))
+                                                }
+                                                else
+                                                {
+                                                    @string.Concat("(", company.HoldingCompanySecurityGUID, ")")
+                                                }
+                                            }
+                                        }
+
                                         @if (string.IsNullOrEmpty(company.Settings?.Where(x => x.ResourceId == 1).FirstOrDefault()?.Value))
                                         {
                                             <i class="fas fa-exclamation-triangle" style="color:burlywood" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.NoCompanyTimezoneAvailableTitle, "No Company TimeZone available.") ?? "No Company TimeZone available.")"></i>

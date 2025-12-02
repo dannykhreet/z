@@ -78,7 +78,7 @@
                         var colorCalculator = (WebApp.Logic.Interfaces.IScoreColorCalculator)audit.ScoreColorCalculator;
 
                         <div class="card" style="box-shadow:none;margin-bottom:0px;cursor:pointer;">
-                            <div class="card-header p-0" id="headingOne" data-toggle="collapse" data-target="#@target">
+                            <div class="card-header p-0" id="headingOne" data-bs-toggle="collapse" data-bs-target="#@target">
                                 <div class="row no-gutters">
                                     <div class="col-md-12">
                                         <div class="card-body p-1 ml-3">
@@ -238,7 +238,7 @@
                                         @(Model?.CmsLanguage?.GetValue(LanguageKeys.PictureProof.PictureProofTitle, "Picture Proof") ?? "Picture Proof")
                                     </h4>
 
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
@@ -266,7 +266,7 @@
                                 </div>
 
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">Close</button>
+                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">Close</button>
                                 </div>
                             </div>
                         </div>

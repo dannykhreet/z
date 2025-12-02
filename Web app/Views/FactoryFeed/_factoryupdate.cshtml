@@ -14,11 +14,13 @@
             {
                 mediaUrl = WebApp.Helpers.MediaHelpers.GetMediaVideoUrl(Model.ApplicationSettings, Model.Media.FirstOrDefault().Uri);
             }
+            Model.Media[0].Uri = mediaUrl;
         }
         else
         {
             mediaUrl = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.Media.FirstOrDefault().Uri);
         }
+        Model.Media[0].Uri = mediaUrl;
     }
 
     var username = User.Identity.Name;

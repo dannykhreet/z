@@ -24,7 +24,7 @@
             </div>
 
             <div class="col-sm-6 d-flex flex-row-reverse">
-                <button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" data-toggle="modal" data-target="#addVersionModal">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnAddNewCompany, "Add new version") ?? "Add new version")</button>
+                <button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" data-bs-toggle="modal" data-bs-target="#addVersionModal">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnAddNewCompany, "Add new version") ?? "Add new version")</button>
             </div><!-- /.col -->
         </div><!-- /.row -->
     </div><!-- /.container-fluid -->
@@ -133,7 +133,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5>Add version</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -181,7 +181,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-ezgo" onclick="versionApp.save()">Save</button>
             </div>
         </div>

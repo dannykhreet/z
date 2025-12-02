@@ -246,7 +246,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modal_day_hour_title">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.HourTitle, "Hour") ?? "Hour")</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -257,7 +257,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="cancel_holdings_btn" class="btn btn-info btn-sm" data-dismiss="modal" data-actiontype="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" id="cancel_holdings_btn" class="btn btn-info btn-sm" data-bs-dismiss="modal" data-actiontype="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.RawViewer.BtnClose, "Close") ?? "Close")</button>
             </div>
         </div>
     </div>

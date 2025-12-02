@@ -1,0 +1,10 @@
+﻿@model BaseViewModel
+@{
+
+}
+<form id="logoutForm" asp-controller="Authentication" asp-action="Logout" method="post" class="d-inline">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="nav-link btn btn-link" style="padding: 0; border: none; background: none; cursor: pointer;">
+        @(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.TopMenuLogOff, "Logoff") ?? "Logoff")
+    </button>
+</form>

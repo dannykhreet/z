@@ -32,10 +32,11 @@
             }
 
             #contentBody .card.results:hover {
+                border-top: solid 1px #93c54b;
+                border-left: solid 1px #93c54b;
+                border-right: solid 1px #93c54b;
                 box-shadow: 0 .425rem .75rem rgba(0,0,0,.075) !important;
-                transform: scale(1.010);
-                margin-left: 5px;
-                left: 5px;
+                color: #93c54b !important;
             }
 
             #contentBody .card.results a:hover {
@@ -179,7 +180,7 @@
 
                                     <div class="input-group-append">
                                         <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
-                                        <button type="button" class="btn btn-default d-block d-xl-none" data-toggle="collapse" data-target=".collapseFilter"><i class="fas fa-filter"></i></button>
+                                        <button type="button" class="btn btn-default d-block d-xl-none" data-bs-toggle="collapse" data-bs-target=".collapseFilter"><i class="fas fa-filter"></i></button>
                                         <button type="button" class="btn btn-default d-xl-none" onclick="reset3DFilters()" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
                                     </div>
                                 </div>
@@ -214,7 +215,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagsFiltering, "Tags filtering") ?? "Tags filtering")</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -235,7 +236,7 @@
             </div>
             <div class="modal-footer">
                 <button id="applyTagsFilterButton" type="button" class="btn btn-ezgo btn-sm">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ApplyButton, "Apply") ?? "Apply") </button>
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
             </div>
         </div>
     </div>
@@ -350,26 +351,26 @@
                     }
 
                     if (ezgoActionOverview.actionFilters.actionType != undefined && ezgoActionOverview.actionFilters.actionType != '') { 
-                        $('#actionTypeFilter').selectpicker('val', ezgoActionOverview.actionFilters.actionType);
-                        $('#actionTypeFilter').selectpicker('refresh');
-                        $('#actionTypeFilterInline').selectpicker('val', ezgoActionOverview.actionFilters.actionType);
-                        $('#actionTypeFilterInline').selectpicker('refresh');
+                        $('#actionTypeFilter').val(ezgoActionOverview.actionFilters.actionType);
+                        $('#actionTypeFilter').trigger('change');
+                        $('#actionTypeFilterInline').val(ezgoActionOverview.actionFilters.actionType);
+                        $('#actionTypeFilterInline').trigger('change');
                     }
 
                     //add involvement filter
                     if (ezgoActionOverview.actionFilters.involvement != "") {
-                        $('#involvementFilter').selectpicker('val', ezgoActionOverview.actionFilters.involvement);
-                        $('#involvementFilter').selectpicker('refresh');
-                        $('#involvementFilterInline').selectpicker('val', ezgoActionOverview.actionFilters.involvement);
-                        $('#involvementFilterInline').selectpicker('refresh');
+                        $('#involvementFilter').val(ezgoActionOverview.actionFilters.involvement);
+                        $('#involvementFilter').trigger('change');
+                        $('#involvementFilterInline').val(ezgoActionOverview.actionFilters.involvement);
+                        $('#involvementFilterInline').trigger('change');
                     }
 
                     //add status filter
                     if (ezgoActionOverview.actionFilters.status != "") {
-                        $('#statusFilter').selectpicker('val', ezgoActionOverview.actionFilters.status);
-                        $('#statusFilter').selectpicker('refresh');
-                        $('#statusFilterInline').selectpicker('val', ezgoActionOverview.actionFilters.status);
-                        $('#statusFilterInline').selectpicker('refresh');
+                        $('#statusFilter').val(ezgoActionOverview.actionFilters.status);
+                        $('#statusFilter').trigger('change');
+                        $('#statusFilterInline').val(ezgoActionOverview.actionFilters.status);
+                        $('#statusFilterInline').trigger('change');
                     }
 
                     //add unviewed comments filter
@@ -378,10 +379,10 @@
                         if(ezgoActionOverview.actionFilters.hasUnviewedComments == true) {
                             unviewedCommentsValue = "unviewed";
                         }
-                        $('#unviewedCommentsFilter').selectpicker('val', unviewedCommentsValue);
-                        $('#unviewedCommentsFilter').selectpicker('refresh');
-                        $('#unviewedCommentsFilterInline').selectpicker('val', unviewedCommentsValue);
-                        $('#unviewedCommentsFilterInline').selectpicker('refresh');
+                        $('#unviewedCommentsFilter').val(unviewedCommentsValue);
+                        $('#unviewedCommentsFilter').trigger('change');
+                        $('#unviewedCommentsFilterInline').val(unviewedCommentsValue);
+                        $('#unviewedCommentsFilterInline').trigger('change');
                     }
 
                     //add resources filter
@@ -505,8 +506,8 @@
             });
 
             $('#actionTypeFilterInline').on('change', function (e) {
-                $('#actionTypeFilter').selectpicker('val', $('#actionTypeFilterInline').val());
-                $('#actionTypeFilter').selectpicker('refresh');
+                $('#actionTypeFilter').val($('#actionTypeFilterInline').val());
+                $('#actionTypeFilter').trigger('change');
                 $('#actionTypeFilter').trigger('change');
             });
 
@@ -535,8 +536,8 @@
             });
 
             $('#unviewedCommentsFilterInline').on('change', function (e) {
-                $('#unviewedCommentsFilter').selectpicker('val', $('#unviewedCommentsFilterInline').val());
-                $('#unviewedCommentsFilter').selectpicker('refresh');
+                $('#unviewedCommentsFilter').val($('#unviewedCommentsFilterInline').val());
+                $('#unviewedCommentsFilter').trigger('change');
                 $('#unviewedCommentsFilter').trigger('change');
             });
 
@@ -561,8 +562,8 @@
             });
 
             $('#statusFilterInline').on('change', function (e) {
-                $('#statusFilter').selectpicker('val', $('#statusFilterInline').val());
-                $('#statusFilter').selectpicker('refresh');
+                $('#statusFilter').val($('#statusFilterInline').val());
+                $('#statusFilter').trigger('change');
                 $('#statusFilter').trigger('change');
             });
 
@@ -587,8 +588,8 @@
             });
 
             $('#involvementFilterInline').on('change', function (e) {
-                $('#involvementFilter').selectpicker('val', $('#involvementFilterInline').val());
-                $('#involvementFilter').selectpicker('refresh');
+                $('#involvementFilter').val($('#involvementFilterInline').val());
+                $('#involvementFilter').trigger('change');
                 $('#involvementFilter').trigger('change');
             });
 
@@ -614,8 +615,8 @@
             });
 
             $('#resourceFilterInline').on('change', function (e) {
-                $('#resourceFilter').selectpicker('val', $('#resourceFilterInline').val());
-                $('#resourceFilter').selectpicker('refresh');
+                $('#resourceFilter').val($('#resourceFilterInline').val());
+                $('#resourceFilter').trigger('change');
                 $('#resourceFilter').trigger('change');
             });
 
@@ -741,14 +742,15 @@
             var strJson = '@Html.Raw(Model?.FiltersPreset ?? "")';
             if (strJson.length) {
                 var presetfilters = JSON.parse(strJson);
+                reset3DFilters();
                 if (presetfilters) {
                     for (var key in presetfilters) {
                         let presetFilterValue = presetfilters[key];
                         if (key == "actiontype") {
-                            $('#actionTypeFilter').selectpicker('val', presetFilterValue);
-                            $('#actionTypeFilter').selectpicker('refresh');
-                            $('#actionTypeFilterInline').selectpicker('val', presetFilterValue);
-                            $('#actionTypeFilterInline').selectpicker('refresh')
+                            $('#actionTypeFilter').val(presetFilterValue);
+                            $('#actionTypeFilter').trigger('change');
+                            $('#actionTypeFilterInline').val(presetFilterValue);
+                            $('#actionTypeFilterInline').trigger('change')
                             ;
                             ezgoActionOverview.actionFilters.actionType = presetFilterValue;
                             
@@ -756,19 +758,19 @@
 
                         }
                         else if(key == "actionstatus") {
-                            $('#statusFilter').selectpicker('val', presetFilterValue);
-                            $('#statusFilter').selectpicker('refresh');
-                            $('#statusFilterInline').selectpicker('val', presetFilterValue);
-                            $('#statusFilterInline').selectpicker('refresh');
+                            $('#statusFilter').val(presetFilterValue);
+                            $('#statusFilter').trigger('change');
+                            $('#statusFilterInline').val(presetFilterValue);
+                            $('#statusFilterInline').trigger('change');
 
                             ezgoActionOverview.actionFilters.status = presetFilterValue;
                         }
                         else if(key == "unviewedcomments")
                         {
-                            $('#unviewedCommentsFilter').selectpicker('val', presetFilterValue);
-                            $('#unviewedCommentsFilter').selectpicker('refresh');
-                            $('#unviewedCommentsFilterInline').selectpicker('val', presetFilterValue);
-                            $('#unviewedCommentsFilterInline').selectpicker('refresh');
+                            $('#unviewedCommentsFilter').val(presetFilterValue);
+                            $('#unviewedCommentsFilter').trigger('change');
+                            $('#unviewedCommentsFilterInline').val(presetFilterValue);
+                            $('#unviewedCommentsFilterInline').trigger('change');
 
                             if (presetFilterValue == "unviewed") {
                                 ezgoActionOverview.actionFilters.hasUnviewedComments = true;
@@ -776,6 +778,15 @@
                             else {
                                 ezgoActionOverview.actionFilters.hasUnviewedComments = null;
                             }
+                        }
+                        else if(key == "involvement") {
+                            //available values "all", "started", "involved", "my"
+                            $('#involvementFilter').val(presetFilterValue);
+                            $('#involvementFilter').trigger('change');
+                            $('#involvementFilterInline').val(presetFilterValue);
+                            $('#involvementFilterInline').trigger('change');
+
+                            ezgoActionOverview.actionFilters.involvement = presetFilterValue;
                         }
                     }
                     
@@ -1101,10 +1112,10 @@
             $('#dueDateFilter').val('');
 
             //reset type filter
-            $('#actionTypeFilter').selectpicker('val', 'action');
-            $('#actionTypeFilter').selectpicker('refresh');
-            $('#actionTypeFilterInline').selectpicker('val', 'action');
-            $('#actionTypeFilterInline').selectpicker('refresh');
+            $('#actionTypeFilter').val('action');
+            $('#actionTypeFilter').trigger('change');
+            $('#actionTypeFilterInline').val('action');
+            $('#actionTypeFilterInline').trigger('change');
 
             //reset text filter
             $('#actionSearchBox').val('');
@@ -1115,28 +1126,28 @@
             });
 
             //reset status filter
-            $('#statusFilter').selectpicker('val', []);
-            $('#statusFilter').selectpicker('refresh');
-            $('#statusFilterInline').selectpicker('val', []);
-            $('#statusFilterInline').selectpicker('refresh');
+            $('#statusFilter').val([]);
+            $('#statusFilter').trigger('change');
+            $('#statusFilterInline').val([]);
+            $('#statusFilterInline').trigger('change');
 
             //reset involvement filter
-            $('#involvementFilter').selectpicker('val', 'all');
-            $('#involvementFilter').selectpicker('refresh');
-            $('#involvementFilterInline').selectpicker('val', 'all');
-            $('#involvementFilterInline').selectpicker('refresh');
+            $('#involvementFilter').val('all');
+            $('#involvementFilter').trigger('change');
+            $('#involvementFilterInline').val('all');
+            $('#involvementFilterInline').trigger('change');
 
             //reset resources filter
-            $('#resourceFilter').selectpicker('val', []);
-            $('#resourceFilter').selectpicker('refresh');
-            $('#resourceFilterInline').selectpicker('val', []);
-            $('#resourceFilterInline').selectpicker('refresh');
+            $('#resourceFilter').val([]);
+            $('#resourceFilter').trigger('change');
+            $('#resourceFilterInline').val([]);
+            $('#resourceFilterInline').trigger('change');
 
             //reset has unviewed comments filter
-            $('#unviewedCommentsFilter').selectpicker('val', '');
-            $('#unviewedCommentsFilter').selectpicker('refresh');
-            $('#unviewedCommentsFilterInline').selectpicker('val', '');
-            $('#unviewedCommentsFilterInline').selectpicker('refresh');
+            $('#unviewedCommentsFilter').val('');
+            $('#unviewedCommentsFilter').trigger('change');
+            $('#unviewedCommentsFilterInline').val('');
+            $('#unviewedCommentsFilterInline').trigger('change');
 
             $('#parentAreaFilter').show();
             
@@ -1174,21 +1185,21 @@
                 //involvement
                 $('#involvementFilterContainer').hide();
                 ezgoActionOverview.actionFilters.involvement = "";
-                $('#involvementFilter').selectpicker('val', 'all');
-                $('#involvementFilter').selectpicker('refresh');
+                $('#involvementFilter').val('all');
+                $('#involvementFilter').trigger('change');
 
                 //comment status
                 $('#unviewedCommentsFilterContainer').hide();
                 ezgoActionOverview.actionFilters.hasUnviewedComments = null;
-                $('#unviewedCommentsFilter').selectpicker('val', '');
-                $('#unviewedCommentsFilter').selectpicker('refresh');
+                $('#unviewedCommentsFilter').val('');
+                $('#unviewedCommentsFilter').trigger('change');
 
                 //resources
                 $('#resourceFilterContainer').hide();
                 ezgoActionOverview.actionFilters.assignedUserIds = [];
                 ezgoActionOverview.actionFilters.assignedAreaIds = [];
-                $('#resourceFilter').selectpicker('val', []);
-                $('#resourceFilter').selectpicker('refresh');
+                $('#resourceFilter').val([]);
+                $('#resourceFilter').trigger('change');
 
                 //resolutiondate
                 $('#resolutionDateFilterContainer').hide();
@@ -1203,8 +1214,8 @@
                 //status
                 $('#statusFilterContainer').hide();
                 ezgoActionOverview.actionFilters.status = [];
-                $('#statusFilter').selectpicker('val', []);
-                $('#statusFilter').selectpicker('refresh');
+                $('#statusFilter').val([]);
+                $('#statusFilter').trigger('change');
 
 
                 var tree = $('#areatree');
@@ -1264,7 +1275,7 @@
                 $(this).val(filterarray);
 
                 // Then refresh
-                $(this).selectpicker("refresh");
+                $(this).trigger('change');
             });
 
             // reflect found number in counter

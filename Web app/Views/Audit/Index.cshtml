@@ -16,9 +16,6 @@
                 border: solid 1px #93c54b;
                 box-shadow: 0 .425rem .75rem rgba(0,0,0,.075) !important;
                 color: #93c54b !important;
-                transform: scale(1.010);
-                margin-left: 5px;
-                left: 5px;
             }
 
             #contentBody .results a:hover {
@@ -140,7 +137,7 @@
 
                                     <div class="input-group-append">
                                         <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
-                                        <button type="button" class="btn btn-default d-block d-xl-none" data-toggle="collapse" data-target=".collapseFilter"><i class="fas fa-filter"></i></button>
+                                        <button type="button" class="btn btn-default d-block d-xl-none" data-bs-toggle="collapse" data-bs-target=".collapseFilter"><i class="fas fa-filter"></i></button>
                                         <button type="button" class="btn btn-default d-xl-none" onclick="areaFilter_v2.reset('block'); ezgoAuditTemplatesOverview.resetFilters();" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
                                     </div>
                                 </div>
@@ -178,7 +175,7 @@
             <div class="modal-header">
                 <h4 class="modal-title" id="exampleModalLongTitle">@(Model.CmsLanguage?.GetValue(LanguageKeys.Tags.TagsTagsFiltering, "Tags filtering") ?? "Tags filtering")</h4>
                 
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -200,7 +197,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Audit.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Audit.BtnClose, "Close") ?? "Close")</button>
             </div>
         </div>
     </div>
@@ -213,7 +210,7 @@
             <div class="modal-header">
                 <h4 class="modal-title" id="exampleModalLongTitle">Filter area</h4>
                 
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -235,7 +232,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Audit.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Audit.BtnClose, "Close") ?? "Close")</button>
             </div>
         </div>
     </div>
@@ -588,8 +585,8 @@
                 });
 
                 $('#roleFilterInline').on('change', function (e) {
-                    $('#roleFilter').selectpicker('val', $('#roleFilterInline').val());
-                    $('#roleFilter').selectpicker('refresh');
+                    $('#roleFilter').val($('#roleFilterInline').val());
+                    $('#roleFilter').trigger('change');
                     $('#roleFilter').trigger('change');
                 });
 
@@ -616,8 +613,8 @@
                 });
 
                 $('#instructionFilterInline').on('change', function (e) {
-                    $('#instructionFilter').selectpicker('val', $('#instructionFilterInline').val());
-                    $('#instructionFilter').selectpicker('refresh');
+                    $('#instructionFilter').val($('#instructionFilterInline').val());
+                    $('#instructionFilter').trigger('change');
                     $('#instructionFilter').trigger('change');
                 });
 
@@ -644,8 +641,8 @@
                 });
 
                 $('#imageFilterInline').on('change', function (e) {
-                    $('#imageFilter').selectpicker('val', $('#imageFilterInline').val());
-                    $('#imageFilter').selectpicker('refresh');
+                    $('#imageFilter').val($('#imageFilterInline').val());
+                    $('#imageFilter').trigger('change');
                     $('#imageFilter').trigger('change');
                 });
             }
@@ -743,25 +740,25 @@
                     //rolesfilter init
                     if ($('#roleFilter')[0] != null) {
                         if (ezgoAuditTemplatesOverview.filters.roles != null && Object.prototype.toString.call(ezgoAuditTemplatesOverview.filters.roles) === "[object String]") {
-                            $('#roleFilter').selectpicker('val', ezgoAuditTemplatesOverview.filters.roles.split(','));
-                            $('#roleFilterInline').selectpicker('val', ezgoAuditTemplatesOverview.filters.roles.split(','));
+                            $('#roleFilter').val(ezgoAuditTemplatesOverview.filters.roles.split(','));
+                            $('#roleFilterInline').val(ezgoAuditTemplatesOverview.filters.roles.split(','));
                         }
                         else if (ezgoAuditTemplatesOverview.filters.roles != null && Array.isArray(ezgoAuditTemplatesOverview.filters.roles)) {
-                            $('#roleFilter').selectpicker('val', ezgoAuditTemplatesOverview.filters.roles);
-                            $('#roleFilterInline').selectpicker('val', ezgoAuditTemplatesOverview.filters.roles);
+                            $('#roleFilter').val(ezgoAuditTemplatesOverview.filters.roles);
+                            $('#roleFilterInline').val(ezgoAuditTemplatesOverview.filters.roles);
                         }
                     }
 
                     //instructions attached init
                     if ($("#instructionFilter")[0] != null && ezgoAuditTemplatesOverview.filters.instructionsAttached != null) {
-                        $("#instructionFilter").val(ezgoAuditTemplatesOverview.filters.instructionsAttached.toString()).selectpicker("refresh");
-                        $("#instructionFilterInline").val(ezgoAuditTemplatesOverview.filters.instructionsAttached.toString()).selectpicker("refresh");
+                        $("#instructionFilter").val(ezgoAuditTemplatesOverview.filters.instructionsAttached.toString()).trigger('change');
+                        $("#instructionFilterInline").val(ezgoAuditTemplatesOverview.filters.instructionsAttached.toString()).trigger('change');
                     }
 
                     //photo attached
                     if ($("#imageFilter")[0] != null && ezgoAuditTemplatesOverview.filters.photosAttached != null) {
-                        $("#imageFilter").val(ezgoAuditTemplatesOverview.filters.photosAttached.toString()).selectpicker("refresh");
-                        $("#imageFilterInline").val(ezgoAuditTemplatesOverview.filters.photosAttached.toString()).selectpicker("refresh");
+                        $("#imageFilter").val(ezgoAuditTemplatesOverview.filters.photosAttached.toString()).trigger('change');
+                        $("#imageFilterInline").val(ezgoAuditTemplatesOverview.filters.photosAttached.toString()).trigger('change');
                     }
                 }
             }

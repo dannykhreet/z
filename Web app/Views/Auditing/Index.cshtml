@@ -52,7 +52,7 @@
     }
 </style>
 
-<section class="content-header row">
+<section id="auditingheader" class="content-header row">
     <div class="container-fluid">
         <br />
 
@@ -146,9 +146,9 @@
     <div class="row">
         <div class="col-4" style="height: 100%;">
             <div class="card h-100">
-                <div class="card-header h5">Changes</div>
+                <div id="auditingchangesviewheader" class="card-header h5">Changes</div>
 
-               <div class="card-body p-0" style="height: 70vh; overflow: auto;">
+                <div id="auditingchangesview" class="card-body p-0" style="height: calc(100vh - 380px); overflow: auto;">
                     <div id="auditingOverviewList"></div>
                 </div>
             </div>
@@ -156,9 +156,9 @@
 
         <div class="col-8" style="height: 100%;">
             <div class="card h-100">
-                <div class="card-header h5">Details</div>
+                <div id="auditingdetailsviewheader" class="card-header h5">Details</div>
 
-                <div class="card-body p-0" style="height: 70vh; overflow: auto;">
+                <div id="auditingdetailsview" class="card-body p-0" style="height: calc(100vh - 380px); overflow: auto;">
                     <div id="auditingDetails">
                         <div class="pl-3">Select a change to view a detailed descritpion</div>
                     </div>
@@ -198,6 +198,9 @@
             document.getElementById('day_picker').onchange = function () {
                 auditingOverview.getNewResults();
             };
+            window.addEventListener('resize', function() {
+                auditingOverview.fixOverflowContainerHeight();
+            });
         },
 
         getNewResults: function () {
@@ -432,6 +435,18 @@
                     this.style.width = highestWidth + 'px';
                 }
             });
+        },
+
+        fixOverflowContainerHeight: function() {
+
+            let headerHeight = document.getElementById('auditingheader').offsetHeight;
+            let containerHeight = document.getElementById('configurationContainer').offsetHeight;
+
+            let changesheaderheight = document.getElementById('auditingchangesviewheader').offsetHeight;
+            let detailsheaderheight = document.getElementById('auditingdetailsviewheader').offsetHeight;
+
+            document.getElementById('auditingchangesview').setAttribute('style', `height: ${containerHeight - headerHeight - changesheaderheight - 10}px; overflow: auto`);//10px padding
+            document.getElementById('auditingdetailsview').setAttribute('style', `height: ${containerHeight - headerHeight - detailsheaderheight - 10}px; overflow: auto`);//10px padding
         }
     }
 

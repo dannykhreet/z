@@ -30,7 +30,7 @@
                 <div id="modal_openfield_message"></div>
                 <button id="btnDeleteOpenField" class="btn btn-danger btn-sm mr-auto" type="button" data-action="delete_close_open_field">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.DeleteButtonTitle, "Delete") ?? "Delete")</button>
                 <!--<button id="btnPreviousOpenField" class="btn btn-light" type="button">Previous</button>-->
-                <button type="button" class="btn btn-ezgo btn-sm" data-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.CloseButtonTitle, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-ezgo btn-sm" data-bs-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.CloseButtonTitle, "Close") ?? "Close")</button>
                 <!--<button id="btnNextOpenField" class="btn btn-light" type="button">Next</button>-->
                 <button id="btnSaveCloseOpenField" class="btn btn-ezgo btn-sm" type="button" data-action="save_and_close_open_field">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.SaveAndClodeButtonTitle, "Save and Close") ?? "Save and Close")</button>
                 <button id="btnSaveOpenField" class="btn btn-ezgo btn-sm" type="button" data-action="save_open_field">@(Model?.CmsLanguage?.GetValue(LanguageKeys.OpenFields.SaveButtonTitle, "Save") ?? "Save")</button>

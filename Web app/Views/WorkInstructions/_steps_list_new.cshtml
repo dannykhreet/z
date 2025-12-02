@@ -4,7 +4,7 @@
 }
 
 <div class="modal-header">
-    <h4 class="modal-title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ItemTitle, "Work instruction item") ?? "Work instruction item") (0/0)</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    <h4 class="modal-title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ItemTitle, "Work instruction item") ?? "Work instruction item") (0/0)</h4><button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
 </div>
 
 <div class="modal-body">
@@ -116,6 +116,6 @@
     <input type="file" style="display:none" accept=".pdf" id="workInstructionItemAttachmentPdf" />
     <button id="btnDeleteItem" class="btn btn-danger btn-sm mr-auto" data-templateid="0" type="button" onclick="ezgolist.deleteItem()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.DialogDelete, "Delete") ?? "Delete")</button>
     <button id="btnPreviousTemplate" class="btn btn-light" type="button" onclick="ezgolist.previousTemplate()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.DialogPrevItem, "previous item") ?? "previous item")</button>
-    <button class="btn btn-ezgo btn-sm" type="button" data-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.DialogClose, "Close") ?? "Close")</button>
+    <button class="btn btn-ezgo btn-sm" type="button" data-bs-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.DialogClose, "Close") ?? "Close")</button>
     <button id="btnNextTemplate" class="btn btn-light" type="button" onclick="ezgolist.nextTemplate()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.DialogNextItem, "next item") ?? "next item")</button>
 </div>

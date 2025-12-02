@@ -75,7 +75,7 @@
                                     <input type="text" placeholder="@(Model?.CmsLanguage?.GetValue(LanguageKeys.User.ListSearchTitle, "Search") ?? "Search")" class="form-control float-right" id="searchField">
 
                                     <div class="input-group-append">
-                                        <button type="button" class="btn btn-default d-block d-xl-none" data-toggle="collapse" data-target=".collapseFilter"><i class="fas fa-filter"></i></button>
+                                        <button type="button" class="btn btn-default d-block d-xl-none" data-bs-toggle="collapse" data-bs-target=".collapseFilter"><i class="fas fa-filter"></i></button>
                                         <button type="button" class="btn btn-default d-xl-none" onclick="resetFilters()" title="@(Model?.CmsLanguage?.GetValue(LanguageKeys.Filters.ResetHover, "Reset filters") ?? "Reset filters")" data-action="resetfilters"><i class="fas fa-undo"></i></button>
                                     </div>
                                 </div>
@@ -151,11 +151,11 @@
                 var filtersJson = JSON.parse(filters);
                 filterObj = filtersJson;
                 //apply filters
-                $('#roleFilter').val(filterObj.role).selectpicker('refresh');
-                $('#roleFilterInline').val(filterObj.role).selectpicker('refresh');;
+                $('#roleFilter').val(filterObj.role).trigger('change');
+                $('#roleFilterInline').val(filterObj.role).trigger('change');;
                 //scroll to scrollYPosition
                 $('#contentBody').scrollTop(filterObj.scrollYPosition);
-                var arr = $('#roleFilter').selectpicker().val();
+                var arr = $('#roleFilter').val();
                 if (arr !== undefined) {
                     var roles = arr.join(",");
                 }
@@ -191,15 +191,15 @@
                 $('#myInput').focus()
             });
 
-            $('[data-role="roleFilterInline"]').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-                $(`#roleFilter`).val($(`#roleFilterInline`).val()).selectpicker("refresh");
+            $('[data-role="roleFilterInline"]').on('change', function (e, clickedIndex, isSelected, previousValue) {
+                $(`#roleFilter`).val($(`#roleFilterInline`).val()).trigger('change');
 
-                $(`#roleFilter`).trigger('changed.bs.select');
+                $(`#roleFilter`).trigger('change');
             });
 
-            $('[data-role="roleFilter"]').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+            $('[data-role="roleFilter"]').on('change', function (e, clickedIndex, isSelected, previousValue) {
 
-                var arr = $('#roleFilter').selectpicker().val();
+                var arr = $('#roleFilter').val();
                 if (arr !== undefined) {
                     var roles = arr.join(",");
                 }
@@ -207,7 +207,7 @@
 
                 localStorage.setItem('userfilters', JSON.stringify(filterObj));
 
-                $(`#roleFilterInline`).val($(`#roleFilter`).val()).selectpicker("refresh");
+                $(`#roleFilterInline`).val($(`#roleFilter`).val()).trigger('change');
                 filter(roles);
                 var cntr = $('#contentCol .card:visible').length;
                 $('#counter').html('&nbsp;(' + cntr + ')');
@@ -224,8 +224,8 @@
         });
 
         function resetFilters() {
-            $("#roleFilter").val('default').selectpicker("refresh");
-            $("#roleFilterInline").val('default').selectpicker("refresh");
+            $("#roleFilter").val('default').trigger('change');
+            $("#roleFilterInline").val('default').trigger('change');
 
             $('#searchField').val('');
 

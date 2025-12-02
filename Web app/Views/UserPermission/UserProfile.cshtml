@@ -140,7 +140,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="staticBackdropLabel">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.ChangePassword, "Change password") ?? "Change password")</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -160,7 +160,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline btn-sm" data-dismiss="modal">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.DialogPasswordCancel, "Cancel") ?? "Cancel")</button>
+                <button type="button" class="btn btn-outline btn-sm" data-bs-dismiss="modal">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.DialogPasswordCancel, "Cancel") ?? "Cancel")</button>
                 <button id="modalChangePasswordButton" type="button" class="btn btn-ezgo btn-sm" data-actiontype="change">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.DialogPasswordSave, "Save") ?? "Save")</button>
             </div>
         </div>
@@ -172,7 +172,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="staticBackdropLabel">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.ProfileChangeButton, "Change areas") ?? "Change areas")</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -195,7 +195,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline btn-sm" data-dismiss="modal">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.DialogPasswordCancel, "Cancel") ?? "Cancel")</button>
+                <button type="button" class="btn btn-outline btn-sm" data-bs-dismiss="modal">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.DialogPasswordCancel, "Cancel") ?? "Cancel")</button>
                 <button id="modalUpdateAreasButton" type="button" class="btn btn-ezgo btn-sm" data-actiontype="change">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.Save, "Update") ?? "Update")</button>
             </div>
         </div>
@@ -207,7 +207,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="staticBackdropLabel">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.ProfileDeleteMessageTitle, "Delete user") ?? "Delete user")</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -240,7 +240,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline btn-sm" data-dismiss="modal">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.DialogPasswordCancel, "Cancel") ?? "Cancel")</button>
+                <button type="button" class="btn btn-outline btn-sm" data-bs-dismiss="modal">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.DialogPasswordCancel, "Cancel") ?? "Cancel")</button>
                 <button id="modalDeleteButton" type="button" class="btn btn-danger btn-sm" data-actiontype="delete">@(Model.CmsLanguage?.GetValue(LanguageKeys.User.Delete, "Delete") ?? "Delete")</button>
             </div>
         </div>

@@ -28,7 +28,7 @@
                 {
                     @foreach (SelectListItem type in Model.RecurrencyTypes.Items)
                     {
-                        <a class="nav-link recurrency @(type.Selected ? "active": null)" data-value="@type.Value" id="v-pills-@(type.Value)-tab" data-toggle="pill" href="#v-pills-@type.Value" role="tab" aria-controls="v-pills-@type.Value" aria-selected="@(type.Selected ? true: false)" data-actiontype="recurrencytype_change">
+                        <a class="nav-link recurrency @(type.Selected ? "active": null)" data-value="@type.Value" id="v-pills-@(type.Value)-tab" data-bs-toggle="pill" href="#v-pills-@type.Value" role="tab" aria-controls="v-pills-@type.Value" aria-selected="@(type.Selected ? true: false)" data-actiontype="recurrencytype_change">
                             @(Model._CmsLanguage?.GetValue(type.Text.ToUpperInvariant(), type.Text) ?? type.Text)
                         </a>
                     }

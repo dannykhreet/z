@@ -214,7 +214,7 @@
             var displayControls = ezgoprops._renderDisplayControls();
             var prop = $('<a id="v-pills-tab-' + property.Id + '" href="#v-pills-' + property.Id + '-' + property.FieldType + '">' + property.Name.replaceAll('(~)', 'range') + '</a>')
                 .attr('role', 'tab')
-                .attr('data-toggle', 'pill')
+                .attr('data-bs-toggle', 'pill')
                 .attr('area-selected', 'false')
                 .attr('data-propid', property.Id)
                 .addClass('nav-link');
@@ -373,7 +373,7 @@
         }) : [];
 
         var inputgroup = $('<div/>').addClass('input-group-append').attr('data-selector', 'valuesymbol');
-        var button = $('<button/>').addClass('btn btn-outline-secondary1 btn-ezgo dropdown-toggle').attr('type', 'button').attr('data-toggle', 'dropdown').attr('data-pvid', filteredProp.length > 0 ? filteredProp[0].Id : '').attr('data-element', 'symbolbutton').html(filteredProp.length > 0 ? filteredProp[0].ValueSymbol : '');
+        var button = $('<button/>').addClass('btn btn-outline-secondary1 btn-ezgo dropdown-toggle').attr('type', 'button').attr('data-bs-toggle', 'dropdown').attr('data-pvid', filteredProp.length > 0 ? filteredProp[0].Id : '').attr('data-element', 'symbolbutton').html(filteredProp.length > 0 ? filteredProp[0].ValueSymbol : '');
         var dropdown = $('<div/>').addClass('dropdown-menu');
         var singleAppend = $('<div><span class="input-group-text">' + ((property.PropertyValue !== undefined && property.PropertyValue.ValueSymbol) ? property.PropertyValue.ValueSymbol : '') + '</span></div>').attr('data-element', 'symbolbutton').attr('data-pvid', filteredProp.length > 0 ? filteredProp[0].Id : '').addClass('input-group-append');
 
@@ -430,7 +430,7 @@
 
     _renderDisplayControls: function () {
         var controls = $('<div/>');
-        var link = $('<a data-toggle="collapse" href="#{{changedisplay}}"><small>change display format</small></a>');
+        var link = $('<a data-bs-toggle="collapse" href="#{{changedisplay}}"><small>change display format</small></a>');
         var display = $('<div id="{{changedisplay}}">').addClass('form-row collapse').attr('role', 'button')
             .append(
                 $('<div/>').addClass('form-group col-md-3')
@@ -471,7 +471,7 @@
 
     _renderAddButton: function () {
         if (ezgoprops.propertiesEnabled) {
-            return $('<li/>').addClass('ui-state-default ui-state-disabled').append(
+            return $('<li/>').addClass('ui-state-sorting-disabled').append(
                 $('<div id="ph-1" style="user-select: none;" data-item="value-ph" onclick="ezgoprops.toggleValuePanel(this)">').addClass('bigbutton-plus d-flex justify-content-center text-center').append(
                     $('<div class="addvalue">')
                         .append('<i class="fa fa-plus-circle"></i>')

@@ -125,7 +125,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modal_addchange_title">@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.SettingTitle, "Setting") ?? "Setting")</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -159,7 +159,7 @@
             </div>
             <div class="modal-footer">
                 <p id="settings_validation_warning_message" style="color:red"></p>
-                <button type="button" id="cancel_settings_btn" class="btn btn-outline btn-sm" data-dismiss="modal">@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.BtnCancel, "Cancel") ?? "Cancel")</button>
+                <button type="button" id="cancel_settings_btn" class="btn btn-outline btn-sm" data-bs-dismiss="modal">@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.BtnCancel, "Cancel") ?? "Cancel")</button>
                 <button id="save_settings_btn" type="button" class="btn btn-ezgo btn-sm" data-actiontype="save">@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.BtnSave, "Save") ?? "Save")</button>
             </div>
             <input type="hidden" name="settings_id" id="settings_id" />

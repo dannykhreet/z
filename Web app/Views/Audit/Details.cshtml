@@ -338,6 +338,15 @@
     right: -2.35rem;
     left: auto;
     }
+    
+        .btn-light.disabled.active {
+            color: #fff !important;
+            background-color: #93C54B;
+            border-color: #d3d9df;
+            opacity: .65;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
 </style>
 }
 
@@ -1044,7 +1053,7 @@
                 <input type="hidden" id="currentTemplateItemStepId" />
                 <button id="btnDeleteStep" class="btn btn-danger btn-sm mr-auto" type="button" data-stepid="0" onclick="ezgolist.deleteItemStep()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.DialogDelete, "Delete") ?? "Delete")</button>
                 <button id="btnPreviousStep" class="btn btn-light" type="button" onclick="ezgolist.previousTemplateStep()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.InstructionPrevStep, "previous step") ?? "previous step")</button>
-                <button type="button" class="btn btn-ezgo btn-sm" data-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.DialogClose, "close") ?? "close")</button>
+                <button type="button" class="btn btn-ezgo btn-sm" data-bs-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.DialogClose, "close") ?? "close")</button>
                 <button id="btnNextStep" class="btn btn-light" type="button" onclick="ezgolist.nextTemplateStep()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.DialogNextStep, "next step") ?? "next step")</button>
             </div>
         </div>
@@ -1057,7 +1066,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage.GetValue(LanguageKeys.Audit.AvailableWorkInstrucitons, "Available workinstructions") ?? "Available workinstructions")</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -1069,7 +1078,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Audit.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Audit.BtnClose, "Close") ?? "Close")</button>
             </div>
         </div>
     </div>
@@ -1081,7 +1090,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="exampleModalLongTitle">QR Code</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -1094,7 +1103,7 @@
             <div class="modal-footer">
                 <a class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto" onclick="printQRCode()"><i class="fa fa-print"></i></a>
                 <button class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto" onclick="downloadQRCode()"><i class="fas fa-download"></i></button>
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
             </div>
         </div>
     </div>
@@ -1110,7 +1119,7 @@
                     <h5 class="modal-title">
                         @(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.ItemAddLinkModalTitle, "Add link to audit item") ?? "Add link to audit item")
                     </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -1121,7 +1130,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-ezgo" onclick="ezgolist.addLinkAttachmentToAuditItem()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.ItemAddLinkModalSaveChanges, "Save changes") ?? "Save changes")</button>
-                    <button type="button" class="btn btn-light" data-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.ItemAddLinkModalClose, "Close") ?? "Close")</button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Audit.ItemAddLinkModalClose, "Close") ?? "Close")</button>
                 </div>
             </div>
         </div>
@@ -1367,7 +1376,8 @@
         };
 
         $('#valueProps').sortable({
-            items: "li:not(.ui-state-disabled)"
+            items: "li:not(.ui-state-sorting-disabled)",
+            placeholder: 'value-placeholder'
         });
 
         $("#valueProps li").disableSelection();

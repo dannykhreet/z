@@ -788,7 +788,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title" id="exampleModalLongTitle">Manage action connections</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -829,14 +829,14 @@
                                         }
                                     </p>
                                     <p>
-                                        <select id="actionConnectionTypeFilter" data-role="actionConnectionTypeFilter" data-type="block" class="form-control selectpicker tdfilter" data-size="10" title="Select type to link">
+                                        <select id="actionConnectionTypeFilter" class="form-control select2 tdfilter" data-placeholder="Select type to link">
                                             <option value="task">Task template/task</option>
                                             <option value="checklist">Checklist template item/checklist item</option>
                                             <option value="audit">Audit template item/audit item</option>
                                         </select>
                                     </p>
                                     <p>
-                                        <select id="checklistTemplatesFilter" data-role="checklistTemplatesFilter" data-type="block" class="form-control selectpicker tdfilter" data-live-search="true" data-size="10" title="Checklist templates">
+                                        <select id="checklistTemplatesFilter" class="form-control select2 tdfilter" data-placeholder="Checklist templates">
                                             <option value=""></option>
                                             @if (Model.ChecklistTemplates != null)
                                             {
@@ -851,7 +851,7 @@
                                                 }
                                             }
                                         </select>
-                                        <select id="auditTemplatesFilter" data-role="auditTemplatesFilter" data-type="block" class="form-control selectpicker tdfilter" data-live-search="true" data-size="10" title="Audit templates">
+                                        <select id="auditTemplatesFilter" class="form-control select2 tdfilter" data-placeholder="Audit templates">
                                             <option value=""></option>
                                             @if (Model.AuditTemplates != null)
                                             {
@@ -866,7 +866,7 @@
                                                 }
                                             }
                                         </select>
-                                        <select id="taskTemplatesFilter" data-role="taskTemplatesFilter" data-type="block" class="form-control selectpicker tdfilter" data-live-search="true" data-size="10" title="Task templates">
+                                        <select id="taskTemplatesFilter" class="form-control select2 tdfilter" data-placeholder="Task templates">
                                             <option value=""></option>
                                             @if (Model.TaskTemplates != null)
                                             {
@@ -909,7 +909,7 @@
                 </div>
                 <div class="modal-footer">
                     <button id="applyActionTaskIdButton" type="button" class="btn btn-ezgo btn-sm" disabled>Set action task id</button>
-                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
                 </div>
             </div>
         </div>
@@ -1341,9 +1341,9 @@
             }
             $('#goBackToActionOverview').attr('href', actionOverviewLocation);
 
-            $('#taskTemplatesFilter').selectpicker('refresh');
-            $('#checklistTemplatesFilter').selectpicker('refresh');
-            $('#auditTemplatesFilter').selectpicker('refresh');
+            $('#taskTemplatesFilter').trigger('change');
+            $('#checklistTemplatesFilter').trigger('change');
+            $('#auditTemplatesFilter').trigger('change');
 
             $('#taskTemplatesFilter').parent('.bootstrap-select').hide();
             $('#checklistTemplatesFilter').parent('.bootstrap-select').hide();
@@ -1380,9 +1380,9 @@
                 $('#checklistTemplatesFilter').parent('.bootstrap-select').hide();
                 $('#auditTemplatesFilter').parent('.bootstrap-select').hide();
 
-                $('#taskTemplatesFilter').selectpicker('val', '');
-                $('#checklistTemplatesFilter').selectpicker('val', '')
-                $('#auditTemplatesFilter').selectpicker('val', '')
+                $('#taskTemplatesFilter').val('');
+                $('#checklistTemplatesFilter').val('')
+                $('#auditTemplatesFilter').val('')
 
                 selectedTemplateIdForLinking = 0;
                 selectedTemplateTypeForLinking = '';

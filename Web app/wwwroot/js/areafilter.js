@@ -101,37 +101,37 @@ var areaFilter = {
 
                 if (!areaFilter._enableExternalFiltering) {
                     //reset filters on left side
-                    $("#instructionFilter").val('default').selectpicker("refresh");
-                    $("#roleFilter").val('default').selectpicker("refresh");
-                    $("#imageFilter").val('default').selectpicker("refresh");
-                    $("#videoFilter").val('default').selectpicker("refresh");
-                    $("#recurrenceFilter").val('default').selectpicker("refresh");
-                    $('#assessorFilter').val('default').selectpicker("refresh");
-                    $('#assesseeFilter').val('default').selectpicker("refresh");
-                    $('#workinstructionTypeFilter').val('default').selectpicker("refresh");
+                    $("#instructionFilter").val('').trigger('change');
+                    $("#roleFilter").val('').trigger('change');
+                    $("#imageFilter").val('').trigger('change');
+                    $("#videoFilter").val('').trigger('change');
+                    $("#recurrenceFilter").val('').trigger('change');
+                    $('#assessorFilter').val('').trigger('change');
+                    $('#assesseeFilter').val('').trigger('change');
+                    $('#workinstructionTypeFilter').val('').trigger('change');
 
                     //reset inline filters
-                    $("#instructionFilterInline").val('default').selectpicker("refresh");
-                    $("#roleFilterInline").val('default').selectpicker("refresh");
-                    $("#imageFilterInline").val('default').selectpicker("refresh");
-                    $("#videoFilterInline").val('default').selectpicker("refresh");
-                    $("#recurrenceFilterInline").val('default').selectpicker("refresh");
-                    $('#assessorFilterInline').val('default').selectpicker("refresh");
-                    $('#assesseeFilterInline').val('default').selectpicker("refresh");
-                    $('#workinstructionTypeFilterInline').val('default').selectpicker("refresh");
+                    $("#instructionFilterInline").val('').trigger('change');
+                    $("#roleFilterInline").val('').trigger('change');
+                    $("#imageFilterInline").val('').trigger('change');
+                    $("#videoFilterInline").val('').trigger('change');
+                    $("#recurrenceFilterInline").val('').trigger('change');
+                    $('#assessorFilterInline').val('').trigger('change');
+                    $('#assesseeFilterInline').val('').trigger('change');
+                    $('#workinstructionTypeFilterInline').val('').trigger('change');
 
-                    $('[data-role="roleFilter"],[data-role="instructionFilter"],[data-role="imageFilter"],[data-role="videoFilter"],[data-role="recurrenceFilter"],[data-role="assessorFilter"],[data-role="assesseeFilter"],[data-role="workinstructionTypeFilter"]').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+                    $('[data-role="roleFilter"],[data-role="instructionFilter"],[data-role="imageFilter"],[data-role="videoFilter"],[data-role="recurrenceFilter"],[data-role="assessorFilter"],[data-role="assesseeFilter"],[data-role="workinstructionTypeFilter"]').on('change', function (e, clickedIndex, isSelected, previousValue) {
                         var filterId = $(e.currentTarget).attr('id');
 
-                        $(`#${filterId}Inline`).val($(`#${filterId}`).val()).selectpicker("refresh");
+                        $(`#${filterId}Inline`).val($(`#${filterId}`).val()).trigger('change');
 
                         areaFilter.doFilter('block');
                     });
 
-                    $('[data-role="roleFilterInline"],[data-role="instructionFilterInline"],[data-role="imageFilterInline"],[data-role="videoFilterInline"],[data-role="recurrenceFilterInline"],[data-role="assessorFilterInline"],[data-role="assesseeFilterInline"],[data-role="workinstructionTypeFilterInline"]').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+                    $('[data-role="roleFilterInline"],[data-role="instructionFilterInline"],[data-role="imageFilterInline"],[data-role="videoFilterInline"],[data-role="recurrenceFilterInline"],[data-role="assessorFilterInline"],[data-role="assesseeFilterInline"],[data-role="workinstructionTypeFilterInline"]').on('change', function (e, clickedIndex, isSelected, previousValue) {
                         var inlineFilterId = $(e.currentTarget).attr('id');
 
-                        $(`#${inlineFilterId.replace("Inline", "")}`).val($(`#${inlineFilterId}`).val()).selectpicker("refresh");
+                        $(`#${inlineFilterId.replace("Inline", "")}`).val($(`#${inlineFilterId}`).val()).trigger('change');
 
                         $(`#${inlineFilterId.replace("Inline", "")}`).trigger('changed.bs.select');
                     });
@@ -152,33 +152,33 @@ var areaFilter = {
                             areaid = parseInt(filterObj.areaid);
                             //console.log('FilterObj: ' + filterObj + ' -> ' + filters);
                             if ($("#instructionFilter")[0] != null) {
-                                $("#instructionFilter").val(filterObj.hasinstruction).selectpicker("refresh");
-                                $("#instructionFilterInline").val(filterObj.hasinstruction).selectpicker("refresh");
+                                $("#instructionFilter").val(filterObj.hasinstruction).trigger('change');
+                                $("#instructionFilterInline").val(filterObj.hasinstruction).trigger('change');
                             }
 
                             if ($('#roleFilter')[0] != null) {
                                 if (filterObj.roles != null) {
-                                    $('#roleFilter').selectpicker('val', filterObj.roles.split(','));
-                                    $('#roleFilterInline').selectpicker('val', filterObj.roles.split(','));
+                                    $('#roleFilter').val(filterObj.roles.split(',')).trigger('change');
+                                    $('#roleFilterInline').val(filterObj.roles.split(',')).trigger('change');
                                 }
                             }
 
                             if ($("#imageFilter")[0] != null) {
-                                $("#imageFilter").val(filterObj.hasimage).selectpicker("refresh");
-                                $("#imageFilterInline").val(filterObj.hasimage).selectpicker("refresh");
+                                $("#imageFilter").val(filterObj.hasimage).trigger('change');
+                                $("#imageFilterInline").val(filterObj.hasimage).trigger('change');
                             }
 
                             if ($("#videoFilter")[0] != null) {
-                                $("#videoFilter").val(filterObj.hasvideo).selectpicker("refresh");
-                                $("#videoFilterInline").val(filterObj.hasvideo).selectpicker("refresh");
+                                $("#videoFilter").val(filterObj.hasvideo).trigger('change');
+                                $("#videoFilterInline").val(filterObj.hasvideo).trigger('change');
                             }
 
-                            $("#recurrenceFilter").val(filterObj.recurrences).selectpicker("refresh");
-                            $("#recurrenceFilterInline").val(filterObj.recurrences).selectpicker("refresh");
+                            $("#recurrenceFilter").val(filterObj.recurrences).trigger('change');
+                            $("#recurrenceFilterInline").val(filterObj.recurrences).trigger('change');
 
                             if ($("#workinstructionTypeFilter")[0] != null) {
-                                $("#workinstructionTypeFilter").val(filterObj.hasvideo).selectpicker("refresh");
-                                $("#workinstructionTypeFilterInline").val(filterObj.hasvideo).selectpicker("refresh");
+                                $("#workinstructionTypeFilter").val(filterObj.hasvideo).trigger('change');
+                                $("#workinstructionTypeFilterInline").val(filterObj.hasvideo).trigger('change');
                             }
 
                             if ($("#tagsfilter")[0] != null && filterObj.tags != null && filterObj.tags.length) {
@@ -311,15 +311,15 @@ var areaFilter = {
         areaid = 0;
         arealevel = 0;
         //reset filters on left side
-        $("#instructionFilter").val('default').selectpicker("refresh");
-        $("#roleFilter").val('default').selectpicker("refresh");
-        $("#imageFilter").val('default').selectpicker("refresh");
-        $("#videoFilter").val('default').selectpicker("refresh");
-        $("#recurrenceFilter").val('default').selectpicker("refresh");
-        $('#assessorFilter').val('default').selectpicker("refresh");
-        $('#assesseeFilter').val('default').selectpicker("refresh");
-        $('#templateFilter').val('default').selectpicker("refresh");
-        $('#workinstructionTypeFilter').val('default').selectpicker("refresh");
+        $("#instructionFilter").val('').trigger('change');
+        $("#roleFilter").val('').trigger('change');
+        $("#imageFilter").val('').trigger('change');
+        $("#videoFilter").val('').trigger('change');
+        $("#recurrenceFilter").val('').trigger('change');
+        $('#assessorFilter').val('').trigger('change');
+        $('#assesseeFilter').val('').trigger('change');
+        $('#templateFilter').val('').trigger('change');
+        $('#workinstructionTypeFilter').val('').trigger('change');
         
         $('[id^="filter-tag-"]').each(function (index, elem) {
             $(elem).hide();
@@ -337,14 +337,14 @@ var areaFilter = {
         tree.find('ul:not(:first)').hide();
 
         //reset inline filters
-        $("#instructionFilterInline").val('default').selectpicker("refresh");
-        $("#roleFilterInline").val('default').selectpicker("refresh");
-        $("#imageFilterInline").val('default').selectpicker("refresh");
-        $("#videoFilterInline").val('default').selectpicker("refresh");
-        $("#recurrenceFilterInline").val('default').selectpicker("refresh");
-        $('#assessorFilterInline').val('default').selectpicker("refresh");
-        $('#assesseeFilterInline').val('default').selectpicker("refresh");
-        $('#workinstructionTypeFilterInline').val('default').selectpicker("refresh");
+        $("#instructionFilterInline").val('').trigger('change');
+        $("#roleFilterInline").val('').trigger('change');
+        $("#imageFilterInline").val('').trigger('change');
+        $("#videoFilterInline").val('').trigger('change');
+        $("#recurrenceFilterInline").val('').trigger('change');
+        $('#assessorFilterInline').val('').trigger('change');
+        $('#assesseeFilterInline').val('').trigger('change');
+        $('#workinstructionTypeFilterInline').val('').trigger('change');
 
         var tree = $('#inlineAreaTree');
         tree.find('a').css('font-weight', '400');
@@ -355,10 +355,10 @@ var areaFilter = {
     },
 
     doFilter: function(displaytype) {
-        var hasimage = $('#imageFilter').selectpicker().val();
-        var hasvideo = $('#videoFilter').selectpicker().val();
-        var hasinstruction = $('#instructionFilter').selectpicker().val();
-        var workinstructiontype = $('#workinstructionTypeFilter').selectpicker().val();
+        var hasimage = $('#imageFilter').val();
+        var hasvideo = $('#videoFilter').val();
+        var hasinstruction = $('#instructionFilter').val();
+        var workinstructiontype = $('#workinstructionTypeFilter').val();
         var tags = [];
 
         $('[id^="filter-tag-"]').each(function (index, elem) {
@@ -371,12 +371,12 @@ var areaFilter = {
 
         var roles;
 
-        var arr = $('#roleFilter').selectpicker().val();
+        var arr = $('#roleFilter').val();
         if (arr !== undefined) {
             roles = arr.join(",");
         }
 
-        var arr_recurrence = $('#recurrenceFilter').selectpicker().val();
+        var arr_recurrence = $('#recurrenceFilter').val();
         if (arr_recurrence !== undefined) {
             recurrences = arr_recurrence.join(",");
         }

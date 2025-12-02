@@ -284,7 +284,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SignAssessmentTitle, "Sign this assessment") ?? "Sign this assessment")</h5>
-                <button type="button" class="close d-none" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close d-none" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -304,7 +304,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnCancel, "Cancel") ?? "Cancel")</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnCancel, "Cancel") ?? "Cancel")</button>
                 <button id="btnFinish" type="button" class="btn btn-ezgo" onclick="ezgoassessment.signAndFinish()" disabled>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnFinishAssessment, "Finish assessment") ?? "Finish assessment")</button>
             </div>
         </div>
@@ -375,7 +375,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
                 <button type="button" class="btn btn-ezgo btn-sm" data-action="execute" disabled>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnAdd, "Add") ?? "Add")</button>
             </div>
         </div>

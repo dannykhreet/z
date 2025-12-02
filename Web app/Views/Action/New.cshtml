@@ -163,7 +163,7 @@
                                                         <div class="btn-group btn-group-sm btn-group-toggle pt-1" data-toggle="buttons" style="display:flex;">
                                                             @foreach (var notificationType in Model.NotificationOptions.NotificationTypeExpanded)
                                                             {
-                                                                <label class="btn btn-light text-muted" style="flex:1;">
+                                                                <label id="notificationType-label-@notificationType.Value" class="btn btn-light text-muted" style="flex:1;">
                                                                     <input type="radio" data-defaultprio="@notificationType.DefaultPrio" name="NotificationType" id="notificationType-@notificationType.Value" value="@notificationType.Value"> @notificationType.Label
                                                                 </label>
                                                             }
@@ -177,7 +177,7 @@
                                                         <div class="btn-group btn-group-sm btn-group-toggle pt-1" data-toggle="buttons" style="display:flex;">
                                                             @foreach (var maintPriority in Model.NotificationOptions.MaintPriorityExpanded)
                                                             {
-                                                                <label class="btn btn-light text-muted" style="flex:1;">
+                                                                <label id="maintPriority-label-@maintPriority.Value" class="btn btn-light text-muted" style="flex:1;">
                                                                     <input type="radio" name="MaintPriority" id="maintPriority-@maintPriority.Value" value="@maintPriority.Value"> @maintPriority.Label
                                                                 </label>
                                                             }
@@ -314,42 +314,41 @@
                 }
             });
 
-            $('#sendToSapOptions').on('click', '[id^="maintPriority-"]', function (e) {
+            $('#sendToSapOptions').on('click', '[id^="maintPriority-label"]', function (e) {
                 if(e.currentTarget) {
-                    if($(e.currentTarget).parent('label').hasClass('active'))
+                    if($(e.currentTarget).hasClass('disabled'))
                     {
-                        $('[id^="maintPriority"]').each(function(index, elem) {
-                            $(elem).parent('label').removeClass('active');
-                            $(elem).attr('checked', false);
-                        });
-                        e.stopPropagation();
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
                     }
                 }
             });
 
-            $('#sendToSapOptions').on('click', '[id^="notificationType-"]', function (e) {
+            $('#sendToSapOptions').on('click', '[id^="notificationType-label"]', function (e) {
                 if(e.currentTarget) {
-                    if($(e.currentTarget).parent('label').hasClass('active'))
+                    if($(e.currentTarget).hasClass('disabled'))
                     {
-                        $('[id^="notificationType"]').each(function(index, elem) {
-                            $(elem).parent('label').removeClass('active');
-                            $(elem).attr('checked', false);
-                        });
-                        e.stopPropagation();
-                    }
-                    else {
-                        let defaultPrio = $(e.currentTarget).data('defaultprio');
-                        if($('#maintPriority-' + defaultPrio).length) {
-                            $('[id^="maintPriority"]').each(function(index, elem) {
-                                $(elem).parent('label').removeClass('active');
-                                $(elem).attr('checked', false);
-                            });
-                            $('#maintPriority-' + defaultPrio).parent('label').addClass('active');
-                            $('#maintPriority-' + defaultPrio).attr('checked', true);
-                        }
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
                     }
                 }
             });
+
+            $('#sendToSapOptions').on('click', 'input[id^="notificationType-"]', function (e) {
+                if(e.currentTarget) {
+                    let defaultPrio = $(e.currentTarget).data('defaultprio');
+                    if($('#maintPriority-' + defaultPrio).length) {
+                        $('[id^="maintPriority"]').each(function(index, elem) {
+                            $(elem).parent('label').removeClass('active');
+                            $(elem).attr('checked', false);
+                        });
+                        $('#maintPriority-' + defaultPrio).parent('label').addClass('active');
+                        $('#maintPriority-' + defaultPrio).attr('checked', true);
+                    }
+                }
+            });
+
+                
 
         } else {
             var marketSapEnabled = false;
@@ -388,7 +387,7 @@
                     $('#Resources').val(userarray);
 
                     // Then refresh
-                    $('#Resources').selectpicker("refresh");
+                    $('#Resources').trigger('change');
                 }
             }
 
@@ -400,7 +399,7 @@
                     $('#ResourcesAreas').val(areaarray);
 
                     // Then refresh
-                    $('#ResourcesAreas').selectpicker("refresh");
+                    $('#ResourcesAreas').trigger('change');
                 }
             }
 
@@ -594,7 +593,7 @@
             image.setAttribute('data-ext', item.ext);
             image.setAttribute('data-index', mediacounter);
             image.setAttribute('data-type', item.type);
-            image.setAttribute('data-target', 'image');
+            image.setAttribute('data-bs-target', 'image');
 
             fileDropZone.parentNode.parentNode.insertBefore(clone, fileDropZone.parentNode);
         }
@@ -648,7 +647,7 @@
             video.src = item.url;
             video.setAttribute('type', item.type);
             video.setAttribute('data-ext', item.ext);
-            video.setAttribute('data-target', 'video');
+            video.setAttribute('data-bs-target', 'video');
             video.setAttribute('data-index', index);
             video.className = 'blob';
             video.id = 'video' + videocounter;
@@ -679,7 +678,7 @@
                     thumbnailImage.src = thumbnailUrl;
                     thumbnailImage.setAttribute('data-index', index);
                     thumbnailImage.setAttribute('data-ext', 'png');
-                    thumbnailImage.setAttribute('data-target', 'videothumbnail');
+                    thumbnailImage.setAttribute('data-bs-target', 'videothumbnail');
                 }
                 return success;
             };

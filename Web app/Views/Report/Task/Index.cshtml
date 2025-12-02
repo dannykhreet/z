@@ -371,7 +371,7 @@
 
         function resetFilters() {
             $('#completedTasksGroupFilter').val('previousshifts');
-            $("#completedTasksGroupFilter").selectpicker("refresh");
+            $("#completedTasksGroupFilter").trigger('change');
             areaFilter.reset();
             completedTasks.templateId = undefined;
             $('#tasklist').empty();
@@ -437,7 +437,7 @@
 
         @if (Model.TemplateId != 0)
         {
-            @:$('#templateFilter').selectpicker('val', 'template' + @(Model.TemplateId));
+            @:$('#templateFilter').val('template' + @(Model.TemplateId));
             @:loadTasksStatistics($("#completedTasksGroupFilter").val(), 0);
         }
 

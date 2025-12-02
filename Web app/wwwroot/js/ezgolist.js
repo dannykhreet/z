@@ -1412,6 +1412,44 @@
     save: async function () {
         ezgolist.reindexItemsAndStages();
 
+        // For skillassessment, sync TaskTemplates array with current DOM order
+        if (ezgolist.listType === 'skillassessment') {
+            var currentDOMOrder = [];
+            $(ezgolist.itemListSelector + ' li[data-type="item"]').each(function () {
+                var cid = parseInt($(this).attr('data-cid'));
+                if (!isNaN(cid)) {
+                    currentDOMOrder.push(cid);
+                }
+            });
+
+            if (currentDOMOrder.length > 0 && currentDOMOrder.length === ezgolist.tmpl.TaskTemplates.length) {
+                var reordered = [];
+                var usedIndices = new Set();
+
+                currentDOMOrder.forEach(function (cid) {
+                    // For skillassessment, data-cid is WorkInstructionTemplateId
+                    var templateIndex = ezgolist.tmpl.TaskTemplates.findIndex(function (t) {
+                        return t.WorkInstructionTemplateId === cid && !usedIndices.has(ezgolist.tmpl.TaskTemplates.indexOf(t));
+                    });
+
+                    if (templateIndex !== -1) {
+                        usedIndices.add(templateIndex);
+                        reordered.push(ezgolist.tmpl.TaskTemplates[templateIndex]);
+                    }
+                });
+
+                // Only apply reorder if we matched all items
+                if (reordered.length === ezgolist.tmpl.TaskTemplates.length) {
+                    ezgolist.tmpl.TaskTemplates = reordered;
+                }
+
+                // Re-index
+                ezgolist.tmpl.TaskTemplates.forEach(function (template, index) {
+                    template.Index = index + 1;
+                });
+            }
+        }
+
         if (!ezgolist.validateTemplate()) {
             return;
         }
@@ -2094,8 +2132,13 @@
                     picture = item.VideoThumbnail;
                 }
 
+                // For skillassessment, use WorkInstructionTemplateId as the unique identifier for DOM tracking
+                var itemCid = (ezgolist.listType === 'skillassessment' && item.WorkInstructionTemplateId)
+                    ? item.WorkInstructionTemplateId
+                    : item.Id;
+
                 var li = cardTemplateVideo
-                    .replaceAll('{{cid}}', item.Id)
+                    .replaceAll('{{cid}}', itemCid)
                     .replaceAll('{{name}}', GlobalParser.escapeHtmlCharacters(item.Name))
                     .replaceAll('{{desc}}', GlobalParser.escapeHtmlCharacters(item.Description))
                     .replaceAll('{{picture}}', picture)
@@ -2110,8 +2153,13 @@
                     picture = item.Picture;
                 }
 
+                // For skillassessment, use WorkInstructionTemplateId as the unique identifier for DOM tracking
+                var itemCid = (ezgolist.listType === 'skillassessment' && item.WorkInstructionTemplateId)
+                    ? item.WorkInstructionTemplateId
+                    : item.Id;
+
                 var li = cardTemplateImage
-                    .replaceAll('{{cid}}', item.Id)
+                    .replaceAll('{{cid}}', itemCid)
                     .replaceAll('{{name}}', GlobalParser.escapeHtmlCharacters(item.Name))
                     .replaceAll('{{desc}}', GlobalParser.escapeHtmlCharacters(item.Description))
                     .replaceAll('{{picture}}', picture)
@@ -2193,6 +2241,9 @@
                 .find('input')
                 .prop('disabled', true)
                 .prop('checked', false);
+
+            $('label:has(input[name="workinstructiontype"][value="1"])')
+                .addClass('disabled');
 
             // Update the title
             $('#selectTypeTitle').text(
@@ -3486,6 +3537,59 @@
         }
     },
 
+    reIndexTaskTemplates: function () {
+        // Try to sync with DOM order first
+        var domItems = $(ezgolist.itemListSelector + ' li[data-type="item"]');
+
+        if (domItems.length > 0 && domItems.length === ezgolist.tmpl.TaskTemplates.length) {
+            var newOrder = [];
+            domItems.each(function (index) {
+                var cid = parseInt($(this).attr('data-cid'));
+                var template = ezgolist.tmpl.TaskTemplates.find(function (obj) {
+                    return obj.Id === cid || obj.WorkInstructionTemplateId === cid;
+                });
+                if (template != undefined) {
+                    template.Index = index + 1;
+                    newOrder.push(template);
+                }
+            });
+
+            if (newOrder.length === ezgolist.tmpl.TaskTemplates.length) {
+                ezgolist.tmpl.TaskTemplates = newOrder;
+                return;
+            }
+        }
+
+        // Fallback: just re-index the existing array order
+        for (var i = 0; i < ezgolist.tmpl.TaskTemplates.length; i++) {
+            ezgolist.tmpl.TaskTemplates[i].Index = i + 1;
+        }
+    }, 
+    reIndexTaskTemplatesFromDOM: function () {
+        // Sync TaskTemplates array order with the current DOM order
+        var newOrder = [];
+        $(ezgolist.itemListSelector + ' li[data-type="item"]').each(function (index) {
+            var cid = parseInt($(this).attr('data-cid'));
+            var template = ezgolist.tmpl.TaskTemplates.find(function (obj) {
+                return obj.Id === cid || obj.WorkInstructionTemplateId === cid;
+            });
+            if (template != undefined) {
+                template.Index = index + 1;
+                newOrder.push(template);
+            }
+        });
+
+        // If we found items in the DOM, use that order
+        // Otherwise keep the existing array (for cases where DOM isn't rendered yet)
+        if (newOrder.length > 0) {
+            ezgolist.tmpl.TaskTemplates = newOrder;
+        } else {
+            // Just re-index the existing array
+            ezgolist.tmpl.TaskTemplates.forEach(function (template, index) {
+                template.Index = index + 1;
+            });
+        }
+    },
     updateGeneralPictureProofToggle: function () {
         if (ezgolist.listType == 'checklist' || ezgolist.listType == 'audit') {
             var tasksHavePictureProof = false;
@@ -3544,10 +3648,11 @@
             initHandlers: function () {
                 $('[data-action="assessment_choice"]').on('click', function () {
                     if ($(this).attr('data-selected') == 'true') {
-                        ezgolist.extension.assessments.setAssessmentRowDisplayOff(this);
+                        ezgolist.extension.assessments.setAssessmentRowDisplayOff(this, null);
                     }
                     else {
-                        ezgolist.extension.assessments.setAssessmentRowDisplayOn(this);
+                        let selectedAssessments = $('[data-containertype="assessment_choice"][data-selected="true"]');
+                        ezgolist.extension.assessments.setAssessmentRowDisplayOn(this, selectedAssessments.length + 1);
                     }
                 });
 
@@ -3587,39 +3692,152 @@
             },
 
             setAssessments: function () {
-                if (ezgolist.tmpl.TaskTemplates != null) {
+                // Clear all existing selections first
+                $('[data-containertype="assessment_choice"]').each(function () {
+                    ezgolist.extension.assessments.setAssessmentRowDisplayOff(this);
+                });
+
+                // Set selections based on current TaskTemplates order
+                if (ezgolist.tmpl.TaskTemplates != null && ezgolist.tmpl.TaskTemplates.length > 0) {
                     for (let i = 0; i < ezgolist.tmpl.TaskTemplates.length; i++) {
-                        let foundAssessment = $('[data-id="' + ezgolist.tmpl.TaskTemplates[i].WorkInstructionTemplateId + '"][data-containertype="assessment_choice"]');
-                        ezgolist.extension.assessments.setAssessmentRowDisplayOn(foundAssessment[0]);
+                        let template = ezgolist.tmpl.TaskTemplates[i];
+                        let foundAssessment = $('[data-id="' + template.WorkInstructionTemplateId + '"][data-containertype="assessment_choice"]');
+
+                        if (foundAssessment.length > 0) {
+                            // Use i+1 as the display order in modal
+                            ezgolist.extension.assessments.setAssessmentRowDisplayOn(foundAssessment[0], i + 1);
+                        }
                     }
                 }
             },
 
-            setAssessmentRowDisplayOn: function (row) {
+            setAssessmentRowDisplayOn: function (row, index) {
                 $(row).find('[data-containertype="assessment_choice_name"]').addClass('font-weight-bold');
                 $(row).find('[data-containertype="assessment_choice_check"]').show();
+                $(row).attr('data-index', index);
                 $(row).attr('data-selected', true);
             },
 
             setAssessmentRowDisplayOff: function (row) {
                 $(row).find('[data-containertype="assessment_choice_name"]').removeClass('font-weight-bold');
                 $(row).find('[data-containertype="assessment_choice_check"]').hide();
+                $(row).removeAttr('data-index');
                 $(row).removeAttr('data-selected');
             },
 
-            setAssessmentsToMainObject: function () {
-                let selectedAssessments = $('[data-containertype="assessment_choice"][data-selected="true"]');
-                ezgolist.tmpl.TaskTemplates = []; //reset selected templates;
-                for (let i = 0; i < selectedAssessments.length; i++) {
-                    let dataitem = $(selectedAssessments[i]).find('[data-type="datastore"]');
-                    if (dataitem != null) {
-                        if ($(dataitem).val() != null) {
-                            let data = JSON.parse($(dataitem).val());
-                            data.Id = 0; //reset id;
-                            ezgolist.tmpl.TaskTemplates.push(data);
+            // Replace these functions in ezgolist.extension.assessments
+            // This ensures order respects manual drag-and-drop reordering
+
+            setAssessments: function () {
+                // Clear all existing selections first
+                $('[data-containertype="assessment_choice"]').each(function () {
+                    ezgolist.extension.assessments.setAssessmentRowDisplayOff(this);
+                });
+
+                // Set selections based on current TaskTemplates order
+                if (ezgolist.tmpl.TaskTemplates != null && ezgolist.tmpl.TaskTemplates.length > 0) {
+                    for (let i = 0; i < ezgolist.tmpl.TaskTemplates.length; i++) {
+                        let template = ezgolist.tmpl.TaskTemplates[i];
+                        let foundAssessment = $('[data-id="' + template.WorkInstructionTemplateId + '"][data-containertype="assessment_choice"]');
+
+                        if (foundAssessment.length > 0) {
+                            // Use i+1 as the display order in modal
+                            ezgolist.extension.assessments.setAssessmentRowDisplayOn(foundAssessment[0], i + 1);
                         }
                     }
                 }
+            },
+
+            setAssessmentsToMainObject: function () {
+                // First, capture the current DOM order of items BEFORE processing modal selections
+                // This preserves any manual drag-and-drop reordering
+                var currentDOMOrder = [];
+                $(ezgolist.itemListSelector + ' li[data-type="item"]').each(function () {
+                    var cid = parseInt($(this).attr('data-cid'));
+                    if (!isNaN(cid)) {
+                        currentDOMOrder.push(cid);
+                    }
+                });
+
+                // Get all selected assessments from modal
+                let selectedAssessments = $('[data-containertype="assessment_choice"][data-selected="true"]');
+
+                // Build a set of currently selected WorkInstructionTemplateIds
+                let selectedWIIds = new Set();
+                selectedAssessments.each(function () {
+                    let wiId = parseInt($(this).attr('data-id'));
+                    selectedWIIds.add(wiId);
+                });
+
+                // Build a map of WorkInstructionTemplateId -> existing TaskTemplate
+                let existingByWIId = new Map();
+                if (ezgolist.tmpl.TaskTemplates && ezgolist.tmpl.TaskTemplates.length > 0) {
+                    ezgolist.tmpl.TaskTemplates.forEach(function (template) {
+                        existingByWIId.set(template.WorkInstructionTemplateId, template);
+                    });
+                }
+
+                // Step 1: Reorder existing items based on current DOM order
+                let reorderedExisting = [];
+                let usedTemplates = new Set();
+
+                currentDOMOrder.forEach(function (cid) {
+                    // For skillassessment, data-cid is WorkInstructionTemplateId
+                    let template = ezgolist.tmpl.TaskTemplates.find(function (t) {
+                        return t.WorkInstructionTemplateId === cid && !usedTemplates.has(t);
+                    });
+                    if (template && selectedWIIds.has(template.WorkInstructionTemplateId)) {
+                        usedTemplates.add(template);
+                        reorderedExisting.push(template);
+                    }
+                });
+
+                // Get IDs of items we've already added to reorderedExisting
+                let addedWIIds = new Set(reorderedExisting.map(function (t) {
+                    return t.WorkInstructionTemplateId;
+                }));
+
+                // Step 2: Find newly selected items (not in DOM yet)
+                let newItems = [];
+                selectedAssessments.each(function () {
+                    let wiId = parseInt($(this).attr('data-id'));
+
+                    // Skip if already added from DOM order
+                    if (addedWIIds.has(wiId)) {
+                        return;
+                    }
+
+                    // Check if it exists but wasn't in DOM (edge case)
+                    if (existingByWIId.has(wiId)) {
+                        reorderedExisting.push(existingByWIId.get(wiId));
+                        addedWIIds.add(wiId);
+                        return;
+                    }
+
+                    // Truly new item - parse from modal data
+                    let dataitem = $(this).find('[data-type="datastore"]');
+                    if (dataitem != null && $(dataitem).val() != null) {
+                        let data = JSON.parse($(dataitem).val());
+                        // Generate unique negative ID for new items to enable DOM tracking
+                        ezgolist._lastNewItemId = (ezgolist._lastNewItemId || 0) - 1;
+                        data.Id = ezgolist._lastNewItemId;
+                        data.isNew = true;
+                        newItems.push(data);
+                    }
+                });
+
+                // Step 3: Combine - existing items in DOM order, then new items at the end
+                ezgolist.tmpl.TaskTemplates = reorderedExisting.concat(newItems);
+
+                // Step 4: Re-index sequentially
+                ezgolist.tmpl.TaskTemplates.forEach(function (template, index) {
+                    template.Index = index + 1;
+                });
+
+                // Mark as changed
+                ezgolist._hasChanged = true;
+                $('body').trigger('ezgolistChanged');
+
                 ezgolist.render();
                 $('#assignInstructionModal').modal('hide');
             },

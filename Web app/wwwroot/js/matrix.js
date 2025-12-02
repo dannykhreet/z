@@ -83,6 +83,7 @@ var matrix = {
     currentUserSkillValues: {},
     skillEdited: false,
     groupEdited: false,
+    relationChanged: false,
     language: {
         userSkills: "User skills - ",
         expiryInDays: "Expiry in days: ",
@@ -177,12 +178,12 @@ var matrix = {
                 matrix.saveGroup();
             }
 
-            var userSkillModalIsShown = $('#AddChangeSkillBehaviourModal').hasClass('in') || $('#AddChangeSkillBehaviourModal').hasClass('show')
+            var userSkillModalIsShown = $('#AddChangeSkillBehaviourModal').hasClass('in') || $('#AddChangeSkillBehaviourModal').hasClass('show');
             if (userSkillModalIsShown) {
                 matrix.saveSkill();
             }
 
-            matrix.updateMatrix();
+            //matrix.updateMatrix();
         });
 
         $('[data-actionvalue]').on('click', function () {
@@ -280,18 +281,17 @@ var matrix = {
                 ]
             });
         });
-       
     },
     initSkillHandlers: function () {
         //skill
         $('#btnAddChangeBehaviourSkills').on('click', function () {
             matrix.initSkillModal();
             $('#btn_new_skill').click();
-            $('#dialog_type_2').click();
+            //$('#dialog_type_2').click();
         });
         $('#btn_new_skill').on('click', function () {
             $('#dialog_skillselection').val('');
-            $('[data-containertype="skill_in_matrix_container"]').hide(); //new one
+            $('#skill_in_matrix_container').hide(); //new one
             matrix.showSkillDetails();
             matrix.showEditSkill();
         });
@@ -299,7 +299,22 @@ var matrix = {
             matrix.showSkillDetails();
             matrix.loadSkillDetails();
         });
-        $('#dialog_skillselection').on('change', function () {
+        $('#dialog_skillselection').on('change', function (e) {
+            if ($(e.currentTarget).val() == '') {
+                $('#skill_in_matrix_container').hide();
+
+                if ($('#dialog_type_1').length) {
+                    $('[id^="dialog_type_"]').each(function (index, elem) {
+                        $(elem).parent('label').removeClass('active');
+                        $(elem).prop('checked', false);
+                    });
+                    $('#dialog_type_1').parent('label').addClass('active');
+                    $('#dialog_type_1').prop('checked', true);
+                }
+
+                $('#btnDeleteUserSkill').attr('disabled', 'disabled');
+            }
+            matrix.showMandatorySkillFields();
             matrix.showEditSkill();
             $('#btn_edit_skill').click();
             if ($('#dialog_skillname').val() != '') {
@@ -326,14 +341,21 @@ var matrix = {
             }
         });
 
-        $('#dialog_skillname, #dialog_skilldescription, #dialog_goal, #dialog_notification_window_days, #dialog_expiryindays, #modal_assessment_choice, #dialog_validfrom, #dialog_validto').on('change', function () {
+        $('#dialog_skillname, #dialog_skilldescription, #dialog_expiryindays, #modal_assessment_choice, #dialog_goal, #dialog_notification_window_days').on('change', function () {
             matrix.skillEdited = true;
             //$('[data-containertype="change_skill_buttons"]').show();
 
         });
 
-        $('#dialog_type_1, #dialog_type_2').on('click', function () {
+        $('#dialog_type_1, #dialog_type_2').on('click', function (e) {
             matrix.skillEdited = true;
+            //change ui
+            if ($(e.currentTarget).attr('id') == 'dialog_type_1') {
+                matrix.showMandatorySkillFields();
+            }
+            else if ($(e.currentTarget).attr('id') == 'dialog_type_2') {
+                matrix.showOperationalSkillFields();
+            }
         });
 
         $('#dialog_goal').on('change', function () {
@@ -351,6 +373,148 @@ var matrix = {
                 $('#dialog_expiryindays').val(0);
             }
         });
+
+        $('.item-target').on('click', function (e) {
+            matrix.skillEdited = true;
+
+            let currentButtonSelected =
+                $(e.currentTarget).hasClass('btn-red-selected') ||
+                $(e.currentTarget).hasClass('btn-orangered-selected') ||
+                $(e.currentTarget).hasClass('btn-orange-selected') ||
+                $(e.currentTarget).hasClass('btn-orangegreen-selected') ||
+                $(e.currentTarget).hasClass('btn-green-selected');
+
+            let currentValue = $(e.currentTarget).data('value');
+
+            matrix.resetDefaultTargetValue();
+
+            //only select current item if it wasn't already selected, in which case it would need to be deselected (toggle)
+            if (!currentButtonSelected) {
+                matrix.setDefaultTargetValue(currentValue, e.currentTarget);
+            }
+            else {
+                //deselecting done by default
+            }
+        });
+
+    },
+    showMandatorySkillFields: function () {
+
+        $('#default_target_container').hide();
+
+        $('#notification_window_container').removeClass('col-6');
+        $('#notification_window_container').addClass('col-4');
+
+        $('#expiry_in_days_container').removeClass('col-6');
+        $('#expiry_in_days_container').addClass('col-4');
+
+        $('#required_goal_container').removeClass('col-6');
+        $('#required_goal_container').addClass('col-4');
+        $('#required_goal_container').css({
+            'align-items': '',
+            'display': 'block',
+            'gap': ''
+        });
+
+        $('#modal_assessment_container').hide();
+    },
+    showOperationalSkillFields: function () {
+
+        $('#default_target_container').show();
+
+        $('#notification_window_container').removeClass('col-4');
+        $('#notification_window_container').addClass('col-6');
+
+        $('#expiry_in_days_container').removeClass('col-4');
+        $('#expiry_in_days_container').addClass('col-6');
+
+        $('#required_goal_container').removeClass('col-4');
+        $('#required_goal_container').addClass('col-6');
+
+        $('#required_goal_container').css({
+            'align-items': 'center',
+            'display': 'flex',
+            'gap': '20px'
+        });
+
+        $('#modal_assessment_container').show();
+    },
+    resetDefaultTargetValue: function () {
+        $('#defaultTarget-1').addClass('btn-red');
+        $('#defaultTarget-2').addClass('btn-orangered');
+        $('#defaultTarget-3').addClass('btn-orange');
+        $('#defaultTarget-4').addClass('btn-orangegreen');
+        $('#defaultTarget-5').addClass('btn-green');
+
+        $('#defaultTarget-1').removeClass('btn-red-selected');
+        $('#defaultTarget-2').removeClass('btn-orangered-selected');
+        $('#defaultTarget-3').removeClass('btn-orange-selected');
+        $('#defaultTarget-4').removeClass('btn-orangegreen-selected');
+        $('#defaultTarget-5').removeClass('btn-green-selected');
+    },
+    setDefaultTargetValue: function (targetValue, elem) {
+        if (targetValue == 1) {
+            $(elem).addClass('btn-red-selected');
+            $(elem).removeClass('btn-red');
+        }
+        else if (targetValue == 2) {
+            $(elem).addClass('btn-orangered-selected');
+            $(elem).removeClass('btn-orangered');
+        }
+        else if (targetValue == 3) {
+            $(elem).addClass('btn-orange-selected');
+            $(elem).removeClass('btn-orange');
+        }
+        else if (targetValue == 4) {
+            $(elem).addClass('btn-orangegreen-selected');
+            $(elem).removeClass('btn-orangegreen');
+        }
+        else if (targetValue == 5) {
+            $(elem).addClass('btn-green-selected');
+            $(elem).removeClass('btn-green');
+        }
+    },
+    getDefaultTargetValue: function () {
+        let selectedElement = $('div[id^="defaultTarget-"][class$="-selected"]');
+
+        if (selectedElement) {
+            let selectedValue = $(selectedElement).data('value');
+            return selectedValue;
+        }
+
+        return null;
+    },
+    validateUserSkill: function () {
+
+        let validationCorrect = true;
+        //#dialog_skillname, #dialog_skilldescription, #dialog_expiryindays, #modal_assessment_choice, #dialog_goal, #dialog_notification_window_days
+        if ($('#dialog_skillname').val() == '') {
+            validationCorrect = false;
+            toastr.error('User skill name is required.');
+        }
+        //else if ($('#dialog_skilldescription').val() == '') {
+        //    validationCorrect = false;
+        //    toastr.error('User skill description is required.');
+        //}
+        //else if ($('#dialog_type_2').is(':checked') && ($('#modal_assessment_choice').val() == '' || $('#modal_assessment_choice').val() <= 0)) {
+        //    validationCorrect = false;
+        //    toastr.error('User skill is type operational but no assessment template selected.');
+        //}
+        else if ($('#dialog_type_2').is(':checked') && (!parseInt(matrix.getDefaultTargetValue()))) {
+            validationCorrect = false;
+            toastr.error('User skill is type operational but no default target configured.')
+        }
+        return validationCorrect;
+        //else if ($('#dialog_expiryindays').val() == '' || $('#dialog_expiryindays').val() <= 0) {
+        //    toastr.error('User skill expiry in days must be larger than 0.');
+        //}
+        //else if ($('#dialog_goal').val() == '' || $('#dialog_goal').val() <= 0) {
+        //    toastr.error('User skill goal must be larger than 0.');
+        //}
+        //else if ($('#dialog_notification_window_days').val() == '' || $('#dialog_notification_window_days').val() <= 0) {
+        //    toastr.error('Notification window in days msut be larger than 0.');
+        //}
+
     },
     initSkillModal: function () {
         $('#dialog_skillselection').val('');
@@ -421,13 +585,20 @@ var matrix = {
         //[{"index":1,"id":1},{"index":2,"id":2}]
         //console.log(items);
         toastr.remove();
-        $('body').toggleClass('loaded');
+        var itemsToUpdate = items.length;
+        var itemsUpdated = 0;
         $(items).each(function (index, item) {
             $.ajax({
                 type: "POST",
                 url: '/skillsmatrix/' + item.MatrixId + '/skills/changerelation',
                 data: JSON.stringify(item),
                 success: function (data) {
+                    itemsUpdated++;
+                    if (itemsUpdated == itemsToUpdate) {
+                        $('#ChangeSkillOrderModal').modal('hide');
+                        $('body').toggleClass('loaded');
+                        window.location.reload();
+                    }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.log(jqXHR.responseText + ' (' + jqXHR.status + ')');
@@ -435,27 +606,46 @@ var matrix = {
                 contentType: "application/json; charset=utf-8"
             })
         });
-
-        $('#ChangeSkillOrderModal').modal('hide');
-        setTimeout(function () {
-            window.location.reload();
-        }, 2000);
-
     },
     cleanSkillDetails: function () {
         matrix.skillEdited = false;
         //$('[data-containertype="change_skill_buttons"]').hide();
-        $('#dialog_skillname, #dialog_skilldescription, #dialog_goal, #dialog_notification_window_days, #dialog_expiryindays, #dialog_validfrom, #dialog_validto').val('');
-        $("#modal_assessment_choice").val($("#modal_assessment_choice option:first").val());
-        $('#dialog_type_1, #dialog_type_2').prop('checked', false);
-        $('#skill_in_matrix').prop('checked', false);
+        $('#modal_assessment_choice, #dialog_skillname, #dialog_skilldescription, #dialog_goal, #dialog_notification_window_days, #dialog_expiryindays, #dialog_validfrom, #dialog_validto').val('');
+
+        $('[id^="dialog_type_"]').each(function (index, elem) {
+            $(elem).parent('label').removeClass('active');
+            $(elem).prop('checked', false);
+        });
+
+        $('#dialog_type_1').parent('label').addClass('active');
+        $('#dialog_type_1').prop('checked', true);
+
+        $('#skill_in_matrix_true').prop('checked', false);
+
+        $('[id^="skill_in_matrix_"]').each(function (index, elem) {
+            $(elem).parent('label').removeClass('active');
+            $(elem).prop('checked', false);
+        });
+
+        $('#skill_in_matrix_false').parent('label').addClass('active');
+        $('#skill_in_matrix_false').prop('checked', true);
+
         $('#modal_assessment_container').hide();
+
+        matrix.resetDefaultTargetValue();
+
+        matrix.showMandatorySkillFields();
+
         matrix.showEditSkill();
     },
     loadSkillDetails: function () {
         //todo cleanup code
         let data = $('#dialog_skillselection option:selected').attr('data-store');
         let inMatrix = ($('#dialog_skillselection option:selected').attr('data-inmatrix') === 'true');
+
+        //always reset ui first
+        matrix.resetDefaultTargetValue();
+
         if (data != null) {
             let skillItem = JSON.parse(data);
             if (skillItem != null && skillItem.Id > 0) {
@@ -473,13 +663,37 @@ var matrix = {
                 $('#dialog_goal').val(skillItem.Goal);
                 $('#dialog_notification_window_days').val(skillItem.NotificationWindowInDays);
                 $('#dialog_expiryindays').val(skillItem.ExpiryInDays);
-                $('#dialog_type_1, #dialog_type_2').prop('checked', false);
+
+                if (skillItem.DefaultTarget && skillItem.DefaultTarget != 0 && $('#defaultTarget-' + skillItem.DefaultTarget).length) {
+                    matrix.setDefaultTargetValue(skillItem.DefaultTarget, $('#defaultTarget-' + skillItem.DefaultTarget)[0])
+                }
 
                 if (skillItem.SkillType == 0) {
-                    $('#dialog_type_1').prop('checked', true);
+                    if ($('#dialog_type_1').length) {
+                        $('[id^="dialog_type_"]').each(function (index, elem) {
+                            $(elem).parent('label').removeClass('active');
+                            $(elem).prop('checked', false);
+                        });
+                        $('#dialog_type_1').parent('label').addClass('active');
+                        $('#dialog_type_1').prop('checked', true);
+                    }
+
+                    matrix.showMandatorySkillFields();
+
+                    $('#modal_assessment_container').hide();
                 }
                 if (skillItem.SkillType == 1) {
-                    $('#dialog_type_2').prop('checked', true);
+                    if ($('#dialog_type_2').length) {
+                        $('[id^="dialog_type_"]').each(function (index, elem) {
+                            $(elem).parent('label').removeClass('active');
+                            $(elem).prop('checked', false);
+                        });
+                        $('#dialog_type_2').parent('label').addClass('active');
+                        $('#dialog_type_2').prop('checked', true);
+                    }
+
+                    matrix.showOperationalSkillFields();
+
                     $('#modal_assessment_container').show();
                 }
                 $('#modal_assessment_choice').val(skillItem.SkillAssessmentId);
@@ -488,34 +702,95 @@ var matrix = {
 
                 $('#skill_in_matrix').prop('checked', false);
                 if (inMatrix) {
-                    $('#skill_in_matrix').prop('checked', true);
+
+                    if ($('#skill_in_matrix_true').length) {
+                        $('[id^="skill_in_matrix_"]').each(function (index, elem) {
+                            $(elem).parent('label').removeClass('active');
+                            $(elem).prop('checked', false);
+                        });
+                        $('#skill_in_matrix_true').parent('label').addClass('active');
+                        $('#skill_in_matrix_true').prop('checked', true);
+                    }
                 }
-                $('#skill_in_matrix').attr('data-userskillid', skillItem.Id);
-                $('[data-containertype="skill_in_matrix_container"]').show();
+                else {
+                    if ($('#skill_in_matrix_false').length) {
+                        $('[id^="skill_in_matrix_"]').each(function (index, elem) {
+                            $(elem).parent('label').removeClass('active');
+                            $(elem).prop('checked', false);
+                        });
+                        $('#skill_in_matrix_false').parent('label').addClass('active');
+                        $('#skill_in_matrix_false').prop('checked', true);
+                    }
+                }
+                $('#skill_in_matrix_true').attr('data-userskillid', skillItem.Id);
+                $('#skill_in_matrix_true').attr('data-id', skillItem.Id);
+                $('#skill_in_matrix_container').show();
             } 
         } 
     },
     saveSkill: function () {
+        //warning if operational skill
+        if ($('#dialog_type_2').is(':checked') && ($('#modal_assessment_choice').val() == '' || $('#modal_assessment_choice').val() <= 0)) {
+
+            $.fn.dialogue({
+                //title: "Alert",
+                content: $("<p />").text('Are you sure you do not want to connect an Assessment to this operational skill?'),
+                closeIcon: true,
+                buttons: [
+                    {
+                        text: "Yes", id: $.utils.createUUID(), click: function ($modal) {
+                            $modal.dismiss();
+                            matrix.updateSkill();
+                        }
+                    },
+                    { text: "No", id: $.utils.createUUID(), click: function ($modal) { $modal.dismiss(); } }
+                ]
+            });
+        }
+        else {
+            matrix.updateSkill();
+        }
+
+    },
+    updateSkill: function () {
         let OldInMatrix = ($('#dialog_skillselection option:selected').attr('data-inmatrix') === 'true');
-        let NewInMatrix = $('#skill_in_matrix').is(':checked');
-        if (!matrix.skillEdited && OldInMatrix == NewInMatrix)
-        {
+        let NewInMatrix = $('#skill_in_matrix_true').is(':checked');
+
+        if (!matrix.skillEdited && OldInMatrix == NewInMatrix) {
+            $('body').toggleClass('loaded');
+            window.location.reload();
             return;
         }
+
+        if (!matrix.validateUserSkill()) {
+            return;
+        }
+
         $('body').toggleClass('loaded');
 
         let newSkill = {};
+
         newSkill.Id = $('#dialog_skillselection').val() !== '' ? parseInt($('#dialog_skillselection').val()) : 0;
+
         newSkill.Name = $('#dialog_skillname').val();
         newSkill.Description = $('#dialog_skilldescription').val();
+
         newSkill.IsInMatrix = NewInMatrix;
+
         newSkill.ExpiryInDays = $('#dialog_expiryindays').val() == '' ? 0 : parseInt($('#dialog_expiryindays').val());
         newSkill.Goal = $('#dialog_goal').val() == '' ? 0 : parseInt($('#dialog_goal').val());
         newSkill.NotificationWindowInDays = $('#dialog_notification_window_days').val() == '' ? 0 : parseInt($('#dialog_notification_window_days').val());
-        if ($('#modal_assessment_choice').val() != '' && $('#modal_assessment_choice').val() != null) {
-            newSkill.SkillAssessmentId = parseInt($('#modal_assessment_choice').val());
-        }
+
         newSkill.SkillType = $('#dialog_type_2').is(':checked') ? 1 : 0;
+
+        if (newSkill.SkillType == 1) {
+            newSkill.SkillAssessmentId = parseInt($('#modal_assessment_choice').val());
+
+            if ($('div[id^="defaultTarget-"][class$="-selected"]').length) {
+                newSkill.DefaultTarget = parseInt(matrix.getDefaultTargetValue());
+            }
+
+        }
 
         if (newSkill.Id > 0) {
             $('#dialog_skillselection option[value="' + newSkill.Id + '"]').remove();
@@ -527,6 +802,7 @@ var matrix = {
             data: JSON.stringify(newSkill),
             async: false,
             success: function (data) {
+                $('body').toggleClass('loaded');
                 var returnedSkill = JSON.parse(data);
                 if (newSkill.Id == 0 || newSkill.IsInMatrix) {
                     newSkill.Id = returnedSkill.Id;
@@ -538,9 +814,8 @@ var matrix = {
                 $('#dialog_skillselection option[value="' + newSkill.Id + '"]').attr('data-store', JSON.stringify(newSkill));
                 $('#dialog_skillselection').val(newSkill.Id);
 
-                matrix.updateSkillMatrix(newSkill.IsInMatrix);
+                matrix.updateSkillMatrix(OldInMatrix, NewInMatrix);
                 matrix.hideSkillDetails();
-                $('body').toggleClass('loaded');
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 $('body').toggleClass('loaded');
@@ -549,44 +824,56 @@ var matrix = {
             contentType: "application/json; charset=utf-8"
         });
     },
-    updateSkillMatrix: function (inMatrix ) {
-            if ($('#dialog_skillselection').val() !== '') {
-                $('body').toggleClass('loaded');
+    updateSkillMatrix: function (oldInMatrix, newInMatrix) {
+        if (!matrix.validateUserSkill()) {
+            return;
+        }
+        if ($('#dialog_skillselection').val() !== '') {
 
-                let updateSkillMatrixUri = '';
-                let relation = {};
-                relation.Id = ($('#skill_in_matrix').attr('data-id') == undefined || $('#skill_in_matrix').attr('data-id') == '' ? 0 : parseInt($('#skill_in_matrix').attr('data-id')));
-                relation.UserSkillId = parseInt($('#skill_in_matrix').attr('data-userskillid'));
-                relation.MatrixId = matrix.currentMatrixId;
+            let updateSkillMatrixUri = '';
+            let relation = {};
 
-                if (inMatrix) {
-                    updateSkillMatrixUri = '/skillsmatrix/' + matrix.currentMatrixId + '/skills/addrelation';
-                } else {
-                    updateSkillMatrixUri = '/skillsmatrix/' + matrix.currentMatrixId + '/skills/removerelation';
-                }
+            //relation.Id = ($('#skill_in_matrix_true').attr('data-userskillid') == undefined || $('#skill_in_matrix_true').attr('data-userskillid') == '' ? 0 : parseInt($('#skill_in_matrix_true').attr('data-userskillid')));
+            relation.UserSkillId = parseInt($('#skill_in_matrix_true').attr('data-userskillid'));
 
-                //TODO enable
-                $.ajax({
-                    type: "POST",
-                    url: updateSkillMatrixUri,
-                    data: JSON.stringify(relation),
-                    success: function (data) {
-                        $('body').toggleClass('loaded');
-                        toastr.success('Matrix skill change saved.');
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        $('body').toggleClass('loaded');
-                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
-                    },
-                    contentType: "application/json; charset=utf-8"
-                });
+            relation.MatrixId = matrix.currentMatrixId;
 
-                let option = $('#dialog_skillselection option[value="' + relation.UserSkillId + '"]');
-                $('#dialog_skillselection option[value="' + relation.UserSkillId + '"]').remove();
-                option.attr('data-inmatrix', inMatrix);
-                $(inMatrix ? '#opt_skill_in_matrix' : '#opt_skill_not_in_matrix').append(option);
-                $('#dialog_skillselection').val(relation.UserSkillId);                
+            if (!oldInMatrix && newInMatrix) {
+                updateSkillMatrixUri = '/skillsmatrix/' + matrix.currentMatrixId + '/skills/addrelation';
+            } else if (oldInMatrix && !newInMatrix) {
+                updateSkillMatrixUri = '/skillsmatrix/' + matrix.currentMatrixId + '/skills/removerelation';
             }
+            else {
+                $('body').toggleClass('loaded');
+                document.location.reload();
+                return;
+            }
+
+            $('body').toggleClass('loaded');
+
+            $.ajax({
+                type: "POST",
+                url: updateSkillMatrixUri,
+                data: JSON.stringify(relation),
+                success: function (data) {
+                    $('body').toggleClass('loaded');
+                    toastr.success('Matrix skill change saved.');
+
+                    window.location.reload();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('body').toggleClass('loaded');
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                },
+                contentType: "application/json; charset=utf-8"
+            });
+
+            let option = $('#dialog_skillselection option[value="' + relation.UserSkillId + '"]');
+            $('#dialog_skillselection option[value="' + relation.UserSkillId + '"]').remove();
+            option.attr('data-inmatrix', newInMatrix);
+            $(newInMatrix ? '#opt_skill_in_matrix' : '#opt_skill_not_in_matrix').append(option);
+            $('#dialog_skillselection').val(relation.UserSkillId);                
+        }
     },
     
     initGroupHandlers: function () {
@@ -917,11 +1204,13 @@ var matrix = {
             }
         });
     },
-    updateMatrix: function () {
-        document.location.reload();
-    },
     saveGroup: function () {
-        if (!matrix.groupEdited) {
+        if (!matrix.groupEdited && !matrix.relationChanged) {
+            return;
+        }
+        else if (matrix.relationChanged) {
+            $('body').toggleClass('loaded');
+            document.location.reload();
             return;
         }
 
@@ -1004,7 +1293,7 @@ var matrix = {
     updateGroupMatrix: function () {
         if ($('#group_choice').val() !== '') {
             $('body').toggleClass('loaded');
-
+            matrix.relationChanged = true;
 
             let inMatrix = $('#group_in_matrix').is(':checked');
             let updateGroupMatrixUri = '';

@@ -102,12 +102,7 @@
             </li>
         }
         <li class="nav-item d-sm-inline-block">
-            <form id="logoutForm" asp-controller="Authentication" asp-action="Logout" method="post" class="d-inline">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="nav-link btn btn-link" style="padding: 0; border: none; background: none; cursor: pointer;">
-                    @(Model?.CmsLanguage?.GetValue(LanguageKeys.FrameWork.TopMenuLogOff, "Logoff") ?? "Logoff")
-                </button>
-            </form>
+            <partial name="_logout_form" model="Model"  />
         </li>
 
 
@@ -116,7 +111,7 @@
         {
             <!-- Notifications Dropdown Menu -->
             <li class="nav-item dropdown">
-                <a class="nav-link" data-toggle="dropdown" href="/action">
+                <a class="nav-link" data-bs-toggle="dropdown" href="/action">
                     <i class="far fa-bell"></i>
                     <span class="badge badge-warning navbar-badge">@Model.NewComments</span>
                 </a>

@@ -314,7 +314,7 @@
                     $('#filter_datechoice').val('');
                 });
 
-                $('#templateFilter').val('default').selectpicker("refresh");
+                $('#templateFilter').val('default').trigger('change');
 
                 $('#templateFilter').on('change', function (e) {
                     completedAudits.templateId = +this.value.replace('template', '');
@@ -439,7 +439,7 @@
 
         @if (Model.TemplateId != 0)
         {
-            @:$('#templateFilter').selectpicker('val', 'template' + @(Model.TemplateId));
+            @:$('#templateFilter').val('template' + @(Model.TemplateId));
         }
 
     </script>
@@ -449,7 +449,7 @@
         $('#filter_datechoice').daterangepicker({
             showDropdowns: true,
             autoUpdateInput: false,
-            opens: 'center', drops: 'up',
+            opens: 'center', drops: 'down',
             locale: {
                 format: 'DD MMM YYYY',
                 firstDay: 1,
@@ -491,7 +491,7 @@
 
         @if (Model.TemplateId != 0)
         {
-            @:$('#templateFilter').selectpicker('val', 'template' + @(Model.TemplateId));
+            @:$('#templateFilter').val('template' + @(Model.TemplateId));
         }
     </script>
 

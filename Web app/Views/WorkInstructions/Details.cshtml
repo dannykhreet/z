@@ -453,6 +453,14 @@
             width: -webkit-fill-available;
         }
 
+        .btn-light.disabled.active {
+            color: #fff !important;
+            background-color: #93C54B;
+            border-color: #d3d9df;
+            opacity: .65;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
     </style>
 }
 
@@ -725,7 +733,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="exampleModalLongTitle">QR Code</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -738,7 +746,7 @@
             <div class="modal-footer">
                 <a class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto" onclick="printQRCode()"><i class="fa fa-print"></i></a>
                 <button class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto" onclick="downloadQRCode()"><i class="fas fa-download"></i></button>
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
             </div>
         </div>
     </div>
@@ -756,7 +764,7 @@
                             <h4 class="modal-title" id="exampleModalLongTitle">Work instructions</h4>
                         </div>
                         <div class="col-6 p-4" style="background-color: #EBEBEB;border-top-right-radius: calc(.3rem - 2px);">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -801,7 +809,7 @@
                         <div class="col-6 p-4">
                         </div>
                         <div class="col-6 p-4" style="text-align: right; background-color: #EBEBEB">
-                            <button type="button" class="btn btn-secondary btn-sm mr-2" data-dismiss="modal" data-action="close">Cancel</button>
+                            <button type="button" class="btn btn-secondary btn-sm mr-2" data-bs-dismiss="modal" data-action="close">Cancel</button>
                             <button class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto" onclick="ezgoWorkInstruction.save()">Save</button>
                             <button type="button" class="btn btn-ezgo btn-sm btn-outline shadow-sm mt-auto" onclick="ezgoWorkInstruction.saveWithNotification()">Save & notify</button>
                         </div>
@@ -818,7 +826,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ItemAddLinkModalTitle, "Add link to work instruction item") ?? "Add link to work instruction item")</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -831,7 +839,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-ezgo" onclick="ezgoWorkInstruction.addLinkAttachmentToItem()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ItemAddLinkModalSaveChanges, "Save changes") ?? "Save changes")</button>
-                <button type="button" class="btn btn-light" data-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ItemAddLinkModalClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.WorkInsctruction.ItemAddLinkModalClose, "Close") ?? "Close")</button>
             </div>
         </div>
     </div>

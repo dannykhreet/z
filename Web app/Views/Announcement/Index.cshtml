@@ -27,7 +27,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modal_addchange_title">@(Model?.CmsLanguage.GetValue(LanguageKeys.Announcement.Title, "Announcement") ?? "Announcement")</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -72,7 +72,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" id="cancek_announcement_btn" class="btn btn-outline btn-sm" data-dismiss="modal">@(Model.CmsLanguage.GetValue(LanguageKeys.Announcement.BtnCancel, "Cancel") ?? "Cancel")</button>
+                <button type="button" id="cancek_announcement_btn" class="btn btn-outline btn-sm" data-bs-dismiss="modal">@(Model.CmsLanguage.GetValue(LanguageKeys.Announcement.BtnCancel, "Cancel") ?? "Cancel")</button>
                 <button id="save_announcement_btn" type="button" class="btn btn-ezgo btn-sm" data-actiontype="save">@(Model.CmsLanguage.GetValue(LanguageKeys.Announcement.BtnSave, "Save") ?? "Save")</button>
             </div>
             <input type="hidden" name="announcement_id" id="announcement_id" />

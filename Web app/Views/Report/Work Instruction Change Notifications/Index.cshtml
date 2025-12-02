@@ -729,7 +729,7 @@
                     changeNotifications.showFilterSectionWithoutDetails();
                 });
 
-                $('#templateFilter').val('default').selectpicker("refresh");
+                $('#templateFilter').val('default').trigger('change');
 
                 $('#templateFilter').on('change', function (e) {
                     changeNotifications.templateId = +this.value.replace('template', '');

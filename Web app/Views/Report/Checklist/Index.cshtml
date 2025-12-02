@@ -452,7 +452,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Delete Checklist</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -476,7 +476,7 @@
 
             <div class="modal-footer">
                 <button id="btn_delete_checklist" data-actiontype="confirmdelete" class="btn btn-danger btn-sm">Confirm delete</button>
-                <button type="button" id="closedelete" class="btn btn-info btn-sm" data-dismiss="modal" data-actiontype="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" id="closedelete" class="btn btn-info btn-sm" data-bs-dismiss="modal" data-actiontype="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnClose, "Close") ?? "Close")</button>
             </div>
 
             <input type="hidden" id="hidden_deletechecklistid" id="hidden_deletechecklistid" />
@@ -708,7 +708,7 @@
                     completedChecklists.showFilterSectionWithoutDetails();
                 });
 
-                $('#templateFilter').val('default').selectpicker("refresh");
+                $('#templateFilter').val('default').trigger('change');
 
                 $('#templateFilter').on('change', function (e) {
                     completedChecklists.templateId = +this.value.replace('template', '');
@@ -995,7 +995,7 @@
 
         @if (Model.TemplateId != 0)
         {
-            @:$('#templateFilter').selectpicker('val', 'template' + @(Model.TemplateId));
+            @:$('#templateFilter').val('template' + @(Model.TemplateId));
         }
 
         completedChecklists.language.openChecklists = '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Reports.OpenChecklists, "Open checklists") ?? "Open checklists")';

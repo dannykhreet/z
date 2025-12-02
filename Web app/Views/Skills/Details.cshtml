@@ -693,7 +693,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AssignInstruction, "Assign assessment instructions") ?? "Assign assessment instructions")</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -746,7 +746,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
                 <button type="button" class="btn btn-ezgo btn-sm" data-action="addinstruction">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnAddOrChangeSelected, "Add or change selected") ?? "Add or change selected")</button>
             </div>
         </div>
@@ -857,6 +857,9 @@
                 var oldIndex = $(this).attr('data-previndex');
                 $.utils.arrayMove(ezgolist.tmpl.TaskTemplates, oldIndex, newIndex);
                 $(this).removeAttr('data-previndex');
+                
+                ezgolist.reIndexTaskTemplates();
+                ezgolist.extension.assessments.setAssessments();
             }
         });
     </script>

@@ -34,6 +34,8 @@
 
 .btn-green {
     background-color: #ddf7dd;
+    font-size: 22px;
+    font-weight: 400;
     border-color: #008000;
     color: #008000;
 }

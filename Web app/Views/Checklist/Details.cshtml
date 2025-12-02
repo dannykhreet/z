@@ -901,7 +901,7 @@
     <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
         <div class="modal-content" id="editStageTemplateStepModalContent">
             <div class="modal-header">
-                <h4 class="modal-title">Stage 1</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Stage 1</h4><button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
             </div>
 
             <div class="modal-body">
@@ -1009,7 +1009,7 @@
             <div class="modal-footer">
                 <input type="hidden" id="currentStageTemplateId" />
                 <button id="btnDeleteStageTemplate" class="btn btn-danger btn-sm mr-auto" data-templateid="0" type="button" onclick="ezgolist.deleteStageTemplate()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.DialogDelete, "delete") ?? "delete")</button>
-                <button class="btn btn-ezgo btn-sm" type="button" data-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.DialogClose, "close") ?? "close")</button>
+                <button class="btn btn-ezgo btn-sm" type="button" data-bs-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.DialogClose, "close") ?? "close")</button>
             </div>
         </div>
     </div>
@@ -1064,7 +1064,7 @@
                 <input type="hidden" id="currentTemplateItemStepId" />
                 <button id="btnDeleteStep" class="btn btn-danger btn-sm mr-auto" type="button" data-stepid="0" onclick="ezgolist.deleteItemStep()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.DialogDelete, "Delete") ?? "delete")</button>
                 <button id="btnPreviousStep" class="btn btn-light" type="button" onclick="ezgolist.previousTemplateStep()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.DialogPrevStep, "previous step") ?? "previous step")</button>
-                <button type="button" class="btn btn-ezgo btn-sm" data-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.DialogClose, "Close") ?? "close")</button>
+                <button type="button" class="btn btn-ezgo btn-sm" data-bs-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.DialogClose, "Close") ?? "close")</button>
                 <button id="btnNextStep" class="btn btn-light" type="button" onclick="ezgolist.nextTemplateStep()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.DialogNextStep, "next step") ?? "next step")</button>
             </div>
         </div>
@@ -1077,7 +1077,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.AvailableWorkInstructions, "Available workinstructions") ?? "Available workinstructions")</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -1090,7 +1090,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
             </div>
         </div>
     </div>
@@ -1102,7 +1102,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="exampleModalLongTitle">QR Code</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -1114,7 +1114,7 @@
             <div class="modal-footer">
                 <a class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto" onclick="printQRCode()"><i class="fa fa-print"></i></a>
                 <button class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto" onclick="downloadQRCode()"><i class="fas fa-download"></i></button>
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Checklist.BtnClose, "Close") ?? "Close")</button>
             </div>
         </div>
     </div>
@@ -1128,7 +1128,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.ItemAddLinkModalTitle, "Add link to checklist item") ?? "Add link to checklist item")</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -1141,7 +1141,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-ezgo" onclick="ezgolist.addLinkAttachmentToChecklistItem()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.ItemAddLinkModalSaveChanges, "Save changes") ?? "Save changes")</button>
-                    <button type="button" class="btn btn-light" data-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.ItemAddLinkModalClose, "Close") ?? "Close")</button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Checklist.ItemAddLinkModalClose, "Close") ?? "Close")</button>
                 </div>
             </div>
         </div>
@@ -1246,23 +1246,29 @@
         $('#stageSignature3').on('click', function (e) {
             $('#stageSignature3Image').attr('src', '/images/checklist stage icons/A_Two_signatures.svg');
         });
-
+         
         $('#lock_next_stages').on('click', function (e) {
             $('#lock_next_stages_image').attr('src', '/images/checklist stage icons/A_Lock(s).svg');
             $('#do_not_lock_stages_image').attr('src', '/images/checklist stage icons/NA_Do_not_lock.svg');
+            $('#lock_next_stages_label, #do_not_lock_stages_label').removeClass('active');
+            $(e.currentTarget).closest('label').addClass('active');
         });
 
         $('#do_not_lock_stages').on('click', function (e) {
             $('#lock_next_stages_image').attr('src', '/images/checklist stage icons/NA_Lock.svg');
             $('#do_not_lock_stages_image').attr('src', '/images/checklist stage icons/A_Do_not_lock.svg');
+            $('#lock_next_stages_label, #do_not_lock_stages_label').removeClass('active');
+            $(e.currentTarget).closest('label').addClass('active');
         });
 
         $('#enable_shift_notes').on('click', function (e) {
             if ($('#enable_shift_notes')[0].checked) {
                 $('#enable_shift_notes_image').attr('src', '/images/checklist stage icons/A_Enable_notes.svg');
+                $(e.currentTarget).closest('label').addClass('active');
             }
             else {
                 $('#enable_shift_notes_image').attr('src', '/images/checklist stage icons/NA_Enable_notes.svg');
+                $(e.currentTarget).closest('label').removeClass('active');
             }
         });
 
@@ -1453,7 +1459,8 @@
         };
 
         $('#valueProps').sortable({
-            items: "li:not(.ui-state-disabled)"
+            items: "li:not(.ui-state-sorting-disabled)",
+            placeholder: 'value-placeholder'
         });
 
         $("#valueProps li").disableSelection();

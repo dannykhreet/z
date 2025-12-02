@@ -325,6 +325,63 @@
             user-select: none;
             cursor: pointer;
         }
+
+        .default-target {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 1px solid rgb(210, 210, 210);
+            font-size: 22px !important;
+            outline: 0 !important;
+        }
+
+
+        .item-target {
+            display: flex;
+        }
+
+        .btn-green-selected {
+            background-color: green;
+            font-size: 22px;
+            font-weight: 400;
+            color: white;
+        }
+
+        .btn-red-selected {
+            background-color: rgb(203,0,0);
+            font-size: 22px !important;
+            font-weight: 400;
+            color: white;
+        }
+
+        .btn-clear-selected {
+            background-color: #ffffff;
+            font-size: 22px;
+            font-weight: 400;
+            color: white;
+        }
+
+        .btn-orangered-selected {
+            background-color: orangered;
+            font-size: 22px;
+            font-weight: 400;
+            color: white;
+        }
+
+        .btn-orange-selected {
+            background-color: orange;
+            font-size: 22px;
+            font-weight: 400;
+            color: white;
+        }
+
+        .btn-orangegreen-selected {
+            background-color: rgb(141,163,5);
+            font-size: 22px;
+            font-weight: 400;
+            color: white;
+        }
     </style>
 
     <link rel="stylesheet" href="/css/matrix/matrix.css" />
@@ -1017,137 +1074,196 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AddOrChangeSkillTitle, "Add or Change Skill (Operational or Mandatory)") ?? "Add or Change Skill (Operational or Mandatory)")</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
 
             <div class="modal-body">
                 <div class="row">
-                    <div class="form-group input-group">
-                        <select class="form-control" id="dialog_skillselection">
-                            @if (Model.UserSkills != null && Model.UserSkills.Count > 0)
-                            {
-                                var idsInMatrix = Model.CurrentSkillsMatrix.MandatorySkills != null ? Model.CurrentSkillsMatrix.MandatorySkills.Select(x => x.UserSkillId).ToList() : new List<int>();
-                                if (Model.CurrentSkillsMatrix.OperationalSkills != null)
+                    <div class="col-12">
+                        <div class="form-group input-group">
+                            <select class="form-control" id="dialog_skillselection">
+                                @if (Model.UserSkills != null && Model.UserSkills.Count > 0)
                                 {
-                                    idsInMatrix.AddRange(Model.CurrentSkillsMatrix.OperationalSkills.Select(x => x.UserSkillId).ToList());
+                                    var idsInMatrix = Model.CurrentSkillsMatrix.MandatorySkills != null ? Model.CurrentSkillsMatrix.MandatorySkills.Select(x => x.UserSkillId).ToList() : new List<int>();
+                                    if (Model.CurrentSkillsMatrix.OperationalSkills != null)
+                                    {
+                                        idsInMatrix.AddRange(Model.CurrentSkillsMatrix.OperationalSkills.Select(x => x.UserSkillId).ToList());
+                                    }
+
+                                    <option value="" title="Please select an existing skill">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SelectSkillTitle, "Please select an existing skill.") ?? "Please select an existing skill.")</option>
+                                    <optgroup label="In matrix" id="opt_skill_in_matrix">
+                                        @foreach (var item in Model.UserSkills.Where(x => x.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Mandatory && idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name))
+                                        {
+                                            <option value="@item.Id.ToString()" title="@item.Description" data-inmatrix="true" data-userskillid="@item.Id" data-store="@item.ToJsonFromObject()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionMandatorySkill, "Mandatory Skill") ?? "Mandatory Skill") - @item.Name</option>
+                                        }
+
+                                        @foreach (var item in Model.UserSkills.Where(x => x.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Operational && idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name))
+                                        {
+                                            <option value="@item.Id.ToString()" title="@item.Description" data-inmatrix="true" data-userskillid="@item.Id" data-store="@item.ToJsonFromObject()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionOperationalSkill, "Operational Skill") ?? "Operational Skill") - @item.Name</option>
+                                        }
+                                    </optgroup>
+
+                                    <optgroup label="Not in matrix" id="opt_skill_not_in_matrix">
+                                        @foreach (var item in Model.UserSkills.Where(x => x.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Mandatory && !idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name))
+                                        {
+                                            <option value="@item.Id.ToString()" title="@item.Description" data-inmatrix="false" data-userskillid="@item.Id" data-store="@item.ToJsonFromObject()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionMandatorySkill, "Mandatory Skill") ?? "Mandatory Skill") - @item.Name</option>
+                                        }
+
+                                        @foreach (var item in Model.UserSkills.Where(x => x.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Operational && !idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name))
+                                        {
+                                            <option value="@item.Id.ToString()" title="@item.Description" data-inmatrix="false" data-userskillid="@item.Id" data-store="@item.ToJsonFromObject()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionOperationalSkill, "Operational Skill") ?? "Operational Skill") - @item.Name</option>
+                                        }
+                                    </optgroup>
                                 }
+                                else
+                                {
+                                    <option value="" title="No skill available, please select create new">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionNoSkillsAvailable, "No skills available.") ?? "No skills available.")</option>
+                                }
+                            </select>
 
-                                <option value="" title="Please select an existing skill">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SelectSkillTitle, "Please select an existing skill.") ?? "Please select an existing skill.")</option>
-                                <optgroup label="In matrix" id="opt_skill_in_matrix">
-                                    @foreach (var item in Model.UserSkills.Where(x => x.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Mandatory && idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name))
-                                    {
-                                        <option value="@item.Id.ToString()" title="@item.Description" data-inmatrix="true" data-store="@item.ToJsonFromObject()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionMandatorySkill, "Mandatory Skill") ?? "Mandatory Skill") - @item.Name</option>
-                                    }
-
-                                    @foreach (var item in Model.UserSkills.Where(x => x.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Operational && idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name))
-                                    {
-                                        <option value="@item.Id.ToString()" title="@item.Description" data-inmatrix="true" data-store="@item.ToJsonFromObject()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionOperationalSkill, "Operational Skill") ?? "Operational Skill") - @item.Name</option>
-                                    }
-                                </optgroup>
-
-                                <optgroup label="Not in matrix" id="opt_skill_not_in_matrix">
-                                    @foreach (var item in Model.UserSkills.Where(x => x.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Mandatory && !idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name))
-                                    {
-                                        <option value="@item.Id.ToString()" title="@item.Description" data-inmatrix="false" data-store="@item.ToJsonFromObject()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionMandatorySkill, "Mandatory Skill") ?? "Mandatory Skill") - @item.Name</option>
-                                    }
-
-                                    @foreach (var item in Model.UserSkills.Where(x => x.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Operational && !idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name))
-                                    {
-                                        <option value="@item.Id.ToString()" title="@item.Description" data-inmatrix="false" data-store="@item.ToJsonFromObject()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionOperationalSkill, "Operational Skill") ?? "Operational Skill") - @item.Name</option>
-                                    }
-                                </optgroup>
-                            }
-                            else
-                            {
-                                <option value="" title="No skill available, please select create new">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionNoSkillsAvailable, "No skills available.") ?? "No skills available.")</option>
-                            }
-                        </select>
-
-                        <div class="input-group-append" style="display: none">
-                            <button class="btn btn-default" title="New" id="btn_new_skill" onclick=""><i class="fas fa-plus"></i></button>
-                            @if (Model.UserSkills != null && Model.UserSkills.Count > 0)
-                            {
-                                <button class="btn btn-default" title="Edit" id="btn_edit_skill" onclick=""><i class="fas fa-edit"></i></button>
-                            }
+                            <div class="input-group-append" style="display: none">
+                                <button class="btn btn-default" title="New" id="btn_new_skill" onclick=""><i class="fas fa-plus"></i></button>
+                                @if (Model.UserSkills != null && Model.UserSkills.Count > 0)
+                                {
+                                    <button class="btn btn-default" title="Edit" id="btn_edit_skill" onclick=""><i class="fas fa-edit"></i></button>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div data-containertype="dialog_skilldetails">
                     <div class="row">
-                        <div class="form-group col-md-10">
+                        <div class="form-group col-12">
                             <label for="dialog_skillname">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.DialogSkillName, "Name") ?? "Name")</label><input type="text" class="form-control" name="dialog_skillname" id="dialog_skillname" />
-                        </div>
-
-                        <div class="form-group col-md-2 align-self-md-center" data-containertype="skill_in_matrix_container">
-                            <label for="">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillInMatrix, "In Matrix") ?? "In Matrix")</label>
-                            <input type="checkbox" id="skill_in_matrix" name="skill_in_matrix" class="form-control" style="accent-color: #93C54B" />
                         </div>
                     </div>
 
+                    <div id="skill_in_matrix_container" class="row pb-2">
+                        <div class="col-12">
+                            <div class="btn-group btn-group-sm btn-group-toggle pt-1" data-toggle="buttons" style="display:flex;vertical-align: middle; border-radius: 10px">
+                                <label id="skill_in_matrix_label" class="btn btn-light text-muted py-4" style="flex:1;font-weight: 400; border-top-left-radius: 10px; border-bottom-left-radius: 10px">
+                                    <input type="radio" checked name="skill_in_matrix" id="skill_in_matrix_true">
+                                    <div class="row" style="align-items: center">
+                                        <div class="col-auto" style="text-align: right; min-width: 80px">
+                                            <i class="fa-solid fa-border-outer" style="font-size: 31px;vertical-align: middle; padding-right: 8px"></i>
+                                        </div>
+                                        <div class="col" style="text-align: left">
+                                            <span style="font-weight: 600">
+                                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillInMatrix, "In Matrix") ?? "In Matrix")
+                                            </span>
+                                            <br />
+                                            <span>
+                                                Edit and add this skill to this matrix.
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                </label>
+
+                                <label id="skill_in_matrix_false_label" class="btn btn-light text-muted py-4" style="flex:1;font-weight: 400; border-top-right-radius: 10px; border-bottom-right-radius: 10px">
+                                    <input type="radio" name="skill_in_matrix" id="skill_in_matrix_false">
+
+                                    <div class="row" style="align-items: center">
+                                        <div class="col-auto" style="text-align: right; min-width: 80px">
+                                            <i class="fa-solid fa-border-none" style="font-size: 31px;vertical-align: middle; padding-right: 8px"></i>
+                                        </div>
+                                        <div class="col" style="text-align: left">
+                                            <span style="font-weight: 600">
+                                                Not in matrix
+                                            </span>
+                                            <br />
+                                            <span>
+                                                Edit this skill without adding it to this matrix.
+                                            </span>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
-                        <div class="form-group col-md-12">
+                        <div class="form-group col-12">
                             <label for="dialog_skilldescription">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.DialogSkillDescription, "Description") ?? "Description")</label><input type="text" class="form-control" name="dialog_skilldescription" id="dialog_skilldescription" />
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="form-group col-md-4">
-                            <div>
-                                <label for="">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillTypeTitle, "Skill type") ?? "Skill type")</label>
-                            </div>
+                        <div class="col-12">
+                            <div class="btn-group btn-group-sm btn-group-toggle pt-1" data-toggle="buttons" style="display:flex;vertical-align: middle">
+                                <label id="dialog_type_1_label" class="btn btn-light text-muted py-4" style="flex:1;font-weight: 400; border-top-left-radius: 10px; border-bottom-left-radius: 10px">
+                                    <input type="radio" checked name="dialog_type" id="dialog_type_1">
+                                        <i class="fa-regular fa-seal-exclamation" style="font-size: 31px;vertical-align: middle; padding-right: 8px"></i>
+                                    <span style="font-weight: 600">
+                                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionMandatorySkill, "Mandatory skill") ?? "Mandatory skill")
+                                    </span>
+                                </label>
 
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="dialog_type" id="dialog_type_1" onclick="if ($(this).is(':checked')) { $('#modal_assessment_container').hide(); };">
-                                <label class="form-check-label" for="dialog_type_1">
-                                    @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionMandatorySkill, "Mandatory skill") ?? "Mandatory skill")
+                                <label id="dialog_type_2_label" class="btn btn-light text-muted py-4" style="flex:1;font-weight: 400; border-top-right-radius: 10px; border-bottom-right-radius: 10px">
+                                    <input type="radio" name="dialog_type" id="dialog_type_2">
+                                    <i class="fa-regular fa-seal" style="font-size: 31px;vertical-align: middle; padding-right: 8px"></i>
+                                    <span style="font-weight: 600">
+                                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionOperationalSkill, "Operational skill") ?? "Operational skill")
+                                    </span>
                                 </label>
                             </div>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="dialog_type" id="dialog_type_2" checked onclick="if ($(this).is(':checked')) { $('#modal_assessment_container').show(); };">
-                                <label class="form-check-label" for="dialog_type_2">
-                                    @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionOperationalSkill, "Operational skill") ?? "Operational skill")
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="form-group col-md-4">
-                            <label for="" title="Aimed number of users that completed this operational/mandatory skill">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixGoalTitle, "Goal") ?? "Goal")</label>
-                            <input type="number" class="form-control" name="dialog_goal" id="dialog_goal" min="0" />
-                        </div>
-
-                        <div class="form-group col-md-4">
-                            <label for="" title="Notification window when data is expiring">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.DialogNotificationWindowDays, "Notification window in days") ?? "Notification window in days")</label>
-                            <input type="number" class="form-control" name="dialog_notification_window_days" id="dialog_notification_window_days" min="0" />
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="form-group col-md-4">
+                    <div class="row pt-2">
+                        <div id="expiry_in_days_container" class="form-group col-4">
                             <label for="" title="Expiry in days after creation">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.DialogExpiryInDays, "Expiry in days") ?? "Expiry in days")</label>
                             <input type="number" class="form-control" name="dialog_expiryindays" id="dialog_expiryindays" min="0" />
                         </div>
 
-                        <div class="form-group col-md-4">
+                        <div id="notification_window_container" class="form-group col-4">
+                            <label for="" title="Notification window when data is expiring">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.DialogNotificationWindowDays, "Notification window in days") ?? "Notification window in days")</label>
+                            <input type="number" class="form-control" name="dialog_notification_window_days" id="dialog_notification_window_days" min="0" />
+                        </div>
+
+                        <div id="default_target_container" class="form-group col-6" style="display: none">
+                            <div class="row">
+                                <div class="col-auto d-flex" style="align-items: end;padding-bottom: 8px;">
+                                    <label for="default_target" title="Default target">Default target</label>
+                                </div>
+                                <div class="col d-flex" style="flex-wrap: wrap; user-select:none">
+
+                                    <div id="defaultTarget-1" data-value="1" class='item-target btn-red m-1'>1</div>
+                                    <div id="defaultTarget-2" data-value="2" class='item-target btn-orangered m-1'>2</div>
+                                    <div id="defaultTarget-3" data-value="3" class='item-target btn-orange m-1'>3</div>
+                                    <div id="defaultTarget-4" data-value="4" class='item-target btn-orangegreen m-1'>4</div>
+                                    <div id="defaultTarget-5" data-value="5" class='item-target btn-green m-1'>5</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="required_goal_container" class="form-group col-4">
+                            <label for="" title="Aimed number of users that completed this operational/mandatory skill">Required</label>
+                            <input type="number" class="form-control" name="dialog_goal" id="dialog_goal" min="0" />
+                        </div>
+                    </div>
+
+                    <div class="row pt-2">
+                        <div class="form-group col-4">
                             <label for="" style="display: none">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.DialogValidFrom, "Valid from") ?? "Valid from")</label>
                             <input type="date" class="form-control" name="dialog_validfrom" id="dialog_validfrom" disabled style="display: none" />
                         </div>
 
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-4">
                             <label for="" style="display: none">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.DialogValidTo, "Valid to") ?? "Valid to")</label>
                             <input type="date" class="form-control" name="dialog_validto" id="dialog_validto" disabled style="display: none" />
                         </div>
                     </div>
 
-                    <div class="row" id="modal_assessment_container">
+                    <div class="row" id="modal_assessment_container" style="display: none">
                         <div class="form-group col-md-12">
                             <label for="modal_assessment_choice">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SelectAssessmentTitle, "Select Assessment") ?? "Select Assessment")</label>
                             @if (Model.SkillAssessmentTemplates != null)
                             {
                                 <select id="modal_assessment_choice" class="form-control">
+                                    <option value=""></option>
                                     @foreach (var item in Model.SkillAssessmentTemplates)
                                     {
                                         <option value="@item.Id">@item.Name</option>
@@ -1161,7 +1277,7 @@
 
             <div class="modal-footer">
                 <button id="btnDeleteUserSkill" type="button" class="btn btn-danger btn-sm" disabled>Delete</button>
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
                 <button type="button" class="btn btn-ezgo btn-sm" data-action="update" id="skill_update_matrix" disabled>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnUpdate, "Update") ?? "Update")</button>
             </div>
         </div>
@@ -1174,7 +1290,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.AddOrChangeUserGroupsTitle, "Add or Change user groups") ?? "Add or Change user groups")</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-actiontype="close_modal">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" data-actiontype="close_modal">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -1305,7 +1421,7 @@
 
             <div class="modal-footer">
                 <button id="btnDeleteUserGroup" type="button" class="btn btn-danger btn-sm" disabled>Delete</button>
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
                 <button type="button" class="btn btn-ezgo btn-sm" data-action="update">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnUpdate, "Update") ?? "Update")</button>
             </div>
         </div>
@@ -1318,7 +1434,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendTitle, "Matrix legend") ?? "Matrix legend")</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -1429,7 +1545,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
             </div>
         </div>
     </div>
@@ -1441,7 +1557,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="UserSkillValuesModalTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkills, "User skills") ?? "User skills")</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -1467,7 +1583,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
             </div>
         </div>
     </div>
@@ -1479,7 +1595,7 @@
         <div class="modal-content" style="background-color: #f1f3f1">
             <div class="modal-header">
                 <h4 class="modal-title" id="ChangeSkillOrderTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ChangeSkillOrder, "Change skill order") ?? "Change skill order")</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -1520,7 +1636,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
                 <button class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto" id="save_indices">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Task.BtnSave, "Save") ?? "Save")</button>
             </div>
         </div>

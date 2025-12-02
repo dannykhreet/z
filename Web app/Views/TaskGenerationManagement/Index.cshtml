@@ -1188,7 +1188,7 @@
                         <label class="custom-control-label font-weight-normal" for="area-@area.Id"></label>
                     </div>
                     <div class="col-sm-11 col-md-11">
-                        <button class="btn btn-light text-left col-12" type="button" data-toggle="collapse" data-target="#collapse-@area.Id" aria-expanded="false" aria-controls="collapse-@area.Id" onclick="@(Model.MoreGenerationOptionsEnabled ? string.Concat("taskManagement.getTasks(", area.Id, ")") : "")">
+                        <button class="btn btn-light text-left col-12" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@area.Id" aria-expanded="false" aria-controls="collapse-@area.Id" onclick="@(Model.MoreGenerationOptionsEnabled ? string.Concat("taskManagement.getTasks(", area.Id, ")") : "")">
                             @area.Name @if (area.Children.Count > 0)
                             {<i class="fas fa-chevron-down" style="float: right; "></i>}
                         </button>

@@ -98,8 +98,40 @@
                     <div class="card-header">
                         <h3 class="card-title">Holding settings</h3>
                     </div>
-
                     <div class="card-body p-3">
+                        <div class="card-header">
+                            <h3 class="card-title" style="border-bottom:1px solid #C0C0C0">Datawarehouse & Reporting Pack</h3>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                @if (Model.HoldingId > 0)
+                                {
+                                    <div class="row">
+                                        <div class="col pb-2">
+                                            <label for="company_datawarehouse_holding_user">Datawarehouse holding account</label>
+                                            <br />
+                                            <div><span id="company_datawarehouse_holding_user">@(Model.DatawarehouseHoldingUser != null ? Model.DatawarehouseHoldingUser.Username : "There is no datawarehouse connection based on a possible holding.")</span> </div>
+                                        </div>
+                                    </div>
+                                    @if (Model.DatawarehouseHoldingUser != null)
+                                    {
+                                        <div class="row">
+                                            <div class="col pb-2">
+                                                <div style="position:relative" title="Available modules">
+                                                    @foreach (string module in Model.DatawarehouseHoldingUser.Modules.Split(","))
+                                                    {
+                                                        <div style="display:inline-block; padding:2px; margin-top:2px;" class="badge badge-secondary"><span style=" font-weight:bolder;font-size:10px;margin:2px;">@module</span></div>
+
+                                                    }
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+
                         <div class="card-header">
                             <h3 class="card-title" style="border-bottom:1px solid #C0C0C0">Connectors</h3>
                         </div>

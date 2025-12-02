@@ -98,7 +98,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12 pr-3">
-                                            <a href="#" class="btn btn-primary btn-sm float-right" id="model_btn_@item.Id" data-actiontype="edit" data-toggle="modal" data-target="#integrationModal" data-marketitem-id="@item.Id">@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.AddIntegration, "Add integration") ?? "Add integration")</a>
+                                            <a href="#" class="btn btn-primary btn-sm float-right" id="model_btn_@item.Id" data-actiontype="edit" data-bs-toggle="modal" data-bs-target="#integrationModal" data-marketitem-id="@item.Id">@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.AddIntegration, "Add integration") ?? "Add integration")</a>
                                         </div>
                                     </div>
                                 </div>
@@ -109,118 +109,6 @@
                         }
                     }
 
-                    <!--
-                    <div class="col-lg-6 col-md-6 app pb-3">
-                        <div class="card h-100">
-                            <div class="row no-gutters">
-                                <div class="col-md-4 align-self-center p-2">
-                                    <img src="/assets/img/apps/solvace.jpeg" class="card-img" alt="...">
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Solvace</h5>
-                                        <p class="card-text">
-                                            Solvace manages improvement opportunities
-                                            around Visual Management and Problem Solving, Solvace Digitizes your Performance Management Process.
-                                        </p>
-                                        <p class="card-text d-none"><small class="text-muted">Last updated 3 mins ago</small></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12 pr-3">
-                                    <a href="#" class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#integrationModal">Add integration</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-6 pb-3">
-                        <div class="card h-100">
-                            <div class="row no-gutters">
-                                <div class="col-md-4 align-self-center p-2">
-                                    <img src="/assets/img/apps/ultimo.png" class="card-img" alt="...">
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Ultimo</h5>
-                                        <p class="card-text">Ultimo offers many rich functionalities as standard. For planning, monitoring, optimization and execution. For tracking all the required maintenance activities.</p>
-                                        <p class="card-text d-none"><small class="text-muted">Last updated 3 mins ago</small></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12 pr-3">
-                                    <a href="#" class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#integrationModal">Add integration</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-6 pb-3">
-                        <div class="card h-100">
-                            <div class="row no-gutters">
-                                <div class="col-md-4 align-self-center p-2">
-                                    <img src="/assets/img/apps/SAP-PM-logo.jpg" class="card-img" alt="...">
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title">SAP Plant Maintenance</h5>
-                                        <p class="card-text">Plant Maintenance module consists of key activities to include inspection, notifications, corrective and preventive maintenance, repairs, and other measures to maintain an ideal technical system.</p>
-                                        <p class="card-text d-none"><small class="text-muted">Last updated 3 mins ago</small></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12 pr-3">
-                                    <a href="#" class="btn btn-primary btn-sm float-right">Add integration</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-6 pb-3">
-                        <div class="card h-100">
-                            <div class="row no-gutters">
-                                <div class="col-md-4 align-self-center p-2">
-                                    <img src="/assets/img/apps/teams-logo.png" class="card-img" alt="...">
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Microsoft Teams</h5>
-                                        <p class="card-text">
-                                            Instantly go from group chat to video call with the touch of a button. Securely connect, access, share, and coauthor files in real time. Stay organized by keeping notes, documents, and your calendar together.
-                                        </p>
-                                        <p class="card-text d-none"><small class="text-muted">Last updated 3 mins ago</small></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12 pr-3">
-                                    <a href="#" class="btn btn-primary btn-sm float-right">Add integration</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-6 pb-3">
-                        <div class="card h-100">
-                            <div class="row no-gutters">
-                                <div class="col-md-4 align-self-center p-2">
-                                    <img src="/assets/img/apps/realwear-logo.png" class="card-img" alt="...">
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Realwear</h5>
-                                        <p class="card-text">Seamless Business Continuity with Remote Hands-Free Collaboration. Accelerate the roll-out of connected work programs, from evaluation through pilot to production use with out-of-the-box functionality.</p>
-                                        <p class="card-text d-none"><small class="text-muted">Last updated 3 mins ago</small></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12 pr-3">
-                                    <a href="#" class="btn btn-primary btn-sm float-right">Add integration</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                     -->
 
                 </div>
             </div>
@@ -236,7 +124,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="integrationModalLabel">@(Model?.CmsLanguage.GetValue(LanguageKeys.Config.HeaderIntegrateWithSolvace, "Integrate with Solvace") ?? "Integrate with Solvace")</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -248,8 +136,8 @@
             </div>
             <div class="modal-footer">
                 <img src="/assets/img/apps/solvace.jpeg" class="mr-auto" style="width: 150px;" date-containertype="modal_picture"/>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonCancel, "Cancel") ?? "Cancel")</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" data-actiontype="save">@(Model.CmsLanguage.GetValue(LanguageKeys.Config.DialogButtonSaveAndAdd, "Save & add") ?? "Save & add")</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@(CmsLanguage?.GetValue(LanguageKeys.Config.DialogButtonCancel, "Cancel") ?? "Cancel")</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" data-actiontype="save">@(Model.CmsLanguage.GetValue(LanguageKeys.Config.DialogButtonSaveAndAdd, "Save & add") ?? "Save & add")</button>
             </div>
         </div>
     </div>

@@ -94,26 +94,26 @@ var areaFilter_v2 = {
 
                 if (!areaFilter_v2._enableExternalFiltering) {
                     //reset filters on left side
-                    $("#instructionFilter").val('default').selectpicker("refresh");
-                    $("#roleFilter").val('default').selectpicker("refresh");
-                    $("#imageFilter").val('default').selectpicker("refresh");
-                    $("#videoFilter").val('default').selectpicker("refresh");
-                    $("#recurrenceFilter").val('default').selectpicker("refresh");
-                    $('#assessorFilter').val('default').selectpicker("refresh");
-                    $('#assesseeFilter').val('default').selectpicker("refresh");
-                    $('#templateFilter').val('default').selectpicker("refresh");
-                    $('#workinstructionTypeFilter').val('default').selectpicker("refresh");
-                    $('#notificationAuthorFilter').val('default').selectpicker("refresh");
+                    $("#instructionFilter").val('').trigger('change');
+                    $("#roleFilter").val('').trigger('change');
+                    $("#imageFilter").val('').trigger('change');
+                    $("#videoFilter").val('').trigger('change');
+                    $("#recurrenceFilter").val('').trigger('change');
+                    $('#assessorFilter').val('').trigger('change');
+                    $('#assesseeFilter').val('').trigger('change');
+                    $('#templateFilter').val('').trigger('change');
+                    $('#workinstructionTypeFilter').val('').trigger('change');
+                    $('#notificationAuthorFilter').val('').trigger('change');
 
                     //reset inline filters
-                    $("#instructionFilterInline").val('default').selectpicker("refresh");
-                    $("#roleFilterInline").val('default').selectpicker("refresh");
-                    $("#imageFilterInline").val('default').selectpicker("refresh");
-                    $("#videoFilterInline").val('default').selectpicker("refresh");
-                    $("#recurrenceFilterInline").val('default').selectpicker("refresh");
-                    $('#assessorFilterInline').val('default').selectpicker("refresh");
-                    $('#assesseeFilterInline').val('default').selectpicker("refresh");
-                    $('#workinstructionTypeFilterInline').val('default').selectpicker("refresh");
+                    $("#instructionFilterInline").val('').trigger('change');
+                    $("#roleFilterInline").val('').trigger('change');
+                    $("#imageFilterInline").val('').trigger('change');
+                    $("#videoFilterInline").val('').trigger('change');
+                    $("#recurrenceFilterInline").val('').trigger('change');
+                    $('#assessorFilterInline').val('').trigger('change');
+                    $('#assesseeFilterInline').val('').trigger('change');
+                    $('#workinstructionTypeFilterInline').val('').trigger('change');
 
                     $('[data-role="roleFilter"],[data-role="instructionFilter"],[data-role="imageFilter"],[data-role="videoFilter"],[data-role="recurrenceFilter"],[data-role="assessorFilter"],[data-role="assesseeFilter"],[data-role="workinstructionTypeFilter"]').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
                         var filterId = $(e.currentTarget).attr('id');
@@ -211,17 +211,17 @@ var areaFilter_v2 = {
         areaid = 0;
         arealevel = 0;
         //reset filters on left side
-        $("#instructionFilter").val('default').selectpicker("refresh");
-        $("#roleFilter").val('default').selectpicker("refresh");
-        $("#imageFilter").val('default').selectpicker("refresh");
-        $("#videoFilter").val('default').selectpicker("refresh");
-        $("#recurrenceFilter").val('default').selectpicker("refresh");
-        $('#assessorsFilter').val('default').selectpicker("refresh");
-        $('#assesseeFilter').val('default').selectpicker("refresh");
-        $('#templateFilter').val('default').selectpicker("refresh");
-        $('#iscompletedFilter').val('true').selectpicker("refresh");
-        $('#workinstructionTypeFilter').val('default').selectpicker("refresh");
-        $('#notificationAuthorFilter').val('default').selectpicker("refresh");
+        $("#instructionFilter").val('').trigger('change');
+        $("#roleFilter").val('').trigger('change');
+        $("#imageFilter").val('').trigger('change');
+        $("#videoFilter").val('').trigger('change');
+        $("#recurrenceFilter").val('').trigger('change');
+        $('#assessorsFilter').val('').trigger('change');
+        $('#assesseeFilter').val('').trigger('change');
+        $('#templateFilter').val('').trigger('change');
+        $('#iscompletedFilter').val('true').trigger('change');
+        $('#workinstructionTypeFilter').val('').trigger('change');
+        $('#notificationAuthorFilter').val('').trigger('change');
         
         $('[id^="filter-tag-"]').each(function (index, elem) {
             $(elem).hide();
@@ -239,14 +239,14 @@ var areaFilter_v2 = {
         tree.find('ul:not(:first)').hide();
 
         //reset inline filters
-        $("#instructionFilterInline").val('default').selectpicker("refresh");
-        $("#roleFilterInline").val('default').selectpicker("refresh");
-        $("#imageFilterInline").val('default').selectpicker("refresh");
-        $("#videoFilterInline").val('default').selectpicker("refresh");
-        $("#recurrenceFilterInline").val('default').selectpicker("refresh");
-        $('#assessorFilterInline').val('default').selectpicker("refresh");
-        $('#assesseeFilterInline').val('default').selectpicker("refresh");
-        $('#workinstructionTypeFilterInline').val('default').selectpicker("refresh");
+        $("#instructionFilterInline").val('').trigger('change');
+        $("#roleFilterInline").val('').trigger('change');
+        $("#imageFilterInline").val('').trigger('change');
+        $("#videoFilterInline").val('').trigger('change');
+        $("#recurrenceFilterInline").val('').trigger('change');
+        $('#assessorFilterInline').val('').trigger('change');
+        $('#assesseeFilterInline').val('').trigger('change');
+        $('#workinstructionTypeFilterInline').val('').trigger('change');
 
         var tree = $('#inlineAreaTree');
         tree.find('a').css('font-weight', '400');

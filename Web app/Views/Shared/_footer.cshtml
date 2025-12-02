@@ -96,8 +96,9 @@
                     $('#connectivity_issue_container').hide();
                 } else if (xhr.status == 401) {
                     if (doRedirect) {
-                        console.log('redirecting...');
-                        document.location.href = '/logout';
+                        if($('#logoutForm').length) {
+                            ensureFreshTokenAndLogout();
+                        }
                     } else {
                         $('#modalSessionExpired').modal('show');
                     }
@@ -105,8 +106,9 @@
                 else {
                     //connection still down, check for redirect, if so do redirect.
                     if (doRedirect) {
-                        console.log('redirecting...');
-                        document.location.href = '/logout';
+                        if($('#logoutForm').length) {
+                            ensureFreshTokenAndLogout();
+                        }
                     } else {
                         $('#connectivity_issue_container').show();
                     }
@@ -115,8 +117,9 @@
             xhr.onerror = function () {
                 checkActivityRunning = false;
                 if (doRedirect) {
-                    console.log('redirecting...');
-                    document.location.href = '/logout';
+                    if($('#logoutForm').length) {
+                        ensureFreshTokenAndLogout();
+                    }
                 } else {
                     $('#connectivity_issue_container').show();
                 }

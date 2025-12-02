@@ -491,7 +491,7 @@
                     completedAssessments.showFilterSectionWithoutDetails();
                 });
 
-                $('#templateFilter').val('default').selectpicker("refresh");
+                $('#templateFilter').val('default').trigger('change');
 
                 $('#templateFilter').on('change', function (e) {
                     $('#detailslist').html('');
@@ -778,6 +778,20 @@
             completedAssessments.retrieve();
         });
 
+        $('[data-action="clearassessorsfilter"]').on('click', function () {
+            $('#assessorsFilter').val('');
+            $('#assessorsFilter').trigger('change');
+
+            completedAssessments.filters.assessorIds = '';
+
+            completedAssessments.clearDetails();
+
+            completedAssessments.filters.offset = 0;
+            completedAssessments.clearItemContainer();
+            completedAssessments.setLoaderStart('load_more_loader');
+            completedAssessments.retrieve();
+        });
+
 
         //fancybox
         $(document).on('afterShow.fb', function () {
@@ -789,7 +803,7 @@
 
         @if(Model.TemplateId != 0)
         {
-            @:$('#templateFilter').selectpicker('val', 'template' + @(Model.TemplateId));
+            @:$('#templateFilter').val('template' + @(Model.TemplateId));
         }
 
         completedAssessments.retrieve();
