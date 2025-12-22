@@ -9,8 +9,8 @@
             <div class="option-content">
                 <i id="RoundDown_icon" class="fa-solid fa-arrow-down-from-line"></i>
                 <div class="option-text">
-                    <strong>Round down</strong><br>
-                    <span>Score of your assessment will be always round down.</span>
+                    <strong>@(Model?.CmsLanguage.GetValue(LanguageKeys.Setting.EnableSkillMatrixTitle, "Round down") ?? "Round down") </strong><br>
+                    <span>@(Model?.CmsLanguage.GetValue(LanguageKeys.Setting.EnableSkillMatrixDescription, "The score from an assessment will always be rounded down.") ?? "The score from an assessment will always be rounded down.")</span>
                 </div>
             </div>
         </label>
@@ -21,12 +21,14 @@
             <div class="option-content">
                 <i id="RoundDown_icon" class="fa-solid fa-arrows-from-line"></i>
                 <div class="option-text">
-                    <strong>Standard rounding</strong><br>
-                    <span>Scores below or equal to 0.5 round down, while those above round up.</span>
+                    <strong>@(Model?.CmsLanguage.GetValue(LanguageKeys.Setting.DisableSkillMatrixTitle, "Standard rounding") ?? "Standard rounding") </strong><br>
+                    <span>@(Model?.CmsLanguage.GetValue(LanguageKeys.Setting.DisableSkillMatrixDescription, "Scores below .5 round down, scores of .5 or above round up.") ?? "Scores below .5 round down, scores of .5 or above round up.")</span>
                 </div>
             </div>
         </label>
     </div>
+
+
 </div>
 <script>
     $(document).ready(function () {

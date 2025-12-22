@@ -88,6 +88,21 @@
             padding: 3px 0px 0px 8px;
             font-size: 23px;
         }
+
+
+        .clearfilter {
+            cursor: pointer;
+            position: absolute;
+            right: 15px;
+            top: 4px;
+            color: gray;
+            z-index: 1050;
+            pointer-events: auto;
+        }
+
+        #templateFilterContainer {
+            position: relative;
+        }
     </style>
 }
 
@@ -483,6 +498,17 @@
 
             completedAudits.clearDetails();
 
+            completedAudits.offset = 0;
+            completedAudits.clearItemContainer();
+            completedAudits.setLoaderStart('load_more_loader');
+            completedAudits.retrieve();
+        });
+
+         $('[data-action="cleartemplatefilter"]').on('click', function () {
+            $('#templateFilter').val('').trigger('change');
+            completedAudits.templateId = 0;
+
+            completedAudits.clearDetails();
             completedAudits.offset = 0;
             completedAudits.clearItemContainer();
             completedAudits.setLoaderStart('load_more_loader');

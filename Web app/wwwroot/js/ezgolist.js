@@ -1645,6 +1645,10 @@
         }
 
         var endpoint = '/' + ezgolist.listType + '/settemplate';
+        // Keep a backup of the current task templates so we can fall back to the
+        // client-side state if the server responds without updated items.
+        const currentTaskTemplatesBackup = structuredClone(ezgolist.tmpl.TaskTemplates || []);
+
         if (uploadError) {
             toastr.error('Error uploading media! Template not saved!');
 
@@ -1668,7 +1672,13 @@
                 data: JSON.stringify(wiExtendedToPost),
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
-                    ezgolist.tmpl = JSON.parse(data);
+                    const parsedTemplate = JSON.parse(data);
+
+                    if (!parsedTemplate.TaskTemplates || parsedTemplate.TaskTemplates.length === 0) {
+                        parsedTemplate.TaskTemplates = currentTaskTemplatesBackup;
+                    }
+
+                    ezgolist.tmpl = parsedTemplate;
 
                     if (ezgolist.tmpl.TaskTemplates === undefined || ezgolist.tmpl.TaskTemplates === null) {
                         ezgolist.tmpl.TaskTemplates = new Array();
@@ -1712,7 +1722,13 @@
                 data: JSON.stringify(ezgolist.tmpl),
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
-                    ezgolist.tmpl = JSON.parse(data);
+                    const parsedTemplate = JSON.parse(data);
+
+                    if (!parsedTemplate.TaskTemplates || parsedTemplate.TaskTemplates.length === 0) {
+                        parsedTemplate.TaskTemplates = currentTaskTemplatesBackup;
+                    }
+
+                    ezgolist.tmpl = parsedTemplate;
 
                     if (ezgolist.tmpl.TaskTemplates === undefined || ezgolist.tmpl.TaskTemplates === null) {
                         ezgolist.tmpl.TaskTemplates = new Array();
@@ -3703,27 +3719,6 @@
                 $('[data-containertype="assessment_choice_check"]').hide();
             },
 
-            setAssessments: function () {
-                ezgolist.extension.assessments.selectionOrderCounter = 0;
-                // Clear all existing selections first
-                $('[data-containertype="assessment_choice"]').each(function () {
-                    ezgolist.extension.assessments.setAssessmentRowDisplayOff(this);
-                });
-
-                // Set selections based on current TaskTemplates order
-                if (ezgolist.tmpl.TaskTemplates != null && ezgolist.tmpl.TaskTemplates.length > 0) {
-                    for (let i = 0; i < ezgolist.tmpl.TaskTemplates.length; i++) {
-                        let template = ezgolist.tmpl.TaskTemplates[i];
-                        let foundAssessment = $('[data-id="' + template.WorkInstructionTemplateId + '"][data-containertype="assessment_choice"]');
-
-                        if (foundAssessment.length > 0) {
-                            // Use i+1 as the display order in modal
-                            ezgolist.extension.assessments.setAssessmentRowDisplayOn(foundAssessment[0], i + 1);
-                        }
-                    }
-                }
-            },
-
             setAssessmentRowDisplayOn: function (row, index) {
                 $(row).find('[data-containertype="assessment_choice_name"]').addClass('font-weight-bold');
                 $(row).find('[data-containertype="assessment_choice_check"]').show();
@@ -3808,7 +3803,6 @@
 
                 // Build a map of WorkInstructionTemplateId -> existing TaskTemplate
                 // but only retain entries that remain selected. This prevents deselected
-                // items from lingering in the client-side list until a page refresh.
                 let existingByWIId = new Map();
                 if (ezgolist.tmpl.TaskTemplates && ezgolist.tmpl.TaskTemplates.length > 0) {
                     ezgolist.tmpl.TaskTemplates.forEach(function (template) {
@@ -3818,7 +3812,7 @@
                     });
                 }
 
-                // Step 1: Reorder existing items based on current DOM order
+                // Reorder existing items based on current DOM order
                 let reorderedExisting = [];
                 let usedTemplates = new Set();
 
@@ -3838,7 +3832,7 @@
                     return t.WorkInstructionTemplateId;
                 }));
 
-                // Step 2: Find newly selected items (not in DOM yet)
+                //Find newly selected items (not in DOM yet)
                 let newItems = [];
                 selectedAssessmentsOrdered.forEach(function (elem) {
                     let wiId = parseInt(elem.getAttribute('data-id'));
@@ -3872,10 +3866,10 @@
                     }
                 });
 
-                // Step 3: Combine - existing items in DOM order, then new items at the end
+                // Combine - existing items in DOM order, then new items at the end
                 ezgolist.tmpl.TaskTemplates = reorderedExisting.concat(newItems);
 
-                // Step 4: Re-index sequentially
+                // Re-index sequentially
                 ezgolist.tmpl.TaskTemplates.forEach(function (template, index) {
                     template.Index = index + 1;
                 });
@@ -3909,7 +3903,6 @@
             }
         }
     }
-    //** end assessment specific logic **//
 }
 
 function showEditTemplateItemDialog(templateId) {

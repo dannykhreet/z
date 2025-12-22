@@ -198,6 +198,23 @@
     transform: scale(1.15);
 }
 
+
+.item-custom-target {
+    cursor: pointer;
+    min-width: 45px;
+    width: 45px;
+    min-height: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .item-custom-target:hover {
+        transform: scale(1.15);
+    }
+
 .item {
     min-width: 45px;
     width: 45px;

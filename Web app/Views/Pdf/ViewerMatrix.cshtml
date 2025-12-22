@@ -470,6 +470,19 @@
             }
     </style>
 
+
+    <style>
+        .gap-too-low {
+            background-color: #D55F5E;
+            color: white;
+        }
+
+        .gap-high-enough {
+            background-color: #61AB5C;
+            color: white;
+        }
+    </style>
+
     <link rel="stylesheet" href="/css/matrix/matrix.css" />
     <link rel="stylesheet" href="/css/matrix/matrix-hover.css" />
     <link rel="stylesheet" href="/css/matrix/matrix-buttons.css" />
@@ -538,10 +551,16 @@
                     <tr class="text-center">
                         <td></td>
                         <td style="vertical-align: bottom; padding: 0">
-                            <div>
-                                <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixGoalTitle, "Goal") ?? "Goal")</span>
-                                <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixResultTitle, "Result") ?? "Result")</span>
-                                <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixDeltaTitle, "Delta") ?? "Delta")</span>
+                                <div>
+                                    <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">
+                                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatrixRequiredLabel, "Required") ?? "Required")
+                                    </span>
+                                    <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">
+                                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatrixAchievedLabel, "Achieved") ?? "Achieved")
+                                    </span>
+                                    <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">
+                                        @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatrixGapLabel, "Gap") ?? "Gap")
+                                    </span>
                             </div>
                         </td>
                         <td id="matrixSpacer1"></td>
@@ -613,7 +632,20 @@
                                 }
 
                                 <td class="goalcell">
-                                    <div class="goaldiv"><div class="matrix-tooltip"><span data-containertype="goal_value">@skillset.Goal</span><span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixGoalValue, "Goal of mandatory skills") ?? "Goal of mandatory skills")</span></div><div class="matrix-tooltip"><span data-containertype="result_value">@skillset.Result</span><span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixResultValue, "Result of mandatory skills") ?? "Result of mandatory skills")</span></div><div class="matrix-tooltip"><span data-containertype="difference_value">@skillset.GoalResultDifference</span><span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixDifferenceValue, "Difference between goal and result") ?? "Difference between goal and result")</span></div></div>
+                                    <div class="goaldiv">
+                                        <div class="matrix-tooltip">
+                                            <span data-containertype="goal_value">@skillset.Goal</span>
+                                            <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixGoalValue, "Goal of mandatory skills") ?? "Goal of mandatory skills")</span>
+                                        </div>
+                                        <div class="matrix-tooltip">
+                                            <span data-containertype="result_value">@skillset.Result</span>
+                                            <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixResultValue, "Result of mandatory skills") ?? "Result of mandatory skills")</span>
+                                        </div>
+                                        <div class="matrix-tooltip">
+                                            <span data-containertype="difference_value">@skillset.GoalResultDifference</span>
+                                            <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixDifferenceValue, "Difference between goal and result") ?? "Difference between goal and result")</span>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td class="endcell skillcell matrixmandatoryskill">
                                     <div>@skillset.Name</div>
@@ -693,7 +725,12 @@
                                 }
 
                                 <td class="goalcell">
-                                    <div class="goaldiv"><div data-containertype="goal_value">@skillset.Goal</div><div data-containertype="result_value">@skillset.Result</div><div data-containertype="difference_value">@skillset.GoalResultDifference</div></div>
+                                    <div class="goaldiv">
+                                        <div data-containertype="goal_value">@skillset.Goal</div>
+                                        <div data-containertype="default_target_value" style="display: none">@skillset.DefaultTarget</div>
+                                        <div data-containertype="result_value">@skillset.Result</div>
+                                        <div data-containertype="difference_value">@skillset.GoalResultDifference</div>
+                                    </div>
                                 </td>
                                 <td class="endcell skillcell matrixoperationalskill">
                                     <div class="matrix-tooltip">
@@ -1041,7 +1078,11 @@
         </div>
     </section>
     </div>
+    <!-- jQuery -->
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/js/matrix.js"></script>
     <script>
+        matrix.calculateMatrix();
         var matrixExporter = {
             matrixName: '@((Model != null && Model.CurrentSkillsMatrix != null) ? Model.CurrentSkillsMatrix.Name : "")',
             downloadLinkElement: {}

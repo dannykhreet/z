@@ -916,7 +916,14 @@
                 const perf = firebase.performance();
             </script>
         }
-
+        <script>
+        $(document).ajaxError(function(event, xhr, settings) {
+            if (settings.type === 'GET' && xhr.status === 401) {
+                event.stopPropagation();
+                doActivityExtraCheck();
+            }
+        });
+        </script>
         <!--Bootstrap select-->
     <script src="~/lib/vendor/select2/dist/js/select2.min.js"></script>
         <script>

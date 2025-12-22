@@ -1,0 +1,108 @@
+﻿@model MatrixUserSkillValuesViewModel
+@using EZGO.Api.Models.Enumerations
+@using System.Globalization
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    <div class="modal-header">
+        <h4 class="modal-title pl-4" id="UserSkillValuesModalTitle">
+            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkills, "User skills") ?? "User skills") - @Model.User.FirstName @Model.User.LastName
+
+            @{
+                var editedByPicture = WebApp.Logic.Constants.General.UserImagePlaceHolder;
+                if (!string.IsNullOrEmpty(Model.User.Picture))
+                {
+                    editedByPicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.User.Picture);
+                }
+            }
+            <img class="userProfilePicture" src="/images/media-loading.gif" data-src="@editedByPicture" style="right: 95px" />
+        </h4>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div class="modal-body" id="UserSkillValuesModalBody">
+        <!-- Date picker backdrop -->
+        <div id="datepicker-backdrop"></div>
+        <div class="row p-4">
+            <div class="col-12">
+                <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MandatorySkillsTitle, "Mandatory skills") ?? "Mandatory skills")</h5>
+                <div id="UserSkillValuesModalBodyMandatory">
+                    @if (Model.UserSkills != null && Model.User != null && Model.UserSkills.Where(s => s.SkillType == SkillTypeEnum.Mandatory).Count() > 0)
+                    {
+                        <div class="row pb-2">
+                            <div class="col-4"></div>
+                            <div class="col-2">Certified at</div>
+                            <div class="col-2">Valid until date</div>
+                            <div class="col-2">Days to expire</div>
+                            <div class="col-1" style="position: relative;vertical-align: middle;text-align: center;">
+                                Status
+                            </div>
+                            <div class="col-1"></div>
+                        </div>
+
+                        foreach (var mandatorySkill in Model.UserSkills.Where(s => s.SkillType == SkillTypeEnum.Mandatory).OrderBy(s => s.Index))
+                        {
+                            var mandatorySkillViewModel = new MatrixUserSkillValueDetailsViewModel()
+                            {
+                                ApplicationSettings = Model.ApplicationSettings,
+                                CmsLanguage = Model.CmsLanguage,
+                                MatrixId = Model.MatrixId,
+                                UserSkill = mandatorySkill,
+                                User = Model.User,
+                                UserSkillValue = Model.UserSkillValues.Where(v => v.UserSkillId == mandatorySkill.UserSkillId && v.UserId == Model.User.Id).FirstOrDefault(),
+                                Applicability = Model.Applicabilities.Where(a => a.UserSkillId == mandatorySkill.UserSkillId && a.UserId == Model.User.Id).FirstOrDefault()
+                                };
+                            <div id="mandatorySkillDetails-@mandatorySkill.UserSkillId-@Model.User.Id">
+                                <partial name="~/Views/Skills/Matrix/_userskillvaluemandatory.cshtml" model="@mandatorySkillViewModel" />
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="row p-4">
+            <div class="col-12">
+                <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OperationalSkills, "Operational skills") ?? "Operational skills")</h5>
+                <div id="UserSkillValuesModalBodyOperational">
+                    @if (Model.UserSkills != null && Model.User != null && Model.UserSkills.Where(s => s.SkillType == SkillTypeEnum.Operational).Count() > 0)
+                    {
+                        <div class="row pb-2">
+                            <div class="col-4"></div>
+                            <div class="col-2">Certified at</div>
+                            <div class="col-2">Valid until date</div>
+                            <div class="col-2">Days to expire</div>
+                            <div class="col-1" style="position: relative;vertical-align: middle;text-align: center;">
+                                Status
+                            </div>
+                            <div class="col-1" style="position: relative;vertical-align: middle;text-align: center;">Target</div>
+                        </div>
+                        foreach (var operationalSkill in Model.UserSkills.Where(s => s.SkillType == SkillTypeEnum.Operational).OrderBy(s => s.Index))
+                        {
+                            var operationalSkillTargetViewModel = new MatrixCustomTargetDetailsViewModel()
+                            {
+                                ApplicationSettings = Model.ApplicationSettings,
+                                CmsLanguage = Model.CmsLanguage,
+                                MatrixId = Model.MatrixId,
+                                UserSkill = operationalSkill,
+                                User = Model.User,
+                                UserSkillValue = Model.UserSkillValues.Where(v => v.UserSkillId == operationalSkill.UserSkillId && v.UserId == Model.User.Id).FirstOrDefault(),
+                                Applicability = Model.Applicabilities.Where(a => a.UserSkillId == operationalSkill.UserSkillId && a.UserId == Model.User.Id).FirstOrDefault()
+                            };
+
+                            <div id="operationalSkillDetails-@operationalSkill.UserSkillId-@Model.User.Id">
+                                <partial name="~/Views/Skills/Matrix/_userskillvalueoperational.cshtml" model="operationalSkillTargetViewModel" />
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+    </div>
+}

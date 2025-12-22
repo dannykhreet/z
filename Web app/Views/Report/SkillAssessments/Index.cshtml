@@ -163,6 +163,21 @@
         .completedAssessmentOverviewElement:hover {
             color: #808080;
         }
+
+
+        .clearfilter {
+            cursor: pointer;
+            position: absolute;
+            right: 15px;
+            top: 4px;
+            color: gray;
+            z-index: 1050;
+            pointer-events: auto;
+        }
+
+        #templateFilterContainer {
+            position: relative;
+        }
     </style>
 }
 
@@ -775,6 +790,18 @@
             completedAssessments.filters.offset = 0;
             completedAssessments.clearItemContainer();
             completedAssessments.setLoaderStart('load_more_loader');
+            completedAssessments.retrieve();
+        });
+
+        $('[data-action="cleartemplatefilter"]').on('click', function () {
+            $('#templateFilter').val('').trigger('change');
+            $('#detailslist').html('');
+            completedAssessments.filters.templateId = 0;
+
+            //clear results
+            $('#contentCol').html('');
+            completedAssessments.filters.offset = 0;
+            //retrieve
             completedAssessments.retrieve();
         });
 

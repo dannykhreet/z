@@ -92,6 +92,20 @@
             padding: 3px 0px 0px 8px;
             font-size: 23px;
         }
+
+        .clearfilter {
+            cursor: pointer;
+            position: absolute;
+            right: 15px;
+            top: 4px;
+            color: gray;
+            z-index: 1050;
+            pointer-events: auto;
+        }
+
+        #templateFilterContainer {
+            position: relative;
+        }
     </style>
 }
 
@@ -479,6 +493,18 @@
         $('[data-action="cleardatefilter"]').on('click', function () {
             $('#filter_datechoice').val('DD-MM-YYYY');
             $('#filter_datechoice').trigger('change');
+        });
+
+        $('[data-action="cleartemplatefilter"]').on('click', function () {
+            $('#templateFilter').val('').trigger('change');
+            completedTasks.taskStatsLoaded = false;
+            completedTasks.date = new Date();
+            completedTasks.limit = 10;
+            completedTasks.offset = 0;
+            $('#tasklist').empty();
+            $('#tasklistContainer').hide();
+            completedTasks.templateId = 0;
+            loadTasksStatistics($("#completedTasksGroupFilter").val(), areaid);
         });
     </script>
 

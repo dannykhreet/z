@@ -140,9 +140,56 @@
         areaFilter.init('/config/getareatree', 'task');
 
         $(document).ready(function () {
-            var cntr = $('#contentCol .card:visible').length;
-            $('#counter').html('&nbsp;(' + cntr + ')');
 
+            $('#contentCol').empty();
+
+            var limit = 500, offset = 0, loading = false, allLoaded = false;
+
+            function appendBatch(html) {
+                const $html = $(html);
+                const cnt = parseInt($html.find('#taskTemplatesCounter').val() || '0', 10);
+
+                // append ONLY the cards
+                $html.find('[data-container="template"]').appendTo('#contentCol');
+
+                // advance by what we actually received
+                offset += cnt;
+
+                // stop when the API returns less than requested (or nothing)
+                if (cnt === 0 || cnt < limit) allLoaded = true;
+
+                $('#counter').html('&nbsp;(' + $('#contentCol .card:visible').length + ')');
+
+                return cnt;
+            }
+
+            function loadAll() {
+                if (loading || allLoaded) return;
+                loading = true;
+
+                (function next() {
+                    $.ajax({
+                        url: '/task/indices/gettasks',
+                        data: { offset: offset, limit: limit },
+                        success: function (html) {
+                            appendBatch(html);
+                            ezgomediafetcher.preloadVisibleImagesAndVideos();
+
+                            if (!allLoaded) {
+                                next(); // keep loading until done
+                            } else {
+                                loading = false;
+                            }
+                        },
+                        error: function () { loading = false; }
+                    });
+                })();
+            }
+
+            // counter (initially 0 because we cleared)
+            $('#counter').html('&nbsp;(0)');
+
+            // keep scroll only for back-to-top (NO loading on scroll)
             $('#contentBody').scroll(function () {
                 ezgomediafetcher.preloadVisibleImagesAndVideos();
                 if ($('#contentBody').scrollTop() > 50) {
@@ -152,11 +199,8 @@
                 }
             });
 
-
             $('#back-to-top').click(function () {
-                $('#contentBody').animate({
-                    scrollTop: 0
-                }, 400);
+                $('#contentBody').animate({ scrollTop: 0 }, 400);
                 return false;
             });
 
@@ -165,26 +209,21 @@
                 $('.panel-wrap').css('transform', 'translateX(100%)');
             });
 
-
             $("#taskSearchBox").on("keyup", function () {
                 var value = $(this).val().toLowerCase();
                 $("#contentCol div.results").filter(function () {
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
                 });
-                var cntr = $('#contentCol .card:visible').length;
-                $('#counter').html('&nbsp;(' + cntr + ')');
+                $('#counter').html('&nbsp;(' + $('#contentCol .card:visible').length + ')');
                 $('#back-to-top').click();
             });
 
             $("#contentCol").on('filterDone', function () {
-                //console.log('filterDone');
-                var cntr = $('#contentCol .card:visible').length;
-                $('#counter').html('&nbsp;(' + cntr + ')');
-
+                $('#counter').html('&nbsp;(' + $('#contentCol .card:visible').length + ')');
             });
 
-
-
+            TemplateOrder.Init();
+            loadAll();
         });
 
         var TemplateOrder = {
@@ -197,7 +236,6 @@
                         $(this).attr('data-index', counter);
                         $(this).attr('data-ischanged', true);
                     }
-
                     counter = counter + 1;
                 });
             },
@@ -211,7 +249,6 @@
 
                 $('[data-container="template"]').each(function () {
                     let areaItemKey = $(this).attr('data-pathids');
-                    //console.log(currentAreaKey, areaItemKey);
                     if (areaItemKey != currentAreaKey) {
                         counter = 0;
                     }
@@ -224,9 +261,7 @@
                     }
 
                     counter = counter + 1;
-
                     currentAreaKey = areaItemKey;
-
                 });
 
                 function sort_auto(a, b) {
@@ -241,12 +276,10 @@
                     item.index = parseInt($(this).attr('data-index'));
                     items.push(item);
                 });
-                //[{"index":1,"id":1},{"index":2,"id":2}]
 
                 toastr.remove();
                 $('body').toggleClass('loaded');
 
-                //add responses management from api (invalid password, upn already exists, username already exists etc,.)
                 $.ajax({
                     type: "POST",
                     url: '/task/indices/save',
@@ -264,31 +297,28 @@
 
             },
             InitHandlers: function () {
-                $('#save_indices').on('click', function () {
+                $('#save_indices').on('click', function () { 
                     TemplateOrder.Save();
                 });
-                $('#reindex_indices_visible').on('click', function () {
+                $('#reindex_indices_visible').on('click', function () { 
                     TemplateOrder.OrderVisibleAll();
                 });
                 $('#reindex_indices_all').on('click', function () {
                     TemplateOrder.OrderAll();
                 });
-
                 $('#contentCol').on('sortupdate', function (event, ui) { TemplateOrder.OrderVisibleAll(); });
             },
             InitSort: function () {
-                $('#contentCol').sortable();
+                $('#contentCol').sortable({
+                    items: '> .card',
+                    cancel: 'a, button, input, textarea, select, img'
+                });
             },
             Init: function () {
                 TemplateOrder.InitSort();
                 TemplateOrder.InitHandlers();
-
             }
         }
-
-        TemplateOrder.Init();
-
-
     </script>
 
 

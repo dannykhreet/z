@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "WebApp": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:44328;http://localhost:44329",
+      "hotReloadEnabled": false
+    }
+  }
+}

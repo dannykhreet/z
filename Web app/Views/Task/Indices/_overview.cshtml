@@ -3,7 +3,7 @@
     Layout = null;
 }
 
-<div class="row no-gutters" id="contentCol">
+<div id="contentCol" class="row no-gutters">
     <!--
             <div data-container="template" style="background-color:green; width: 100%;height:200px;margin:5px;">Tada 1</div>
     <div data-container="template" style="background-color:yellow; width: 100%;height:200px;margin:5px;">Tada 2</div>
@@ -13,6 +13,7 @@
 
     @if (Model.TaskTemplates.Count != 0)
     {
+        <input type="text" value="@Model.TaskTemplates.Count" id="taskTemplatesCounter" style="display: none" />
         @foreach (WebApp.Models.Task.TaskTemplateModel taskTemplate in Model.TaskTemplates)
         {
 

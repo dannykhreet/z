@@ -51,15 +51,15 @@
             }
 
             <div class="pt-1">
-                Ended: 
-                @if (Model.IsCompleted == true && Model.EndDate.HasValue)
+                @if (Model.IsCompleted == true && Model.CompletedAt.HasValue)
                 {
-                    DateTime EndDate = TimeZoneInfo.ConvertTime(Model.EndDate.Value, timezone);
-
-                    <div class="inline-bold">@EndDate.ToString("dddd, MMMM d, yyyy, HH:mm")</div>
+                    DateTime CompletedDate = TimeZoneInfo.ConvertTime(Model.CompletedAt.Value, timezone);
+                    @:Ended: 
+                    <div class="inline-bold">@CompletedDate.ToString("dddd, MMMM d, yyyy, HH:mm")</div>
                 }
                 else if (!Model.IsCompleted)
                 {
+                    @:Ended: 
                     <div class="inline-bold">-</div>
                 }
             </div>

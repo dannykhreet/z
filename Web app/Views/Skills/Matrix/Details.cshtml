@@ -382,7 +382,264 @@
             font-weight: 400;
             color: white;
         }
+
+        .btn-white-selected {
+            background-color: #D9D9D9;
+            font-size: 52px;
+            font-weight: 400;
+            color: white;
+        }
     </style>
+
+    <style>
+        .gap-too-low {
+            background-color: #D55F5E;
+            color: white;
+        }
+
+        .gap-high-enough {
+            background-color: #61AB5C;
+            color: white;
+        }
+    </style>
+
+    <style>
+
+
+        .userProfilePicture {
+            min-width: 40px;
+            width: 40px;
+            height: 40px;
+            top: 0px;
+            background-size: cover;
+            border-radius: 50%;
+        }
+
+
+        .userProfilePictureSmall {
+            width: 17px;
+            height: 17px;
+            background-size: cover;
+            border-radius: 50%;
+        }
+    </style>
+
+    <!-- Custom daterange picker -->
+    <style>
+        .daterangepicker.single .drp-calendar {
+            float: none !important; 
+            display: block; 
+            margin: 0 auto; 
+            padding-left: 40px;
+            padding-right: 40px;
+            width: auto !important;
+            max-width: 100%; 
+        }
+
+        #datepicker-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0,0,0,0.5); 
+            z-index: 1040; 
+            display: none;
+            opacity: 0; 
+            transition: opacity 0.15s linear;
+        }
+
+            #datepicker-backdrop.show {
+                display: block;
+                opacity: 1; 
+            }
+        </style>
+        <style>
+
+
+        .daterangepicker .drp-buttons .btn.customConfirmButton,
+        .daterangepicker .drp-buttons .btn.customCloseButton,
+        .daterangepicker .drp-buttons .btn.deleteUserSkillValueButton,
+        .daterangepicker .drp-buttons .btn.notRequiredForThisPersonButton,
+        .daterangepicker .drp-buttons .btn.requiredForThisPersonButton {
+            font-weight: 400;
+        }
+
+        .daterangepicker .drp-buttons button.customConfirmButton,
+        .daterangepicker .drp-buttons button.notRequiredForThisPersonButton,
+        .daterangepicker .drp-buttons button.requiredForThisPersonButton {
+            background-color: #93C54B;
+            color: white;
+            border: 2px solid #93C54B;
+            border-radius: 4px;
+        }
+
+        .datepicker-header {
+            background-color: #F5FAED;
+        }
+
+        .daterangepicker td.active,
+        .daterangepicker td.active:hover,
+        .daterangepicker td.start-date,
+        .daterangepicker td.end-date,
+        .daterangepicker td.start-date.end-date {
+            background: none !important;
+            border: none !important;
+            color: inherit !important;
+            padding: 0;
+        }
+
+            .daterangepicker td.active span,
+            .daterangepicker td.start-date span,
+            .daterangepicker td.end-date span,
+            .daterangepicker td.start-date.end-date span {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 36px;
+                height: 36px;
+                line-height: 36px;
+                border-radius: 50%;
+                background-color: #93C54B;
+                color: white;
+                font-weight: bold;
+                box-sizing: border-box;
+                transition: background-color 0.2s;
+            }
+
+        .daterangepicker .calendar-table th, 
+        .daterangepicker .calendar-table td {
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .daterangepicker td span {
+            pointer-events: none;
+        }
+
+        .daterangepicker td.available span:hover {
+            cursor: pointer;
+        }
+
+        .daterangepicker {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .currentUserSkillValueDatePicker span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 36px;
+            height: 36px;
+            line-height: 36px;
+            border-radius: 50%;
+            border: 1px solid #93C54B;
+            background-color: #FFFFFF00;
+            box-sizing: border-box;
+            transition: background-color 0.2s;
+        }
+
+        .daterangepicker td.available:hover,
+        .daterangepicker th.available:hover {
+            background: none !important;
+            border: none !important;
+            color: inherit !important;
+        }
+
+        .daterangepicker td.available:not(.active):hover span {
+            background-color: #ccc;
+            color: black;
+            width: 36px;
+            height: 36px;
+            line-height: 36px;
+            border-radius: 50%;
+            display: inline-block;
+            text-align: center;
+            box-sizing: border-box;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .daterangepicker td {
+            height: 48px !important;
+        }
+
+    </style>
+
+    <!-- Datepicker custom date controls-->
+    <style>
+        .daterangepicker select.monthselect, 
+        .daterangepicker select.yearselect {
+            width: auto;
+        }
+
+        .daterangepicker th.month {
+            text-align: left;
+        }
+
+        .daterangepicker .calendar-table thead tr th.month select {
+            appearance: none; /* remove default OS styling */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-color: #fff; /* white background */
+            border: 1px solid #A6A6A6; /* thin border */
+            border-radius: 4px; /* rounded corners */
+            padding: 2px 10px; /* small padding for readability */
+            font-size: 14px;
+            color: #333;
+            outline: none; /* remove focus outline */
+        }
+
+            /* optional: subtle hover/focus effects */
+            .daterangepicker .calendar-table thead tr th.month select:hover {
+                border-color: #999;
+            }
+
+            .daterangepicker .calendar-table thead tr th.month select:focus {
+                border-color: #0077cc;
+                box-shadow: 0 0 0 2px rgba(0, 119, 204, 0.2);
+            }
+
+        .daterangepicker .calendar-table thead tr th.month select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><polygon points="0,0 10,0 5,5" fill="%23333"/></svg>') no-repeat right 6px center;
+            background-size: 10px 10px;
+            padding-right: 20px; /* space for arrow */
+        }
+
+        .daterangepicker .calendar-table th{
+            cursor: default;
+        }
+
+        .daterangepicker .calendar-table th select,
+        .daterangepicker .calendar-table th.next,
+        .daterangepicker .calendar-table th.prev {
+            cursor: pointer;
+        }
+
+        .daterangepicker {
+            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.5);
+        }
+
+        .daterangepicker {
+            opacity: 0;
+            transition: opacity 0.15s ease-out;
+        }
+
+            .daterangepicker.showPicker {
+                opacity: 1;
+            }
+
+        </style>
 
     <link rel="stylesheet" href="/css/matrix/matrix.css" />
     <link rel="stylesheet" href="/css/matrix/matrix-hover.css" />
@@ -463,9 +720,15 @@
                     <td></td>
                     <td style="vertical-align: bottom; padding: 0">
                         <div>
-                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixGoalTitle, "Goal") ?? "Goal")</span>
-                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixResultTitle, "Result") ?? "Result")</span>
-                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixDeltaTitle, "Delta") ?? "Delta")</span>
+                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatrixRequiredLabel, "Required") ?? "Required")
+                            </span>
+                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatrixAchievedLabel, "Achieved") ?? "Achieved")
+                            </span>
+                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatrixGapLabel, "Gap") ?? "Gap")
+                            </span>
                         </div>
                     </td>
 
@@ -728,9 +991,15 @@
                     <td></td>
                     <td style="vertical-align: bottom; padding: 0">
                         <div>
-                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixGoalTitle, "Goal") ?? "Goal")</span>
-                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixResultTitle, "Result") ?? "Result")</span>
-                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixDeltaTitle, "Delta") ?? "Delta")</span>
+                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatrixRequiredLabel, "Required") ?? "Required")
+                            </span>
+                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatrixAchievedLabel, "Achieved") ?? "Achieved")
+                            </span>
+                            <span style="width: 35px; display: inline-block; line-height: 35px" class="vertical">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatrixGapLabel, "Gap") ?? "Gap")
+                            </span>
                         </div>
                     </td>
 
@@ -797,7 +1066,19 @@
                             }
 
                             <td class="goalcell">
-                                <div class="goaldiv"><div class="matrix-tooltip"><span data-containertype="goal_value">@skillset.Goal</span><span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixGoalValue, "Goal of mandatory skills") ?? "Goal of mandatory skills")</span></div><div class="matrix-tooltip"><span data-containertype="result_value">@skillset.Result</span><span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixResultValue, "Result of mandatory skills") ?? "Result of mandatory skills")</span></div><div class="matrix-tooltip"><span data-containertype="difference_value">@skillset.GoalResultDifference</span><span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixDifferenceValue, "Difference between goal and result") ?? "Difference between goal and result")</span></div></div>
+                                <div class="goaldiv">
+                                    <div class="matrix-tooltip">
+                                        <div data-containertype="default_target_value" style="display: none">0</div>
+                                        <span data-containertype="goal_value">@skillset.Goal</span>
+                                        <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixGoalValue, "Goal of mandatory skills") ?? "Goal of mandatory skills")</span>
+                                    </div>
+                                    <div class="matrix-tooltip"><span data-containertype="result_value">@skillset.Result</span>
+                                        <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixResultValue, "Result of mandatory skills") ?? "Result of mandatory skills")</span>
+                                    </div>
+                                    <div class="matrix-tooltip"><span data-containertype="difference_value">@skillset.GoalResultDifference</span>
+                                        <span class="tooltiptext shadow">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixDifferenceValue, "Difference between goal and result") ?? "Difference between goal and result")</span>
+                                    </div>
+                                </div>
                             </td>
 
                             <td class="endcell skillcell matrixmandatoryskill">
@@ -859,7 +1140,12 @@
                             }
 
                             <td class="goalcell">
-                                <div class="goaldiv"><div data-containertype="goal_value">@skillset.Goal</div><div data-containertype="result_value">@skillset.Result</div><div data-containertype="difference_value">@skillset.GoalResultDifference</div></div>
+                                <div class="goaldiv">
+                                    <div data-containertype="goal_value">@skillset.Goal</div>
+                                    <div data-containertype="default_target_value" style="display: none">@skillset.DefaultTarget</div>
+                                    <div data-containertype="result_value">@skillset.Result</div>
+                                    <div data-containertype="difference_value">@skillset.GoalResultDifference</div>
+                                </div>
                             </td>
 
                             <td class="endcell skillcell matrixoperationalskill">
@@ -922,10 +1208,22 @@
                                         bool showWarning = almostExpired || expired;
                                         string warningmessage = expired ? "Operational skill expired" : almostExpired ? "Operational almost expired" : "";
                                         string warningbackgroundcolor = expired ? "#FFFFFF" : almostExpired ? "#FFF0D4" : "";
-
+                                        var applicability = Model.Applicabilities.Where(a => a.UserSkillId == skillset.UserSkillId && a.UserId == userprofile.UserProfileId).FirstOrDefault();
                                         <td class="buttoncell" data-containertype="value" @(decimalScore > 0 ? $"title={decimalScore}" : "")>
                                             <div style="position: relative; display: inline-block">
-                                                <button class="btn circlebtn @color" style="font-size:22px !important;" type="button" data-popup="score" data-userid="@userprofile.UserProfileId" data-usergroupid="@usergroup.Id" data-skillid="@skillset.UserSkillId" data-actiontype="user_value_choice" @(decimalScore > 0 ? $"data-value=\"{decimalScore}\"" : "")>@(score > 0 ? score : "")</button>
+                                                <button 
+                                                    class="btn circlebtn @color" 
+                                                    style="font-size:22px !important;" 
+                                                    type="button" 
+                                                    data-popup="score" 
+                                                    data-userid="@userprofile.UserProfileId" 
+                                                    data-usergroupid="@usergroup.Id" 
+                                                    data-skillid="@skillset.UserSkillId" 
+                                                    data-actiontype="user_value_choice" 
+                                                    data-customtarget="@(applicability != null ? applicability.CustomTarget.ToString().ToLowerInvariant() : skillset.DefaultTarget)"
+                                                    data-isapplicable="@(applicability != null ? applicability.IsApplicable.ToString().ToLowerInvariant() : "false")"
+                                                    @(decimalScore > 0 ? $"data-value={score}" : "")>@(score > 0 ? score : "")
+                                                </button>
                                                 @if (showWarning)
                                                 {
                                                     <div title="@warningmessage" class="circlebtn btn-orange" style="position: absolute; border: 1px solid #ffa500; height: 19px; width: 19px; right: -2px; bottom: -2px; border-radius: 19px; float: right; font-size: 19px; background: url(/images/icons/v2/warning.png) center / 10px no-repeat, @warningbackgroundcolor;"></div>
@@ -1240,7 +1538,9 @@
                         </div>
 
                         <div id="required_goal_container" class="form-group col-4">
-                            <label for="" title="Aimed number of users that completed this operational/mandatory skill">Required</label>
+                            <label for="" title="Aimed number of users that completed this operational/mandatory skill">
+                                @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatrixRequiredLabel, "Required") ?? "Required")
+                            </label>
                             <input type="number" class="form-control" name="dialog_goal" id="dialog_goal" min="0" />
                         </div>
                     </div>
@@ -1551,43 +1851,70 @@
     </div>
 </div>
 
+
+
+
 <!-- Modal -->
 <div class="modal fade" id="UserSkillValuesModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div id="UserSkillValuesModalContent" class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="CustomTargetModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="UserSkillValuesModalTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkills, "User skills") ?? "User skills")</h4>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body" id="UserSkillValuesModalBody">
-                <div class="row">
-                    <div class="col-6">
-                        <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MandatorySkillsTitle, "Mandatory skills") ?? "Mandatory skills")</h5>
-                        <div id="UserSkillValuesModalBodyMandatory">
-                            <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ModalHeaderTitle, "modal header") ?? "modal header")</h5>
-                            <p>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ModalContentTitle, "modal content") ?? "modal content")</p>
+                <div class="row" style="width: 100%;">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-12">
+                                <h4 class="modal-title">Set Custom target</h4>
+                            </div>
+                            <div class="col-12">
+                                <h6 id="customTargetOperationalSkillName">Skill name</h6>
+                            </div>
                         </div>
                     </div>
+                    <div class="col-auto">
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-                    <div class="col-6">
-                        <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OperationalSkills, "Operational skills") ?? "Operational skills")</h5>
-                        <div id="UserSkillValuesModalBodyOperational">
-                            <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ModalHeaderTitle, "modal header") ?? "modal header")</h5>
-                            <p>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ModalContentTitle, "modal content") ?? "modal content")</p>
+            <div class="modal-body">
+                <div class="row" style="background-color: #93C54B1A; border-radius: 10px">
+                    <div class="col-12">
+
+                        <div class="col d-flex py-2" style="flex-wrap: wrap; user-select:none; justify-content: space-evenly">
+
+                            <div id="customDefaultTarget-1" data-value="1" class='item-custom-target btn-red m-1'>1</div>
+                            <div id="customDefaultTarget-2" data-value="2" class='item-custom-target btn-orangered m-1'>2</div>
+                            <div id="customDefaultTarget-3" data-value="3" class='item-custom-target btn-orange m-1'>3</div>
+                            <div id="customDefaultTarget-4" data-value="4" class='item-custom-target btn-orangegreen m-1'>4</div>
+                            <div id="customDefaultTarget-5" data-value="5" class='item-custom-target btn-green m-1'>5</div>
+                            <div id="customDefaultTarget--1" data-value="-1" class='item-custom-target btn-white m-1'>&times;</div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-danger btn-sm resetToDefaultTargetButton">Reset to default target</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
+                <button type="button" class="btn btn-ezgo btn-sm configureCustomTargetButton">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnUpdate, "Update") ?? "Update")</button>
             </div>
         </div>
     </div>
 </div>
+
+
 
 <!-- Modal -->
 <div class="modal fade" id="ChangeSkillOrderModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -1643,6 +1970,7 @@
     </div>
 </div>
 
+
 @section Scripts{
     <script src="/js/ezgoUtils.js"></script>
     <script src="/js/matrix.js"></script>
@@ -1654,7 +1982,11 @@
             expiryWarningInDays: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkillModalExpiryWarningInDays, "expiry warning in days: ") ?? "expiry warning in days: ")',
             expiryWarningInDaysNotSet: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkillModalExpiryWarningInDaysNotSet, "expiry warning in days: not set") ?? "expiry warning in days: not set")',
             certifiedAt: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkillModalCertifiedAt, "Certified at") ?? "Certified at")',
-            confirm: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkillModalConfirm, "Confirm") ?? "Confirm")'
+            confirm: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkillModalConfirm, "Confirm") ?? "Confirm")',
+            cancel: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnCancel, "Cancel") ?? "Cancel")',
+            keepOldScores: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkillModalKeepOldScoresBtn, "Keep old scores") ?? "Keep old scores")',
+            removeOldScores: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkillModalRemoveOldScoresBtn, "Remove old scores") ?? "Remove old scores")',
+            keepOldScoresDialogueBody: '@(Html.Raw(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkillModalKeepOldScoresMessageBody, "The assessment template that is connected to this skill has been changed.<br />The scores from the new assessment will be used for everybody who has completed it already.<br /> Do you want to keep the old scores for users who have not completed the new assessment yet?") ?? "The assessment template that is connected to this skill has been changed.<br />The scores from the new assessment will be used for everybody who has completed it already.<br /> Do you want to keep the old scores for users who have not completed the new assessment yet?"))',
         };
 
         function printSkillAssessment() {

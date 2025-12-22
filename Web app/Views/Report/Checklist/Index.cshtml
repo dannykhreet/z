@@ -345,6 +345,21 @@
             font-size: 32px;
             color: #93C54B;
         }
+
+
+        .clearfilter {
+            cursor: pointer;
+            position: absolute;
+            right: 15px;
+            top: 4px;
+            color: gray;
+            z-index: 1050;
+            pointer-events: auto;
+        }
+
+        #templateFilterContainer {
+            position: relative;
+        }
     </style>
 }
 
@@ -987,6 +1002,17 @@
 
             completedChecklists.clearDetails();
 
+            completedChecklists.offset = 0;
+            completedChecklists.clearItemContainer();
+            completedChecklists.setLoaderStart('load_more_loader');
+            completedChecklists.retrieve();
+        });
+
+        $('[data-action="cleartemplatefilter"]').on('click', function () {
+            $('#templateFilter').val('').trigger('change');
+            completedChecklists.templateId = 0;
+
+            completedChecklists.clearDetails();
             completedChecklists.offset = 0;
             completedChecklists.clearItemContainer();
             completedChecklists.setLoaderStart('load_more_loader');

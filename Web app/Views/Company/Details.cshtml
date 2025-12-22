@@ -318,12 +318,15 @@
                                             {
                                                 if (Model.DatawarehouseCompanyUser != null)
                                                 {
-                                                    <i class="fa-solid fa-trash" id="btn_dw_company_remove" data-kind="company" data-type="dw_company_remove_button" data-companyid="@(Model.DatawarehouseCompanyUser != null ? Model.DatawarehouseCompanyUser.CompanyId : 0)" data-holdingid="0" style="cursor: pointer; color:red" title="Remove DW account, this can not be undone."></i>
+                                                    <i class="fa-solid fa-trash" id="btn_dw_company_remove" data-kind="company" data-type="dw_company_delete_button" data-companyid="@(Model.DatawarehouseCompanyUser != null ? Model.DatawarehouseCompanyUser.CompanyId : 0)" data-holdingid="0" style="cursor: pointer; color:red" title="Remove DW account, this can not be undone."></i>
                                                 }
                                                 else
                                                 {
                                                     <i class="fa-solid fa-plus" id="btn_dw_company_add" data-kind="company" data-type="dw_company_add_button" data-companyid="@(Model.DatawarehouseCompanyUser != null ? Model.DatawarehouseCompanyUser.CompanyId : 0)" data-holdingid="0" style="cursor: pointer; color:green" title="Add DW Account, user information will be supplied one time after creation."></i>
+
                                                 }
+                                                <input type="hidden" id="dw_company_id" value="@Model.Id" />
+                                                <input type="hidden" id="dw_holding_id" value="0"/>
                                             }
                                           
                                         </div>
@@ -547,6 +550,70 @@
 </section>
 
 
+<div class="modal fade" id="modalCreateDatawarehouseUser" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create datawarehouse user</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">You are about to create a datawarehouse user for a specific company. When started this process can not be stopped. </div>
+                <div class="row">Before starting make sure that changes to this company are saved!</div>
+                <div class="row">After creation the application key, username and password will be supplied below.</div>
+                <div class="row">These credentials will need to be used when connecting to the datawarehouse.</div>
+                <div class="row">&nbsp;</div>
+                <div class="row" style="text-align:center">
+                    <div class="col-md-12"><span style="color:red;font-size:15px;font-weight:bolder;">This information is encrypted on creation and therefor can not be supplied afterwards! <br />Make sure you do NOT loose it and save it in a secured place.</span></div>
+                </div>
+                <div class="row"><textarea id="create_dw_user_results" style="width:100%" class="form-control" rows="8"></textarea></div>
+                <div class="row" style="text-align:center">
+                    <div class="col-md-12"><span style="font-size:12px">When created the datawarehouse is automatically initialized for this account, but data will only be synced when the datawarehouse is enabled.</span></div>
+                    <div class="col-md-12"><span style="font-size:12px">It can take up to 24 hours for data to fully start syncing.</span></div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="dw_company_add_execute_button" data-actiontype="usercreate" class="btn btn-warning btn-sm" title="When pressed user will be created">Create user</button>
+                <button type="button" id="closeitem" class="btn btn-info btn-sm" data-actiontype="close" onclick="location.href='/company/details/@Model.Id';">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnClose, "Close") ?? "Close")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDeleteDatawarehouseUser" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete datawarehouse user</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row" style="text-align:center">
+                    <div class="col-md-12"><span style="color:red;font-size:15px;font-weight:bolder;">You are about to delete a datawarehouse user. When started this process can not be undone. All data within the datawarehouse will be DELETED for this specific user.</span></div>
+                </div>
+                <div class="row">&nbsp;</div>
+                <div class="row" style="text-align:center">
+                    <label for="dw_delete_confirmation">Type [DELETE] without brackets below for confirmation.</label>
+                    <input type="text" id="dw_delete_confirmation" name="dw_delete_confirmation" class="form-control"/>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="dw_company_delete_execute_button" data-actiontype="userdelete" class="btn btn-danger btn-sm" title="When pressed user will be deleted">Delete user</button>
+                <button type="button" id="closeitem" class="btn btn-info btn-sm" data-actiontype="close" onclick="location.href='/company/details/@Model.Id';">@(Model?.CmsLanguage.GetValue(LanguageKeys.Company.BtnClose, "Close") ?? "Close")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 @section Scripts{
     <script src="/js/ezgoUtils.js"></script>
     @if (Model.Holdings != null)
@@ -660,6 +727,18 @@
                 });
                 $('[data-type="map_button"]').on('click', function() {
                     company.openMaps($(this).attr('data-kind'));
+                });
+                $('[data-type="dw_company_add_button"]').on('click', function() {
+                    company.displayDatawarehouseModal();
+                });
+                $('[data-type="dw_company_delete_button"]').on('click', function() {
+                    company.displayDatawarehouseDeleteModal();
+                });
+                $('#dw_company_add_execute_button').on('click', function() {
+                    company.createDatawarehouseUser($('#dw_company_id').val(), $('#dw_holding_id').val(), $('#company_name').val());
+                });
+                $('#dw_company_delete_execute_button').on('click', function() {
+                    company.deleteDatawarehouseUser($('#dw_company_id').val(), $('#dw_holding_id').val());
                 });
             },
             initSettingValues: function () {
@@ -1029,6 +1108,74 @@
                     } else {
                          toastr.warning(mapskind + ' maps not available, please make sure maps url are correctly added.');
                     }
+                }
+            }, 
+            displayDatawarehouseModal: function() {
+                $('#modalCreateDatawarehouseUser').modal('show');
+            },
+            displayDatawarehouseDeleteModal: function() {
+                $('#modalDeleteDatawarehouseUser').modal('show');
+            },
+            createDatawarehouseUser: async function (companyid, holdingid, username) {
+                toastr.remove();
+                $('body').toggleClass('loaded');
+
+                let newUser = {}
+                newUser.CompanyId = parseInt(companyid);
+                newUser.HoldingId = parseInt(holdingid);
+                newUser.Username = username;
+
+                $.ajax({
+                    type: "POST",
+                    url: '/company/createdatawarehouseuser',
+                    data: JSON.stringify(newUser),
+                    success: function (data) {
+                        var dwUser = JSON.parse(JSON.parse(data)); //double parse, cuz string interpretation
+                        var outputForText = 'Username: \n' + dwUser.username +  '\nPassword: \n' + dwUser.password +  '\nAppId: \n' + dwUser.appId;
+                        $('#create_dw_user_results').val(outputForText);
+                        $('#dw_company_add_execute_button').attr('disabled', true);
+
+                        $('body').toggleClass('loaded');
+                        toastr.success('DatawarehouseUser Created');
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('body').toggleClass('loaded');
+                        toastr.error(JSON.parse(jqXHR.responseText) + ' (' + jqXHR.status + ')');
+                    },
+                    contentType: "application/json; charset=utf-8"
+                });
+            },
+            deleteDatawarehouseUser: async function (companyid, holdingid) {
+                if ($('#dw_delete_confirmation').val() != 'DELETE') {
+                     toastr.warning('Please fill in DELETE as confirmation');
+                } else {
+                    toastr.remove();
+                    $('body').toggleClass('loaded');
+
+                    let deleteUser = {}
+                    deleteUser.CompanyId = parseInt(companyid);
+                    deleteUser.HoldingId = parseInt(holdingid);
+                    $.ajax({
+                        type: "POST",
+                        url: '/company/deletedatawarehouseuser',
+                        data: JSON.stringify(deleteUser),
+                        success: function (data) {
+                            $('delete_dw_user_results').val('User is deleted.');
+                            $('#dw_company_add_execute_button').attr('disabled', true);
+
+                            $('body').toggleClass('loaded');
+                            toastr.success('DatawarehouseUser Deleted');
+
+                            setTimeout(() => {
+                                location.href='/company/details/@Model.Id';
+                            }, 2000);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            $('body').toggleClass('loaded');
+                            toastr.error(JSON.parse(jqXHR.responseText) + ' (' + jqXHR.status + ')');
+                        },
+                        contentType: "application/json; charset=utf-8"
+                    });
                 }
             }
         }

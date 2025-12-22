@@ -48,14 +48,14 @@ else
                             <label class="text-secondary" id="password_label">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Login.PassWord, "Password") ?? "Password")</label>
                             <input id="loginPassword" asp-for="LoginPassword" class="form-control" type="password">
                         </div>
-                        <div class="form-row mt-2">
+                        <div class="row mt-2">
                             <div class="col-md-4">
 
                                 <select asp-for="Locale" asp-items="@Model.Languages" class="form-control">
                                     @*<option>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Login.PleaseSelect, "Please select") ?? "Please select")</option>*@
                                 </select>
                             </div>
-                            <div class="col-md-8 text-right">
+                            <div class="col-md-8 text-end">
                                 @if (Model.UseExternalLogin)
                                 {
                                     <span class="btn btn-secondary" onclick="document.location.href='/login/external'" title="@(Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.ExternalLoginTitle, "External login can be used when enabled by EZ Factory.") ?? "External login can be used when enabled by EZ Factory.")" id="external_login_label">@(Model?.CmsLanguage.GetValue(LanguageKeys.Authentication.BtnExternalLogin, "External login") ?? "External login")</span>

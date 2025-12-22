@@ -1,0 +1,146 @@
+﻿@using System.Globalization
+@model MatrixCustomTargetDetailsViewModel
+@{
+    var user = Model.User;
+    var operationalSkill = Model.UserSkill;
+    var applicability = Model.Applicability;
+var userSkillValue = Model.UserSkillValue;
+}
+
+
+<div class="row p-1" style="border-bottom: 2px solid #E8E8E8; align-items: center;">
+    <div class="col-4">@operationalSkill.Name</div>
+
+    @{
+        var valueDateString = "";
+        var valueUntilString = "";
+        if (userSkillValue != null && userSkillValue.ValueDate != null)
+        {
+            valueDateString = userSkillValue.ValueDate.ToString("dd MMM yyyy");
+            valueUntilString = userSkillValue.ValueDate.AddDays(operationalSkill.ExpiryInDays ?? 0).ToString("dd MMM yyyy");
+        }
+    }
+    <div class="col-2">@valueDateString</div>
+    <div class="col-2">@valueUntilString</div>
+    @{
+        int? validDaysNumber = null;
+        var validDaysColour = "";
+        if (userSkillValue != null && userSkillValue.ValueDate != null)
+        {
+            validDaysNumber = (int)Math.Round(userSkillValue.ValueDate.AddDays(operationalSkill.ExpiryInDays ?? 0).Subtract(DateTime.UtcNow).TotalDays, 0);
+        }
+
+        if (validDaysNumber == null || validDaysNumber >= operationalSkill.NotificationWindowInDays)
+        {
+            validDaysColour = "#212529";
+        }
+        else if (validDaysNumber <= 0)
+        {
+            validDaysColour = "#FF0000";
+        }
+        else if (validDaysNumber < operationalSkill.NotificationWindowInDays)
+        {
+            validDaysColour = "#FFA500";
+        }
+    }
+    <div class="col-2" style="color: @validDaysColour">@validDaysNumber</div>
+
+    @{
+        int score = -1;
+        decimal decimalScore = -1;
+        bool expired = false;
+        bool almostExpired = false;
+
+        if (userSkillValue != null)
+        {
+            decimalScore = userSkillValue.Score;
+            // Round according to your setting
+            score = Model.ApplicationSettings?.Features?.EnableMatrixScoreStandard == true
+            ? (int)Math.Round(decimalScore, MidpointRounding.AwayFromZero)  // Standard rounding
+            : (int)Math.Floor(decimalScore);                                // Always round down
+
+            if (score != 0 && operationalSkill.ExpiryInDays.HasValue && userSkillValue.ValueDate != DateTime.MinValue)
+            {
+                if (userSkillValue.ValueDate.AddDays(operationalSkill.ExpiryInDays.Value) < DateTime.UtcNow)
+                {
+                    expired = true;
+                }
+                else if (operationalSkill.NotificationWindowInDays.HasValue && ((operationalSkill.NotificationWindowInDays.Value > operationalSkill.ExpiryInDays.Value) || (userSkillValue.ValueDate.AddDays(operationalSkill.ExpiryInDays.Value - operationalSkill.NotificationWindowInDays.Value) < DateTime.UtcNow)))
+                {
+                    almostExpired = true;
+                }
+            }
+        }
+
+        string color = score == 0 ? "" : score == 1 ? "btn-red" : score == 2 ? "btn-orangered" : score == 3 ? "btn-orange" : score == 4 ? "btn-orangegreen" : score == 5 ? "btn-green" : "";
+        bool showWarning = almostExpired || expired;
+        string warningmessage = expired ? "Operational skill expired" : almostExpired ? "Operational almost expired" : "";
+        string warningbackgroundcolor = expired ? "#FFFFFF" : almostExpired ? "#FFF0D4" : "";
+
+    }
+    <div class="col-1">
+        <div class="buttoncell" data-containertype="value" @(decimalScore > 0 ? $"title={decimalScore}" : "")>
+            <div style="position: relative; display: inline-block">
+                <button class="btn circlebtnNoHover @color"
+                        style="font-size:22px !important;"
+                        type="button"
+                        @(decimalScore > 0 ? $"data-value={score}" : "")>
+                    @(score > 0 ? score : "")
+                </button>
+                @if (showWarning)
+                {
+                    <div title="@warningmessage" class="circlebtn btn-orange" style="position: absolute; border: 1px solid #ffa500; height: 19px; width: 19px; right: -2px; bottom: -2px; border-radius: 19px; float: right; font-size: 19px; background: url(/images/icons/v2/warning.png) center / 10px no-repeat, @warningbackgroundcolor;"></div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div id="customTargetDisplay-@operationalSkill.UserSkillId-@Model.User.Id" class="col-1">
+        @{
+            var userSkillTarget = operationalSkill.DefaultTarget == 0 ? 1 : operationalSkill.DefaultTarget;
+            if(Model.Applicability != null && Model.Applicability.IsApplicable)
+            {
+                userSkillTarget = Model.Applicability.CustomTarget.HasValue ? Model.Applicability.CustomTarget.Value : 1;
+            }
+            var hasCustomApplicability = Model?.Applicability != null;
+        }
+        <div class="buttoncell" data-containertype="value">
+                @if(Model?.Applicability?.IsApplicable != null && !Model.Applicability.IsApplicable)
+                {
+                    <button class="btn circlebtnNoHover" type="button" style="font-size: 52px !important; line-height: 48px; font-weight: 400; color: #A6A6A6; padding: 0px">&times;</button>
+                }
+                else
+                {
+                    <button class="btn circlebtnNoHover"
+                            type="button"
+                            style="font-size:22px !important; color: #A6A6A6">
+                        @(userSkillTarget)
+                    </button>
+                }
+        </div>
+        <div class="buttoncell circlebtnOtherBorder editCustomTarget"
+             style="position: absolute; border: 1px solid #A6A6A6; height: 19px; width: 19px; right: 12px; bottom: 0px; font-size: 10px !important; border-radius: 19px; float: right; background-color: #FAFAFA; color: #212529"
+             data-matrixid="@Model.MatrixId"
+             data-userskillid="@operationalSkill.UserSkillId"
+             data-userid="@user.Id"
+             data-userskillname="@operationalSkill.Name"
+             data-defaulttarget="@(operationalSkill.DefaultTarget == 0 ? "" : operationalSkill.DefaultTarget.ToString())"
+             data-userskilltarget="@(userSkillTarget)"
+             data-iscustomtarget="@(hasCustomApplicability.ToString().ToLowerInvariant())"
+             data-isapplicable="@((Model?.Applicability?.IsApplicable != null && Model.Applicability.IsApplicable).ToString().ToLowerInvariant())">
+            @if (hasCustomApplicability)
+            {
+                var editedByPicture = WebApp.Logic.Constants.General.UserImagePlaceHolder;
+                if (!string.IsNullOrEmpty(Model.User.Picture))
+                {
+                    editedByPicture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, Model.User.Picture);
+                }
+                <img class="userProfilePictureSmall" src="/images/media-loading.gif" data-src="@editedByPicture" style="right: 95px" />
+            }
+            else
+            {
+                <i class="fa-solid fa-pencil" style="margin-top: 4px; font-size: 10px !important"></i>
+            }
+        </div>
+    </div>
+</div>

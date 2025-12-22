@@ -1,0 +1,35 @@
+﻿using EZGO.Api.Models.Relations;
+using EZGO.Api.Models.Settings;
+using EZGO.Api.Models.Tags;
+using EZGO.Api.Models;
+using System;
+using System.Collections.Generic;
+using WebApp.Models.Properties;
+
+namespace WebApp.Models.Checklist
+{
+    public class ChecklistTaskTemplatesModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Picture { get; set; }
+        public string Video { get; set; }
+        public string VideoThumbnail { get; set; }
+        public int CompanyId { get; set; }
+        public string Type { get; set; }
+        public bool isNew { get; set; }
+        public int Index { get; set; }
+
+        //if filled show total instructions on checklist template. combined with or stepscount
+        public string DescriptionFile { get; set; }
+        public int StepsCount { get; set; }
+        public bool HasPictureProof { get; set; }
+        public List<Tag> Tags { get; set; }
+        public List<Attachment> Attachments { get; set; }
+        public List<ChecklistStepModel> Steps { get; set; }
+        public List<TemplatePropertyModel> Properties { get; set; }
+        public List<TaskTemplateRelationWorkInstructionTemplate> WorkInstructionRelations { get; set; }
+        public ApplicationSettings ApplicationSettings { get; set; }
+    }
+}

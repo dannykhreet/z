@@ -81,6 +81,10 @@ var matrix = {
     currentSkillId: 0,
     currentUserSkills: {},
     currentUserSkillValues: {},
+    currentCertifiedAt: '',
+    currentUserSkillName: '',
+    currentExpiryInDays: 0,
+    currentNotificationWindowInDays: 0,
     skillEdited: false,
     groupEdited: false,
     relationChanged: false,
@@ -91,7 +95,11 @@ var matrix = {
         expiryWarningInDays: "expiry warning in days: ",
         expiryWarningInDaysNotSet: "expiry warning in days: not set",
         certifiedAt: "Certified at",
-        confirm: "Confirm"
+        confirm: "Confirm",
+        keepOldScoresDialogueBody: 'The assessment template that is connected to this skill has been changed.<br />The scores from the new assessment will be used for everybody who has completed it already.<br /> Do you want to keep the old scores for users who have not completed the new assessment yet?',
+        cancel: "Cancel",
+        removeOldScores: "Remove old scores",
+        keepOldScores: "Keep old scores"
     },
     init: function (matrixId) {
         matrix.initDisplay();
@@ -112,6 +120,280 @@ var matrix = {
             $('#MatrixLegendModal').modal('show');
         });
 
+        $('#UserSkillValuesModalContent').on('click', '.editSkillValue', function (event) {
+            let matrixid = +$(event.currentTarget).data('matrixid');
+            let userskillid = +$(event.currentTarget).data('userskillid');
+            let userid = +$(event.currentTarget).data('userid');
+            let expiryindays = +$(event.currentTarget).data('expiryindays');
+            let notificationwindowindays = +$(event.currentTarget).data('notificationwindowindays');
+
+            matrix.currentMatrixId = matrixid;
+            matrix.currentSkillId = userskillid;
+            matrix.currentUserId = userid;
+            matrix.currentExpiryInDays = expiryindays;
+            matrix.currentNotificationWindowInDays = notificationwindowindays;
+
+            matrix.showUserSkillPickerAndFixPosition(true, $(`#valuedate-${matrix.currentMatrixId}-${matrix.currentSkillId}`)[0], event.currentTarget, $('#UserSkillValuesModal'));
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        });
+
+        $('#UserSkillValuesModalContent').on('click', '.editCustomTarget', function (event) {
+            let matrixid = +$(event.currentTarget).data('matrixid');
+            let userskillid = +$(event.currentTarget).data('userskillid');
+            let userid = +$(event.currentTarget).data('userid');
+
+            matrix.currentMatrixId = matrixid;
+            matrix.currentSkillId = userskillid;
+            matrix.currentUserId = userid;
+
+            if ($(event.currentTarget).data('userskillname')) {
+                $('#customTargetOperationalSkillName').html($(event.currentTarget).data('userskillname'));
+            }
+
+            matrix.resetCustomDefaultTargetValue();
+
+            if ($(event.currentTarget).data('userskilltarget')) {
+
+                let userSkillTarget = +$(event.currentTarget).data('userskilltarget');
+                if (userSkillTarget == 1 && !$(event.currentTarget).data('isapplicable')) {
+                    userSkillTarget = -1;
+                }
+                matrix.setCustomDefaultTargetValue(userSkillTarget, $(`[id^="customDefaultTarget-${userSkillTarget}"]`));
+            }
+
+            $('#CustomTargetModal').modal('show');
+        });
+
+        $('#UserSkillValuesModalContent').on('click', '.daterangepicker .applyBtn', function () {
+            const picker = $(`#valuedate-${matrix.currentMatrixId}-${matrix.currentSkillId}`).data('daterangepicker');
+            if (!picker) return;
+
+            matrix.saveUserSkillValueNew(matrix.currentMatrixId, matrix.currentSkillId, matrix.currentUserId);
+        });
+
+        $('#UserSkillValuesModalContent').on('click', '.daterangepicker .deleteUserSkillValueButton', function () {
+            let userId = matrix.currentUserId;
+            let userSkillId = matrix.currentSkillId;
+
+            let userSkillAndUserMetadata = {
+                UserId: userId,
+                UserSkillId: userSkillId,
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '/skillsmatrix/skillvalue/remove/' + matrix.currentMatrixId,
+                data: JSON.stringify(userSkillAndUserMetadata),
+                success: function (data) {
+                    toastr.success('Value removed.');
+
+                    let removePicker = $(`#valuedate-${matrix.currentMatrixId}-${userSkillId}`).data('daterangepicker')
+                    if (removePicker) {
+                        removePicker.hide();
+                    }
+
+                    $(`#mandatorySkillDetails-${userSkillId}-${userId}`).html(data);
+                    matrix.initDateRangePicker($(`#valuedate-${matrix.currentMatrixId}-${userSkillId}`));
+
+                    let buttons = $('[data-userid="' + userId + '"][data-skillid="' + userSkillId + '"]');
+                    //update matrix UI;
+                    buttons.each(function () {
+                        buttons.attr('class', 'btn circlebtn');
+                        buttons.attr('data-value', 0);
+                    });
+
+                    matrix.calculateMatrix();
+
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                },
+                contentType: "application/json; charset=utf-8"
+            });
+        });
+
+        $('#UserSkillValuesModalContent').on('click', '.daterangepicker .notRequiredForThisPersonButton', function () {
+            console.log("not required for this person clicked");
+
+            let userId = matrix.currentUserId;
+            let userSkillId = matrix.currentSkillId;
+
+            let customTargetInfo = {
+                CustomTarget: null,
+                UserId: userId,
+                UserSkillId: userSkillId,
+                IsApplicable: false
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '/skillsmatrix/applicability/set/mandatory/' + matrix.currentMatrixId,
+                data: JSON.stringify(customTargetInfo),
+                success: function (data) {
+                    toastr.success('User skill marked as not required for this person!');
+
+                    let removePicker = $(`#valuedate-${matrix.currentMatrixId}-${userSkillId}`).data('daterangepicker')
+                    if (removePicker) {
+                        removePicker.hide();
+                    }
+
+                    $(`#mandatorySkillDetails-${userSkillId}-${userId}`).html(data);
+                    matrix.initDateRangePicker($(`#valuedate-${matrix.currentMatrixId}-${userSkillId}`));
+
+                    matrix.calculateMatrix();
+
+                    //todo update matrix
+                    //let buttons = $('[data-userid="' + userId + '"][data-skillid="' + userSkillId + '"]');
+                    ////update matrix UI;
+                    //buttons.each(function () {
+                    //    buttons.attr('class', 'btn circlebtn');
+                    //    buttons.attr('data-value', 0);
+                    //});
+
+                    //ezgomediafetcher.preloadImagesAndVideos();
+                    //update/load operational skill row?
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                },
+                contentType: "application/json; charset=utf-8"
+            });
+        });
+
+        $('#UserSkillValuesModalContent').on('click', '.daterangepicker .requiredForThisPersonButton', function () {
+            console.log("not required for this person clicked");
+
+            let userId = matrix.currentUserId;
+            let userSkillId = matrix.currentSkillId;
+
+            let userSkillAndUserMetadata = {
+                UserId: userId,
+                UserSkillId: userSkillId,
+            }
+            $.ajax({
+                type: "POST",
+                url: '/skillsmatrix/applicability/remove/mandatory/' + matrix.currentMatrixId,
+                data: JSON.stringify(userSkillAndUserMetadata),
+                success: function (data) {
+                    toastr.success('User skill marked as required for this person!');
+
+                    let removePicker = $(`#valuedate-${matrix.currentMatrixId}-${userSkillId}`).data('daterangepicker')
+                    if (removePicker) {
+                        removePicker.hide();
+                    }
+
+                    $(`#mandatorySkillDetails-${userSkillId}-${userId}`).html(data);
+                    matrix.initDateRangePicker($(`#valuedate-${matrix.currentMatrixId}-${userSkillId}`));
+
+                    matrix.calculateMatrix();
+
+                    //todo update matrix
+                    //let buttons = $('[data-userid="' + userId + '"][data-skillid="' + userSkillId + '"]');
+                    ////update matrix UI;
+                    //buttons.each(function () {
+                    //    buttons.attr('class', 'btn circlebtn');
+                    //    buttons.attr('data-value', 0);
+                    //});
+
+                    //matrix.calculateMatrix();
+                    //ezgomediafetcher.preloadImagesAndVideos();
+                    //update/load operational skill row?
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                },
+                contentType: "application/json; charset=utf-8"
+            });
+        });
+
+        $('.resetToDefaultTargetButton').on('click', function () {
+            console.log("reset to default target button clicked");
+
+            let userId = matrix.currentUserId;
+            let userSkillId = matrix.currentSkillId;
+
+            let userSkillAndUserMetadata = {
+                UserId: userId,
+                UserSkillId: userSkillId,
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '/skillsmatrix/applicability/remove/operational/' + matrix.currentMatrixId,
+                data: JSON.stringify(userSkillAndUserMetadata),
+                success: function (data) {
+                    toastr.success('Custom target removed!');
+
+                    $('#CustomTargetModal').modal('hide');
+
+                    $(`#operationalSkillDetails-${userSkillId}-${userId}`).html(data);
+
+                    matrix.calculateMatrix();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                },
+                contentType: "application/json; charset=utf-8"
+            });
+        });
+
+        $('.configureCustomTargetButton').on('click', function () {
+            console.log("configure custom target button clicked");
+            let customTarget = matrix.getCustomDefaultTargetValue();
+            let userId = matrix.currentUserId;
+            let userSkillId = matrix.currentSkillId;
+            let applicable = customTarget != -1;
+
+            let customTargetInfo = {
+                CustomTarget: customTarget,
+                UserId: userId,
+                UserSkillId: userSkillId,
+                IsApplicable: applicable
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '/skillsmatrix/applicability/set/operational/' + matrix.currentMatrixId,
+                data: JSON.stringify(customTargetInfo),
+                success: function (data) {
+                    toastr.success('Custom target set ' + (applicable ? 'applicable' : 'not applicable') + '!');
+                    $('#CustomTargetModal').modal('hide');
+
+                    $(`#operationalSkillDetails-${userSkillId}-${userId}`).html(data);
+
+                    ezgomediafetcher.preloadImagesAndVideos();
+
+                    matrix.calculateMatrix();
+
+                    //TODO: update matrix score display with new custom target (goal might not be met anymore)
+                    //also calculateMatrix (still has to be edited)
+                    /*
+                    
+                    let buttons = $('[data-userid="' + userId + '"][data-skillid="' + userSkillId + '"]');
+                    //update matrix UI;
+                    buttons.each(function () {
+                        buttons.attr('class', 'btn circlebtn');
+                        buttons.attr('data-value', 0);
+                    });
+
+                    matrix.calculateMatrix();
+
+                    */
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+                },
+                contentType: "application/json; charset=utf-8"
+            });
+        });
+
+        $('#CustomTargetModal').on('hidden.bs.modal', function () {
+            if ($('.modal.show').length) {
+                $('body').addClass('modal-open');
+            }
+        });
 
         $("#matrixBody").scroll(function () {
             if ($('.user-title').first().offset().top <= $('#matrixBody').first().offset().top) {
@@ -347,6 +629,19 @@ var matrix = {
 
         });
 
+        $('#UserSkillValuesModalBody').on('click', '.daterangepicker td span', function (e) {
+            const td = this.closest('td');
+            if (td) {
+                // Create a native MouseEvent and dispatch it
+                const event = new MouseEvent('mousedown', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                });
+                td.dispatchEvent(event);
+            }
+        });
+
         $('#dialog_type_1, #dialog_type_2').on('click', function (e) {
             matrix.skillEdited = true;
             //change ui
@@ -396,6 +691,27 @@ var matrix = {
                 //deselecting done by default
             }
         });
+
+        $('.item-custom-target').on('click', function (e) {
+            let currentButtonSelected =
+                $(e.currentTarget).hasClass('btn-red-selected') ||
+                $(e.currentTarget).hasClass('btn-orangered-selected') ||
+                $(e.currentTarget).hasClass('btn-orange-selected') ||
+                $(e.currentTarget).hasClass('btn-orangegreen-selected') ||
+                $(e.currentTarget).hasClass('btn-green-selected');
+
+            let currentValue = $(e.currentTarget).data('value');
+
+            matrix.resetCustomDefaultTargetValue();
+
+            //only select current item if it wasn't already selected, in which case it would need to be deselected (toggle)
+            if (!currentButtonSelected) {
+                matrix.setCustomDefaultTargetValue(currentValue, e.currentTarget);
+            }
+            else {
+                //deselecting done by default
+            }
+        })
 
     },
     showMandatorySkillFields: function () {
@@ -476,6 +792,57 @@ var matrix = {
     },
     getDefaultTargetValue: function () {
         let selectedElement = $('div[id^="defaultTarget-"][class$="-selected"]');
+
+        if (selectedElement) {
+            let selectedValue = $(selectedElement).data('value');
+            return selectedValue;
+        }
+
+        return null;
+    },
+    resetCustomDefaultTargetValue: function () {
+        $('#customDefaultTarget-1').addClass('btn-red');
+        $('#customDefaultTarget-2').addClass('btn-orangered');
+        $('#customDefaultTarget-3').addClass('btn-orange');
+        $('#customDefaultTarget-4').addClass('btn-orangegreen');
+        $('#customDefaultTarget-5').addClass('btn-green');
+        $('#customDefaultTarget--1').addClass('btn-white');
+
+        $('#customDefaultTarget-1').removeClass('btn-red-selected');
+        $('#customDefaultTarget-2').removeClass('btn-orangered-selected');
+        $('#customDefaultTarget-3').removeClass('btn-orange-selected');
+        $('#customDefaultTarget-4').removeClass('btn-orangegreen-selected');
+        $('#customDefaultTarget-5').removeClass('btn-green-selected');
+        $('#customDefaultTarget--1').removeClass('btn-white-selected');
+    },
+    setCustomDefaultTargetValue: function (targetValue, elem) {
+        if (targetValue == 1) {
+            $(elem).addClass('btn-red-selected');
+            $(elem).removeClass('btn-red');
+        }
+        else if (targetValue == 2) {
+            $(elem).addClass('btn-orangered-selected');
+            $(elem).removeClass('btn-orangered');
+        }
+        else if (targetValue == 3) {
+            $(elem).addClass('btn-orange-selected');
+            $(elem).removeClass('btn-orange');
+        }
+        else if (targetValue == 4) {
+            $(elem).addClass('btn-orangegreen-selected');
+            $(elem).removeClass('btn-orangegreen');
+        }
+        else if (targetValue == 5) {
+            $(elem).addClass('btn-green-selected');
+            $(elem).removeClass('btn-green');
+        }
+        else if (targetValue == -1) {
+            $(elem).addClass('btn-white-selected');
+            $(elem).removeClass('btn-white');
+        }
+    },
+    getCustomDefaultTargetValue: function () {
+        let selectedElement = $('div[id^="customDefaultTarget-"][class$="-selected"]');
 
         if (selectedElement) {
             let selectedValue = $(selectedElement).data('value');
@@ -582,8 +949,7 @@ var matrix = {
             item.UserSkillId = parseInt($(this).attr('data-userskillid'));
             items.push(item);
         });
-        //[{"index":1,"id":1},{"index":2,"id":2}]
-        //console.log(items);
+
         toastr.remove();
         var itemsToUpdate = items.length;
         var itemsUpdated = 0;
@@ -725,8 +1091,8 @@ var matrix = {
                 $('#skill_in_matrix_true').attr('data-userskillid', skillItem.Id);
                 $('#skill_in_matrix_true').attr('data-id', skillItem.Id);
                 $('#skill_in_matrix_container').show();
-            } 
-        } 
+            }
+        }
     },
     saveSkill: function () {
         //warning if operational skill
@@ -740,7 +1106,7 @@ var matrix = {
                     {
                         text: "Yes", id: $.utils.createUUID(), click: function ($modal) {
                             $modal.dismiss();
-                            matrix.updateSkill();
+                            matrix.verifyDeleteOld();
                         }
                     },
                     { text: "No", id: $.utils.createUUID(), click: function ($modal) { $modal.dismiss(); } }
@@ -748,11 +1114,49 @@ var matrix = {
             });
         }
         else {
-            matrix.updateSkill();
+            matrix.verifyDeleteOld();
         }
 
     },
-    updateSkill: function () {
+    verifyDeleteOld: function(){
+        let Skill;
+        let skillData = $('#dialog_skillselection option:selected').attr('data-store');
+        if (skillData) {
+            Skill = JSON.parse(skillData);
+        }
+
+        //warning if assessment was changed, right hand side of && is to prevent warning when assessment id is not and was not chosen (would be undefined and '')
+        if (Skill && $('#dialog_type_2').is(':checked') && ($('#modal_assessment_choice').val() != Skill.SkillAssessmentId) && !(!$('#modal_assessment_choice').val() && !Skill.SkillAssessmentId)) {
+
+            $.fn.dialogue({
+                //title: "Keep old scores?",
+                content: $("<p />").html(matrix.language.keepOldScoresDialogueBody),
+                closeIcon: true,
+                buttons: [
+                    {
+                        text: matrix.language.removeOldScores, id: $.utils.createUUID(), click: function ($modal) {
+                            $modal.dismiss();
+                            matrix.updateSkill(true); //remove old values
+                        }
+                    },
+                    {
+                        text: matrix.language.keepOldScores, id: $.utils.createUUID(), click: function ($modal) {
+                            $modal.dismiss();
+                            matrix.updateSkill(false); //do not remove old values
+                        }
+                    },
+                    {
+                        text: matrix.language.cancel, id: $.utils.createUUID(), click: function ($modal) {
+                            $modal.dismiss();
+                        }
+                    }
+                ]
+            });
+        } else {
+            matrix.updateSkill(false);
+        }
+    },
+    updateSkill: function (deleteoldvalues = false) {
         let OldInMatrix = ($('#dialog_skillselection option:selected').attr('data-inmatrix') === 'true');
         let NewInMatrix = $('#skill_in_matrix_true').is(':checked');
 
@@ -798,7 +1202,7 @@ var matrix = {
 
         $.ajax({
             type: "POST",
-            url: '/skillsmatrix/' + matrix.currentMatrixId + '/skills/addchange',
+            url: '/skillsmatrix/' + matrix.currentMatrixId + '/skills/addchange?deleteoldvalues=' + deleteoldvalues,
             data: JSON.stringify(newSkill),
             async: false,
             success: function (data) {
@@ -872,10 +1276,10 @@ var matrix = {
             $('#dialog_skillselection option[value="' + relation.UserSkillId + '"]').remove();
             option.attr('data-inmatrix', newInMatrix);
             $(newInMatrix ? '#opt_skill_in_matrix' : '#opt_skill_not_in_matrix').append(option);
-            $('#dialog_skillselection').val(relation.UserSkillId);                
+            $('#dialog_skillselection').val(relation.UserSkillId);
         }
     },
-    
+
     initGroupHandlers: function () {
         //group
         $('[data-action="search_person"]').on('keyup', function () {
@@ -902,7 +1306,7 @@ var matrix = {
             matrix.saveGroup();
         });
         //$('[data-actiontype="close_modal"]').on('click', function () {
-            //matrix.updateMatrix();
+        //matrix.updateMatrix();
         //});
         $('#group_name, #group_description').on('keyup', function () {
             matrix.groupEdited = true;
@@ -987,7 +1391,8 @@ var matrix = {
             }
             else {
                 $('#btnDeleteUserGroup').attr('disabled', true);
-                $('#btnDeleteUserGroup').attr('title', 'This user group cannot be deleted because it is in use in one or more Skills Matrices.');            }
+                $('#btnDeleteUserGroup').attr('title', 'This user group cannot be deleted because it is in use in one or more Skills Matrices.');
+            }
             if ($('#group_choice option:selected').attr('data-inmatrix').toString() === 'true') {
                 $('#group_in_matrix').prop('checked', true);
             } else {
@@ -1073,104 +1478,250 @@ var matrix = {
         });
     },
     showUserSkillValuesModal: function (matrixid, userid, userName) {
-        $('#UserSkillValuesModalTitle').html(matrix.language.userSkills + userName);
         $.ajax({
             type: "GET",
-            url: '/skillsmatrix/' + matrixid + '/skillvalues/' + userid,
-            success: function (uservalues) {
-                matrix.currentUserSkillValues = uservalues;
-                $.ajax({
-                    type: "GET",
-                    url: '/skillsmatrix/' + matrixid + '/skills/' + userid,
-                    success: function (data) {
-                        matrix.currentUserSkills = data;
-                        $('#UserSkillValuesModalBodyMandatory').html('');
-                        $('#UserSkillValuesModalBodyOperational').html('');
-
-                        $.each(data, function (index, elem) {
-                            var expiryInDays = "";
-                            var expiryWarningInDays = "";
-                            var dateInput = "";
-                            var readonly = "";
-                            if (elem.ExpiryInDays != undefined && elem.ExpiryInDays != null) {
-                                expiryInDays = matrix.language.expiryInDays + elem.ExpiryInDays + ', ';
-                            }
-                            else {
-                                expiryInDays = matrix.language.expiryInDays + ', ';
-                            }
-
-                            if (elem.NotificationWindowInDays != undefined && elem.NotificationWindowInDays != null) {
-                                expiryWarningInDays = matrix.language.expiryWarningInDays + elem.NotificationWindowInDays;
-                            }
-                            else {
-                                expiryWarningInDays = matrix.language.expiryWarningInDaysNotSet;
-                            }
-                            var uservalue = uservalues.find(u => u.UserSkillId == elem.UserSkillId);
-                            
-                            if (elem.SkillType == 0) {
-                                readonly = "";
-                            }
-                            else if (elem.SkillType == 1) {
-                                readonly = "disabled";
-                            }
-
-                            if (uservalue && !uservalue.ValueDate.startsWith("0001-01-01")) {
-                                //date
-                                dateInput = '<input type="date" ' + readonly + ' min="1970-01-01" max="2050-01-01" data-matrixid="' + matrixid + '" data-userskillid="' + elem.UserSkillId + '" data-valuetype="userDateTimeChoice" class="form-control" id="valuedate-' + matrixid + '-' + elem.UserSkillId + '" value="' + uservalue.ValueDate.substring(0, 10) + '"> ';
-                            }
-                            else {
-                                //date
-                                dateInput = '<input type="date" ' + readonly + ' min="1970-01-01" max="2050-01-01" data-matrixid="' + matrixid + '" data-userskillid="' + elem.UserSkillId + '" class="form-control" id="valuedate-' + matrixid + '-' + elem.UserSkillId + '" data-valuetype="userDateTimeChoice"> ';
-                            }
-
-                            //set button disabled by default
-                            if (elem.SkillType == 0) {
-                                $('#UserSkillValuesModalBodyMandatory').append('<strong>' + elem.Name + '</strong>' +
-                                    '<br />' + expiryInDays + expiryWarningInDays + '<br />' +
-                                    '<div class="input-group mb-3">' +
-                                    '<div class="input-group-prepend">' +
-                                    '<span class="input-group-text">' + matrix.language.certifiedAt + '</span>' +
-                                    '</div>' +
-                                    dateInput +
-                                    '<div class="input-group-append">' +
-                                    '<button class="btn btn-outline-secondary" disabled id="confirmUserSkillValue-' + matrixid + '-' + elem.UserSkillId + '" onclick="matrix.saveUserSkillValue(' + matrixid + ', ' + elem.UserSkillId + ', ' + userid + ', false)">' + matrix.language.confirm + '</button>' +
-                                    '<button class="btn btn-outline-secondary" onclick="matrix.saveUserSkillValue(' + matrixid + ', ' + elem.UserSkillId + ', ' + userid + ', true)"><i class="fas fa-trash"></i></button>' +
-                                    '</div>' +
-                                    '</div>' +
-                                    '<br />');
-                            }
-                            else if (elem.SkillType == 1) {
-                                $('#UserSkillValuesModalBodyOperational').append('<strong>' + elem.Name + '</strong>' +
-                                    '<br />' + expiryInDays + expiryWarningInDays + '<br />' +
-                                    '<div class="input-group mb-3">' +
-                                    '<div class="input-group-prepend">' +
-                                    '<span class="input-group-text">' + matrix.language.certifiedAt + '</span>' +
-                                    '</div>' +
-                                    dateInput +
-                                    '<div class="input-group-append">' +
-                                    '</div>' +
-                                    '</div>' +
-                                    '<br />');
-                                }
-
-                        });
-                        $('#UserSkillValuesModal').modal('show');
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        //console.log('getting user skills failed');
-                        toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
-                    },
-                    dataType: 'json',
-                    contentType: "application/json; charset=utf-8"
+            url: `/skillsmatrix/${matrixid}/skillvalues/${userid}/modalcontent`,
+            success: function (modalContent) {
+                $('#UserSkillValuesModalContent').html(modalContent);
+                $('#UserSkillValuesModal').modal('show');
+                matrix.currentMatrixId = matrixid;
+                matrix.currentUserId = userid;
+                $('[id^="valuedate-"]').each(function (index, elem) {
+                    matrix.initDateRangePicker(elem);
                 });
+
+                ezgomediafetcher.preloadImagesAndVideos();
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                //console.log('getting user skill values failed');
                 toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
-            },
-            dataType: 'json',
-            contentType: "application/json; charset=utf-8"
+            }
         });
+    },
+    initDateRangePicker: function (elem) {
+
+        let startDate = $(elem).data('iso8601certifiedat');
+        if (!startDate) {
+            startDate = moment().format('YYYY-MM-DD');
+        }
+        let picker = $(elem).data('daterangepicker');
+
+        if (picker && picker.container) {
+            return;
+        }
+
+        $(elem).daterangepicker({
+            parentEl: '#UserSkillValuesModalBody',
+            singleDatePicker: true,
+            showDropdowns: true,
+            autoApply: false,
+            applyButtonClasses: 'btn-ezgo customConfirmButton',
+            cancelButtonClasses: 'btn-secondary customCloseButton',
+            startDate: moment(startDate, 'YYYY-MM-DD', true),
+            locale: {
+                format: 'YYYY-MM-DD',
+                firstDay: 1,
+                applyLabel: 'Confirm',
+                autoUpdateInput: false,
+                cancelLabel: 'Close',
+                daysOfWeek: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+            }
+        });
+
+        picker = $(elem).data('daterangepicker');
+
+        let container = $(picker.container);
+
+        matrix.currentUserSkillName = $(elem).data('userskillname');
+
+        matrix.currentExpiryInDays = $(elem).data('expiryindays');
+
+        matrix.currentNotificationWindowInDays = $(elem).data('notificationwindowindays');
+
+        const $buttons = container.find('.drp-buttons');
+        $buttons.css({
+            display: 'flex',
+            justifyContent: 'center',
+            padding: '10px 20px'
+        });
+
+        let preventHide = false;
+
+        const originalSetStartDate = picker.setStartDate;
+        picker.setStartDate = function (date) {
+            preventHide = true;
+            originalSetStartDate.call(this, date);
+            $('#valuedate-' + matrix.currentMatrixId + '-' + matrix.currentSkillId).val(date.format('YYYY-MM-DD'));
+            requestAnimationFrame(() => {
+                this.move();
+            });
+        };
+
+        const originalShow = picker.show;
+
+        picker.show = function () {
+
+            originalShow.call(this);
+            picker.container.addClass('showPicker');
+        };
+
+        const originalHide = picker.hide;
+        picker.hide = function () {
+            if (preventHide) {
+                preventHide = false;
+                return;
+            }
+            picker.container.removeClass('showPicker');
+
+            $('#datepicker-backdrop').removeClass('show');
+
+            picker.container.one('transitionend', () => {
+                originalHide.call(this);
+            });
+        };
+
+        const originalMove = picker.move;
+        picker.move = function () {
+            originalMove.call(this);
+
+            requestAnimationFrame(() => {
+                matrix.showUserSkillPickerAndFixPosition(false,
+                    $(`#valuedate-${matrix.currentMatrixId}-${matrix.currentSkillId}`),
+                    $(`#editSkillValuePositioningElement-${matrix.currentMatrixId}-${matrix.currentSkillId}`)[0], $('#UserSkillValuesModal'));
+            });
+        };
+
+        var originalRenderCalendar = picker.renderCalendar;
+
+        picker.renderCalendar = function (side) {
+            originalRenderCalendar.call(this, side);
+
+            const displayedMonth = this.leftCalendar.month.clone();
+            const month = displayedMonth.month();
+            const year = displayedMonth.year();
+
+            const specialMoment = moment(matrix.currentCertifiedAt, 'YYYY-MM-DD');
+
+            this.container.find('td.available').each(function () {
+                const $td = $(this);
+                if ($td.hasClass('off')) return;
+
+                const text = $td.text().trim();
+
+                if (!$td.find('span').length) {
+                    $td.html('<span>' + text + '</span>');
+                }
+
+                const day = parseInt(text, 10);
+                if (isNaN(day)) return;
+
+                const cellMoment = moment({ year, month, day });
+
+                if (cellMoment.isSame(specialMoment, 'day')) {
+                    $td.addClass('currentUserSkillValueDatePicker');
+                } else {
+                    $td.removeClass('currentUserSkillValueDatePicker');
+                }
+            });
+
+            const $row = this.container.find('.drp-calendar.' + side + ' thead tr:first');
+
+            const $prev = $row.find('th.prev');
+            const $next = $row.find('th.next');
+            const $month = $row.find('th.month');
+
+            $row.append($month);
+            $row.append($prev);
+            $row.append($next);
+        };
+
+        if (!container.find('.drp-custom-header').length) {
+            container.prepend(`
+                            <div class="modal-header datepicker-header">
+                                <div class="row" style="width: 100%;">
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h4 style="display: inline-block">Certified at</h4>
+                                                &nbsp;&nbsp;
+                                                <h6 style="display: inline-block" id="certifiedAtValue-${matrix.currentMatrixId}-${$(elem).data('userskillid')}">${$(elem).data('certifiedat')}</h6>
+                                            </div>
+                                            <div class="col-12">
+                                                <h6 id="datePickerSkillName">${matrix.currentUserSkillName}</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="button" class="close drp-x-btn" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+        }
+
+        container.on('click', '.drp-x-btn', function () {
+            const originalFlag = preventHide;
+            preventHide = false;  // allow hide
+            picker.hide();
+            preventHide = originalFlag;
+        });
+
+        $('#UserSkillValuesModalBody').on('mousedown', function (e) {
+            if (!picker.isShowing) return;
+
+            if (!container.is(e.target) && container.has(e.target).length === 0) {
+                preventHide = true;
+            }
+        });
+
+        let deleteButton = $('<button type="button" class="btn btn-sm btn-danger deleteUserSkillValueButton">Delete</button>');
+        container.find('.drp-buttons').prepend(deleteButton);
+
+        //todo make toggle
+        let isRequired = $(elem).data('isrequired');
+        console.log(isRequired);
+        let notRequiredButton = '';
+        if (!isRequired) {
+            notRequiredButton = $('<button type="button" class="btn btn-sm btn-ezgo requiredForThisPersonButton">Required for this person</button>');
+        }
+        else {
+            notRequiredButton = $('<button type="button" class="btn btn-sm btn-ezgo notRequiredForThisPersonButton">Not required for this person</button>');
+
+        }
+        container.find('.drp-buttons').prepend(notRequiredButton);
+    },
+    showUserSkillPickerAndFixPosition: function (show, dateinput, element, modal) {
+        let picker = $(dateinput).data('daterangepicker');
+        if (!picker) {
+            matrix.initDateRangePicker(dateinput);
+            picker = $(dateinput).data('daterangepicker');
+        }
+        matrix.currentCertifiedAt = $(element).data('iso8601certifiedat');
+
+        if (show) {
+            picker.show();
+            picker.move();
+
+            $('#datepicker-backdrop').addClass('show');
+        }
+
+        if (picker && picker.container) {
+            picker.container.find('.drp-buttons').show();
+
+            picker.container.css({
+                position: 'fixed',
+                top: '50%',
+                left: '50%',
+                width: '30vw',
+                maxWidth: '600px',
+                minWidth: '250px',
+                transform: 'translate(-50%, -50%)',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                zIndex: 1050  // higher than backdrop
+            });
+        }
     },
     displayUsers: function () {
         $('[data-containertype="group_users"] li[data-containertype="user_chosen"]').hide();
@@ -1308,8 +1859,6 @@ var matrix = {
                 updateGroupMatrixUri = '/skillsmatrix/' + matrix.currentMatrixId + '/groups/removerelation';
             }
 
-            //console.log(relation);
-
             $.ajax({
                 type: "POST",
                 url: updateGroupMatrixUri,
@@ -1361,6 +1910,12 @@ var matrix = {
             }
             goal_difference = goal_result - goal;
             $(this).find('[data-containertype="difference_value"]').text(goal_difference);
+            if (goal_difference < 0) {
+                $(this).find('[data-containertype="difference_value"]').parent('div.matrix-tooltip').addClass('gap-too-low');
+            }
+            else {
+                $(this).find('[data-containertype="difference_value"]').parent('div.matrix-tooltip').addClass('gap-high-enough');
+            }
             $(this).find('[data-containertype="result_value"]').text(goal_result);
         });
     },
@@ -1368,13 +1923,21 @@ var matrix = {
         let result = 0;
         $('[data-containertype="operational_skill_row"]').each(function () {
             let goal = parseInt($(this).find('[data-containertype="goal_value"]').text());
+            let defaultTarget = parseInt($(this).find('[data-containertype="default_target_value"]').text());
+            if (!defaultTarget) {
+                defaultTarget = 0;
+            }
             let goal_difference = 0; // $(this).find('[data-containertype="difference_value"]').text();
             let goal_result = 0; // $(this).find('[data-containertype="result_value"]').text();
             let items = $(this).find('[data-containertype="value"] button[data-value]');
             goal_result = 0;
             let userCol = [];
             items.each(function () {
-                if ($(this).attr('data-value') != 0) {
+                if ($(this).attr('data-isapplicable')) {
+                    defaultTarget = parseInt($(this).attr('data-customtarget'));
+                }
+                if ($(this).attr('data-value') != 0 && (!defaultTarget || $(this).attr('data-value') >= defaultTarget)) {
+                    console.log(true);
                     userCol.push($(this).attr('data-userid'));
                 }
             });
@@ -1386,6 +1949,12 @@ var matrix = {
             }
             goal_difference = goal_result - goal;
             $(this).find('[data-containertype="difference_value"]').text(goal_difference);
+            if (goal_difference < 0) {
+                $(this).find('[data-containertype="difference_value"]').addClass('gap-too-low');
+            }
+            else {
+                $(this).find('[data-containertype="difference_value"]').addClass('gap-high-enough');
+            }
             $(this).find('[data-containertype="result_value"]').text(goal_result);
         });
     },
@@ -1398,7 +1967,7 @@ var matrix = {
             skillValue.UserId = parseInt(matrix.currentUserId);
             skillValue.UserSkillId = parseInt(matrix.currentSkillId);
             skillValue.ValueDate = new Date().toISOString();
-            //console.log(skillValue);
+
             $.ajax({
                 type: "POST",
                 url: '/skillsmatrix/' + matrix.currentMatrixId + '/skillvalue/save',
@@ -1503,6 +2072,66 @@ var matrix = {
         });
 
         matrix.calculateMatrix();
+    },
+    saveUserSkillValueNew: function (skillsmatrixid, userskillid, userid) {
+        let skillValue = {};
+        var skillValueScore = 2;
+        var skillClass = 'btn circlebtn btn-green thumbsup';
+
+        var referenceDate = new Date($('#valuedate-' + skillsmatrixid + '-' + userskillid).val());
+        var now = Date.now();
+        if (referenceDate > now) {
+            skillValueScore = 0;
+            skillClass = 'btn circlebtn';
+        }
+        else if (matrix.currentExpiryInDays != undefined && matrix.currentExpiryInDays != null) {
+            var expiryDate = new Date(referenceDate.valueOf());
+            expiryDate.setDate(referenceDate.getDate() + matrix.currentExpiryInDays);
+            if (now >= expiryDate) {
+                skillValueScore = 1;
+                skillClass = 'btn circlebtn btn-red thumbsdown';
+            }
+            else if (matrix.currentNotificationWindowInDays != undefined && matrix.currentNotificationWindowInDays != null) {
+                //2 when now is smaller than expiry date and now is smaller than expiry date - notification window in days
+                //1 when now is bigger than expiry date
+                //5 when now is smaller than expiry date
+                var notificationDate = new Date(expiryDate.valueOf());
+                notificationDate.setDate(expiryDate.getDate() - matrix.currentNotificationWindowInDays);
+                if (now >= notificationDate) {
+                    skillValueScore = 5;
+                    skillClass = 'btn circlebtn btn-orange warning';
+                }
+            }
+        }
+
+        skillValue.Score = skillValueScore;
+        skillValue.UserId = parseInt(userid);
+        skillValue.UserSkillId = parseInt(userskillid);
+        skillValue.ValueDate = new Date($('#valuedate-' + skillsmatrixid + '-' + userskillid).val()).toISOString();
+
+        $.ajax({
+            type: "POST",
+            url: '/skillsmatrix/' + skillsmatrixid + '/skillvalue/save',
+            data: JSON.stringify(skillValue),
+            success: function (data) {
+                toastr.success('Value saved.');
+                $(`#mandatorySkillDetails-${userskillid}-${userid}`).html(data);
+                matrix.initDateRangePicker($(`#valuedate-${skillsmatrixid}-${userskillid}`));
+
+                let buttons = $('[data-userid="' + userid + '"][data-skillid="' + userskillid + '"]');
+                //update UI;
+                buttons.each(function () {
+                    buttons.attr('class', skillClass);
+                    buttons.attr('data-value', skillValueScore);
+                });
+
+                matrix.calculateMatrix();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
+            },
+            contentType: "application/json; charset=utf-8"
+        });
     }
 } 
 

@@ -1,0 +1,165 @@
+﻿@using System.Globalization
+@model MatrixUserSkillValueDetailsViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@{
+    var userSkillValue = Model.UserSkillValue;
+    var mandatorySkill = Model.UserSkill;
+    var applicability = Model.Applicability;
+}
+
+<div class="row p-1" style="border-bottom: 2px solid #E8E8E8; align-items: center;">
+    <div class="col-4">@mandatorySkill.Name</div>
+
+    @{
+        var valueDateString = "";
+        var valueUntilString = "";
+        if (userSkillValue != null && userSkillValue.ValueDate != null)
+        {
+            valueDateString = userSkillValue.ValueDate.ToString("dd MMM yyyy");
+            valueUntilString = userSkillValue.ValueDate.AddDays(mandatorySkill.ExpiryInDays ?? 0).ToString("dd MMM yyyy");
+        }
+    }
+    <div class="col-2">@valueDateString</div>
+    <div class="col-2">@valueUntilString</div>
+    @{
+        int? validDaysNumber = null;
+        var validDaysColour = "";
+        if (userSkillValue != null && userSkillValue.ValueDate != null)
+        {
+            validDaysNumber = (int)Math.Round(userSkillValue.ValueDate.AddDays(mandatorySkill.ExpiryInDays ?? 0).Subtract(DateTime.UtcNow).TotalDays, 0);
+        }
+
+        if (validDaysNumber == null || validDaysNumber >= mandatorySkill.NotificationWindowInDays)
+        {
+            validDaysColour = "#212529";
+        }
+        else if (validDaysNumber <= 0)
+        {
+            validDaysColour = "#FF0000";
+        }
+        else if (validDaysNumber < mandatorySkill.NotificationWindowInDays)
+        {
+            validDaysColour = "#FFA500";
+        }
+    }
+    <div class="col-2" style="color: @validDaysColour">@validDaysNumber</div>
+    @{
+        int score = -1;
+        @if (userSkillValue != null)
+        {
+            score = (int)userSkillValue.Score;
+        }
+
+        string statusclass = score == 1 ? "btn-red thumbsdown" : score == 2 ? "btn-green thumbsup" : score == 5 ? "btn-orange warning" : "";
+        int[] validScores = new[] { 0, 1, 2, 5 };
+        string dataValueAttr = validScores.Contains(score) ? $"data-value={score}" : "";
+    }
+    <div class="col-1">
+        @if(Model.Applicability != null && !Model.Applicability.IsApplicable)
+        {
+            <div class="buttoncell" data-containertype="value">
+                <button id="editSkillValuePositioningElement-@Model.MatrixId-@mandatorySkill.UserSkillId"
+                        class="btn circlebtnNoHover"
+                        style="font-size: 52px !important; line-height: 48px; font-weight: 400;color: #A6A6A6; padding: 0px;"
+                        type="button"
+                        data-matrixid="@Model.MatrixId"
+                        data-userskillid="@mandatorySkill.UserSkillId"
+                        data-userid="@Model.User.Id"
+                        data-userskillname="@mandatorySkill.Name"
+                        data-expiryindays="@mandatorySkill.ExpiryInDays"
+                        data-notificationwindowindays="@mandatorySkill.NotificationWindowInDays"
+                        data-isrequired="@((Model.Applicability == null || Model.Applicability.IsApplicable).ToString().ToLowerInvariant())"
+                        data-certifiedat="@(userSkillValue == null ? "" : userSkillValue.ValueDate.ToString("ddd, dd MMM yyyy"))"
+                        data-iso8601certifiedat="@(userSkillValue == null ? "" : userSkillValue.ValueDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))"
+                        @dataValueAttr>
+                    &times;
+                </button>
+            </div>
+            <div class="buttoncell circlebtn editSkillValue"
+                 style="position: absolute; border: 1px solid #A6A6A6; height: 19px; width: 19px; right: 12px; bottom: 0px; font-size: 10px !important; border-radius: 19px; float: right; background-color: #FAFAFA; color: #212529"
+                 data-matrixid="@Model.MatrixId"
+                 data-userskillid="@mandatorySkill.UserSkillId"
+                 data-userid="@Model.User.Id"
+                 data-userskillname="@mandatorySkill.Name"
+                 data-expiryindays="@mandatorySkill.ExpiryInDays"
+                 data-notificationwindowindays="@mandatorySkill.NotificationWindowInDays"
+                 data-isrequired="@((Model.Applicability == null || Model.Applicability.IsApplicable).ToString().ToLowerInvariant())"
+                 data-certifiedat="@(userSkillValue == null ? "" : userSkillValue.ValueDate.ToString("ddd, dd MMM yyyy"))"
+                 data-iso8601certifiedat="@(userSkillValue == null ? "" : userSkillValue.ValueDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))">
+                <i class="fa-solid fa-pencil" style="margin-top: 4px; font-size: 10px !important"></i>
+            </div>
+        }
+        else if (score == -1)
+        {
+            <div class="buttoncell" data-containertype="value">
+                <button id="editSkillValuePositioningElement-@Model.MatrixId-@mandatorySkill.UserSkillId"
+                        class="btn circlebtnOtherBorder editSkillValue"
+                        type="button"
+                        data-matrixid="@Model.MatrixId"
+                        data-userskillid="@mandatorySkill.UserSkillId"
+                        data-userid="@Model.User.Id"
+                        data-userskillname="@mandatorySkill.Name"
+                        data-expiryindays="@mandatorySkill.ExpiryInDays"
+                        data-notificationwindowindays="@mandatorySkill.NotificationWindowInDays"
+                        data-isrequired="@((Model.Applicability != null && Model.Applicability.IsApplicable).ToString().ToLowerInvariant())"
+                        data-certifiedat="@(userSkillValue == null ? "" : userSkillValue.ValueDate.ToString("ddd, dd MMM yyyy"))"
+                        data-iso8601certifiedat="@(userSkillValue == null ? "" : userSkillValue.ValueDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))">
+                    <i style="color: #A6A6A6" class="fa-regular fa-pencil"></i>
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="buttoncell" data-containertype="value">
+                <button id="editSkillValuePositioningElement-@Model.MatrixId-@mandatorySkill.UserSkillId"
+                        class="btn circlebtnNoHover @statusclass"
+                        type="button"
+                        data-matrixid="@Model.MatrixId"
+                        data-userskillid="@mandatorySkill.UserSkillId"
+                        data-userid="@Model.User.Id"
+                        data-userskillname="@mandatorySkill.Name"
+                        data-expiryindays="@mandatorySkill.ExpiryInDays"
+                        data-notificationwindowindays="@mandatorySkill.NotificationWindowInDays"
+                        data-isrequired="@((Model.Applicability == null || Model.Applicability.IsApplicable).ToString().ToLowerInvariant())"
+                        data-certifiedat="@(userSkillValue == null ? "" : userSkillValue.ValueDate.ToString("ddd, dd MMM yyyy"))"
+                        data-iso8601certifiedat="@(userSkillValue == null ? "" : userSkillValue.ValueDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))"
+                        @dataValueAttr></button>
+            </div>
+            <div class="buttoncell circlebtn editSkillValue"
+                 style="position: absolute; border: 1px solid #A6A6A6; height: 19px; width: 19px; right: 12px; bottom: 0px; font-size: 10px !important; border-radius: 19px; float: right; background-color: #FAFAFA; color: #212529"
+                 data-matrixid="@Model.MatrixId"
+                 data-userskillid="@mandatorySkill.UserSkillId"
+                 data-userid="@Model.User.Id"
+                 data-userskillname="@mandatorySkill.Name"
+                 data-expiryindays="@mandatorySkill.ExpiryInDays"
+                 data-notificationwindowindays="@mandatorySkill.NotificationWindowInDays"
+                 data-isrequired="@((Model.Applicability == null || Model.Applicability.IsApplicable).ToString().ToLowerInvariant())"
+                 data-certifiedat="@(userSkillValue == null ? "" : userSkillValue.ValueDate.ToString("ddd, dd MMM yyyy"))"
+                 data-iso8601certifiedat="@(userSkillValue == null ? "" : userSkillValue.ValueDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))">
+                <i class="fa-solid fa-pencil" style="margin-top: 4px; font-size: 10px !important"></i>
+            </div>
+        }
+
+        <input style="display: none"
+               type="date"
+               min="1970-01-01"
+               data-matrixid="@Model.MatrixId"
+               data-userskillid="@mandatorySkill.UserSkillId"
+               data-userid="@Model.User.Id"
+               data-userskillname="@mandatorySkill.Name"
+               data-expiryindays="@mandatorySkill.ExpiryInDays"
+               data-notificationwindowindays="@mandatorySkill.NotificationWindowInDays"
+               data-isrequired="@((Model.Applicability == null || Model.Applicability.IsApplicable).ToString().ToLowerInvariant())"
+               data-certifiedat="@(userSkillValue == null ? "" : userSkillValue.ValueDate.ToString("ddd, dd MMM yyyy"))"
+               data-iso8601certifiedat="@(userSkillValue == null ? "" : userSkillValue.ValueDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))"
+               class="form-control"
+               id="valuedate-@Model.MatrixId-@mandatorySkill.UserSkillId"
+               data-valuetype="userDateTimeChoice"
+               value="@(userSkillValue == null || userSkillValue?.ValueDate == DateTime.MinValue ? DateTime.UtcNow.ToString("yyyy-MM-dd") : userSkillValue.ValueDate.ToString("yyyy-MM-dd"))">
+    </div>
+    <div class="col-1">&nbsp;</div>
+</div>
