@@ -20,6 +20,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using WebApp.Helpers;
 using WebApp.Attributes;
 using WebApp.Logic;
 using WebApp.Logic.Converters;
@@ -507,6 +508,8 @@ namespace WebApp.Controllers
                 return View("~/Views/Shared/_template_not_found.cshtml", output);
             }
 
+            output.CurrentSkillsMatrix.LegendItems = await GetLegendOrDefault(output.CurrentSkillsMatrix.LegendItems);
+
             string uri = Logic.Constants.Task.GetTaskAreas;
             var arearesult = await _connector.GetCall(uri);
             if (arearesult.StatusCode == HttpStatusCode.OK)
@@ -716,6 +719,38 @@ namespace WebApp.Controllers
             {
                 return BadRequest();
             }
+        }
+
+        [HttpGet]
+        [FeatureAttribute(Feature = FeatureAttribute.FeatureFiltersEnum.SkillMatrix)]
+        [Route("/skillsmatrix/legend")]
+        public async Task<IActionResult> GetSkillMatrixLegend()
+        {
+            var legend = await GetLegendOrDefault(new List<SkillMatrixLegendItem>());
+            return Ok(legend);
+        }
+
+        private async Task<List<SkillMatrixLegendItem>> GetLegendOrDefault(List<SkillMatrixLegendItem> currentLegend)
+        {
+            var legendItems = currentLegend ?? new List<SkillMatrixLegendItem>();
+            var legendResult = await _connector.GetCall("/v1/skillsmatrix/legend");
+            if (legendResult.StatusCode == HttpStatusCode.OK)
+            {
+                try
+                {
+                    legendItems = legendResult.Message.ToObjectFromJson<List<SkillMatrixLegendItem>>();
+                }
+                catch
+                {
+                }
+            }
+
+            if (legendItems == null || !legendItems.Any())
+            {
+                legendItems = SkillMatrixLegendItem.CreateDefaultLegend();
+            }
+
+            return legendItems.OrderBy(x => x.DisplayOrder).ToList();
         }
 
         [FeatureAttribute(Feature = FeatureAttribute.FeatureFiltersEnum.SkillMatrix)]

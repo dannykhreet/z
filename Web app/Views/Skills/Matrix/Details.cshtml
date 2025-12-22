@@ -1,12 +1,49 @@
 ﻿@model WebApp.ViewModels.SkillsViewModel
 @using WebApp.Logic
+@using WebApp.Models.Skills
 @{
     Layout = "_Layout_template";
     ViewData["Title"] = @Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatrixDetailsTitle, "Skill matrix details") ?? "Skill matrix details";
+    var legendItems = Model.CurrentSkillsMatrix?.LegendItems?.Any() == true ? Model.CurrentSkillsMatrix.LegendItems.OrderBy(x => x.DisplayOrder).ToList() : SkillMatrixLegendItem.CreateDefaultLegend();
+    SkillMatrixLegendItem GetLegendItem(string key, int? score = null, string type = null) => legendItems.FirstOrDefault(x => (!string.IsNullOrEmpty(key) && x.Key == key) || (score.HasValue && x.Score == score && (string.IsNullOrEmpty(type) || x.Type == type)));
+    string Bg(SkillMatrixLegendItem item, string fallback) => string.IsNullOrWhiteSpace(item?.BackgroundColor) ? fallback : item.BackgroundColor;
+    string Txt(SkillMatrixLegendItem item, string fallback) => string.IsNullOrWhiteSpace(item?.TextColor) ? fallback : item.TextColor;
+    var op1 = GetLegendItem("operational-1", 1, SkillMatrixLegendItem.TypeOperational);
+    var op2 = GetLegendItem("operational-2", 2, SkillMatrixLegendItem.TypeOperational);
+    var op3 = GetLegendItem("operational-3", 3, SkillMatrixLegendItem.TypeOperational);
+    var op4 = GetLegendItem("operational-4", 4, SkillMatrixLegendItem.TypeOperational);
+    var op5 = GetLegendItem("operational-5", 5, SkillMatrixLegendItem.TypeOperational);
+    var mandatoryMaster = GetLegendItem("mandatory-master");
+    var mandatoryWarn = GetLegendItem("mandatory-almost-expired");
+    var mandatoryExpired = GetLegendItem("mandatory-expired");
+    var operationalAlmost = GetLegendItem("operational-almost-expired", null, SkillMatrixLegendItem.TypeOperationalStatus);
+    var warningSource = operationalAlmost ?? mandatoryWarn;
+    var warnIcon = GetLegendItem("operational-expired", null, SkillMatrixLegendItem.TypeOperationalStatus);
 }
 
 @section CSS{
     <style>
+        :root {
+            --matrix-color-1-bg: @(Bg(op1, "#ffeaea"));
+            --matrix-color-1-text: @(Txt(op1, "#cb0000"));
+            --matrix-color-2-bg: @(Bg(op2, "#ffe4da"));
+            --matrix-color-2-text: @(Txt(op2, "#ff4500"));
+            --matrix-color-3-bg: @(Bg(op3, "#fff0d4"));
+            --matrix-color-3-text: @(Txt(op3, "#ffa500"));
+            --matrix-color-4-bg: @(Bg(op4, "#f2f5dd"));
+            --matrix-color-4-text: @(Txt(op4, "#8da304"));
+            --matrix-color-5-bg: @(Bg(op5, "#ddf7dd"));
+            --matrix-color-5-text: @(Txt(op5, "#008000"));
+            --matrix-mandatory-master-bg: @(Bg(mandatoryMaster, "#ddf7dd"));
+            --matrix-mandatory-master-text: @(Txt(mandatoryMaster, "#5eaf5e"));
+            --matrix-mandatory-warning-bg: @(Bg(warningSource, "#fff0d4"));
+            --matrix-mandatory-warning-text: @(Txt(warningSource, "#ffa500"));
+            --matrix-mandatory-expired-bg: @(Bg(mandatoryExpired, "#ffeaea"));
+            --matrix-mandatory-expired-text: @(Txt(mandatoryExpired, "#cb0000"));
+            --matrix-warning-icon-bg: @(Bg(warnIcon, "#ffeaea"));
+            --matrix-warning-icon-text: @(Txt(warnIcon, "#cb0000"));
+        }
+
         #instructions {
             top: 0px;
             position: absolute;
@@ -1740,24 +1777,23 @@
             </div>
 
             <div class="modal-body">
+                @{
+                    var mandatoryLegend = legendItems.Where(x => x.Type == SkillMatrixLegendItem.TypeMandatory).ToList();
+                    var operationalLegend = legendItems.Where(x => x.Type == SkillMatrixLegendItem.TypeOperational).OrderByDescending(x => x.Score).ToList();
+                    var operationalStatusLegend = legendItems.Where(x => x.Type == SkillMatrixLegendItem.TypeOperationalStatus).ToList();
+                    string BuildStyle(SkillMatrixLegendItem legendItem) => $"background-color:{legendItem?.BackgroundColor ?? "#fff"};border-color:{legendItem?.TextColor ?? "#5eaf5e"};color:{legendItem?.TextColor ?? "#5eaf5e"};";
+                }
                 @if (Model.ApplicationSettings.Features.SkillMatrixMandatorySkills != null && Model.ApplicationSettings.Features.SkillMatrixMandatorySkills.Value)
                 {
                     <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixMandatorySkills, "Mandatory skills (users can fill these in)") ?? "Mandatory skills (users can fill these in)")</h5>
                     <div class="row">
-                        <div class="col-4">
-                            <button class="btn circlebtn btn-green thumbsup m-2" type="button" data-popup="thumbs" data-value="2" data-actiontype="user_value_choice"></button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueMastersTheSkill, "Masters the skill") ?? "Masters the skill")
-                        </div>
-
-                        <div class="col-4">
-                            <button class="btn circlebtn btn-orange warning m-2" type="button" data-popup="thumbs" data-value="5" data-actiontype="user_value_choice"></button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueAlmostExpired, "Almost expired") ?? "Almost expired")
-                        </div>
-
-                        <div class="col-4">
-                            <button class="btn circlebtn btn-red thumbsdown m-2" type="button" data-popup="thumbs" data-value="1" data-actiontype="user_value_choice"></button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueExpired, "Expired") ?? "Expired")
-                        </div>
+                        @foreach (var item in mandatoryLegend)
+                        {
+                            <div class="col-4">
+                                <button class="btn circlebtn @(item.IconClass ?? string.Empty) m-2" type="button" style="@BuildStyle(item)">@(!string.IsNullOrWhiteSpace(item.IconText) ? item.IconText : item.Score?.ToString())</button>
+                                @item.Label
+                            </div>
+                        }
                     </div>
                 }
 
@@ -1765,47 +1801,27 @@
                 {
                     <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixOperationalSkillsTitle, "Operational skills (users can fill these in)") ?? "Operational skills (users can fill these in)")</h5>
                     <div class="row">
-                        <div class="col-6">
-                            <button class="btn circlebtn btn-green m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice">5</button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueCanEducateOthers, "Can educate others") ?? "Can educate others")
-                        </div>
-
-                        <div class="col-6">
-                            <button class="btn circlebtn btn-orangegreen m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice">4</button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueNonStandardConditions, "Is able to apply it in non-standard conditions") ?? "Is able to apply it in non-standard conditions")
-                        </div>
+                        @foreach (var item in operationalLegend)
+                        {
+                            <div class="col-6">
+                                <button class="btn circlebtn @(item.IconClass ?? string.Empty) m-2" style="font-size:22px !important;@BuildStyle(item)" type="button" data-popup="score" data-actiontype="user_value_choice">@(!string.IsNullOrWhiteSpace(item.IconText) ? item.IconText : item.Score?.ToString())</button>
+                                @item.Label
+                            </div>
+                        }
                     </div>
 
-                    <div class="row">
-                        <div class="col-6">
-                            <button class="btn circlebtn btn-orange m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice">3</button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueStandardSituations, "Is able to apply it in standard situations") ?? "Is able to apply it in standard situations")
+                    @if (operationalStatusLegend.Any())
+                    {
+                        <div class="row">
+                            @foreach (var item in operationalStatusLegend)
+                            {
+                                <div class="col-6">
+                                    <button class="btn circlebtn @(item.IconClass ?? string.Empty) m-2" style="font-size:22px !important;@BuildStyle(item)" type="button" data-popup="score" data-actiontype="user_value_choice">@item.IconText</button>
+                                    @item.Label
+                                </div>
+                            }
                         </div>
-
-                        <div class="col-6">
-                            <button class="btn circlebtn btn-orangered m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice">2</button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueKnowTheTheory, "Knows the theory") ?? "Knows the theory")
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <button class="btn circlebtn btn-red m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice">1</button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueNoKnowTheTheory, "Doesn't know the theory") ?? "Doesn't know the theory")
-                        </div>
-
-                        <div class="col-6">
-                            <button class="btn circlebtn warning-icon m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice"></button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueOperationalSkillExpired, "Operational skill expired") ?? "Operational skill expired")
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <button class="btn circlebtn btn-orange warning m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice"></button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueAlmostExpired, "Operational almost expired") ?? "Operational almost expired")
-                        </div>
-                    </div>
-                 
+                    }
                 }
 
                 @if (Model.ApplicationSettings.Features.SkillMatrixOperationalBehaviour != null && Model.ApplicationSettings.Features.SkillMatrixOperationalBehaviour.Value)

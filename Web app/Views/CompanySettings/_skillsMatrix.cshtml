@@ -1,8 +1,13 @@
 ﻿@model WebApp.ViewModels.CompanySettingsViewModel
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Serialization
+@{
+    var legendItems = Model.SkillMatrixLegend?.Any() == true ? Model.SkillMatrixLegend.OrderBy(x => x.DisplayOrder).ToList() : WebApp.Models.Skills.SkillMatrixLegendItem.CreateDefaultLegend();
+}
 
 <!-- Right Content Area -->
-<div class="col-9 p-4" style="border-radius: 8px; max-width:100%">
-    <div class="btn-group btn-group-toggle" data-toggle="buttons" style="display: flex; justify-content: space-between;">
+<div class="col-12 p-4" style="border-radius: 8px; max-width:100%">
+    <div class="btn-group btn-group-toggle mb-4" data-toggle="buttons" style="display: flex; justify-content: space-between;">
         <!-- Use Round Down -->
         <label id="RoundDown_label" class="btn work-instructions-option @(Model.ApplicationSettings?.Features?.EnableMatrixScoreStandard == false ? "active" : "")">
             <input type="radio" name="RoundDown" id="RoundDown" value="RoundDown" @(Model.ApplicationSettings?.Features?.EnableMatrixScoreStandard == false ? "checked" : "") />
@@ -28,54 +33,114 @@
         </label>
     </div>
 
-
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.MatrixLegendTitle, "Matrix legend") ?? "Matrix legend")</h5>
+            <small class="text-muted d-block">Update the labels and colors that are used in the matrix legend and across the skill matrix.</small>
+        </div>
+        <div class="card-body">
+            <div id="legendEditor" class="row">
+                @foreach (var item in legendItems)
+                {
+                    <div class="col-md-6 col-lg-4 mb-3" data-legend-key="@item.Key">
+                        <div class="border rounded p-3 h-100">
+                            <div class="d-flex align-items-center mb-2">
+                                <button type="button" class="btn circlebtn @item.IconClass legend-preview mr-2" style="background-color:@(item.BackgroundColor ?? "#fff");border-color:@(item.TextColor ?? "#5eaf5e");color:@(item.TextColor ?? "#5eaf5e");">
+                                    @(string.IsNullOrWhiteSpace(item.IconText) ? item.Score?.ToString() : item.IconText)
+                                </button>
+                                <div class="flex-grow-1">
+                                    <strong class="legend-label-preview d-block">@item.Label</strong>
+                                    <small class="text-muted d-block">@item.Key.Replace("-", " ").ToUpper()</small>
+                                </div>
+                            </div>
+                            <div class="form-group mb-2">
+                                <label class="small mb-1">@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.SettingsValue, "Value") ?? "Value")</label>
+                                <input type="text" class="form-control form-control-sm legend-label-input" value="@item.Label" />
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-6 mb-2">
+                                    <label class="small mb-1">Background color</label>
+                                    <input type="color" class="form-control form-control-color legend-bg-input" value="@(string.IsNullOrWhiteSpace(item.BackgroundColor) ? "#ffffff" : item.BackgroundColor)" />
+                                </div>
+                                <div class="form-group col-6 mb-2">
+                                    <label class="small mb-1">Text color</label>
+                                    <input type="color" class="form-control form-control-color legend-text-input" value="@(string.IsNullOrWhiteSpace(item.TextColor) ? "#5eaf5e" : item.TextColor)" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="d-flex justify-content-end">
+                <button id="saveLegendBtn" class="btn btn-ezgo btn-sm">
+                    <i class="fa fa-save pr-1"></i>
+                    @(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.BtnSave, "Save") ?? "Save")
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 <script>
     $(document).ready(function () {
-        // Debounce timer
+        const legendDefaults = @Html.Raw(JsonConvert.SerializeObject(legendItems, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() }));
         let debounceTimer;
 
-        // Event handler for label clicks
+        const legendMap = new Map();
+        const legendKey = (item) => item.key || item.Key;
+        legendDefaults.forEach(item => legendMap.set(legendKey(item), item));
+
+        const applyPreview = (row, item) => {
+            const previewBtn = $(row).find('.legend-preview');
+            const labelPreview = $(row).find('.legend-label-preview');
+            previewBtn.css('background-color', item.backgroundColor || '#ffffff');
+            previewBtn.css('border-color', item.textColor || '#5eaf5e');
+            previewBtn.css('color', item.textColor || '#5eaf5e');
+            previewBtn.text(item.iconText || item.score || '');
+            labelPreview.text(item.label || '');
+        };
+
+        const updateLegendItem = (row) => {
+            const key = $(row).data('legend-key');
+            const legendItem = legendMap.get(key);
+            legendItem.label = $(row).find('.legend-label-input').val();
+            legendItem.backgroundColor = $(row).find('.legend-bg-input').val();
+            legendItem.textColor = $(row).find('.legend-text-input').val();
+            legendMap.set(key, legendItem);
+            applyPreview(row, legendItem);
+        };
+
+        $('#legendEditor').on('input change', '.legend-label-input, .legend-bg-input, .legend-text-input', function () {
+            updateLegendItem($(this).closest('[data-legend-key]'));
+        });
+
+        // Debounce timer for rounding setting
         $('.btn-group-toggle').off('click', 'label').on('click', 'label', function (e) {
             e.preventDefault();
             e.stopPropagation();
 
-            // Clear previous debounce timer
             clearTimeout(debounceTimer);
-
-            // Set debounce timer to prevent multiple requests
             debounceTimer = setTimeout(() => {
-                // Remove active class from all buttons
                 $('.btn-group-toggle label').removeClass('active');
-
-                // Add active class to the clicked button
                 $(this).addClass('active');
 
-                // Determine the selected state and update the UI accordingly
                 let settingValue;
-
                 if ($(this).attr('id') === 'RoundDown_label') {
-                    // Enable notifications selected
                     settingValue = false;
                     $('#RoundDown').prop('checked', false);
                     $('#donotRoundDown').prop('checked', true);
                 } else if ($(this).attr('id') === 'do_not_RoundDown_label') {
-                    // Dispensable notifications selected
                     settingValue = true;
                     $('#RoundDown').prop('checked', true);
                     $('#donotRoundDown').prop('checked', false);
                 }
 
-                // Send AJAX request to update the setting in the backend
                 updateWorkInstructionChangesStatus(settingValue);
-            }, 300); // Debounce delay
+            }, 300);
         });
 
-        // Initialize Work Instructions state properly
         initializeWorkInstructions();
 
         function initializeWorkInstructions() {
-            // Remove 'active' class from both labels
             $('#RoundDown_label').removeClass('active');
             $('#do_not_RoundDown_label').removeClass('active');
 
@@ -92,11 +157,27 @@
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(settingValue),
-                success: function (response) {
+                success: function () {
                     toastr.success('@(Model?.CmsLanguage.GetValue(LanguageKeys.CompanySetting.NotifyEndUserSkillMatrixChangeDoneCorrectly, "Skill matrix setting updated correctly") ?? "Skill matrix setting updated correctly")');
                 },
-                error: function (xhr, status, error) { }
+                error: function () { }
             });
         }
+
+        $('#saveLegendBtn').on('click', function () {
+            const payload = Array.from(legendMap.values());
+            $.ajax({
+                url: '/CompanySettings/UpdateSkillMatrixLegend',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function () {
+                    toastr.success('@(Model?.CmsLanguage.GetValue(LanguageKeys.Settings.SettingSaved, "Setting saved") ?? "Setting saved")');
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.responseText || 'Unable to save legend');
+                }
+            });
+        });
     });
 </script>

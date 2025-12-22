@@ -1,5 +1,26 @@
 ﻿/* Global button styles */
 
+:root {
+    --matrix-color-1-bg: #ffeaea;
+    --matrix-color-1-text: #cb0000;
+    --matrix-color-2-bg: #ffe4da;
+    --matrix-color-2-text: #ff4500;
+    --matrix-color-3-bg: #fff0d4;
+    --matrix-color-3-text: #ffa500;
+    --matrix-color-4-bg: #f2f5dd;
+    --matrix-color-4-text: #8da304;
+    --matrix-color-5-bg: #ddf7dd;
+    --matrix-color-5-text: #008000;
+    --matrix-mandatory-master-bg: #ddf7dd;
+    --matrix-mandatory-master-text: #5eaf5e;
+    --matrix-mandatory-warning-bg: #fff0d4;
+    --matrix-mandatory-warning-text: #ffa500;
+    --matrix-mandatory-expired-bg: #ffeaea;
+    --matrix-mandatory-expired-text: #cb0000;
+    --matrix-warning-icon-bg: #ffeaea;
+    --matrix-warning-icon-text: #cb0000;
+}
+
 .text-sm .btn {
     font-size: .875rem;
 }
@@ -78,19 +99,19 @@
 }
 
 .btn-green {
-    background-color: #ddf7dd;
+    background-color: var(--matrix-color-5-bg, #ddf7dd);
     font-size: 22px;
     font-weight: 400;
-    border-color: #008000;
-    color: #008000;
+    border-color: var(--matrix-color-5-text, #008000);
+    color: var(--matrix-color-5-text, #008000);
 }
 
 .btn-red {
-    background-color: #ffeaea;
+    background-color: var(--matrix-color-1-bg, #ffeaea);
     font-size: 22px !important;
     font-weight: 400;
-    border-color: #cb0000;
-    color: #cb0000;
+    border-color: var(--matrix-color-1-text, #cb0000);
+    color: var(--matrix-color-1-text, #cb0000);
 }
 
 .btn-clear {
@@ -102,27 +123,27 @@
 }
 
 .btn-orangered {
-    background-color: #ffe4da;
+    background-color: var(--matrix-color-2-bg, #ffe4da);
     font-size: 22px;
     font-weight: 400;
-    border-color: #ff4500;
-    color: #ff4500;
+    border-color: var(--matrix-color-2-text, #ff4500);
+    color: var(--matrix-color-2-text, #ff4500);
 }
 
 .btn-orange {
-    background-color: #fff0d4;
+    background-color: var(--matrix-color-3-bg, #fff0d4);
     font-size: 22px;
     font-weight: 400;
-    border-color: #ffa500;
-    color: #ffa500;
+    border-color: var(--matrix-color-3-text, #ffa500);
+    color: var(--matrix-color-3-text, #ffa500);
 }
 
 .btn-orangegreen {
-    background-color: #f2f5dd;
+    background-color: var(--matrix-color-4-bg, #f2f5dd);
     font-size: 22px;
     font-weight: 400;
-    border-color: #8da304;
-    color: #8da304;
+    border-color: var(--matrix-color-4-text, #8da304);
+    color: var(--matrix-color-4-text, #8da304);
 }
 
 .btn-border-green {
@@ -140,43 +161,43 @@
 /* Operational behaviour icons */
 
 .king {
-    background: url("/images/icons/v2/king.png") center / 26px no-repeat, #ddf7dd;
+    background: url("/images/icons/v2/king.png") center / 26px no-repeat, var(--matrix-color-5-bg, #ddf7dd);
     border-color: #5eaf5e;
 }
 
 .champion {
-    background: url("/images/icons/v2/champion.png") center / 26px no-repeat, #f2f5dd;
+    background: url("/images/icons/v2/champion.png") center / 26px no-repeat, var(--matrix-color-4-bg, #f2f5dd);
     border-color: #8da304;
 }
 
 .spoton {
-    background: url("/images/icons/v2/spoton.png") center / 26px no-repeat, #fff0d4;
+    background: url("/images/icons/v2/spoton.png") center / 26px no-repeat, var(--matrix-color-3-bg, #fff0d4);
     border-color: #ffa500;
 }
 
 .risingstar {
-    background: url("/images/icons/v2/risingstar.png") center / 26px no-repeat, #ffe4da;
+    background: url("/images/icons/v2/risingstar.png") center / 26px no-repeat, var(--matrix-color-2-bg, #ffe4da);
     border-color: #ff4500;
 }
 
 .powerup {
-    background: url("/images/icons/v2/powerup.png") center / 26px no-repeat, #ffeaea;
+    background: url("/images/icons/v2/powerup.png") center / 26px no-repeat, var(--matrix-color-1-bg, #ffeaea);
     border-color: #cb0000;
 }
 
 .thumbsup {
-    background: url("/images/icons/v2/thumbsup.png") center / 26px no-repeat, #ddf7dd;
-    border-color: #5eaf5e;
+    background: url("/images/icons/v2/thumbsup.png") center / 26px no-repeat, var(--matrix-mandatory-master-bg, #ddf7dd);
+    border-color: var(--matrix-mandatory-master-text, #5eaf5e);
 }
 
 .thumbsdown {
-    background: url("/images/icons/v2/thumbsdown.png") center / 26px no-repeat, #ffeaea;
-    border-color: #cb0000;
+    background: url("/images/icons/v2/thumbsdown.png") center / 26px no-repeat, var(--matrix-mandatory-expired-bg, #ffeaea);
+    border-color: var(--matrix-mandatory-expired-text, #cb0000);
 }
 
 .warning {
-    background: url("/images/icons/v2/warning.png") center / 26px no-repeat, #fff0d4;
-    border-color: #ffa500;
+    background: url("/images/icons/v2/warning.png") center / 26px no-repeat, var(--matrix-mandatory-warning-bg, #fff0d4);
+    border-color: var(--matrix-mandatory-warning-text, #ffa500);
 }
 
 .warning-icon {
@@ -184,6 +205,8 @@
     background-size: 26px 26px;
     background-position: center center;
     background-repeat: no-repeat;
+    background-color: var(--matrix-warning-icon-bg, #ffeaea);
+    color: var(--matrix-warning-icon-text, #cb0000);
 }
 
 /* End operational behaviour icons */

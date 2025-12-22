@@ -5,9 +5,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WebApp.Logic.Interfaces;
 using WebApp.ViewModels;
+using WebApp.Models.Skills;
+using WebApp.Helpers;
 
 
 namespace WebApp.Controllers
@@ -64,7 +67,53 @@ namespace WebApp.Controllers
             output.Filter.Module = FilterViewModel.ApplicationModules.CompanySetting;
             output.Locale = _locale;
             output.ApplicationSettings = await this.GetApplicationSettings();
+            output.SkillMatrixLegend = await GetLegendOrDefault(output.SkillMatrixLegend);
             return PartialView("_skillsMatrix", output);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SkillMatrixLegend()
+        {
+            var legend = await GetLegendOrDefault(new List<SkillMatrixLegendItem>());
+            return Ok(legend);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateSkillMatrixLegend([FromBody] List<SkillMatrixLegendItem> legendItems)
+        {
+            var payload = legendItems ?? new List<SkillMatrixLegendItem>();
+            var postResult = await _connector.PostCall("/v1/skillsmatrix/legend", payload.ToJsonFromObject(true));
+
+            if (postResult.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return Ok(legendItems);
+            }
+
+            return StatusCode((int)postResult.StatusCode, postResult.Message);
+        }
+
+        private async Task<List<SkillMatrixLegendItem>> GetLegendOrDefault(List<SkillMatrixLegendItem> current)
+        {
+            var legendItems = current ?? new List<SkillMatrixLegendItem>();
+
+            var legendResult = await _connector.GetCall("/v1/skillsmatrix/legend");
+            if (legendResult.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                try
+                {
+                    legendItems = legendResult.Message.ToObjectFromJson<List<SkillMatrixLegendItem>>();
+                }
+                catch
+                {
+                }
+            }
+
+            if (legendItems == null || !legendItems.Any())
+            {
+                legendItems = SkillMatrixLegendItem.CreateDefaultLegend();
+            }
+
+            return legendItems.OrderBy(x => x.DisplayOrder).ToList();
         }
 
         [HttpPost]
