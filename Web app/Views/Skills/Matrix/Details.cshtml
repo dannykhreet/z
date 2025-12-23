@@ -4,7 +4,8 @@
 @{
     Layout = "_Layout_template";
     ViewData["Title"] = @Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatrixDetailsTitle, "Skill matrix details") ?? "Skill matrix details";
-    var legendItems = Model.CurrentSkillsMatrix?.LegendItems?.Any() == true ? Model.CurrentSkillsMatrix.LegendItems.OrderBy(x => x.DisplayOrder).ToList() : SkillMatrixLegendItem.CreateDefaultLegend();
+    var legendItems = Model.CurrentSkillsMatrix?.LegendItems?.Any() == true ? new List<SkillMatrixLegendItem>(Model.CurrentSkillsMatrix.LegendItems) : SkillMatrixLegendItem.CreateDefaultLegend();
+    legendItems.Sort(new LegendDisplayOrderComparer());
     SkillMatrixLegendItem GetLegendItem(string key, int? score, string type)
     {
         foreach (var legendItem in legendItems)
@@ -19,8 +20,8 @@
         return null;
     }
 
-    string Bg(SkillMatrixLegendItem item, string fallback) => string.IsNullOrWhiteSpace(item?.BackgroundColor) ? fallback : item.BackgroundColor;
-    string Txt(SkillMatrixLegendItem item, string fallback) => string.IsNullOrWhiteSpace(item?.TextColor) ? fallback : item.TextColor;
+    string Bg(SkillMatrixLegendItem item, string fallback) { return string.IsNullOrWhiteSpace(item?.BackgroundColor) ? fallback : item.BackgroundColor; }
+    string Txt(SkillMatrixLegendItem item, string fallback) { return string.IsNullOrWhiteSpace(item?.TextColor) ? fallback : item.TextColor; }
 
     var op1 = GetLegendItem("operational-1", 1, SkillMatrixLegendItem.TypeOperational);
     var op2 = GetLegendItem("operational-2", 2, SkillMatrixLegendItem.TypeOperational);
@@ -34,6 +35,20 @@
     var warningSource = operationalAlmost ?? mandatoryWarn;
     var warnIcon = GetLegendItem("operational-expired", null, SkillMatrixLegendItem.TypeOperationalStatus);
 }
+
+    var mandatorySkillsOrdered = new List<EZGO.Api.Models.Skills.SkillsMatrixItem>();
+    if (Model.CurrentSkillsMatrix != null && Model.CurrentSkillsMatrix.MandatorySkills != null)
+    {
+        mandatorySkillsOrdered.AddRange(Model.CurrentSkillsMatrix.MandatorySkills);
+    }
+    mandatorySkillsOrdered.Sort(new SkillIndexComparer());
+
+    var operationalSkillsOrdered = new List<EZGO.Api.Models.Skills.SkillsMatrixItem>();
+    if (Model.CurrentSkillsMatrix != null && Model.CurrentSkillsMatrix.OperationalSkills != null)
+    {
+        operationalSkillsOrdered.AddRange(Model.CurrentSkillsMatrix.OperationalSkills);
+    }
+    operationalSkillsOrdered.Sort(new SkillIndexComparer());
 
 @section CSS{
     <style>
@@ -905,7 +920,7 @@
 
                 @if (Model.CurrentSkillsMatrix.MandatorySkills != null)
                 {
-                    @foreach (var skillset in Model.CurrentSkillsMatrix.MandatorySkills.OrderBy(s => s.Index))
+    @foreach (var skillset in mandatorySkillsOrdered)
                     {
                         <tr class="skillsrow" data-containertype="mandatory_skill_row">
                             @if (isHeader)
@@ -958,7 +973,7 @@
                 }
                 @if (Model.CurrentSkillsMatrix.OperationalSkills != null)
                 {
-                    @foreach (var skillset in Model.CurrentSkillsMatrix.OperationalSkills.OrderBy(s => s.Index))
+    @foreach (var skillset in operationalSkillsOrdered)
                     {
                         <tr class="skillsrow" data-containertype="operational_skill_row">
                             @if (isHeaderr)
@@ -1107,7 +1122,7 @@
 
                 @if (Model.CurrentSkillsMatrix.MandatorySkills != null && Model.ApplicationSettings.Features.SkillMatrixMandatorySkills != null && Model.ApplicationSettings.Features.SkillMatrixMandatorySkills.Value)
                 {
-                    @foreach (var skillset in Model.CurrentSkillsMatrix.MandatorySkills.OrderBy(s => s.Index))
+                    @foreach (var skillset in mandatorySkillsOrdered)
                     {
                         <tr class="skillsrow" data-containertype="mandatory_skill_row">
                             @if (isHeader)
@@ -1150,7 +1165,17 @@
                                         int score = -1;
                                         @if (skillset.Values != null)
                                         {
-                                            var found = skillset.Values.Where(m => m.UserId.Equals(userprofile.UserProfileId));
+                            var found = new List<EZGO.Api.Models.Skills.SkillsMatrixItemValue>();
+                            if (skillset.Values != null)
+                            {
+                                foreach (var value in skillset.Values)
+                                {
+                                    if (value.UserId == userprofile.UserProfileId)
+                                    {
+                                        found.Add(value);
+                                    }
+                                }
+                            }
                                             if (found != null && found.Any())
                                             {
                                                 score = (int)found.FirstOrDefault().Score;
@@ -1181,7 +1206,7 @@
 
                 @if (Model.CurrentSkillsMatrix.OperationalSkills != null && Model.ApplicationSettings.Features.SkillMatrixOperationalSkills != null && Model.ApplicationSettings.Features.SkillMatrixOperationalSkills.Value)
                 {
-                    @foreach (var skillset in Model.CurrentSkillsMatrix.OperationalSkills.OrderBy(s => s.Index))
+                    @foreach (var skillset in operationalSkillsOrdered)
                     {
                         <tr class="skillsrow" data-containertype="operational_skill_row">
                             @if (isHeader)
@@ -1223,10 +1248,18 @@
                                         bool almostExpired = false;
                                         @if (skillset.Values != null)
                                         {
-                                            var found = skillset.Values?
-                                            .Where(m => m.UserId.Equals(userprofile.UserProfileId))
-                                            .OrderByDescending(s => s.ValueDate)
-                                            .ToList();
+                                            var found = new List<EZGO.Api.Models.Skills.SkillsMatrixItemValue>();
+                                            if (skillset.Values != null)
+                                            {
+                                                foreach (var val in skillset.Values)
+                                                {
+                                                    if (val.UserId == userprofile.UserProfileId)
+                                                    {
+                                                        found.Add(val);
+                                                    }
+                                                }
+                                                found.Sort(new SkillValueDateDescComparer());
+                                            }
 
                                             if (found != null && found.Any())
                                             {
@@ -1259,7 +1292,18 @@
                                         bool showWarning = almostExpired || expired;
                                         string warningmessage = expired ? "Operational skill expired" : almostExpired ? "Operational almost expired" : "";
                                         string warningbackgroundcolor = expired ? "#FFFFFF" : almostExpired ? "#FFF0D4" : "";
-                                        var applicability = Model.Applicabilities.Where(a => a.UserSkillId == skillset.UserSkillId && a.UserId == userprofile.UserProfileId).FirstOrDefault();
+                                        EZGO.Api.Models.Users.UserSkillCustomTargetApplicability applicability = null;
+                                        if (Model.Applicabilities != null)
+                                        {
+                                            foreach (var app in Model.Applicabilities)
+                                            {
+                                                if (app.UserSkillId == skillset.UserSkillId && app.UserId == userprofile.UserProfileId)
+                                                {
+                                                    applicability = app;
+                                                    break;
+                                                }
+                                            }
+                                        }
                                         <td class="buttoncell" data-containertype="value" @(decimalScore > 0 ? $"title={decimalScore}" : "")>
                                             <div style="position: relative; display: inline-block">
                                                 <button 
@@ -1376,7 +1420,7 @@
                 @if (Model.ApplicationSettings.Features.SkillMatrixMandatorySkills != null && Model.ApplicationSettings.Features.SkillMatrixMandatorySkills.Value)
                 {
                     useSpacer = true;
-                    @foreach (var skillset in Model.CurrentSkillsMatrix.MandatorySkills.OrderBy(s => s.Index))
+                    @foreach (var skillset in mandatorySkillsOrdered)
                     {
                         <tr class="skillsrow" data-containertype="mandatory_skill_row">
                             <td class="endcell skillcell matrixmandatoryskilloverlay" style="height: 59px">
@@ -1395,7 +1439,7 @@
                         useSpacer = false;
                     }
                     useSpacer = true;
-                    @foreach (var skillset in Model.CurrentSkillsMatrix.OperationalSkills.OrderBy(s => s.Index))
+                    @foreach (var skillset in operationalSkillsOrdered)
                     {
                         <tr class="skillsrow" data-containertype="operational_skill_row">
                             <td class="endcell skillcell matrixoperationalskilloverlay" style="height: 59px">
@@ -1435,32 +1479,58 @@
                             <select class="form-control" id="dialog_skillselection">
                                 @if (Model.UserSkills != null && Model.UserSkills.Count > 0)
                                 {
-                                    var idsInMatrix = Model.CurrentSkillsMatrix.MandatorySkills != null ? Model.CurrentSkillsMatrix.MandatorySkills.Select(x => x.UserSkillId).ToList() : new List<int>();
-                                    if (Model.CurrentSkillsMatrix.OperationalSkills != null)
+                                    var idsInMatrix = new List<int>();
+                                    foreach (var ms in mandatorySkillsOrdered)
                                     {
-                                        idsInMatrix.AddRange(Model.CurrentSkillsMatrix.OperationalSkills.Select(x => x.UserSkillId).ToList());
+                                        idsInMatrix.Add(ms.UserSkillId);
+                                    }
+                                    foreach (var os in operationalSkillsOrdered)
+                                    {
+                                        idsInMatrix.Add(os.UserSkillId);
+                                    }
+
+                                    var mandatoryInMatrix = new List<EZGO.Api.Models.Users.UserSkill>();
+                                    var operationalInMatrix = new List<EZGO.Api.Models.Users.UserSkill>();
+                                    var mandatoryNotInMatrix = new List<EZGO.Api.Models.Users.UserSkill>();
+                                    var operationalNotInMatrix = new List<EZGO.Api.Models.Users.UserSkill>();
+                                    foreach (var item in Model.UserSkills)
+                                    {
+                                        var isInMatrix = idsInMatrix.Contains(item.Id);
+                                        if (item.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Mandatory)
+                                        {
+                                            if (isInMatrix) mandatoryInMatrix.Add(item); else mandatoryNotInMatrix.Add(item);
+                                        }
+                                        else if (item.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Operational)
+                                        {
+                                            if (isInMatrix) operationalInMatrix.Add(item); else operationalNotInMatrix.Add(item);
+                                        }
+                                    }
+                                    mandatoryInMatrix.Sort(new UserSkillNameComparer());
+                                    operationalInMatrix.Sort(new UserSkillNameComparer());
+                                    mandatoryNotInMatrix.Sort(new UserSkillNameComparer());
+                                    operationalNotInMatrix.Sort(new UserSkillNameComparer());
                                     }
 
                                     <option value="" title="Please select an existing skill">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SelectSkillTitle, "Please select an existing skill.") ?? "Please select an existing skill.")</option>
                                     <optgroup label="In matrix" id="opt_skill_in_matrix">
-                                        @foreach (var item in Model.UserSkills.Where(x => x.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Mandatory && idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name))
+                                        @foreach (var item in mandatoryInMatrix)
                                         {
                                             <option value="@item.Id.ToString()" title="@item.Description" data-inmatrix="true" data-userskillid="@item.Id" data-store="@item.ToJsonFromObject()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionMandatorySkill, "Mandatory Skill") ?? "Mandatory Skill") - @item.Name</option>
                                         }
 
-                                        @foreach (var item in Model.UserSkills.Where(x => x.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Operational && idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name))
+                                        @foreach (var item in operationalInMatrix)
                                         {
                                             <option value="@item.Id.ToString()" title="@item.Description" data-inmatrix="true" data-userskillid="@item.Id" data-store="@item.ToJsonFromObject()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionOperationalSkill, "Operational Skill") ?? "Operational Skill") - @item.Name</option>
                                         }
                                     </optgroup>
 
                                     <optgroup label="Not in matrix" id="opt_skill_not_in_matrix">
-                                        @foreach (var item in Model.UserSkills.Where(x => x.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Mandatory && !idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name))
+                                        @foreach (var item in mandatoryNotInMatrix)
                                         {
                                             <option value="@item.Id.ToString()" title="@item.Description" data-inmatrix="false" data-userskillid="@item.Id" data-store="@item.ToJsonFromObject()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionMandatorySkill, "Mandatory Skill") ?? "Mandatory Skill") - @item.Name</option>
                                         }
 
-                                        @foreach (var item in Model.UserSkills.Where(x => x.SkillType == EZGO.Api.Models.Enumerations.SkillTypeEnum.Operational && !idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name))
+                                        @foreach (var item in operationalNotInMatrix)
                                         {
                                             <option value="@item.Id.ToString()" title="@item.Description" data-inmatrix="false" data-userskillid="@item.Id" data-store="@item.ToJsonFromObject()">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionOperationalSkill, "Operational Skill") ?? "Operational Skill") - @item.Name</option>
                                         }
@@ -1653,9 +1723,33 @@
                         <select id="group_choice" class="form-control">
                             @if (Model.UserGroups != null)
                             {
-                                var idsInMatrix = Model.CurrentSkillsMatrix.UserGroups != null ? Model.CurrentSkillsMatrix.UserGroups.Select(x => x.UserGroupId).ToList() : new List<int>();
-                                var groupsInMatrix = Model.UserGroups.Where(x => idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name).ToList();
-                                var groupsNotInMatrix = Model.UserGroups.Where(x => !idsInMatrix.Contains(x.Id)).OrderBy(y => y.Name).ToList();
+                                var idsInMatrix = new List<int>();
+                                if (Model.CurrentSkillsMatrix.UserGroups != null)
+                                {
+                                    foreach (var g in Model.CurrentSkillsMatrix.UserGroups)
+                                    {
+                                        idsInMatrix.Add(g.UserGroupId);
+                                    }
+                                }
+
+                                var groupsInMatrix = new List<EZGO.Api.Models.Users.UserGroup>();
+                                var groupsNotInMatrix = new List<EZGO.Api.Models.Users.UserGroup>();
+                                if (Model.UserGroups != null)
+                                {
+                                    foreach (var g in Model.UserGroups)
+                                    {
+                                        if (idsInMatrix.Contains(g.Id))
+                                        {
+                                            groupsInMatrix.Add(g);
+                                        }
+                                        else
+                                        {
+                                            groupsNotInMatrix.Add(g);
+                                        }
+                                    }
+                                }
+                                groupsInMatrix.Sort(new UserGroupNameComparer());
+                                groupsNotInMatrix.Sort(new UserGroupNameComparer());
 
                                 <option value="" title="Please select a group">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.OptionSelectAnExistingGroup, "Please select an existing group.") ?? "Please select an existing group.")</option>
                                 <optgroup label="In Matrix" id="opt_group_in_matrix">
@@ -1749,9 +1843,30 @@
                                     @foreach (var user in Model.Users)
                                     {
                                         var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, user.Picture);
-                                        var possibleMatrixUsers = Model.MatrixUsers.Where(x => x.UserProfileId == user.Id);
+                                        var possibleMatrixUsers = new List<EZGO.Api.Models.Skills.SkillsMatrixUser>();
+                                        if (Model.MatrixUsers != null)
+                                        {
+                                            foreach (var matrixUser in Model.MatrixUsers)
+                                            {
+                                                if (matrixUser.UserProfileId == user.Id)
+                                                {
+                                                    possibleMatrixUsers.Add(matrixUser);
+                                                }
+                                            }
+                                        }
 
-                                        <li class="list-group-item" data-lastname="@user.LastName" data-firstname="@user.FirstName" data-groupid="@(possibleMatrixUsers != null && possibleMatrixUsers.Any() ? possibleMatrixUsers.Select(x => x.GroupId).ToList().ToJsonFromObject() : "")" data-id="@user.Id" data-containertype="user_chosen" data-action="user_chosen" style="margin-left: 5px; margin-right: 5px; cursor: pointer; ">
+                                        var groupIdsJson = "";
+                                        if (possibleMatrixUsers != null && possibleMatrixUsers.Any())
+                                        {
+                                            var groupIds = new List<int>();
+                                            foreach (var pmu in possibleMatrixUsers)
+                                            {
+                                                groupIds.Add(pmu.GroupId);
+                                            }
+                                            groupIdsJson = groupIds.ToJsonFromObject();
+                                        }
+
+                                        <li class="list-group-item" data-lastname="@user.LastName" data-firstname="@user.FirstName" data-groupid="@groupIdsJson" data-id="@user.Id" data-containertype="user_chosen" data-action="user_chosen" style="margin-left: 5px; margin-right: 5px; cursor: pointer; ">
                                             <div class="row">
                                                 <div class="col-md-9" data-containertype="user_chosen_name">
                                                     <img class="user-img" src="/images/media-loading.gif" data-src="@picture" style="width:25px;height:25px;" loading="lazy" />&nbsp;&nbsp;<span>@user.LastName, @user.FirstName</span>
@@ -1792,10 +1907,26 @@
 
             <div class="modal-body">
                 @{
-                    var mandatoryLegend = legendItems.Where(x => x.Type == SkillMatrixLegendItem.TypeMandatory).ToList();
-                    var operationalLegend = legendItems.Where(x => x.Type == SkillMatrixLegendItem.TypeOperational).OrderByDescending(x => x.Score).ToList();
-                    var operationalStatusLegend = legendItems.Where(x => x.Type == SkillMatrixLegendItem.TypeOperationalStatus).ToList();
-                    string BuildStyle(SkillMatrixLegendItem legendItem) => $"background-color:{legendItem?.BackgroundColor ?? "#fff"};border-color:{legendItem?.TextColor ?? "#5eaf5e"};color:{legendItem?.TextColor ?? "#5eaf5e"};";
+                    var mandatoryLegend = new List<SkillMatrixLegendItem>();
+                    var operationalLegend = new List<SkillMatrixLegendItem>();
+                    var operationalStatusLegend = new List<SkillMatrixLegendItem>();
+                    foreach (var legendItem in legendItems)
+                    {
+                        if (legendItem.Type == SkillMatrixLegendItem.TypeMandatory)
+                        {
+                            mandatoryLegend.Add(legendItem);
+                        }
+                        else if (legendItem.Type == SkillMatrixLegendItem.TypeOperational)
+                        {
+                            operationalLegend.Add(legendItem);
+                        }
+                        else if (legendItem.Type == SkillMatrixLegendItem.TypeOperationalStatus)
+                        {
+                            operationalStatusLegend.Add(legendItem);
+                        }
+                    }
+                    operationalLegend.Sort(new SkillMatrixLegendScoreDescComparer());
+                    string BuildStyle(SkillMatrixLegendItem legendItem) { return $"background-color:{legendItem?.BackgroundColor ?? "#fff"};border-color:{legendItem?.TextColor ?? "#5eaf5e"};color:{legendItem?.TextColor ?? "#5eaf5e"};"; }
                 }
                 @if (Model.ApplicationSettings.Features.SkillMatrixMandatorySkills != null && Model.ApplicationSettings.Features.SkillMatrixMandatorySkills.Value)
                 {
@@ -1960,7 +2091,7 @@
             <div class="modal-body" id="ChangeSkillOrderBody">
                 <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MandatorySkillsTitle, "Mandatory skills") ?? "Mandatory skills")</h5>
                 <div id="ChangeSkillOrderMandatorySkills" class="noselect">
-                    @foreach (var skill in Model.CurrentSkillsMatrix.MandatorySkills.OrderBy(s => s.Index))
+                    @foreach (var skill in mandatorySkillsOrdered)
                     {
 
                         <div class="mb-1 mt-1 p-1 changeSkillOrderSkill col-12" style="" data-matrixid="@Model.CurrentSkillsMatrix.Id" data-userskillid="@skill.UserSkillId" data-relationid="@skill.Id" data-index="@skill.Index" data-ischanged="false" data-container="mandatorySkill">
@@ -1977,7 +2108,7 @@
 
                 <h5 class="pt-2 mt-2">Operational skills</h5>
                 <div id="ChangeSkillOrderOperationalSkills" class="noselect">
-                    @foreach (var skill in Model.CurrentSkillsMatrix.OperationalSkills.OrderBy(s => s.Index))
+                    @foreach (var skill in operationalSkillsOrdered)
                     {
                         <div class="mb-1 mt-1 p-1 changeSkillOrderSkill col-12" style="" data-matrixid="@Model.CurrentSkillsMatrix.Id" data-userskillid="@skill.UserSkillId" data-relationid="@skill.Id" data-index="@skill.Index" data-ischanged="false" data-container="operationalSkill">
                             <div class="col-2">
@@ -2092,4 +2223,74 @@
 
         ezgomediafetcher.preloadImagesAndVideos();
     </script>
+}
+
+@functions {
+    private class LegendDisplayOrderComparer : IComparer<SkillMatrixLegendItem>
+    {
+        public int Compare(SkillMatrixLegendItem x, SkillMatrixLegendItem y)
+        {
+            if (x == null && y == null) return 0;
+            if (x == null) return -1;
+            if (y == null) return 1;
+            return x.DisplayOrder.CompareTo(y.DisplayOrder);
+        }
+    }
+
+    private class SkillMatrixLegendScoreDescComparer : IComparer<SkillMatrixLegendItem>
+    {
+        public int Compare(SkillMatrixLegendItem x, SkillMatrixLegendItem y)
+        {
+            if (x == null && y == null) return 0;
+            if (x == null) return 1;
+            if (y == null) return -1;
+            var xScore = x != null && x.Score.HasValue ? x.Score.Value : 0;
+            var yScore = y != null && y.Score.HasValue ? y.Score.Value : 0;
+            return yScore.CompareTo(xScore);
+        }
+    }
+
+    private class SkillIndexComparer : IComparer<EZGO.Api.Models.Skills.SkillsMatrixItem>
+    {
+        public int Compare(EZGO.Api.Models.Skills.SkillsMatrixItem x, EZGO.Api.Models.Skills.SkillsMatrixItem y)
+        {
+            if (x == null && y == null) return 0;
+            if (x == null) return -1;
+            if (y == null) return 1;
+            return x.Index.CompareTo(y.Index);
+        }
+    }
+
+    private class SkillValueDateDescComparer : IComparer<EZGO.Api.Models.Skills.SkillsMatrixItemValue>
+    {
+        public int Compare(EZGO.Api.Models.Skills.SkillsMatrixItemValue x, EZGO.Api.Models.Skills.SkillsMatrixItemValue y)
+        {
+            if (x == null && y == null) return 0;
+            if (x == null) return 1;
+            if (y == null) return -1;
+            return y.ValueDate.CompareTo(x.ValueDate);
+        }
+    }
+
+    private class UserSkillNameComparer : IComparer<EZGO.Api.Models.Users.UserSkill>
+    {
+        public int Compare(EZGO.Api.Models.Users.UserSkill x, EZGO.Api.Models.Users.UserSkill y)
+        {
+            if (x == null && y == null) return 0;
+            if (x == null) return -1;
+            if (y == null) return 1;
+            return string.Compare(x.Name, y.Name, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    private class UserGroupNameComparer : IComparer<EZGO.Api.Models.Users.UserGroup>
+    {
+        public int Compare(EZGO.Api.Models.Users.UserGroup x, EZGO.Api.Models.Users.UserGroup y)
+        {
+            if (x == null && y == null) return 0;
+            if (x == null) return -1;
+            if (y == null) return 1;
+            return string.Compare(x.Name, y.Name, StringComparison.OrdinalIgnoreCase);
+        }
+    }
 }
