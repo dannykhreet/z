@@ -680,7 +680,7 @@
 <section id="contentDiv" class="content">
     <div class="mb-2 text-right">
         <button id="btnViewModalLegend" class="btn btn-success btn-sm shadow-sm">
-            <i class="fa fa-table-list pr-1"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnViewMatrixLegend, "View matrix legend") ?? "View matrix legend")
+            <i class="fa fa-table-list pr-1"></i> @(Model?.CmsLanguage?.GetValue("skills.btn_view_matrix_legend", "View matrix legend") ?? "View matrix legend")
         </button>
     </div>
     @if (Model.CurrentUser?.Role != null && (Model.CurrentUser.Role.ToLower().Equals("manager") || Model.CurrentUser.Role.ToLower().Equals("teamleader")))
@@ -1735,7 +1735,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendTitle, "Matrix legend") ?? "Matrix legend")</h4>
+                <h4 class="modal-title" id="exampleModalLongTitle">@(Model?.CmsLanguage?.GetValue("skills.matrix_legend_title", "Matrix legend") ?? "Matrix legend")</h4>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -1757,27 +1757,27 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendLabel, "Label") ?? "Label")</label>
+                                <label class="form-label">@(Model?.CmsLanguage?.GetValue("skills.matrix_legend_label", "Label") ?? "Label")</label>
                                 <input class="form-control form-control-sm" data-field="label" value="@item.Label" @(Model.CurrentUser?.Role?.ToLower() == "manager" || Model.CurrentUser?.Role?.ToLower() == "teamleader" ? "" : "readonly") required />
                             </div>
                             <div class="form-group">
-                                <label class="form-label">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendDescription, "Description") ?? "Description")</label>
+                                <label class="form-label">@(Model?.CmsLanguage?.GetValue("skills.matrix_legend_description", "Description") ?? "Description")</label>
                                 <textarea class="form-control form-control-sm" rows="2" data-field="description" @(Model.CurrentUser?.Role?.ToLower() == "manager" || Model.CurrentUser?.Role?.ToLower() == "teamleader" ? "" : "readonly") required>@item.Description</textarea>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-6">
-                                    <label class="form-label">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendIconColor, "Color of the number") ?? "Color of the number")</label>
+                                    <label class="form-label">@(Model?.CmsLanguage?.GetValue("skills.matrix_legend_icon_color", "Color of the number") ?? "Color of the number")</label>
                                     <input type="color" class="form-control form-control-color" data-field="icon_color" value="@item.IconColor" @(Model.CurrentUser?.Role?.ToLower() == "manager" || Model.CurrentUser?.Role?.ToLower() == "teamleader" ? "" : "disabled") />
                                     <input type="text" class="form-control form-control-sm mt-1" data-field="icon_color_text" value="@item.IconColor" pattern="#?[A-Fa-f0-9]{6}" @(Model.CurrentUser?.Role?.ToLower() == "manager" || Model.CurrentUser?.Role?.ToLower() == "teamleader" ? "" : "readonly") />
                                 </div>
                                 <div class="form-group col-6">
-                                    <label class="form-label">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendBackgroundColor, "Color of the background") ?? "Color of the background")</label>
+                                    <label class="form-label">@(Model?.CmsLanguage?.GetValue("skills.matrix_legend_background_color", "Color of the background") ?? "Color of the background")</label>
                                     <input type="color" class="form-control form-control-color" data-field="background_color" value="@item.BackgroundColor" @(Model.CurrentUser?.Role?.ToLower() == "manager" || Model.CurrentUser?.Role?.ToLower() == "teamleader" ? "" : "disabled") />
                                     <input type="text" class="form-control form-control-sm mt-1" data-field="background_color_text" value="@item.BackgroundColor" pattern="#?[A-Fa-f0-9]{6}" @(Model.CurrentUser?.Role?.ToLower() == "manager" || Model.CurrentUser?.Role?.ToLower() == "teamleader" ? "" : "readonly") />
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendOrder, "Order") ?? "Order")</label>
+                                <label class="form-label">@(Model?.CmsLanguage?.GetValue("skills.matrix_legend_order", "Order") ?? "Order")</label>
                                 <input type="number" min="0" class="form-control form-control-sm" data-field="order" value="@item.Order" @(Model.CurrentUser?.Role?.ToLower() == "manager" || Model.CurrentUser?.Role?.ToLower() == "teamleader" ? "" : "readonly") />
                             </div>
                         </div>
@@ -1980,9 +1980,9 @@
                     try {
                         const parsed = typeof data === 'string' ? JSON.parse(data) : data;
                         legendModal.data('legend-version', parsed.version || payload.version);
-                        toastr.success('@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendUpdated, "Legend updated") ?? "Legend updated")');
+                        toastr.success('@(Model?.CmsLanguage?.GetValue("skills.matrix_legend_updated", "Legend updated") ?? "Legend updated")');
                     } catch (err) {
-                        toastr.success('@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendUpdated, "Legend updated") ?? "Legend updated")');
+                        toastr.success('@(Model?.CmsLanguage?.GetValue("skills.matrix_legend_updated", "Legend updated") ?? "Legend updated")');
                     }
                 },
                 error: function (jqXHR) {
