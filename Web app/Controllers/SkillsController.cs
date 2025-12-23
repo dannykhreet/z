@@ -502,6 +502,31 @@ namespace WebApp.Controllers
                 output.CurrentSkillsMatrix = JsonConvert.DeserializeObject<Models.Skills.SkillsMatrix>(result.Message);
             }
 
+            // Load matrix legend (if not provided in the base payload)
+            if (output.CurrentSkillsMatrix != null)
+            {
+                try
+                {
+                    var legendEndpoint = string.Format("/v1/skillsmatrix/{0}/legend", id);
+                    var legendResult = await _connector.GetCall(legendEndpoint);
+                    if (legendResult.StatusCode == HttpStatusCode.OK)
+                    {
+                        var legendPayload = JsonConvert.DeserializeObject<SkillMatrixLegendPayload>(legendResult.Message);
+                        if (legendPayload != null)
+                        {
+                            output.CurrentSkillsMatrix.LegendEntries = legendPayload.Entries;
+                            output.CurrentSkillsMatrix.LegendVersion = legendPayload.Version;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+
+                output.CurrentSkillsMatrix?.EnsureLegendDefaults();
+            }
+
             if (output.CurrentSkillsMatrix == null)
             {
                 return View("~/Views/Shared/_template_not_found.cshtml", output);
@@ -599,6 +624,58 @@ namespace WebApp.Controllers
             if (output.UserGroups == null) { output.UserGroups = new List<EZGO.Api.Models.Users.UserGroup>(); }
 
             return View("~/Views/Skills/Matrix/Details.cshtml", output);
+        }
+
+        [HttpGet]
+        [FeatureAttribute(Feature = FeatureAttribute.FeatureFiltersEnum.SkillMatrix)]
+        [Route("/skillsmatrices/{matrixId}/legend")]
+        public async Task<IActionResult> MatrixLegend(int matrixId)
+        {
+            var legendEndpoint = string.Format("/v1/skillsmatrix/{0}/legend", matrixId);
+            var legendResult = await _connector.GetCall(legendEndpoint);
+            if (legendResult.StatusCode == HttpStatusCode.OK)
+            {
+                var legendPayload = JsonConvert.DeserializeObject<SkillMatrixLegendPayload>(legendResult.Message);
+                legendPayload ??= new SkillMatrixLegendPayload();
+                legendPayload.Version = legendPayload.Version == 0 ? 1 : legendPayload.Version;
+                return StatusCode((int)HttpStatusCode.OK, legendPayload.ToJsonFromObject());
+            }
+
+            return StatusCode((int)legendResult.StatusCode, legendResult.Message);
+        }
+
+        [HttpPost]
+        [FeatureAttribute(Feature = FeatureAttribute.FeatureFiltersEnum.SkillMatrix)]
+        [Route("/skillsmatrices/{matrixId}/legend")]
+        public async Task<IActionResult> MatrixLegend(int matrixId, [FromBody] SkillMatrixLegendPayload legendPayload)
+        {
+            legendPayload ??= new SkillMatrixLegendPayload();
+            legendPayload.Entries = legendPayload.Entries ?? new List<SkillMatrixLegendItem>();
+
+            var validationErrors = ValidateLegendPayload(legendPayload);
+            if (validationErrors.Any())
+            {
+                return StatusCode((int)HttpStatusCode.BadRequest, validationErrors.ToJsonFromObject());
+            }
+
+            legendPayload.Version++;
+
+            var legendEndpoint = string.Format("/v1/skillsmatrix/{0}/legend", matrixId);
+            var legendResult = await _connector.PostCall(legendEndpoint, legendPayload.ToJsonFromObject());
+            if (legendResult.StatusCode == HttpStatusCode.OK)
+            {
+                try
+                {
+                    var payload = JsonConvert.DeserializeObject<SkillMatrixLegendPayload>(legendResult.Message);
+                    return StatusCode((int)HttpStatusCode.OK, (payload ?? legendPayload).ToJsonFromObject());
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            }
+
+            return StatusCode((int)legendResult.StatusCode, legendResult.Message);
         }
 
         [FeatureAttribute(Feature = FeatureAttribute.FeatureFiltersEnum.SkillMatrix)]
@@ -1631,6 +1708,31 @@ namespace WebApp.Controllers
             }
 
             return tagGroups;
+        }
+
+        private static List<string> ValidateLegendPayload(SkillMatrixLegendPayload legendPayload)
+        {
+            var errors = new List<string>();
+            var entries = legendPayload?.Entries ?? new List<SkillMatrixLegendItem>();
+
+            foreach (var item in entries)
+            {
+                errors.AddRange(item.Validate());
+            }
+
+            var duplicateIds = entries.GroupBy(e => e.SkillLevelId).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
+            if (duplicateIds.Any())
+            {
+                errors.Add($"Duplicate skill_level_id values found: {string.Join(", ", duplicateIds)}");
+            }
+
+            var duplicateOrders = entries.GroupBy(e => e.Order).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
+            if (duplicateOrders.Any())
+            {
+                errors.Add($"Duplicate order values found: {string.Join(", ", duplicateOrders)}");
+            }
+
+            return errors.Distinct().ToList();
         }
     }
 }

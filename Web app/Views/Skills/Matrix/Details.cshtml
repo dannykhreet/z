@@ -1,5 +1,6 @@
 ﻿@model WebApp.ViewModels.SkillsViewModel
 @using WebApp.Logic
+@using System.Linq
 @{
     Layout = "_Layout_template";
     ViewData["Title"] = @Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatrixDetailsTitle, "Skill matrix details") ?? "Skill matrix details";
@@ -668,10 +669,6 @@
                     <i class="fa fa-sort pr-1"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnChangeSkillOrder, "Skill ordering") ?? "Skill ordering")
                 </button>
 
-                <button id="btnViewModalLegend" class="btn btn-ezgo btn-sm mr-2 shadow-sm mt-auto">
-                    <i class="fa fa-table-list pr-1"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnViewMatrixLegend, "Matrix legend") ?? "Matrix legend")
-                </button>
-                
                 <a class="btn btn-ezgo btn-sm btn-outline mr-2 shadow-sm mt-auto" onclick="window.open('/pdf/viewer/matrix/@(Model.CurrentSkillsMatrix.Id)', '_blank', 'toolbar=no,top=10,left=10,width=' + (screen.availWidth-10) + ',height=' + (screen.availHeight-10) + '');">
                     <i class="fa fa-print"></i>
                 </a>
@@ -681,7 +678,12 @@
 </section>
 
 <section id="contentDiv" class="content">
-    @if (Model.CurrentUser.Role.ToLower().Equals("manager"))
+    <div class="mb-2 text-right">
+        <button id="btnViewModalLegend" class="btn btn-success btn-sm shadow-sm">
+            <i class="fa fa-table-list pr-1"></i> @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnViewMatrixLegend, "View matrix legend") ?? "View matrix legend")
+        </button>
+    </div>
+    @if (Model.CurrentUser?.Role != null && (Model.CurrentUser.Role.ToLower().Equals("manager") || Model.CurrentUser.Role.ToLower().Equals("teamleader")))
     {
         <div class="popUp hidePopUp popUpScore" data-containertype="score_choice">
             <div class="arrowUp"></div><div class='item btn-clear' data-actionvalue="0"></div><div class='item btn-red' data-actionvalue="1">1</div><div class='item btn-orangered' data-actionvalue="2">2</div><div class='item btn-orange' data-actionvalue="3">3</div><div class='item btn-orangegreen' data-actionvalue="4">4</div><div class='item btn-green' data-actionvalue="5">5</div>
@@ -1739,112 +1741,55 @@
                 </button>
             </div>
 
-            <div class="modal-body">
-                @if (Model.ApplicationSettings.Features.SkillMatrixMandatorySkills != null && Model.ApplicationSettings.Features.SkillMatrixMandatorySkills.Value)
-                {
-                    <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixMandatorySkills, "Mandatory skills (users can fill these in)") ?? "Mandatory skills (users can fill these in)")</h5>
-                    <div class="row">
-                        <div class="col-4">
-                            <button class="btn circlebtn btn-green thumbsup m-2" type="button" data-popup="thumbs" data-value="2" data-actiontype="user_value_choice"></button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueMastersTheSkill, "Masters the skill") ?? "Masters the skill")
+            <div class="modal-body" data-legend-version="@Model.CurrentSkillsMatrix.LegendVersion" data-can-edit="@((Model.CurrentUser?.Role?.ToLower() == "manager" || Model.CurrentUser?.Role?.ToLower() == "teamleader").ToString().ToLower())">
+                @{ var legendItems = Model.CurrentSkillsMatrix.LegendEntries?.OrderBy(x => x.Order) ?? Enumerable.Empty<WebApp.Models.Skills.SkillMatrixLegendItem>(); }
+                <div class="row">
+                    @foreach (var item in legendItems)
+                    {
+                        <div class="col-md-6 mb-3" data-legend-entry data-id="@item.SkillLevelId" data-order="@item.Order">
+                            <div class="d-flex align-items-center mb-2">
+                                <div data-preview class="rounded-circle d-flex align-items-center justify-content-center" style="width:48px;height:48px;background:@item.BackgroundColor;color:@item.IconColor;font-weight:bold;">
+                                    @item.SkillLevelId
+                                </div>
+                                <div class="ms-3">
+                                    <strong data-preview-label>@item.Label</strong>
+                                    <div class="text-muted" data-preview-description>@item.Description</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendLabel, "Label") ?? "Label")</label>
+                                <input class="form-control form-control-sm" data-field="label" value="@item.Label" @(Model.CurrentUser?.Role?.ToLower() == "manager" || Model.CurrentUser?.Role?.ToLower() == "teamleader" ? "" : "readonly") required />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendDescription, "Description") ?? "Description")</label>
+                                <textarea class="form-control form-control-sm" rows="2" data-field="description" @(Model.CurrentUser?.Role?.ToLower() == "manager" || Model.CurrentUser?.Role?.ToLower() == "teamleader" ? "" : "readonly") required>@item.Description</textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-6">
+                                    <label class="form-label">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendIconColor, "Color of the number") ?? "Color of the number")</label>
+                                    <input type="color" class="form-control form-control-color" data-field="icon_color" value="@item.IconColor" @(Model.CurrentUser?.Role?.ToLower() == "manager" || Model.CurrentUser?.Role?.ToLower() == "teamleader" ? "" : "disabled") />
+                                    <input type="text" class="form-control form-control-sm mt-1" data-field="icon_color_text" value="@item.IconColor" pattern="#?[A-Fa-f0-9]{6}" @(Model.CurrentUser?.Role?.ToLower() == "manager" || Model.CurrentUser?.Role?.ToLower() == "teamleader" ? "" : "readonly") />
+                                </div>
+                                <div class="form-group col-6">
+                                    <label class="form-label">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendBackgroundColor, "Color of the background") ?? "Color of the background")</label>
+                                    <input type="color" class="form-control form-control-color" data-field="background_color" value="@item.BackgroundColor" @(Model.CurrentUser?.Role?.ToLower() == "manager" || Model.CurrentUser?.Role?.ToLower() == "teamleader" ? "" : "disabled") />
+                                    <input type="text" class="form-control form-control-sm mt-1" data-field="background_color_text" value="@item.BackgroundColor" pattern="#?[A-Fa-f0-9]{6}" @(Model.CurrentUser?.Role?.ToLower() == "manager" || Model.CurrentUser?.Role?.ToLower() == "teamleader" ? "" : "readonly") />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendOrder, "Order") ?? "Order")</label>
+                                <input type="number" min="0" class="form-control form-control-sm" data-field="order" value="@item.Order" @(Model.CurrentUser?.Role?.ToLower() == "manager" || Model.CurrentUser?.Role?.ToLower() == "teamleader" ? "" : "readonly") />
+                            </div>
                         </div>
-
-                        <div class="col-4">
-                            <button class="btn circlebtn btn-orange warning m-2" type="button" data-popup="thumbs" data-value="5" data-actiontype="user_value_choice"></button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueAlmostExpired, "Almost expired") ?? "Almost expired")
-                        </div>
-
-                        <div class="col-4">
-                            <button class="btn circlebtn btn-red thumbsdown m-2" type="button" data-popup="thumbs" data-value="1" data-actiontype="user_value_choice"></button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueExpired, "Expired") ?? "Expired")
-                        </div>
-                    </div>
-                }
-
-                @if (Model.ApplicationSettings.Features.SkillMatrixOperationalSkills != null && Model.ApplicationSettings.Features.SkillMatrixOperationalSkills.Value)
-                {
-                    <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixOperationalSkillsTitle, "Operational skills (users can fill these in)") ?? "Operational skills (users can fill these in)")</h5>
-                    <div class="row">
-                        <div class="col-6">
-                            <button class="btn circlebtn btn-green m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice">5</button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueCanEducateOthers, "Can educate others") ?? "Can educate others")
-                        </div>
-
-                        <div class="col-6">
-                            <button class="btn circlebtn btn-orangegreen m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice">4</button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueNonStandardConditions, "Is able to apply it in non-standard conditions") ?? "Is able to apply it in non-standard conditions")
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <button class="btn circlebtn btn-orange m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice">3</button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueStandardSituations, "Is able to apply it in standard situations") ?? "Is able to apply it in standard situations")
-                        </div>
-
-                        <div class="col-6">
-                            <button class="btn circlebtn btn-orangered m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice">2</button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueKnowTheTheory, "Knows the theory") ?? "Knows the theory")
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <button class="btn circlebtn btn-red m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice">1</button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueNoKnowTheTheory, "Doesn't know the theory") ?? "Doesn't know the theory")
-                        </div>
-
-                        <div class="col-6">
-                            <button class="btn circlebtn warning-icon m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice"></button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueOperationalSkillExpired, "Operational skill expired") ?? "Operational skill expired")
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <button class="btn circlebtn btn-orange warning m-2" style="font-size:22px !important;" type="button" data-popup="score" data-actiontype="user_value_choice"></button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueAlmostExpired, "Operational almost expired") ?? "Operational almost expired")
-                        </div>
-                    </div>
-                 
-                }
-
-                @if (Model.ApplicationSettings.Features.SkillMatrixOperationalBehaviour != null && Model.ApplicationSettings.Features.SkillMatrixOperationalBehaviour.Value)
-                {
-                    <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixOperationalBehaviorTitle, "Operational behavior (generated statistics)") ?? "Operational behavior (generated statistics)")</h5>
-                    <div class="row">
-                        <div class="col-6">
-                            <button style="cursor: default; " class="btn circlebtn king m-2" type="button" data-popup="grade" title="The King with 80-100% score of total"></button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueTheKingScoreOfTotal, "The King with a score of above 100%") ?? "The King with a score of above 100%")
-                        </div>
-
-                        <div class="col-6">
-                            <button style="cursor: default; " class="btn circlebtn champion m-2" type="button" data-popup="grade" title="Champion with 60-80% score of total"></button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueChampionScoreOfTotal, "Champion with a score between 90 - 100%") ?? "Champion with a score between 90 - 100%")
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <button style="cursor: default; " class="btn circlebtn spoton m-2" type="button" data-popup="grade" title="Spot On with 40-60% score of total"></button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueSpotOnScoreOfTotal, "Spot On with a score of 60 - 90%") ?? "Spot On with a score of 60 - 90%")
-                        </div>
-
-                        <div class="col-6">
-                            <button style="cursor: default; " class="btn circlebtn risingstar m-2" type="button" data-popup="grade" title="Rising Star with 20-40% score of total"></button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueRisingStarScoreOfTotal, "Rising Star with a score between 20 - 60%") ?? "Rising Star with a score between 20 - 60%")
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12">
-                            <button style="cursor: default; " class="btn circlebtn powerup m-2" type="button" data-popup="grade" title="Power Up with 0-20% score of total"></button>
-                            @(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValuePowerUpScoreOfTotal, "Power Up with a score between 0 - 20%") ?? "Power Up with a score between 0 - 20%")
-                        </div>
-                    </div>
-                }
+                    }
+                </div>
             </div>
 
             <div class="modal-footer">
+                @if (Model.CurrentUser?.Role?.ToLower() == "manager" || Model.CurrentUser?.Role?.ToLower() == "teamleader")
+                {
+                    <button type="button" class="btn btn-ezgo btn-sm" id="btnSaveLegendEntries">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnUpdate, "Update") ?? "Update")</button>
+                }
                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-action="close">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.BtnClose, "Close") ?? "Close")</button>
             </div>
         </div>
@@ -1988,6 +1933,143 @@
             removeOldScores: '@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkillModalRemoveOldScoresBtn, "Remove old scores") ?? "Remove old scores")',
             keepOldScoresDialogueBody: '@(Html.Raw(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixUserSkillModalKeepOldScoresMessageBody, "The assessment template that is connected to this skill has been changed.<br />The scores from the new assessment will be used for everybody who has completed it already.<br /> Do you want to keep the old scores for users who have not completed the new assessment yet?") ?? "The assessment template that is connected to this skill has been changed.<br />The scores from the new assessment will be used for everybody who has completed it already.<br /> Do you want to keep the old scores for users who have not completed the new assessment yet?"))',
         };
+
+        const legendModal = $('#MatrixLegendModal');
+        const canEditLegend = legendModal.data('can-edit') === true || legendModal.data('can-edit') === 'true';
+
+        $('#btnViewModalLegend').on('click', function () {
+            legendModal.modal('show');
+        });
+
+        legendModal.on('input change', '[data-field="icon_color"]', function () {
+            syncLegendColor($(this), 'icon_color_text');
+        });
+
+        legendModal.on('input change', '[data-field="background_color"]', function () {
+            syncLegendColor($(this), 'background_color_text');
+        });
+
+        legendModal.on('input change', '[data-field$="_text"]', function () {
+            const normalized = normalizeHex($(this).val());
+            $(this).val(normalized);
+            const fieldName = $(this).data('field').replace('_text', '');
+            $(this).closest('[data-legend-entry]').find(`[data-field="${fieldName}"]`).val(normalized);
+            updateLegendPreview($(this).closest('[data-legend-entry]'));
+        });
+
+        legendModal.on('input change', '[data-field="label"], [data-field="description"]', function () {
+            updateLegendPreview($(this).closest('[data-legend-entry]'));
+        });
+
+        $('#btnSaveLegendEntries').on('click', function () {
+            if (!canEditLegend) {
+                return;
+            }
+
+            const payload = collectLegendEntries();
+            if (!payload) {
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: `/skillsmatrices/${matrix.currentMatrixId}/legend`,
+                data: JSON.stringify(payload),
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    try {
+                        const parsed = typeof data === 'string' ? JSON.parse(data) : data;
+                        legendModal.data('legend-version', parsed.version || payload.version);
+                        toastr.success('@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendUpdated, "Legend updated") ?? "Legend updated")');
+                    } catch (err) {
+                        toastr.success('@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixLegendUpdated, "Legend updated") ?? "Legend updated")');
+                    }
+                },
+                error: function (jqXHR) {
+                    let message = jqXHR.responseText || 'Validation failed';
+                    try {
+                        const parsed = JSON.parse(message);
+                        if (Array.isArray(parsed)) {
+                            message = parsed.join('<br />');
+                        }
+                    } catch (err) { }
+                    toastr.error(message);
+                }
+            });
+        });
+
+        function collectLegendEntries() {
+            const entries = [];
+            const errors = [];
+            const hexPattern = /^#([A-Fa-f0-9]{6})$/;
+
+            legendModal.find('[data-legend-entry]').each(function () {
+                const container = $(this);
+                const labelValue = container.find('[data-field="label"]').val();
+                const descriptionValue = container.find('[data-field="description"]').val();
+                const label = labelValue ? labelValue.toString().trim() : '';
+                const description = descriptionValue ? descriptionValue.toString().trim() : '';
+                const iconColor = normalizeHex(container.find('[data-field="icon_color"]').val());
+                const backgroundColor = normalizeHex(container.find('[data-field="background_color"]').val());
+                const order = parseInt(container.find('[data-field="order"]').val(), 10) || 0;
+                const skillLevelId = container.data('id');
+
+                if (!label) { errors.push(`Label for ${skillLevelId} is required`); }
+                if (!description) { errors.push(`Description for ${skillLevelId} is required`); }
+                if (!hexPattern.test(iconColor)) { errors.push(`Icon color for ${skillLevelId} must be a 6-digit hex value`); }
+                if (!hexPattern.test(backgroundColor)) { errors.push(`Background color for ${skillLevelId} must be a 6-digit hex value`); }
+
+                entries.push({
+                    skill_level_id: skillLevelId,
+                    label: label,
+                    description: description,
+                    icon_color: iconColor,
+                    background_color: backgroundColor,
+                    order: order,
+                    version: legendModal.data('legend-version') || 0
+                });
+            });
+
+            const duplicateIds = entries.map(e => e.skill_level_id).filter((id, idx, arr) => arr.indexOf(id) !== idx);
+            const duplicateOrders = entries.map(e => e.order).filter((order, idx, arr) => arr.indexOf(order) !== idx);
+            if (duplicateIds.length > 0) {
+                errors.push('Duplicate skill_level_id values are not allowed.');
+            }
+            if (duplicateOrders.length > 0) {
+                errors.push('Duplicate order values are not allowed.');
+            }
+
+            if (errors.length > 0) {
+                toastr.error(errors.join('<br />'));
+                return null;
+            }
+
+            return { version: legendModal.data('legend-version') || 0, entries: entries };
+        }
+
+        function normalizeHex(value) {
+            if (!value) return '#000000';
+            const cleaned = value.toString().trim().replace('#', '').substring(0, 6);
+            return `#${cleaned.padEnd(6, '0')}`.toUpperCase();
+        }
+
+        function syncLegendColor(colorInput, textFieldName) {
+            const normalized = normalizeHex(colorInput.val());
+            colorInput.val(normalized);
+            colorInput.closest('[data-legend-entry]').find(`[data-field="${textFieldName}"]`).val(normalized);
+            updateLegendPreview(colorInput.closest('[data-legend-entry]'));
+        }
+
+        function updateLegendPreview(container) {
+            const iconColor = normalizeHex(container.find('[data-field="icon_color"]').val());
+            const backgroundColor = normalizeHex(container.find('[data-field="background_color"]').val());
+            const label = container.find('[data-field="label"]').val();
+            const description = container.find('[data-field="description"]').val();
+
+            container.find('[data-preview]').css({ 'background-color': backgroundColor, 'color': iconColor });
+            container.find('[data-preview-label]').text(label);
+            container.find('[data-preview-description]').text(description);
+        }
 
         function printSkillAssessment() {
             var t = $('#itemlist li').eq(15).append('<div style="height:170px;page-break-after: always !important;page-break: always !important;" class="pagebreak"></div>');
