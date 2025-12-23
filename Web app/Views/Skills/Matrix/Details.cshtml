@@ -5,43 +5,44 @@
     Layout = "_Layout_template";
     ViewData["Title"] = @Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatrixDetailsTitle, "Skill matrix details") ?? "Skill matrix details";
     var legendItems = Model.CurrentSkillsMatrix?.LegendItems?.Any() == true ? Model.CurrentSkillsMatrix.LegendItems.OrderBy(x => x.DisplayOrder).ToList() : SkillMatrixLegendItem.CreateDefaultLegend();
-    SkillMatrixLegendItem GetLegendItem(string key, int? score = null, string type = null) => legendItems.FirstOrDefault(x => (!string.IsNullOrEmpty(key) && x.Key == key) || (score.HasValue && x.Score == score && (string.IsNullOrEmpty(type) || x.Type == type)));
-    string Bg(SkillMatrixLegendItem item, string fallback) => string.IsNullOrWhiteSpace(item?.BackgroundColor) ? fallback : item.BackgroundColor;
-    string Txt(SkillMatrixLegendItem item, string fallback) => string.IsNullOrWhiteSpace(item?.TextColor) ? fallback : item.TextColor;
-    var op1 = GetLegendItem("operational-1", 1, SkillMatrixLegendItem.TypeOperational);
-    var op2 = GetLegendItem("operational-2", 2, SkillMatrixLegendItem.TypeOperational);
-    var op3 = GetLegendItem("operational-3", 3, SkillMatrixLegendItem.TypeOperational);
-    var op4 = GetLegendItem("operational-4", 4, SkillMatrixLegendItem.TypeOperational);
-    var op5 = GetLegendItem("operational-5", 5, SkillMatrixLegendItem.TypeOperational);
-    var mandatoryMaster = GetLegendItem("mandatory-master");
-    var mandatoryWarn = GetLegendItem("mandatory-almost-expired");
-    var mandatoryExpired = GetLegendItem("mandatory-expired");
-    var operationalAlmost = GetLegendItem("operational-almost-expired", null, SkillMatrixLegendItem.TypeOperationalStatus);
+    Func<string, int?, string, SkillMatrixLegendItem> getLegendItem = (key, score, type) =>
+        legendItems.FirstOrDefault(x => (!string.IsNullOrEmpty(key) && x.Key == key) || (score.HasValue && x.Score == score && (string.IsNullOrEmpty(type) || x.Type == type)));
+    Func<SkillMatrixLegendItem, string, string> bg = (item, fallback) => string.IsNullOrWhiteSpace(item?.BackgroundColor) ? fallback : item.BackgroundColor;
+    Func<SkillMatrixLegendItem, string, string> txt = (item, fallback) => string.IsNullOrWhiteSpace(item?.TextColor) ? fallback : item.TextColor;
+    var op1 = getLegendItem("operational-1", 1, SkillMatrixLegendItem.TypeOperational);
+    var op2 = getLegendItem("operational-2", 2, SkillMatrixLegendItem.TypeOperational);
+    var op3 = getLegendItem("operational-3", 3, SkillMatrixLegendItem.TypeOperational);
+    var op4 = getLegendItem("operational-4", 4, SkillMatrixLegendItem.TypeOperational);
+    var op5 = getLegendItem("operational-5", 5, SkillMatrixLegendItem.TypeOperational);
+    var mandatoryMaster = getLegendItem("mandatory-master", null, null);
+    var mandatoryWarn = getLegendItem("mandatory-almost-expired", null, null);
+    var mandatoryExpired = getLegendItem("mandatory-expired", null, null);
+    var operationalAlmost = getLegendItem("operational-almost-expired", null, SkillMatrixLegendItem.TypeOperationalStatus);
     var warningSource = operationalAlmost ?? mandatoryWarn;
-    var warnIcon = GetLegendItem("operational-expired", null, SkillMatrixLegendItem.TypeOperationalStatus);
+    var warnIcon = getLegendItem("operational-expired", null, SkillMatrixLegendItem.TypeOperationalStatus);
 }
 
 @section CSS{
     <style>
         :root {
-            --matrix-color-1-bg: @(Bg(op1, "#ffeaea"));
-            --matrix-color-1-text: @(Txt(op1, "#cb0000"));
-            --matrix-color-2-bg: @(Bg(op2, "#ffe4da"));
-            --matrix-color-2-text: @(Txt(op2, "#ff4500"));
-            --matrix-color-3-bg: @(Bg(op3, "#fff0d4"));
-            --matrix-color-3-text: @(Txt(op3, "#ffa500"));
-            --matrix-color-4-bg: @(Bg(op4, "#f2f5dd"));
-            --matrix-color-4-text: @(Txt(op4, "#8da304"));
-            --matrix-color-5-bg: @(Bg(op5, "#ddf7dd"));
-            --matrix-color-5-text: @(Txt(op5, "#008000"));
-            --matrix-mandatory-master-bg: @(Bg(mandatoryMaster, "#ddf7dd"));
-            --matrix-mandatory-master-text: @(Txt(mandatoryMaster, "#5eaf5e"));
-            --matrix-mandatory-warning-bg: @(Bg(warningSource, "#fff0d4"));
-            --matrix-mandatory-warning-text: @(Txt(warningSource, "#ffa500"));
-            --matrix-mandatory-expired-bg: @(Bg(mandatoryExpired, "#ffeaea"));
-            --matrix-mandatory-expired-text: @(Txt(mandatoryExpired, "#cb0000"));
-            --matrix-warning-icon-bg: @(Bg(warnIcon, "#ffeaea"));
-            --matrix-warning-icon-text: @(Txt(warnIcon, "#cb0000"));
+            --matrix-color-1-bg: @(bg(op1, "#ffeaea"));
+            --matrix-color-1-text: @(txt(op1, "#cb0000"));
+            --matrix-color-2-bg: @(bg(op2, "#ffe4da"));
+            --matrix-color-2-text: @(txt(op2, "#ff4500"));
+            --matrix-color-3-bg: @(bg(op3, "#fff0d4"));
+            --matrix-color-3-text: @(txt(op3, "#ffa500"));
+            --matrix-color-4-bg: @(bg(op4, "#f2f5dd"));
+            --matrix-color-4-text: @(txt(op4, "#8da304"));
+            --matrix-color-5-bg: @(bg(op5, "#ddf7dd"));
+            --matrix-color-5-text: @(txt(op5, "#008000"));
+            --matrix-mandatory-master-bg: @(bg(mandatoryMaster, "#ddf7dd"));
+            --matrix-mandatory-master-text: @(txt(mandatoryMaster, "#5eaf5e"));
+            --matrix-mandatory-warning-bg: @(bg(warningSource, "#fff0d4"));
+            --matrix-mandatory-warning-text: @(txt(warningSource, "#ffa500"));
+            --matrix-mandatory-expired-bg: @(bg(mandatoryExpired, "#ffeaea"));
+            --matrix-mandatory-expired-text: @(txt(mandatoryExpired, "#cb0000"));
+            --matrix-warning-icon-bg: @(bg(warnIcon, "#ffeaea"));
+            --matrix-warning-icon-text: @(txt(warnIcon, "#cb0000"));
         }
 
         #instructions {
