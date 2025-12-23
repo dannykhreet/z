@@ -1,4 +1,4 @@
-﻿@model WebApp.ViewModels.SkillsViewModel
+@model WebApp.ViewModels.SkillsViewModel
 @using WebApp.Logic
 @using System.Linq
 @{
@@ -977,15 +977,15 @@
             <table>
                 <tr>
                     <td rowspan="1" colspan="3" id="matrixSpacer2"></td>
-                    @{
+                    @{ 
                         int rowspan = (Model.CurrentSkillsMatrix.MandatorySkills != null ? Model.CurrentSkillsMatrix.MandatorySkills.Count() : 0) +
                         (Model.CurrentSkillsMatrix.OperationalSkills != null ? Model.CurrentSkillsMatrix.OperationalSkills.Count() : 0) + 11;
+                    }
 
-                        foreach (var usergroup in Model.CurrentSkillsMatrix.UserGroups)
-                        {
-                                <td class="rowtitle" colspan="@(usergroup.Users.Count())"><span>@(usergroup.Name)</span></td>
-                                <td rowspan="@rowspan"></td>
-                        }
+                    @foreach (var usergroup in Model.CurrentSkillsMatrix.UserGroups)
+                    {
+                        <td class="rowtitle" colspan="@(usergroup.Users.Count())"><span>@(usergroup.Name)</span></td>
+                        <td rowspan="@rowspan"></td>
                     }
                 </tr>
 
@@ -1021,7 +1021,7 @@
                             }
                             else
                             {
-                                foreach (var userprofile in usergroup.Users)
+                                @foreach (var userprofile in usergroup.Users)
                                 {
                                     collspan++;
                                     <td class="user-title" style="border: 1px solid rgb(210,210,210); cursor: pointer" data-containertype="user" data-id="@userprofile.Id" onclick="matrix.showUserSkillValuesModal(@Model.CurrentSkillsMatrix.Id, @userprofile.UserProfileId, '@userprofile.LastName, @userprofile.FirstName')">
@@ -1096,7 +1096,7 @@
                                 }
                                 else
                                 {
-                                    foreach (var userprofile in usergroup.Users)
+                                    @foreach (var userprofile in usergroup.Users)
                                     {
                                         int score = -1;
                                         @if (skillset.Values != null)
@@ -1166,10 +1166,10 @@
                                 }
                                 else
                                 {
-                                    foreach (var userprofile in usergroup.Users)
-                                    {
-                                        int score = -1;
-                                        decimal decimalScore = -1;
+                                      @foreach (var userprofile in usergroup.Users)
+                                      {
+                                          int score = -1;
+                                          decimal decimalScore = -1;
                                         bool expired = false;
                                         bool almostExpired = false;
                                         @if (skillset.Values != null)
@@ -1266,12 +1266,12 @@
                         int rowspanOverlay = (Model.CurrentSkillsMatrix.MandatorySkills != null ? Model.CurrentSkillsMatrix.MandatorySkills.Count() : 0) +
                         (Model.CurrentSkillsMatrix.OperationalSkills != null ? Model.CurrentSkillsMatrix.OperationalSkills.Count() : 0) +
                         (Model.CurrentSkillsMatrix.OperationalBehaviours != null ? Model.CurrentSkillsMatrix.OperationalBehaviours.Count() : 0) + 6;
+                    }
 
-                        foreach (var usergroup in Model.CurrentSkillsMatrix.UserGroups)
-                        {
-                                <td class="rowtitle" colspan="@(usergroup.Users.Count())"><span>@(usergroup.Name)</span></td>
-                                <td rowspan="@rowspanOverlay"></td>
-                        }
+                    @foreach (var usergroup in Model.CurrentSkillsMatrix.UserGroups)
+                    {
+                        <td class="rowtitle" colspan="@(usergroup.Users.Count())"><span>@(usergroup.Name)</span></td>
+                        <td rowspan="@rowspanOverlay"></td>
                     }
                 </tr>
 
@@ -1675,9 +1675,9 @@
                                 <ul style="width:100%;margin-left:0px;padding-left:0px;" data-containertype="group_all_users">
                                     @if (Model.Users != null)
                                     {
-                                        foreach (var user in Model.Users)
-                                        {
-                                            var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, user.Picture);
+                                          @foreach (var user in Model.Users)
+                                          {
+                                              var picture = WebApp.Helpers.MediaHelpers.GetMediaImageUrl(Model.ApplicationSettings, user.Picture);
 
                                             <li class="list-group-item" data-lastname="@user.LastName" data-firstname="@user.FirstName" data-id="@user.Id" data-containertype="user_choice" data-action="user_choice" style="margin-left: 5px; margin-right: 5px; cursor: pointer; ">
                                                 <div class="row">
