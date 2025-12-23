@@ -5,21 +5,34 @@
     Layout = "_Layout_template";
     ViewData["Title"] = @Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.SkillMatrixDetailsTitle, "Skill matrix details") ?? "Skill matrix details";
     var legendItems = Model.CurrentSkillsMatrix?.LegendItems?.Any() == true ? Model.CurrentSkillsMatrix.LegendItems.OrderBy(x => x.DisplayOrder).ToList() : SkillMatrixLegendItem.CreateDefaultLegend();
-    Func<string, int?, string, SkillMatrixLegendItem> getLegendItem = (key, score, type) =>
-        legendItems.FirstOrDefault(x => (!string.IsNullOrEmpty(key) && x.Key == key) || (score.HasValue && x.Score == score && (string.IsNullOrEmpty(type) || x.Type == type)));
-    Func<SkillMatrixLegendItem, string, string> bg = (item, fallback) => string.IsNullOrWhiteSpace(item?.BackgroundColor) ? fallback : item.BackgroundColor;
-    Func<SkillMatrixLegendItem, string, string> txt = (item, fallback) => string.IsNullOrWhiteSpace(item?.TextColor) ? fallback : item.TextColor;
-    var op1 = getLegendItem("operational-1", 1, SkillMatrixLegendItem.TypeOperational);
-    var op2 = getLegendItem("operational-2", 2, SkillMatrixLegendItem.TypeOperational);
-    var op3 = getLegendItem("operational-3", 3, SkillMatrixLegendItem.TypeOperational);
-    var op4 = getLegendItem("operational-4", 4, SkillMatrixLegendItem.TypeOperational);
-    var op5 = getLegendItem("operational-5", 5, SkillMatrixLegendItem.TypeOperational);
-    var mandatoryMaster = getLegendItem("mandatory-master", null, null);
-    var mandatoryWarn = getLegendItem("mandatory-almost-expired", null, null);
-    var mandatoryExpired = getLegendItem("mandatory-expired", null, null);
-    var operationalAlmost = getLegendItem("operational-almost-expired", null, SkillMatrixLegendItem.TypeOperationalStatus);
+    SkillMatrixLegendItem GetLegendItem(string key, int? score, string type)
+    {
+        foreach (var legendItem in legendItems)
+        {
+            var keyMatch = !string.IsNullOrEmpty(key) && legendItem.Key == key;
+            var scoreMatch = score.HasValue && legendItem.Score == score && (string.IsNullOrEmpty(type) || legendItem.Type == type);
+            if (keyMatch || scoreMatch)
+            {
+                return legendItem;
+            }
+        }
+        return null;
+    }
+
+    string Bg(SkillMatrixLegendItem item, string fallback) => string.IsNullOrWhiteSpace(item?.BackgroundColor) ? fallback : item.BackgroundColor;
+    string Txt(SkillMatrixLegendItem item, string fallback) => string.IsNullOrWhiteSpace(item?.TextColor) ? fallback : item.TextColor;
+
+    var op1 = GetLegendItem("operational-1", 1, SkillMatrixLegendItem.TypeOperational);
+    var op2 = GetLegendItem("operational-2", 2, SkillMatrixLegendItem.TypeOperational);
+    var op3 = GetLegendItem("operational-3", 3, SkillMatrixLegendItem.TypeOperational);
+    var op4 = GetLegendItem("operational-4", 4, SkillMatrixLegendItem.TypeOperational);
+    var op5 = GetLegendItem("operational-5", 5, SkillMatrixLegendItem.TypeOperational);
+    var mandatoryMaster = GetLegendItem("mandatory-master", null, null);
+    var mandatoryWarn = GetLegendItem("mandatory-almost-expired", null, null);
+    var mandatoryExpired = GetLegendItem("mandatory-expired", null, null);
+    var operationalAlmost = GetLegendItem("operational-almost-expired", null, SkillMatrixLegendItem.TypeOperationalStatus);
     var warningSource = operationalAlmost ?? mandatoryWarn;
-    var warnIcon = getLegendItem("operational-expired", null, SkillMatrixLegendItem.TypeOperationalStatus);
+    var warnIcon = GetLegendItem("operational-expired", null, SkillMatrixLegendItem.TypeOperationalStatus);
 }
 
 @section CSS{
