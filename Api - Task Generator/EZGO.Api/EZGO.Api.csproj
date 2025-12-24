@@ -41,17 +41,9 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EZ.Connector.Init\EZ.Connector.Init.csproj" />
-    <ProjectReference Include="..\EZ.Connector.SAP\EZ.Connector.SAP.csproj" />
-    <ProjectReference Include="..\EZ.Connector.Ultimo\EZ.Connector.Ultimo.csproj" />
     <ProjectReference Include="..\EZGO.Api.Data.Logic\EZGO.Api.Data.Logic.csproj" />
     <ProjectReference Include="..\EZGO.Api.Interfaces\EZGO.Api.Interfaces.csproj" />
-    <ProjectReference Include="..\EZGO.Api.Logic.Exporting\EZGO.Api.Logic.Exporting.csproj" />
-    <ProjectReference Include="..\EZGO.Api.Logic.Provisioner\EZGO.Api.Logic.Provisioner.csproj" />
-    <ProjectReference Include="..\EZGO.Api.Logic.SapPmConnector\EZGO.Api.Logic.SapPmConnector.csproj" />
-    <ProjectReference Include="..\EZGO.Api.Logic.Templates\EZGO.Api.Logic.Templates.AspNetCore.csproj" />
     <ProjectReference Include="..\EZGO.Api.Logic\EZGO.Api.Logic.csproj" />
-    <ProjectReference Include="..\EZGO.Api.Migrations\EZGO.Api.Migrations.csproj" />
     <ProjectReference Include="..\EZGO.Api.Models\EZGO.Api.Models.csproj" />
     <ProjectReference Include="..\EZGO.Api.Security\EZGO.Api.Security.AspNetCore.csproj" />
     <ProjectReference Include="..\EZGO.Api.Utils\EZGO.Api.Utils.csproj" />

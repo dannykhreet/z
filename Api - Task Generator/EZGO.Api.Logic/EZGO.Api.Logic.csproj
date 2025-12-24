@@ -17,7 +17,6 @@
     <ProjectReference Include="..\EZGO.Api.Data.Logic\EZGO.Api.Data.Logic.csproj" />
     <ProjectReference Include="..\EZGO.Api.Interfaces\EZGO.Api.Interfaces.csproj" />
     <ProjectReference Include="..\EZGO.Api.Models\EZGO.Api.Models.csproj" />
-    <ProjectReference Include="..\EZGO.Api.TaskGeneration\EZGO.Api.TaskGeneration.csproj" />
     <ProjectReference Include="..\EZGO.Api.Utils.Security\EZGO.Api.Utils.Security.csproj" />
     <ProjectReference Include="..\EZGO.Api.Utils\EZGO.Api.Utils.csproj" />
   </ItemGroup>
