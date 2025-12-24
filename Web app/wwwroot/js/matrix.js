@@ -117,6 +117,8 @@ var matrix = {
         matrix.initGroupHandlers();
 
         $('#btnViewModalLegend').on('click', function () {
+            // Load legend configuration and apply to modal
+            matrix.loadLegendConfiguration();
             $('#MatrixLegendModal').modal('show');
         });
 
@@ -2131,6 +2133,93 @@ var matrix = {
                 toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
             },
             contentType: "application/json; charset=utf-8"
+        });
+    },
+
+    // Legend Configuration Functions
+    legendConfiguration: null,
+
+    loadLegendConfiguration: function () {
+        $.ajax({
+            type: "GET",
+            url: '/companysettings/legend',
+            success: function (config) {
+                matrix.legendConfiguration = config;
+                matrix.applyLegendConfiguration(config);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error('Failed to load legend configuration:', errorThrown);
+                // Apply defaults on error
+                matrix.applyDefaultLegendConfiguration();
+            }
+        });
+    },
+
+    applyLegendConfiguration: function (config) {
+        if (!config) {
+            matrix.applyDefaultLegendConfiguration();
+            return;
+        }
+
+        // Apply mandatory skills configuration
+        if (config.mandatorySkills && config.mandatorySkills.length > 0) {
+            config.mandatorySkills.forEach(function (item) {
+                var btn = $('.legend-btn-mandatory[data-skill-level-id="' + item.skillLevelId + '"]');
+                var label = $('.legend-label-mandatory[data-skill-level-id="' + item.skillLevelId + '"]');
+
+                if (btn.length) {
+                    btn.css({
+                        'background-color': item.backgroundColor,
+                        'border-color': item.iconColor,
+                        'color': item.iconColor
+                    });
+                }
+                if (label.length && item.label) {
+                    label.text(item.label);
+                }
+            });
+        }
+
+        // Apply operational skills configuration
+        if (config.operationalSkills && config.operationalSkills.length > 0) {
+            config.operationalSkills.forEach(function (item) {
+                var btn = $('.legend-btn-operational[data-skill-level-id="' + item.skillLevelId + '"]');
+                var label = $('.legend-label-operational[data-skill-level-id="' + item.skillLevelId + '"]');
+
+                if (btn.length) {
+                    btn.css({
+                        'background-color': item.backgroundColor,
+                        'border-color': item.iconColor,
+                        'color': item.iconColor
+                    });
+                }
+                if (label.length && item.label) {
+                    label.text(item.label);
+                }
+            });
+        }
+    },
+
+    applyDefaultLegendConfiguration: function () {
+        // Default mandatory skills
+        var defaultMandatory = [
+            { skillLevelId: 1, label: 'Masters the skill', iconColor: '#008000', backgroundColor: '#DDF7DD' },
+            { skillLevelId: 2, label: 'Almost expired', iconColor: '#FFA500', backgroundColor: '#FFF0D4' },
+            { skillLevelId: 3, label: 'Expired', iconColor: '#CB0000', backgroundColor: '#FFEAEA' }
+        ];
+
+        // Default operational skills
+        var defaultOperational = [
+            { skillLevelId: 1, label: "Doesn't know the theory", iconColor: '#CB0000', backgroundColor: '#FFEAEA' },
+            { skillLevelId: 2, label: 'Knows the theory', iconColor: '#FF4500', backgroundColor: '#FFE4DA' },
+            { skillLevelId: 3, label: 'Is able to apply this in the standard situations', iconColor: '#FFA500', backgroundColor: '#FFF0D4' },
+            { skillLevelId: 4, label: 'Is able to apply this in the non-standard conditions', iconColor: '#8DA304', backgroundColor: '#F2F5DD' },
+            { skillLevelId: 5, label: 'Can educate others', iconColor: '#008000', backgroundColor: '#DDF7DD' }
+        ];
+
+        matrix.applyLegendConfiguration({
+            mandatorySkills: defaultMandatory,
+            operationalSkills: defaultOperational
         });
     }
 } 
