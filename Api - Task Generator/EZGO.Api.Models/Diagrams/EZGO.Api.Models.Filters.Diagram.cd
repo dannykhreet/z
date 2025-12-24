@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZGO.Api.Models.Filters.DashboardFilters">
+    <Position X="0.5" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIAAAAAQAAAASAAAQAAAAAAAAAAAQAA=</HashCode>
+      <FileName>Filters\DashboardFilters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Filters.SkillAssessmentFilters">
+    <Position X="3.75" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAIiAAAAAAAAAAQAAAACAQCAEAAAAAAAIAAAAgAAgBA=</HashCode>
+      <FileName>Filters\SkillAssessmentFilters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Filters.WorkInstructionFilters">
+    <Position X="6.75" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAIiAAAAAAAAAAQQAAACAQCAEAAAAAAAIAAAAgAAgBA=</HashCode>
+      <FileName>Filters\WorkInstructionFilters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="EZGO.Api.Models.Filters.ActionFilters">
+    <Position X="0.5" Y="4.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAgCAAAACAAAAAAAAMCAQiAEAgBAAAAAAQAAAAAgAA=</HashCode>
+      <FileName>Filters\ActionFilters.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="EZGO.Api.Models.Filters.AreaFilters">
+    <Position X="3.75" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Filters\AreaFilters.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="EZGO.Api.Models.Filters.AuditFilters">
+    <Position X="5.75" Y="4.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAIiAAAAAAAAAAQQAAACAQCAEAAAABBAIAAAAgAAgBA=</HashCode>
+      <FileName>Filters\AuditFilters.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="EZGO.Api.Models.Filters.ChecklistFilters">
+    <Position X="8.75" Y="4.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAIiAAAAAAAAAAQAAAACAQCAEAAAABBAIAAAAgAAgBA=</HashCode>
+      <FileName>Filters\ChecklistFilters.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="EZGO.Api.Models.Filters.CommentFilters">
+    <Position X="11.75" Y="4.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAACAQiAEAgAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Filters\CommentFilters.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="EZGO.Api.Models.Filters.FeedFilters">
+    <Position X="0.5" Y="9" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAAAAAAAAQAAACAQgAEAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Filters\FeedFilters.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="EZGO.Api.Models.Filters.PropertyFilters">
+    <Position X="3" Y="9" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAQAAEAAAABAAAAAAAAAAgAA=</HashCode>
+      <FileName>Filters\PropertyFilters.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="EZGO.Api.Models.Filters.ShiftFilters">
+    <Position X="5.25" Y="9" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAEAAAAAAAIAAAAgAAAAA=</HashCode>
+      <FileName>Filters\ShiftFilters.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="EZGO.Api.Models.Filters.TaskFilters">
+    <Position X="8.25" Y="9" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAiAAAEAAAAAAgCEIACAQCAEgAAABBAIgAAAgACiBA=</HashCode>
+      <FileName>Filters\TaskFilters.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="EZGO.Api.Models.Filters.UserFilters">
+    <Position X="12.25" Y="9" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAgAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Filters\UserFilters.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

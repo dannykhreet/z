@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="4.0.9.1" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="4.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.10" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EZGO.Api.Data\EZGO.Api.Data.AspNetCore.csproj" />
+    <ProjectReference Include="..\EZGO.Api.Interfaces\EZGO.Api.Interfaces.csproj" />
+    <ProjectReference Include="..\EZGO.Api.Models\EZGO.Api.Models.csproj" />
+    <ProjectReference Include="..\EZGO.Api.Settings\EZGO.Api.Settings.csproj" />
+    <ProjectReference Include="..\EZGO.Api.Utils\EZGO.Api.Utils.csproj" />
+  </ItemGroup>
+</Project>

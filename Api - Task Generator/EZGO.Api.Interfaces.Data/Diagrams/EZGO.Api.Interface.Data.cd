@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Interface Name="EZGO.Api.Interfaces.Data.IDatabaseAccessHelper">
+    <Position X="0.5" Y="0.5" Width="16" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAIAAQAIAEQBAAAQAAAAAAAAAAEAAAEAJBAAAA=</HashCode>
+      <FileName>IDatabaseAccessHelper.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Data.IDatabaseLogWriter">
+    <Position X="0.5" Y="4.5" Width="7.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAABABA=</HashCode>
+      <FileName>IDatabaseLogWriter.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

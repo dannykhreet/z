@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "EZGO.Api.Utils.Security/1.0.0": {
+        "runtime": {
+          "EZGO.Api.Utils.Security.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "EZGO.Api.Utils.Security/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

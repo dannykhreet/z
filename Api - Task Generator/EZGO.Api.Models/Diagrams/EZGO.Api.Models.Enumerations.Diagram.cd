@@ -1,0 +1,263 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" GroupingSetting="Alphabetical" MembersFormat="FullSignature">
+  <Enum Name="EZGO.Api.Models.Enumerations.AnnouncementTypeEnum">
+    <Position X="0.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAIAA=</HashCode>
+      <FileName>Enumerations\AnnouncementTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.DefaultImageTypeEnum">
+    <Position X="4.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAIAAAAgAAAAgACAAAAAAAAAAAEAAAQAAAAQ=</HashCode>
+      <FileName>Enumerations\DefaultImageTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.ExportTaskTemplateOverviewTypeEnum">
+    <Position X="6.75" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAQAAA=</HashCode>
+      <FileName>Enumerations\ExportTaskTemplateOverviewTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.FeatureTypeEnum">
+    <Position X="10" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAIIAAAAAAAAAAAAAAAAEAAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>Enumerations\FeatureTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.FeedItemTypeEnum">
+    <Position X="11.75" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AJAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAABAAAAAA=</HashCode>
+      <FileName>Enumerations\FeedItemTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.FeedTypeEnum">
+    <Position X="13.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAEAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Enumerations\FeedTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.FilterAreaTypeEnum">
+    <Position X="0.5" Y="3.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAAAAAAACCAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Enumerations\FilterAreaTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.IncludesEnum">
+    <Position X="2.5" Y="3.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>EgAJwAAIIAAAJAgAAAACkAAgQAGABAICABIIFAACIAA=</HashCode>
+      <FileName>Enumerations\IncludesEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.MachineStatusTypeEnum">
+    <Position X="4.75" Y="3.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAIAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>Enumerations\MachineStatusTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.MediaStorageTypeEnum">
+    <Position X="7" Y="3.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAABIMAAABACwACAAAAgAkEAAAAAAAAKQQAAIAA=</HashCode>
+      <FileName>Enumerations\MediaStorageTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.MediaTypeEnum">
+    <Position X="9.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAg=</HashCode>
+      <FileName>Enumerations\MediaTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.MenuTypeEnum">
+    <Position X="11" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAIIAAAAAAAAAAAAAAAAEAAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>Enumerations\MenuTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.MonthRecurrencyTypeEnum">
+    <Position X="12.75" Y="3.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAgABAAAAAAAAAAAAA=</HashCode>
+      <FileName>Enumerations\MonthRecurrencyTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.ObjectTypeActionEnum">
+    <Position X="0.5" Y="10.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAADAAAAAAAAAAAAEBAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Enumerations\ObjectTypeActionEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.ObjectTypeEnum">
+    <Position X="2.75" Y="10.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEEAMDAAAkAAAIgAAAIABAAAAAAQEEAAwAAAKQ=</HashCode>
+      <FileName>Enumerations\ObjectTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.PropertyDisplayTypeEnum">
+    <Position X="5.25" Y="10.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAgAAAEIASAIAQQAAACECAAAAAFEABA=</HashCode>
+      <FileName>Enumerations\PropertyDisplayTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.PropertyFieldKindTypeEnum">
+    <Position X="7.75" Y="10.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAABACAAAAgAEAQA=</HashCode>
+      <FileName>Enumerations\PropertyFieldKindTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.PropertyFieldTypeEnum">
+    <Position X="10.25" Y="10.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAgAAAACAAAQAAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Enumerations\PropertyFieldTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.PropertyTypeEnum">
+    <Position X="12.5" Y="10.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Enumerations\PropertyTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.PropertyValueTypeEnum">
+    <Position X="14.5" Y="10.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAgAAAAQAAAAAAAAAAAAgQBAAAAAAAAAQA=</HashCode>
+      <FileName>Enumerations\PropertyValueTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.PropertyValueUnitMeasurementTypeEnum">
+    <Position X="0.5" Y="15.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AEAQSQAhQoYACBDAAAACCIyEAAAEAEEAAlEACCOIAEY=</HashCode>
+      <FileName>Enumerations\PropertyValueUnitMeasurementTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.RecurrencyTypeEnum">
+    <Position X="3.75" Y="15.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAEAAAAAAAEAAAAAIAAAAA=</HashCode>
+      <FileName>Enumerations\RecurrencyTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.RequiredSignatureTypeEnum">
+    <Position X="5.75" Y="15.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAAAAAAAAAAAAAAgAAAAAAAAAAAACAAAAA=</HashCode>
+      <FileName>Enumerations\RequiredSignatureTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.ResourceLanguageTypeEnum">
+    <Position X="8.25" Y="15.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAEAAAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Enumerations\ResourceLanguageTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.RoleTypeEnum">
+    <Position X="10.75" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAAAAAAgAACAABAAAAAAAAACAAAA=</HashCode>
+      <FileName>Enumerations\RoleTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.ScoreTypeEnum">
+    <Position X="12.5" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Enumerations\ScoreTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.SettingResourceSettingsTypeEnum">
+    <Position X="14.25" Y="15.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAAAAAAAACAAAAAAAAABAAAADCAAAAA=</HashCode>
+      <FileName>Enumerations\SettingResourceSettingsTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.SettingResourceTypeEnum">
+    <Position X="0.5" Y="24.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAACAAAAAAAAAAAAAAAgAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Enumerations\SettingResourceTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.StatisticStatusEnum">
+    <Position X="2.75" Y="24.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAQAAAAAAAAABAAAAAAAAQAAABBAAAAABAAA=</HashCode>
+      <FileName>Enumerations\StatisticStatusEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.StatusTypeEnum">
+    <Position X="4.75" Y="24.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAgAAAAAAAAAAAAAAAAAAAAABAAABAAA=</HashCode>
+      <FileName>Enumerations\StatusTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.StorageTypeEnum">
+    <Position X="6.5" Y="24.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAABAAAAAAEAAAAA=</HashCode>
+      <FileName>Enumerations\StorageTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.TaskStatusEnum">
+    <Position X="8.25" Y="24.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAgAAAAAAAAAAAAAAAAAAAAABAAABAAA=</HashCode>
+      <FileName>Enumerations\TaskStatusEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.TaskTypeEnum">
+    <Position X="10" Y="24.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAAAAAAAAgAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>Enumerations\TaskTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.TimespanTypeEnum">
+    <Position X="11.75" Y="24.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAQAAAAAAAAAAABCIAAAIAAAACAIAAAA=</HashCode>
+      <FileName>Enumerations\TimespanTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.UpdateCheckTypeEnum">
+    <Position X="0.5" Y="27" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAIIAAAAgAAAAAAAAAAAGAAAAAAIMIBgAAAAQ=</HashCode>
+      <FileName>Enumerations\UpdateCheckTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Models.Enumerations.WorkInstructionTypeEnum">
+    <Position X="2.75" Y="27" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Enumerations\WorkInstructionTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EZGO.Api.Data.Enumerations.ConnectionKind">
+    <Position X="2.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAEAAAA=</HashCode>
+      <FileName>Enumerations\ConnectionKind.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

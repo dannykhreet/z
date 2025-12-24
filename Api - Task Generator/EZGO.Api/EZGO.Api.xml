@@ -1,0 +1,509 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>EZGO.Api</name>
+    </assembly>
+    <members>
+        <member name="T:EZGO.Api.Controllers.Base.BaseController`1">
+             <summary>
+             BaseController(Of T); used for base of each controller in the project.
+             This class contains a basic route named health that can be called on controller level (for external monitoring), it contains basic functionality for checking if static output is needed and it sets and gets the basic Logger and CurrentApplicationUser.
+            
+             Make sure when you implement a new controller that you will add this base class.
+            
+             All routes within the controllers must implement the IActionResult as output. So we can add statuses with our responses.
+            
+             NOTE! all controllers must inherit from this controller and are therefor default authorized. If unauthorized access is needed add [AllowAnonymous] to the route.
+             </summary>
+             <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:EZGO.Api.Controllers.Base.BaseController`1.UseStaticOutput">
+            <summary>
+            UseStaticOutput; calls  <see cref="M:EZGO.Api.Controllers.Base.BaseController`1.CheckStaticOutput">CheckStaticOutput</see> which checks the QueryString if static is available and true, if so returns true or false so a static string located in <see cref="T:EZGO.Api.Settings.StaticOutput">StaticOutput</see>.
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Controllers.Base.BaseController`1.CurrentApplicationUser">
+            <summary>
+            CurrentApplicationUser; current application used is the user that is currently connecting with the API based on the user Token that is supplied within the headers of the call.
+            The user contains basic information like its CompanyId.
+            NOTE! the user is only filled when 1) the token supplied exists. 2) the right constructor is used with implementation.
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Controllers.Base.BaseController`1.IsAppRequest">
+            <summary>
+            IsAppRequest; Checks if request is a request from one of the apps.
+            </summary>
+            <returns>true/false</returns>
+        </member>
+        <member name="P:EZGO.Api.Controllers.Base.BaseController`1.IsCmsRequest">
+            <summary>
+            IsCmsRequest; Checks if request is a request from the cms.
+            </summary>
+            <returns>true/false</returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.Base.BaseController`1.#ctor(Microsoft.Extensions.Logging.ILogger{`0},EZGO.Api.Security.Interfaces.IApplicationUser)">
+            <summary>
+            BaseController; Implementation for controllers that use a logger and application user (e.g. contain some kind of database connectivity).
+            </summary>
+            <param name="logger"></param>
+            <param name="applicationuser"></param>
+        </member>
+        <member name="M:EZGO.Api.Controllers.Base.BaseController`1.#ctor(Microsoft.Extensions.Logging.ILogger{`0})">
+            <summary>
+            BaseController; Implementation for controllers that only use the logger.
+            </summary>
+            <param name="logger"></param>
+        </member>
+        <member name="M:EZGO.Api.Controllers.Base.BaseController`1.Get">
+            <summary>
+            Base route, returns the name of the controller when its active and no other routing parameters are used.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.Base.BaseController`1.CheckStaticOutput">
+            <summary>
+            CheckStaticOutput; check if static output must be generated based on QueryString parameter 'static'
+            The static output is based on strings, and only used for the development of the API, will probably be removed before release candidate is published.
+            </summary>
+            <returns>true/false depending on parameter.</returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.Base.BaseController`1.GetObjectResultJsonWithStatus(System.Object)">
+            <summary>
+            GetObjectResultWithStatus; Gets a object result based on the supplied object. Depending if object is null a certain status will be returned.
+            </summary>
+            <param name="o">The object that needs to be checked and returned</param>
+            <returns>ObjectResult, containing a status code, and content (as JSON)</returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.Base.BaseController`1.GetAgentHeader">
+            <summary>
+            GetAgentHeader; Get agent headers
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:EZGO.Api.Controllers.General.GenerationController">
+            <summary>
+            GenerationController; Controller for calling several parts of the generation functionality.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.GenerationController.CheckGenerationEnabled">
+            <summary>
+            CheckGenerationEnabled, check if generation is enabled based on EnableTaskGenerationFromRoutes in appsettings.
+            </summary>
+            <returns>true/false</returns>
+        </member>
+        <member name="T:EZGO.Api.Controllers.General.HealthController">
+            <summary>
+            HealthController; health controller calls different functionality to determine basic availability of the API
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.HealthController.GetItWorksCheck">
+            <summary>
+            Default route, when working will return true.
+            </summary>
+            <returns>true/or standard http error.</returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.HealthController.GetDatabaseUpAndRunning">
+            <summary>
+            GetDatabaseUpAndRunning; checks if the db is available based on a query through entity framework. When there are results the basics works as it should
+            </summary>
+            <returns>true/false</returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.HealthController.GetUserConnection">
+            <summary>
+            GetUserConnection; checks if a prepared user can be validated through its company id, if so the db and basic authentication work based on request token header.
+            </summary>
+            <returns>true/false</returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.HealthController.GetVersion">
+            <summary>
+            GetVersion; get version of application assembly.
+            Version: [major].[minor].[yyMM].[ddHH(mm rounded)]
+            e.g. when it's 21th of march 2020 15:33
+            The minor version = 1
+            The major version = 2
+            The total version will be 2.1.2003.21153
+            </summary>
+            <returns>Active version number</returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.HealthController.GetLogicVersions">
+            <summary>
+            GetLogicVersions; Get all versions of the logic parts of the EZGO api.
+            In normal conditions these would be the same as the API version.
+            </summary>
+            <returns>String containing all EZGO logic (dlls) with their versions.</returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.HealthController.GetAuthorization">
+            <summary>
+            GetAuthorization; Checks Authorization, should return 401 when not supplying a bearer token.
+            </summary>
+            <returns>Returns string with Ok when authorized.</returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.HealthController.GetEnvironmentDb">
+            <summary>
+            GetEnvironmentDb; Gets the current running environment (based on db connection parts)
+            </summary>
+            <returns>A string containing the technical name of the current environment.</returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.HealthController.GetEnvironment">
+            <summary>
+            GetEnvironment; Gets the current running environment (based on config)
+            </summary>
+            <returns>A string containing the technical name of the current environment.</returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.HealthController.GetEnvironmentVariables">
+            <summary>
+            GetEnvironmentVariables; Gets the API_ENVIRONMENTAL_VARIABLES_ACTIVE variable from the environmental variables settings.
+            </summary>
+            <returns>Should return true. If not available will return false or generate an error..</returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.HealthController.GetApiTime">
+            <summary>
+            GetApiTime(); Gets the API time.
+            </summary>
+            <returns>DateTime.Now</returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.MigrationsController.MigrateChecklistsToStatic(System.Int32)">
+            <summary>
+            MigrateChecklistsToStatic; Migrate existing data to static table. Currently capped at 100 per run due to load. (hard coded). Can only be used when logged in with EZ-Administrator account.
+            </summary>
+            <param name="companyid">CompanyId if that needs to be migrated</param>
+            <returns>true/false or not found.</returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.MigrationsController.MigrateAuditsToStatic(System.Int32)">
+            <summary>
+            MigrateAuditsToStatic; Migrate existing data to static table. Currently capped at 100 per run due to load. (hard coded). Can only be used when logged in with EZ-Administrator account.
+            </summary>
+            <param name="companyid">CompanyId if that needs to be migrated</param>
+            <returns>true/false or not found.</returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.PropertyValueController.GetPropertiesHealth">
+            <summary>
+            GetPropertiesHealth; Checks the basic property functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.PropertyValueController.GetPropertyValuesHealth">
+            <summary>
+            GetPropertyValuesHealth; Checks the basic propertyvalues functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.PropertyValueController.GetPropertyValueKindsHealth">
+            <summary>
+            GetPropertyValuesHealth; Checks the basic propertyvalues functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.PropertyValueController.GetPropertyGroupsHealth">
+            <summary>
+            GetPropertyGroupsHealth; Checks the basic propertyvalues functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.PropertyValueController.ValidateAuditPropertyUserCollectionCollection(System.Collections.Generic.List{EZGO.Api.Models.PropertyValue.PropertyUserValue})">
+            <summary>
+            ValidateAuditPropertyUserCollectionCollection; For each item the parent object are checked if there are rights for using these.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.PropertyValueController.ValidateAuditPropertyUserValue(EZGO.Api.Models.PropertyValue.PropertyUserValue)">
+             <summary>
+            
+             </summary>
+             <param name="propertyUserValue"></param>
+             <returns></returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.PropertyValueController.ValidateChecklistPropertyUserCollectionCollection(System.Collections.Generic.List{EZGO.Api.Models.PropertyValue.PropertyUserValue})">
+            <summary>
+            ValidateAuditPropertyUserCollectionCollection; For each item the parent object are checked if there are rights for using these.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.General.PropertyValueController.ValidateChecklistPropertyUserValue(EZGO.Api.Models.PropertyValue.PropertyUserValue)">
+             <summary>
+            
+             </summary>
+             <param name="propertyUserValue"></param>
+             <returns></returns>
+        </member>
+        <member name="T:EZGO.Api.Controllers.General.ToolsController.Languages">
+            <summary>
+            private support class for displaying language arrays of items that can be used.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.ActionsController">
+            <summary>
+            ActionsController; contains all routes based on action this includes Actions, single Action, Comments and single Comments.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.ActionsController.GetActionsHealth">
+            <summary>
+            GetActionsHealth; Checks the basic action functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.ActionsController.GetActionCommentsHealth">
+            <summary>
+            GetActionCommentsHealth; Checks the basic actioncomment functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.AreasController">
+            <summary>
+            AreasController; contains all routes based on area.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.AreasController.GetAreasHealth">
+            <summary>
+            GetAreasHealth; Checks the basic action functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.AuditsController">
+            <summary>
+            AuditsController; contains all routes based on audits.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.AuditsController.GetAuditsHealth">
+            <summary>
+            GetAuditsHealth; Checks the basic action functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.AuditTemplatesController">
+            <summary>
+            AuditTemplatesController; contains all routes based on audit template.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.AuditTemplatesController.GetAuditTemplatesHealth">
+            <summary>
+            GetAuditTemplatesHealth; Checks the basic action functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.AuthenticationController">
+            <summary>
+            AuthenticationController; contains all routes based on authentication.
+            All logout, login and validate token parts are located within this controller.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.AuthenticationController.Login(EZGO.Api.Models.Authentication.Login)">
+            <summary>
+            Login; Main access route for getting acc token.
+            NOTE! there is a specific hammer protection based on the UserName, depending on settings only a number of times within a certain time frame a login request for a specific UserName can be done.
+            </summary>
+            <param name="login">Login object based on <see cref="M:EZGO.Api.Controllers.V1.AuthenticationController.Login(EZGO.Api.Models.Authentication.Login)">Login</see> model within the API models.</param>
+            <returns>Security token (JWT for now)</returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.AuthenticationController.AutoLogin(System.String)">
+            <summary>
+            External login; Used for getting token through a external login. Depending on the source (e.g. MSAL, Google) will be validated through several structures.
+            </summary>
+            <param name="externaltokens">JWT token containing external information. Based on external login structure.</param>
+            <returns>Internal access token also based on JWT</returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.AuthenticationController.AutoLoginV2(EZGO.Api.Models.Authentication.ExternalLogin)">
+            <summary>
+            <see cref="M:EZGO.Api.Controllers.V1.AuthenticationController.AutoLogin(System.String)">AutoLogin method</see> above. This is a overload for that method for directly parsing the external login object. 
+            </summary>
+            <param name="externaltokens"></param>
+            <returns></returns>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.ChecklistsController">
+            <summary>
+            ChecklistsController; contains all routes based on checklists.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.ChecklistsController.GetChecklistsHealth">
+            <summary>
+            GetChecklistsHealth; Checks the basic action functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.ChecklistTemplatesController">
+            <summary>
+            ChecklistTemplatesController; contains all routes based on checklist templates.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.ChecklistTemplatesController.GetChecklistTemplatesHealth">
+            <summary>
+            GetChecklistTemplatesHealth; Checks the basic action functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.CompaniesController">
+            <summary>
+            CompaniesController; contains all routes based on companies.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.CompaniesController.GetCompaniesHealth">
+            <summary>
+            GetCompaniesHealth; Checks the basic action functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.GeneralController">
+            <summary>
+            GeneralController; contains all routes based on general functionality used by the App.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.MarketPlaceController">
+            <summary>
+            ShiftsController; contains all routes based on shifts.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.MarketPlaceController.GetMarketPlaceHealth">
+            <summary>
+            GetShiftsAsync; Checks the basic action functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.OfflineController">
+            <summary>
+            OfflineController; For downloading a set of data for use with the application when off-line.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.ShiftsController">
+            <summary>
+            ShiftsController; contains all routes based on shifts.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.ShiftsController.GetShiftsHealth">
+            <summary>
+            GetShiftsAsync; Checks the basic action functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.SkillsController">
+            <summary>
+            ShiftsController; contains all routes based on shifts.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.SkillTemplatesController">
+            <summary>
+            ShiftsController; contains all routes based on shifts.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.TaskRecurrenciesController">
+            <summary>
+            TaskRecurrenciesController; contains all routes based on task recurrencies.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.TaskRecurrenciesController.GetTaskRecurrenciesHealth">
+            <summary>
+            GetTaskRecurrencies; Checks the basic action functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.TasksController">
+            <summary>
+            TasksController; contains all routes based on tasks.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.TasksController.GetTasksHealth">
+            <summary>
+            GetTasksHealth; Checks the basic action functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.TaskTemplatesController">
+            <summary>
+            TaskTemplatesController; contains all routes based on task templates.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.TaskTemplatesController.GetTaskTemplatesHealth">
+            <summary>
+            GetTaskTemplatesHealth; Checks the basic action functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.TaskTemplateStepsController">
+            <summary>
+            TaskTemplateStepsController; Steps are usually not directly called. But this controller will add functionality to do so.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.TaskTemplateStepsController.GetTaskTemplateStepsHealth">
+            <summary>
+            GetTaskTemplateStepsHealth; Checks the basic action functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.UsersController">
+            <summary>
+            UsersController; contains all routes based on users.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.UsersController.GetUsersHealth">
+            <summary>
+            GetUsersHealth; Checks the basic action functionality by running a part of the logic with specific id's.
+            Depending on result this route will return a true / false and a httpstatus.
+            This route can be used for remote monitoring partial functionalities of the API.
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.WorkInstructionsController">
+            <summary>
+            ShiftsController; contains all routes based on shifts.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.WorkInstructionsController.AddWorkInstruction(EZGO.Api.Models.WorkInstructions.WorkInstruction)">
+            <summary>
+            Probably not needed
+            </summary>
+            <param name="workInstruction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EZGO.Api.Controllers.V1.WorkInstructionsController.ChangeWorkInstruction(EZGO.Api.Models.WorkInstructions.WorkInstruction,System.Int32)">
+            <summary>
+            Probably not needed
+            </summary>
+            <param name="workinstructionid"></param>
+            <returns></returns>
+        </member>
+        <member name="T:EZGO.Api.Controllers.V1.WorkInstructionTemplatesController">
+            <summary>
+            ShiftsController; contains all routes based on shifts.
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Logging.ILoggerFactory,EZGO.Api.Interfaces.Data.IDatabaseLogWriter)">
+            <summary>
+            This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+            </summary>
+            <param name="app">Application Builder used by core3.1</param>
+            <param name="env">Hosting environment used for release/dev settings</param>
+            <param name="loggerFactory">Logger factory used for logging within providers and certain structures</param>
+            <param name="dblogWriter">Log writer for writing simple logs to DB used within log provider and middlewares.</param>
+        </member>
+        <member name="M:EZGO.Api.Startup.GetCorrs">
+            <summary>
+            GetCorrs; Get corrs array
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EZGO.Api.Startup.AllowLocalhost(System.String)">
+            <summary>
+            AllowLocalhost; Set corrs for allowing localhost.
+            NOTE! not used, but will probably needed in future. To activiate add custom corrs handler logic and enable though: SetIsOriginAllowed(origin -> AllowLocalhost(origin));
+            </summary>
+            <param name="origin">original origin</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

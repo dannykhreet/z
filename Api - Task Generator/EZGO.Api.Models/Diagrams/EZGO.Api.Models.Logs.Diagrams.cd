@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZGO.Api.Models.Logs.LogAuditingItem">
+    <Position X="0.5" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>QAACAAAAAAIgAAAAAAAAAAgAAAAAAgAAAIAAAAAABAA=</HashCode>
+      <FileName>Logs\LogAuditingItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Logs.LogTimeStructure">
+    <Position X="3.5" Y="0.5" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>QAADAAAAAAIAIAAAAEEAAAgAAAAAAAAAAIAAAAAAAAA=</HashCode>
+      <FileName>Logs\LogTimeStructure.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

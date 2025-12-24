@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZGO.Api.Data.Helpers.AuditHistoryHelper">
+    <Position X="0.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Helpers\AuditHistoryHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Data.Helpers.ConnectionHelper" BaseTypeListCollapsed="true">
+    <Position X="5.5" Y="0.5" Width="5.25" />
+    <TypeIdentifier>
+      <HashCode>CAAAIAAAAABEgAAAUEAAgIgAAsAAAAAQAAAAAAAAAAA=</HashCode>
+      <FileName>Helpers\ConnectionHelper.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Data.Helpers.DatabaseAccessHelper" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="5.25" Width="16" />
+    <NestedTypes>
+      <Enum Name="EZGO.Api.Data.Helpers.DatabaseAccessHelper.TableNames" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Helpers\DatabaseAccessHelper.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>kAAAACAIBaQAIIkQBAAQRACAJAgCAAAUAAQEAJBAAAg=</HashCode>
+      <FileName>Helpers\DatabaseAccessHelper.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Data.Helpers.DatabaseLogWriter" BaseTypeListCollapsed="true">
+    <Position X="11" Y="0.5" Width="7.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAACAAAAAQAAAAAAgAAAAAAAAAAAABABA=</HashCode>
+      <FileName>Helpers\DatabaseLogWriter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Data.Helpers.DataReaderExtensions">
+    <Position X="0.5" Y="1.5" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>Helpers\DataReaderExtensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Data.Helpers.StartupHelperExtension">
+    <Position X="11" Y="3.25" Width="5.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Helpers\StartupHelperExtension.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

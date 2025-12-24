@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZGO.Api.Controllers.V1.ActionsController">
+    <Position X="6.75" Y="0.5" Width="15.25" />
+    <TypeIdentifier>
+      <HashCode>IAAAAYBAIABABCAACCAAARAAAIAACABAkwAAAQAgCAA=</HashCode>
+      <FileName>Controllers\V1\ActionsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.AreasController">
+    <Position X="6.75" Y="7" Width="8.75" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAgAAAAgAAAIAYAAAAAgAAAAAAAAkAEAAAA=</HashCode>
+      <FileName>Controllers\V1\AreasController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.AuditsController">
+    <Position X="6.75" Y="11.5" Width="19.25" />
+    <TypeIdentifier>
+      <HashCode>IAABAgAAAAABAAAEBQAQAQAAAAAAwAAAACEBAQBAwAA=</HashCode>
+      <FileName>Controllers\V1\AuditsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.AuditTemplatesController">
+    <Position X="6.75" Y="17.25" Width="12" />
+    <TypeIdentifier>
+      <HashCode>IAACAgAABAAAAAAAAAAAAQAAAAAAAAAAEAAAEAAEAAA=</HashCode>
+      <FileName>Controllers\V1\AuditTemplatesController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.AuthenticationController">
+    <Position X="6.75" Y="21" Width="8.25" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAIAAAAAEAAAAAAIAAAAAAAAAAAgQAIAAAAA=</HashCode>
+      <FileName>Controllers\V1\AuthenticationController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.ChecklistsController">
+    <Position X="6.75" Y="24.5" Width="18.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAEAAAAgAQAAACUABEAEACABQQAAQUA=</HashCode>
+      <FileName>Controllers\V1\ChecklistsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.ChecklistTemplatesController">
+    <Position X="6.75" Y="30" Width="10.75" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAEAABAAAAAAAAAQAAACAAACAAAEAAAgAAAAA=</HashCode>
+      <FileName>Controllers\V1\ChecklistTemplatesController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.CommentsController">
+    <Position X="6.75" Y="33.75" Width="7.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAAAAAAAAAQAAQAAAQACAAAgAAAAAAAA=</HashCode>
+      <FileName>Controllers\V1\CommentsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.CompaniesController">
+    <Position X="6.75" Y="37.25" Width="9.75" />
+    <TypeIdentifier>
+      <HashCode>IAAAgAAAQAgAQgAAAAAAQQCACAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\V1\CompaniesController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.DashboardsController">
+    <Position X="6.75" Y="41.5" Width="16.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAQAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\V1\DashboardsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.FeedsController">
+    <Position X="6.75" Y="44.25" Width="10.25" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAACAAAAAAAAAAAQAAAAIAACAEAAAAIAAgAAA=</HashCode>
+      <FileName>Controllers\V1\FeedsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.GeneralController">
+    <Position X="6.75" Y="48" Width="9.25" />
+    <TypeIdentifier>
+      <HashCode>ABAACIAAAIAIAAKAAAIAAQAAAIAAAAAAAAAAAAARAOA=</HashCode>
+      <FileName>Controllers\V1\GeneralController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.MarketPlaceController">
+    <Position X="6.75" Y="53" Width="10" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAAAAUAAAAABAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Controllers\V1\MarketPlaceController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.OfflineController">
+    <Position X="6.75" Y="56.25" Width="7" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAQAAAAAAAAQAAgAFAgAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\V1\OfflineController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.ReportsController">
+    <Position X="6.75" Y="59.75" Width="11.25" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAEJAAAAAAAQAAAAEQAAAAAAAEAAAAAAEEAACAA=</HashCode>
+      <FileName>Controllers\V1\ReportsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.ShiftsController">
+    <Position X="6.75" Y="64.25" Width="8.75" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAACAACABAAAAAAQAAAAAAAAAAAAAQAAABAAA=</HashCode>
+      <FileName>Controllers\V1\ShiftsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.SkillsController">
+    <Position X="6.75" Y="67.75" Width="20" />
+    <TypeIdentifier>
+      <HashCode>IAAABAIAEAAQAAAAACAAgAAAAAgCAAABEAACCQAABAA=</HashCode>
+      <FileName>Controllers\V1\SkillsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.SkillTemplatesController">
+    <Position X="6.75" Y="72.75" Width="20.5" />
+    <TypeIdentifier>
+      <HashCode>IAAABAIAAAAAAAAAAAAAgAAAAAACAACAEAACAAAAAAA=</HashCode>
+      <FileName>Controllers\V1\SkillTemplatesController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.TaskRecurrenciesController">
+    <Position X="6.75" Y="76.75" Width="14.25" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAABAAAAQCAAAEAAAAAAAAFAAAAAAg=</HashCode>
+      <FileName>Controllers\V1\TaskRecurrenciesController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.TasksController">
+    <Position X="6.75" Y="80.5" Width="20" />
+    <TypeIdentifier>
+      <HashCode>oAAAQSACEAhAAAECwAAEAQgApIAAAAAAAAAEAAQwAAA=</HashCode>
+      <FileName>Controllers\V1\TasksController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.TaskTemplatesController">
+    <Position X="6.75" Y="87.5" Width="15" />
+    <TypeIdentifier>
+      <HashCode>IBAAAAAAAAAAAAAAAAAQAQAAgIAABAAAAAgABAAAAAI=</HashCode>
+      <FileName>Controllers\V1\TaskTemplatesController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.TaskTemplateStepsController">
+    <Position X="6.75" Y="91.5" Width="10.25" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAEAACAAAAAAIQAAAIABAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>Controllers\V1\TaskTemplateStepsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.TestController">
+    <Position X="6.75" Y="95" Width="7.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAEAAAAACACCCEAAAAAA=</HashCode>
+      <FileName>Controllers\V1\TestController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.UsersController">
+    <Position X="6.75" Y="98.25" Width="8.75" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAABAAAAACAAAAABQAAAAAkAAAAQBAAAAAAACA=</HashCode>
+      <FileName>Controllers\V1\UsersController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.WorkInstructionsController">
+    <Position X="6.75" Y="103" Width="20" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAIAAAMAAAAAIAAAgAACAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Controllers\V1\WorkInstructionsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.V1.WorkInstructionTemplatesController">
+    <Position X="6.75" Y="106.75" Width="20.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAIAAAAAAAAAIAAAgAACAAAAAAAAAAAEAAAAAAg=</HashCode>
+      <FileName>Controllers\V1\WorkInstructionTemplatesController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Controllers.Base.BaseController&lt;T&gt;">
+    <Position X="0.75" Y="0.5" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAQAQAAAABAEAQQAAAAIAAAAAgAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\Base\BaseController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

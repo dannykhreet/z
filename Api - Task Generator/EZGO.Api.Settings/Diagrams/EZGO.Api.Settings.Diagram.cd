@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZGO.Api.Settings.ApiSettings">
+    <Position X="0.5" Y="0.5" Width="4.75" />
+    <TypeIdentifier>
+      <HashCode>IDAIAAAA8AIAAKAAYECJQAAIABAAAAQAcCUAGQCSoAE=</HashCode>
+      <FileName>ApiSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Settings.AuthenticationSettings">
+    <Position X="5.5" Y="0.5" Width="5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAAAAAMCAAAABACACMABIDAAAAAAAAAAAA=</HashCode>
+      <FileName>AuthenticationSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Settings.CacheSettings">
+    <Position X="10.75" Y="0.5" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAiAAIBACAAQQRACAAABCgAAAQAAgCAIBgAgOQAAA=</HashCode>
+      <FileName>CacheSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Settings.Connectors">
+    <Position X="15.5" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAAACAAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Connectors.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Settings.FeatureSettings">
+    <Position X="0.5" Y="9.25" Width="5.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAIAGAAAAAgCUEAAIAAAAAAQAQAMAAEAABQgEA=</HashCode>
+      <FileName>FeatureSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Settings.MediaSettings">
+    <Position X="6.25" Y="9.25" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAAgAgAAICIMIQAACEBhBABKjDAAAACCACKACAAgAAA=</HashCode>
+      <FileName>MediaSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Settings.PropertySettings">
+    <Position X="10.5" Y="9.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PropertySettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Settings.StaticOutput">
+    <Position X="13.25" Y="9.25" Width="4" />
+    <TypeIdentifier>
+      <HashCode>ykDEgMZYhR8oCEFDAZAAUEVCg4hGArYiBAAAgBwCdwA=</HashCode>
+      <FileName>StaticOutput.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Settings.StatisticSettings">
+    <Position X="0.5" Y="17" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>StatisticSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Settings.TaskGenerationSettings">
+    <Position X="2.5" Y="17" Width="4.75" />
+    <TypeIdentifier>
+      <HashCode>CQAAAIAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>TaskGenerationSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Settings.Helpers.ConfigurationHelper">
+    <Position X="0.5" Y="19.25" Width="5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAKAAAAACAgAAAAAEAAAAAAAA=</HashCode>
+      <FileName>Helpers\ConfigurationHelper.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="EZGO.Api.Settings.Helpers.StartupHelperExtension">
+    <Position X="3.5" Y="19.25" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Helpers\StartupHelperExtension.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZGO.Api.Models.ActionComment">
+    <Position X="0.5" Y="0.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAACCIAFAAIAAAAAACACAAgAAAAAQBAAAAAAAAAAAAk=</HashCode>
+      <FileName>ActionComment.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.ActionsAction">
+    <Position X="4" Y="0.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAACgAAFACIggCAAACAAQACQAAkBABACgAAAAAAAIAk=</HashCode>
+      <FileName>ActionsAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Area">
+    <Position X="7.5" Y="0.75" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAASgAAAAAIgAAAAAAAEAAQAAAAAAAABAgAAAAAAAAA=</HashCode>
+      <FileName>Area.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.AreaSystemInformation">
+    <Position X="11.5" Y="0.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEADAAAAIAAAAAAAAAAACACAAAAAAAA=</HashCode>
+      <FileName>AreaSystemInformation.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Audit">
+    <Position X="0.5" Y="7.25" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>AgACoAABAAIkAABQACAQAAQgAAIAABBAMAAIEAACAAA=</HashCode>
+      <FileName>Audit.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.AuditTemplate">
+    <Position X="5.25" Y="7.25" Width="4.25" />
+    <TypeIdentifier>
+      <HashCode>AgAKgAAAAAIkAAgQEQAAAAQAAACAAAAAMAIIEAACAAA=</HashCode>
+      <FileName>AuditTemplate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Checklist">
+    <Position X="0.5" Y="13.75" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>AgACgAABAAIkAABAACAAAAQgAAIAABBAMAAIEAACAAA=</HashCode>
+      <FileName>Checklist.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.ChecklistTemplate">
+    <Position X="5.25" Y="13.75" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>AgACgAAAAAIkAAAAEQAAAAQAAAAAAIAAMAIIEAACAAA=</HashCode>
+      <FileName>ChecklistTemplate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Comment">
+    <Position X="0.5" Y="19.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAACAAABBAIgAAEAACAAQAiAAAgAAAAAAAACAAAAAAE=</HashCode>
+      <FileName>Comment.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Company">
+    <Position X="0.5" Y="24.25" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAACgAAAAAAgAAgAAAAIQAQAAAAAAAAAgAAAAAAAAAA=</HashCode>
+      <FileName>Company.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.CompanyRoles">
+    <Position X="6.5" Y="24.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAwAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>CompanyRoles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Schedule">
+    <Position X="8.75" Y="27.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>gAAYFAAAIAAACgUAAAIAAAAgAEAAAAAFAgAAAMAAAAA=</HashCode>
+      <FileName>Schedule.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Shift">
+    <Position X="4" Y="24.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAICAAAAICIAAAAAAAAAgAAAAAAAABAAIAAAAAAAAAA=</HashCode>
+      <FileName>Shift.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Signature">
+    <Position X="4.75" Y="35" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAQAAAAAAAAEAAAABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Signature.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Step">
+    <Position X="6.75" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACgIAAAAAgAAAAAAAAAACAAAAAAAAAAAEAAAAAAAg=</HashCode>
+      <FileName>Step.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.TaskRecurrency">
+    <Position X="8.75" Y="32.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAIAAAgAAIAAAAAAAkAAAEBAIAAAAAAAAAA=</HashCode>
+      <FileName>TaskRecurrency.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.TasksTask">
+    <Position X="0.5" Y="27.5" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AhALpIAFIEIgAAgCAKAAAA0wAgAEJgDBIAEA0EACKAk=</HashCode>
+      <FileName>TasksTask.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.TaskTemplate">
+    <Position X="4.75" Y="27.5" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AgADgIAAIAIgAAEAEYAAAAUAACCEJgABIQEAkEACAAg=</HashCode>
+      <FileName>TaskTemplate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.UserProfile">
+    <Position X="3.5" Y="19.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAALgEAgACAAAAAAMAAAAAAAAAIAAAAAAQAABAEAAgg=</HashCode>
+      <FileName>UserProfile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

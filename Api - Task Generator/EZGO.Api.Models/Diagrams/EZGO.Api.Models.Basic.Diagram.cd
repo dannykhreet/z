@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZGO.Api.Models.Basic.ActionParentBasic">
+    <Position X="0.5" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAADAAAIAAAAAAABAAAAAiAAAgAAACAAQAAAEAAAAA=</HashCode>
+      <FileName>Basic\ActionParentBasic.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Basic.AreaBasic">
+    <Position X="3.75" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>QAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Basic\AreaBasic.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Basic.AuditBasic">
+    <Position X="6.25" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>Basic\AuditBasic.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Basic.ChecklistBasic">
+    <Position X="9" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAIAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Basic\ChecklistBasic.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Basic.CompanyBasic">
+    <Position X="12" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAACgAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Basic\CompanyBasic.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Basic.MediaBasic">
+    <Position X="14.25" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>
+      <FileName>Basic\MediaBasic.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Basic.SignBasic">
+    <Position X="0.5" Y="4" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEACAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Basic\SignBasic.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Basic.TaskBasic">
+    <Position X="3.5" Y="4" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAASAAAgAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Basic\TaskBasic.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Basic.TaskExtendedDataBasic">
+    <Position X="6.25" Y="4" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>AAADAAAAAAAAAAAAAAAAAAAgAAgAAAAAAAAAAAAACAA=</HashCode>
+      <FileName>Basic\TaskExtendedDataBasic.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Basic.TaskPropertyUserValueBasic">
+    <Position X="11" Y="4" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAASCAABAIIAAAAAAGAAAAgACAgEEAAAAQgAAAAAAAA=</HashCode>
+      <FileName>Basic\TaskPropertyUserValueBasic.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Basic.TaskStatusBasic">
+    <Position X="14.25" Y="4" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAQAAAAAAACEAAgABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Basic\TaskStatusBasic.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Basic.UserBasic">
+    <Position X="17" Y="4" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAACgAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Basic\UserBasic.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

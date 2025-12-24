@@ -1,0 +1,12 @@
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Utils.Security\bin\Release\net6.0\EZGO.Api.Utils.Security.deps.json
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Utils.Security\bin\Release\net6.0\EZGO.Api.Utils.Security.dll
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Utils.Security\bin\Release\net6.0\EZGO.Api.Utils.Security.pdb
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Utils.Security\obj\Release\net6.0\EZGO.Api.Utils.Security.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Utils.Security\obj\Release\net6.0\EZGO.Api.Utils.Security.AssemblyInfoInputs.cache
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Utils.Security\obj\Release\net6.0\EZGO.Api.Utils.Security.AssemblyInfo.cs
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Utils.Security\obj\Release\net6.0\EZGO.Api.Utils.Security.csproj.CoreCompileInputs.cache
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Utils.Security\obj\Release\net6.0\EZGO.Api.Utils.Security.sourcelink.json
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Utils.Security\obj\Release\net6.0\EZGO.Api.Utils.Security.dll
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Utils.Security\obj\Release\net6.0\refint\EZGO.Api.Utils.Security.dll
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Utils.Security\obj\Release\net6.0\EZGO.Api.Utils.Security.pdb
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Utils.Security\obj\Release\net6.0\ref\EZGO.Api.Utils.Security.dll

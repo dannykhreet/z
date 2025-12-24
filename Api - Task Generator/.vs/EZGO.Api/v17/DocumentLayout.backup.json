@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\BackEnd\\Api - Task Generator\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{4FBFB1E4-9F2E-4F53-BFFA-845C48074A57}|EZGO.Api\\EZGO.Api.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\backend\\api - task generator\\ezgo.api\\controllers\\v1\\actionscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4FBFB1E4-9F2E-4F53-BFFA-845C48074A57}|EZGO.Api\\EZGO.Api.csproj|solutionrelative:ezgo.api\\controllers\\v1\\actionscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3CA2896A-355D-4EA4-BCE1-E4F57AA64212}|EZGO.Api.Logic\\EZGO.Api.Logic.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\backend\\api - task generator\\ezgo.api.logic\\managers\\actionmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3CA2896A-355D-4EA4-BCE1-E4F57AA64212}|EZGO.Api.Logic\\EZGO.Api.Logic.csproj|solutionrelative:ezgo.api.logic\\managers\\actionmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AC2AD3B3-EF27-4480-BD78-709F1837415A}|EZGO.Api.Models\\EZGO.Api.Models.csproj|c:\\users\\dannykhreet\\desktop\\project repos\\backend\\api - task generator\\ezgo.api.models\\filters\\actionfilters.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AC2AD3B3-EF27-4480-BD78-709F1837415A}|EZGO.Api.Models\\EZGO.Api.Models.csproj|solutionrelative:ezgo.api.models\\filters\\actionfilters.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ActionsController.cs",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\BackEnd\\Api - Task Generator\\EZGO.Api\\Controllers\\V1\\ActionsController.cs",
+              "RelativeDocumentMoniker": "EZGO.Api\\Controllers\\V1\\ActionsController.cs",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\BackEnd\\Api - Task Generator\\EZGO.Api\\Controllers\\V1\\ActionsController.cs",
+              "RelativeToolTip": "EZGO.Api\\Controllers\\V1\\ActionsController.cs",
+              "ViewState": "AgIAAGUAAAAAAAAAAIAwwHsAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-17T10:31:00.113Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ActionManager.cs",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\BackEnd\\Api - Task Generator\\EZGO.Api.Logic\\Managers\\ActionManager.cs",
+              "RelativeDocumentMoniker": "EZGO.Api.Logic\\Managers\\ActionManager.cs",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\BackEnd\\Api - Task Generator\\EZGO.Api.Logic\\Managers\\ActionManager.cs",
+              "RelativeToolTip": "EZGO.Api.Logic\\Managers\\ActionManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFoAAABjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-16T13:49:16.903Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ActionFilters.cs",
+              "DocumentMoniker": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\BackEnd\\Api - Task Generator\\EZGO.Api.Models\\Filters\\ActionFilters.cs",
+              "RelativeDocumentMoniker": "EZGO.Api.Models\\Filters\\ActionFilters.cs",
+              "ToolTip": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\BackEnd\\Api - Task Generator\\EZGO.Api.Models\\Filters\\ActionFilters.cs",
+              "RelativeToolTip": "EZGO.Api.Models\\Filters\\ActionFilters.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAuwB8AAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-16T11:57:27.475Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

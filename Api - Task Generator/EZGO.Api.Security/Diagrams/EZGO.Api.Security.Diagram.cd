@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZGO.Api.Security.Helpers.StartupHelperExtension">
+    <Position X="12.25" Y="11.5" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Helpers\StartupHelperExtension.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Security.ApplicationUser">
+    <Position X="1" Y="3.75" Width="15.75" />
+    <TypeIdentifier>
+      <HashCode>ICAANAEAAIKABAABgAAEUQgBKAAAAAEAAAEAEADIAIE=</HashCode>
+      <FileName>ApplicationUser.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="EZGO.Api.Security.Authenticator">
+    <Position X="1" Y="11.5" Width="4.75" />
+    <TypeIdentifier>
+      <HashCode>BgEAAAAAAgACAAAAAiAAFEAAACAAAAAAAIAAAAAAAIA=</HashCode>
+      <FileName>Authenticator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Security.Encryptor">
+    <Position X="6.25" Y="11.5" Width="5.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Encryptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Security.KeyGenerator">
+    <Position X="6.25" Y="13" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAgAAAAAAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>KeyGeneration.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="EZGO.Api.Security.Interfaces.IApplicationAuthorization">
+    <Position X="9.25" Y="13" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\IApplicationAuthorization.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Security.Interfaces.IApplicationUser">
+    <Position X="1" Y="0.5" Width="9" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAICAAAAAAAAEEAABAAAAAAAAAAAAAABIAAE=</HashCode>
+      <FileName>Interfaces\IApplicationUser.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

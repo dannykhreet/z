@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Interface Name="EZGO.Api.Interfaces.Managers.IActionManager">
+    <Position X="0.5" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>EUAFAAAAwAAIABAACAACGACEAAAEAAAQCACEHAACAAA=</HashCode>
+      <FileName>Managers\IActionManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.IAreaManager">
+    <Position X="3.5" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AACQABAAAAAAAAAAEAAAAAAAIAIAAAAAAAAAAAAQQAA=</HashCode>
+      <FileName>Managers\IAreaManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.IAuditManager">
+    <Position X="6.25" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>CGBAAgAAEAAAAAAFYAAAAEABAAAIBIAAgAAAAEAAAIA=</HashCode>
+      <FileName>Managers\IAuditManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.IChecklistManager">
+    <Position X="9" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAEIAAAgAAAAAQAEAAABAAACEAABEAAgAhAAIAAAA=</HashCode>
+      <FileName>Managers\IChecklistManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.ICommentManager">
+    <Position X="11.75" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAgAAAAIAAAABAAAAAAAAQAAAAAAAAAAAAA=</HashCode>
+      <FileName>Managers\ICommentManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.ICompanyManager">
+    <Position X="0.5" Y="6.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AFAAAAAAAAAAAAAAAAQAAAQCAAAAAAAAAAAAAAIAAAE=</HashCode>
+      <FileName>Managers\ICompanyManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.IDashboardsManager">
+    <Position X="2.75" Y="6.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>Managers\IDashboardsManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.IFeedManager">
+    <Position X="4.75" Y="6.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAEAAAgAAgAAAQAAAACECAAAAAAAACAA=</HashCode>
+      <FileName>Managers\IFeedManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.IGeneralManager">
+    <Position X="7" Y="6.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AgAASAAAAACAAACAEAIAAAAAAJAAjCAAiAAIASEAAEE=</HashCode>
+      <FileName>Managers\IGeneralManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.IMarketPlaceManager">
+    <Position X="10.25" Y="6.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAAA=</HashCode>
+      <FileName>Managers\IMarketPlaceManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.IOfflineManager">
+    <Position X="0.5" Y="12.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Managers\IOfflineManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.IPropertyValueManager">
+    <Position X="2.5" Y="12.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAABCABAgAjCQgQAEgAIJkggAQAAgLEJCBBICgCAABA=</HashCode>
+      <FileName>Managers\IPropertyValueManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.IReportManager">
+    <Position X="6" Y="12.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIABAAAAAAACACAAAEACAAAAAAAAABAAIAAAAA=</HashCode>
+      <FileName>Managers\IReportManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.IShiftManager">
+    <Position X="9" Y="12.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAYQAAAAAAAAAAAAAABAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>Managers\IShiftManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.ITaskGenerationManager">
+    <Position X="11" Y="12.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAgCAAAIAAgAABAAAEEAAAQAAAEAAIAAAAAAAAAA=</HashCode>
+      <FileName>Managers\ITaskGenerationManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.ITaskManager">
+    <Position X="0.5" Y="21.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>EKCABwAAMgAJFwRAAAwgAAgQIIAIAwAeVIIJAAQV4CA=</HashCode>
+      <FileName>Managers\ITaskManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.IToolsManager">
+    <Position X="4.25" Y="21.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABBQAAAAIAAAAAAAAAAQIAAQAAAAAAAAAIAAAA=</HashCode>
+      <FileName>Managers\IToolsManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.IUserAccessManager">
+    <Position X="7.75" Y="21.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAACAAAAIAAAAAAAAAAAAAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>Managers\IUserAccessManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.IUserManager">
+    <Position X="11.25" Y="21.5" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AiAAAAgBAgACAAEDAAAEAAAgQAABAAAKAIBAAAEBEAI=</HashCode>
+      <FileName>Managers\IUserManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="EZGO.Api.Interfaces.Managers.IVersionReleaseManager">
+    <Position X="15.5" Y="21.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAQoAAAAQAAAAIAAAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Managers\IVersionReleaseManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

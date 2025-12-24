@@ -1,0 +1,17 @@
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Interfaces.Data\bin\Debug\net6.0\EZGO.Api.Interfaces.Data.deps.json
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Interfaces.Data\bin\Debug\net6.0\EZGO.Api.Interfaces.Data.dll
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Interfaces.Data\bin\Debug\net6.0\EZGO.Api.Interfaces.Data.pdb
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Interfaces.Data\bin\Debug\net6.0\EZGO.Api.Models.dll
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Interfaces.Data\bin\Debug\net6.0\EZGO.Api.Models.pdb
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Interfaces.Data\bin\Debug\net6.0\EZGO.Api.Models.xml
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Interfaces.Data\obj\Debug\net6.0\EZGO.Api.Interfaces.Data.csproj.AssemblyReference.cache
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Interfaces.Data\obj\Debug\net6.0\EZGO.Api.Interfaces.Data.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Interfaces.Data\obj\Debug\net6.0\EZGO.Api.Interfaces.Data.AssemblyInfoInputs.cache
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Interfaces.Data\obj\Debug\net6.0\EZGO.Api.Interfaces.Data.AssemblyInfo.cs
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Interfaces.Data\obj\Debug\net6.0\EZGO.Api.Interfaces.Data.csproj.CoreCompileInputs.cache
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Interfaces.Data\obj\Debug\net6.0\EZGO.Api.Interfaces.Data.sourcelink.json
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Interfaces.Data\obj\Debug\net6.0\EZGO.Api.8C4A72FD.Up2Date
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Interfaces.Data\obj\Debug\net6.0\EZGO.Api.Interfaces.Data.dll
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Interfaces.Data\obj\Debug\net6.0\refint\EZGO.Api.Interfaces.Data.dll
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Interfaces.Data\obj\Debug\net6.0\EZGO.Api.Interfaces.Data.pdb
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Interfaces.Data\obj\Debug\net6.0\ref\EZGO.Api.Interfaces.Data.dll

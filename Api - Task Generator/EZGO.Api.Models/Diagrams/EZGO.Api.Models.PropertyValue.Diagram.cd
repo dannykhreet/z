@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZGO.Api.Models.PropertyValue.BasePropertyObject">
+    <Position X="0.5" Y="0.5" Width="4.75" />
+    <TypeIdentifier>
+      <HashCode>JAECAABBKAAAASAAhSAABAhgAIAgEBACAgEIAQAwEQA=</HashCode>
+      <FileName>PropertyValue\BasePropertyObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.PropertyValue.MeasurementUnit">
+    <Position X="4.25" Y="15.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PropertyValue\MeasurementUnit.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.PropertyValue.MeasurementUnitKind">
+    <Position X="0.5" Y="14.25" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PropertyValue\MeasurementUnitKind.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.PropertyValue.Property">
+    <Position X="5.75" Y="0.5" Width="5" />
+    <TypeIdentifier>
+      <HashCode>BAEKAIBBiAAgBAABICABEAQAAAAoIJBAAQAAAAAAFAA=</HashCode>
+      <FileName>PropertyValue\Property.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.PropertyValue.PropertyAction">
+    <Position X="0.5" Y="9.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PropertyValue\PropertyAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.PropertyValue.PropertyAuditTemplate">
+    <Position X="6" Y="9.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>PropertyValue\PropertyAuditTemplate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.PropertyValue.PropertyChecklistTemplate">
+    <Position X="8.75" Y="9.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PropertyValue\PropertyChecklistTemplate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.PropertyValue.PropertyGroup">
+    <Position X="11" Y="5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAACAAABAAIgAAAAACAAAAQAAAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>PropertyValue\PropertyGroup.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.PropertyValue.PropertyTaskTemplate">
+    <Position X="3.25" Y="9.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAEAAAAACAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PropertyValue\PropertyTaskTemplate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.PropertyValue.PropertyUserValue">
+    <Position X="11" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAASBAABAIIAAAAAAGAAAAgACAgEEBAAAQgAAAAAAAA=</HashCode>
+      <FileName>PropertyValue\PropertyUserValue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.PropertyValue.PropertyValue">
+    <Position X="4.25" Y="11.25" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAKAIABAQAgABAABCAAAAQAAABAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PropertyValue\PropertyValue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.PropertyValue.PropertyValueKind">
+    <Position X="0.5" Y="11.25" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAKAAABAAAgAAAAACAAAAQAAACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PropertyValue\PropertyValueKind.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

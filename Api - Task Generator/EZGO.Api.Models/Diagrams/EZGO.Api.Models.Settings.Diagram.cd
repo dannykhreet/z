@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZGO.Api.Models.Settings.ApplicationSettings">
+    <Position X="0.5" Y="0.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AACCBAAsAAAAAIAAAACBACAIACAAgBAAAAAAIAQBQAA=</HashCode>
+      <FileName>Settings\ApplicationSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Settings.DatabaseTimezoneItem">
+    <Position X="4.25" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>QAAAEAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAABAAAAA=</HashCode>
+      <FileName>Settings\DatabaseTimezoneItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Settings.Features">
+    <Position X="7.5" Y="0.5" Width="4.25" />
+    <TypeIdentifier>
+      <HashCode>EA4CAwgAQSABA5AAIRAAAAASIABCEQihAAAgAAAAAQA=</HashCode>
+      <FileName>Settings\Features.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Settings.LanguageResource">
+    <Position X="0.5" Y="8.5" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAAAAAAAAgAAAAAAAAAAAAAAAACAAAAg=</HashCode>
+      <FileName>Settings\LanguageResource.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Settings.LanguageResourceItem">
+    <Position X="4.75" Y="8.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAgAAAAAAAAAAAAAAAABCAAAAAAAAAAAAA=</HashCode>
+      <FileName>Settings\LanguageResourceItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Settings.MediaLocations">
+    <Position X="12" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AIEAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>Settings\MediaLocations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Settings.SettingResource">
+    <Position X="7.5" Y="8.5" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>AIACCAAAAAAgAAAAAAAAAAQAAAAAAAAAAAAgACAAAAA=</HashCode>
+      <FileName>Settings\SettingResource.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Settings.SettingResourceItem">
+    <Position X="12.25" Y="8.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAIggAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Settings\SettingResourceItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

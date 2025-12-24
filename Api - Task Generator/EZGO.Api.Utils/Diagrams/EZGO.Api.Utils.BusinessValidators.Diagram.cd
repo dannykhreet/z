@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZGO.Api.Utils.BusinessValidators.ActionValidators">
+    <Position X="0.5" Y="1" Width="5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAIAAQAAAAAAAAAAAAAIACAAAABAAAAAAQAAAAA=</HashCode>
+      <FileName>BusinessValidators\ActionValidators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.BusinessValidators.AreaValidators">
+    <Position X="5.75" Y="1" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAJAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>BusinessValidators\AreaValidators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.BusinessValidators.AuditTemplateValidators">
+    <Position X="10.5" Y="1" Width="5.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAA=</HashCode>
+      <FileName>BusinessValidators\AuditTemplateValidators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.BusinessValidators.AuditValidators">
+    <Position X="0.5" Y="4" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAACQAAAAAAAAAAAAAEAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>BusinessValidators\AuditValidators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.BusinessValidators.ChecklistValidators">
+    <Position X="5.25" Y="4" Width="5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAIAAACBAAAAAAAAAAAAkAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>BusinessValidators\ChecklistValidators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.BusinessValidators.CompanyValidators">
+    <Position X="10.5" Y="4" Width="4.75" />
+    <TypeIdentifier>
+      <HashCode>ABAAQAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>BusinessValidators\CompanyValidators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.BusinessValidators.PasswordValidators">
+    <Position X="0.5" Y="7.5" Width="6.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAQAEEAAAMAAQAAAAAAAAAAA=</HashCode>
+      <FileName>BusinessValidators\PasswordValidators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.BusinessValidators.ShiftValidators">
+    <Position X="7.5" Y="7.5" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAAAAAAAAAAAAAAAAACEAAAAAAAQAAAAAA=</HashCode>
+      <FileName>BusinessValidators\ShiftValidators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.BusinessValidators.TaskTemplateValidators">
+    <Position X="12.25" Y="7.5" Width="5.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAgAAAAAAACAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>BusinessValidators\TaskTemplateValidators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.BusinessValidators.TaskValidators">
+    <Position X="0.5" Y="10.75" Width="4.75" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAIAAACQAADABgAAAAAAAQAAAACAAAAAAAAgAAA=</HashCode>
+      <FileName>BusinessValidators\TaskValidators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.BusinessValidators.UserValidators">
+    <Position X="5.5" Y="10.75" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAAAAAACAAAAAAAAAAAAAQAAAAAgAQAAAA=</HashCode>
+      <FileName>BusinessValidators\UserValidators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

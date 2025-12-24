@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZGO.Api.Models.Skills.Base.SkillAssessmentBase">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgACqAABAAIgAAAAACAAAAQAEAAAAAAAIAAAEEAAAAE=</HashCode>
+      <FileName>Skills\Base\SkillAssessmentBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Skills.SkillAssessment">
+    <Position X="3" Y="0.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAAAAAAAAAAAAAIAQBBAAAAAAAAAAAA=</HashCode>
+      <FileName>Skills\SkillAssessment.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Skills.SkillAssessmentTemplate">
+    <Position X="3" Y="3" Width="4.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAACAAAQAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Skills\SkillAssessmentTemplate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Skills.SkillsMatrix">
+    <Position X="4.75" Y="5.25" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAABACMgAAQAACAAAAQAAAAABBAAAAAAAAAAAAA=</HashCode>
+      <FileName>Skills\SkillsMatrix.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Skills.SkillsMatrixBehaviourItem">
+    <Position X="0.5" Y="5.25" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAQAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Skills\SkillsMatrixBehaviourItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Skills.SkillsMatrixBehaviourItemValue">
+    <Position X="9.5" Y="5.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAgAACAAAAgAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Skills\SkillsMatrixBehaviourItemValue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Skills.SkillsMatrixItem">
+    <Position X="12.25" Y="5.25" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAgAABAAAAAAAQAAAAAACACACAgAAAAgAA=</HashCode>
+      <FileName>Skills\SkillsMatrixItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Skills.SkillsMatrixItemValue">
+    <Position X="0.5" Y="9" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAABAAAAAAhAACAAAAgAAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Skills\SkillsMatrixItemValue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Skills.SkillsMatrixUser">
+    <Position X="3.25" Y="9" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAACgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAg=</HashCode>
+      <FileName>Skills\SkillsMatrixUser.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Skills.SkillsMatrixUserGroups">
+    <Position X="5.75" Y="9" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAgAAAgAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Skills\SkillsMatrixUserGroups.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Skills.SkillInstruction">
+    <Position X="9.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Skills\SkillInstruction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Skills.SkillInstructionTemplate">
+    <Position X="11.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Skills\SkillInstructionTemplate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZGO.Api.Models.Reports.ReportAuditDeviationItem">
+    <Position X="0.5" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAADAAAAAAAAAAAAAAAAACABAQgAQAAAAABAEAAAAA=</HashCode>
+      <FileName>Reports\ReportAuditDeviationItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Reports.ReportAuditDeviations">
+    <Position X="3.75" Y="0.5" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>Reports\ReportAuditDeviations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Reports.ReportChecklistDeviations">
+    <Position X="8" Y="0.5" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Reports\ReportChecklistDeviations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Reports.ReportDeviationItem">
+    <Position X="0.5" Y="4.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAACBAAEAAAAAAAAAAAAAAQAAQgEAAABAAABAAAAAAA=</HashCode>
+      <FileName>Reports\ReportDeviationItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Reports.ReportDeviationTaskStatusItem">
+    <Position X="12.25" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAARAQECAAAAAAAAAAAAACAAQSEAAABAACBAEQAEAA=</HashCode>
+      <FileName>Reports\ReportDeviationTaskStatusItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Reports.ReportTaskDeviations">
+    <Position X="3.75" Y="4.75" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAAAAAAAgAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Reports\ReportTaskDeviations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Reports.TaskOverviewReport">
+    <Position X="8" Y="4.75" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAEEgAAAAgAAQBBAAAAAAAAAgAECAAAAIAAAQA=</HashCode>
+      <FileName>Reports\TaskOverviewReport.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Models.Reports.TaskOverviewReportItem">
+    <Position X="12" Y="4.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAEAAAAAAAAAAAAAAAAAAAAAAAAAQAACAAAAAA=</HashCode>
+      <FileName>Reports\TaskOverviewReportItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

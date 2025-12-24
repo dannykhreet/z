@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyVersion>1.0.2509.22133</AssemblyVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.21" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
+    <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.14.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.14.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
+    <PackageReference Include="System.IO.Packaging" Version="9.0.10" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EZGO.Api.Data\EZGO.Api.Data.AspNetCore.csproj" />
+    <ProjectReference Include="..\EZGO.Api.Interfaces\EZGO.Api.Interfaces.csproj" />
+    <ProjectReference Include="..\EZGO.Api.Utils.AspNetCore\EZGO.Api.Utils.AspNetCore.csproj" />
+    <ProjectReference Include="..\EZGO.Api.Utils.Security\EZGO.Api.Utils.Security.csproj" />
+    <ProjectReference Include="..\EZGO.Api.Utils\EZGO.Api.Utils.csproj" />
+  </ItemGroup>
+</Project>

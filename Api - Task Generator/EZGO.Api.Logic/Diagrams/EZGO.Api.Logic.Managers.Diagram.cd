@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZGO.Api.Logic.Managers.ActionManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="0.5" Width="16.5" />
+    <TypeIdentifier>
+      <HashCode>EUAFJCJA4IAIQBAgyYACWQiECAAEKIQwCICkHYCigEw=</HashCode>
+      <FileName>Managers\ActionManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.AreaManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="14.5" Width="11.75" />
+    <TypeIdentifier>
+      <HashCode>AACQABAAAAAAQAAAEAQACQIAIAIABAQJCAAABAgQwIA=</HashCode>
+      <FileName>Managers\AreaManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.AuditManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="21" Width="19.5" />
+    <TypeIdentifier>
+      <HashCode>CGRAAgaoEABASAEHZMAMBUAlANIMBYBAgUggBEFRwIg=</HashCode>
+      <FileName>Managers\AuditManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.ChecklistManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="36.5" Width="17.5" />
+    <TypeIdentifier>
+      <HashCode>AQIAUKIgEgCAQHASCkAEhRABALkIEDEoAkshgMIAwAo=</HashCode>
+      <FileName>Managers\ChecklistManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.CommentManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="49.75" Width="9.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAgCQAAIAAAABQAAAAAAAQAAAAAQAAAAgAA=</HashCode>
+      <FileName>Managers\CommentManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.CompanyManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="53.75" Width="11.5" />
+    <TypeIdentifier>
+      <HashCode>AFAAAAAAAIgCQAEBAAQACQQCAAAAAAAAAAAAAQIAAAU=</HashCode>
+      <FileName>Managers\CompanyManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.DashboardsManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="59" Width="15.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAACAAAMAAwBA=</HashCode>
+      <FileName>Managers\DashboardsManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.DataMigrationManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="62.25" Width="15" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAhAAAAQAAAAAAAAQAIAAAAAAAAAIABAEAAgAA=</HashCode>
+      <FileName>Managers\DataMigrationManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.FeedManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="66.25" Width="10" />
+    <TypeIdentifier>
+      <HashCode>BBAAAAAAAAAAQEAAAggAgQIAQIACACECCAAAAAAACAA=</HashCode>
+      <FileName>Managers\FeedManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.GeneralManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="71.75" Width="11.25" />
+    <TypeIdentifier>
+      <HashCode>AgAAaAAAAACAQACAEAIgAQAAAJAAjCAAiAAIASEAAEE=</HashCode>
+      <FileName>Managers\GeneralManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.MarketPlaceManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="79.25" Width="8.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAACAAAUAAEAA=</HashCode>
+      <FileName>Managers\MarketPlaceManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.OfflineManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="82" Width="7.75" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAQAAAAAAAAQAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Managers\OfflineManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.PropertyValueManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="84.5" Width="14.5" />
+    <InheritanceLine Type="EZGO.Api.Logic.Base.BaseManager&lt;T&gt;" FixedToPoint="true">
+      <Path>
+        <Point X="2" Y="2.055" />
+        <Point X="2" Y="84.319" />
+        <Point X="12.217" Y="84.319" />
+        <Point X="12.217" Y="84.5" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAJCABAgAjiUgQIEwQIJ0khASAIgLEJDBBIKgCgAZA=</HashCode>
+      <FileName>Managers\PropertyValueManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.ReportManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="100" Width="11.75" />
+    <TypeIdentifier>
+      <HashCode>AACAAAoABAABQgAACCCCCQEETAAACAAGAABUAIAAAAA=</HashCode>
+      <FileName>Managers\ReportManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.ShiftManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="107.25" Width="11" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAIYQIAAQAAAABAgAQAFAAAAAAAAAABAAAEAAAA=</HashCode>
+      <FileName>Managers\ShiftManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.TaskManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="112" Width="19.75" />
+    <TypeIdentifier>
+      <HashCode>HaLAJwIIM4upfzRmER4lGQgzIKAogwEeVop5BAUd6jg=</HashCode>
+      <FileName>Managers\TaskManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.UserAccessManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="138.5" Width="8.25" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAACAASAIAAAAAAQAAAAAAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>Managers\UserAccessManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.UserManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="141.75" Width="13.75" />
+    <TypeIdentifier>
+      <HashCode>B2DAAIgBAgEiTQEDgAAEARAgSAADAAEKAITAAAEBUFI=</HashCode>
+      <FileName>Managers\UserManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Managers.VersionReleaseManager" BaseTypeListCollapsed="true">
+    <Position X="4" Y="153" Width="8.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAQoAEAAQAAQAIAAAAAAAgAgAAAAAAAAA=</HashCode>
+      <FileName>Managers\VersionReleaseManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EZGO.Api.Logic.Base.BaseManager&lt;T&gt;">
+    <Position X="0.75" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Base\BaseManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

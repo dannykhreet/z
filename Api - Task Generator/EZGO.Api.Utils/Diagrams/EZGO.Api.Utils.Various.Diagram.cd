@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZGO.Api.Utils.Cache.CacheHelpers">
+    <Position X="0.5" Y="0.5" Width="6.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAACAAACAAAAAAAgAAACAAAAAAAA=</HashCode>
+      <FileName>Cache\CacheHelpers.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.Crypto.Cryptography">
+    <Position X="7" Y="0.5" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>IQAAAAAAAAIEAAAQIAAEAAAAAAAABACCAAAAAAAAAAA=</HashCode>
+      <FileName>Crypto\Cryptography.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="EZGO.Api.Utils.Data.DataAuditing">
+    <Position X="11" Y="0.5" Width="8.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAAAAQAAIAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Data\DataAuditing.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="EZGO.Api.Utils.Helpers.StartupHelperExtension">
+    <Position X="11" Y="2.75" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Helpers\StartupHelperExtension.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.Json.JsonExtensions">
+    <Position X="0.5" Y="4.5" Width="7.25" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Json\JsonExtensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.Logging.DatabaseLogger">
+    <Position X="8" Y="4.5" Width="8" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAgAAAAAAAAIAAAAAAE=</HashCode>
+      <FileName>Logging\DatabaseLogger.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="EZGO.Api.Utils.Logging.DatabaseLoggerProvider">
+    <Position X="16.25" Y="4.5" Width="5.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAIAAACAEAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>Logging\DatabaseLoggerProvider.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="EZGO.Api.Utils.Mappers.LanguageMapper">
+    <Position X="0.5" Y="7.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>Mappers\LanguageMapper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.Media.MediaStorageTypeExtensions">
+    <Position X="4.25" Y="7.75" Width="5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAA=</HashCode>
+      <FileName>Media\MediaStorageTypeExtensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.Media.MediaUploader">
+    <Position X="0.5" Y="10.75" Width="15.25" />
+    <TypeIdentifier>
+      <HashCode>MAgAABAAAAAAAAAACAAAAAIQIAAAAAAAQAACQAAAAAA=</HashCode>
+      <FileName>Media\MediaUploader.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="EZGO.Api.Utils.Middleware.ExceptionMiddleware">
+    <Position X="9.5" Y="7.75" Width="5.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAQAAAAAAAAAAAAAAAIAAAAAAxAAAAAAAAAAA=</HashCode>
+      <FileName>Middleware\ExceptionMiddleware.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.Middleware.RequestResponseMiddleware">
+    <Position X="15.25" Y="7.75" Width="5.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAADACAAAAAQAAAAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>Middleware\RequestResponseMiddleware.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.ProtectionHelper">
+    <Position X="0.5" Y="15" Width="5.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAAAAAAAIQAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Protection\ProtectionHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.Security.ClaimsExtensions">
+    <Position X="6" Y="15" Width="4.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Security\ClaimsExtensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Utils.Tools.Copier">
+    <Position X="11" Y="15" Width="5.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Tools\Copier.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
