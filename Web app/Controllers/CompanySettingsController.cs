@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using WebApp.Logic;
 using WebApp.Logic.Interfaces;
 using WebApp.Models.Skills;
 using WebApp.ViewModels;
@@ -135,7 +136,7 @@ namespace WebApp.Controllers
                 return StatusCode((int)HttpStatusCode.Forbidden);
             }
 
-            var result = await _connector.GetCall($"/v1/company/{companyId}/skillmatrixlegend");
+            var result = await _connector.GetCall(string.Format(SkillMatrixLegendConstants.GetLegendConfiguration, companyId));
             if (result.StatusCode == HttpStatusCode.OK && !string.IsNullOrEmpty(result.Message))
             {
                 var legendConfig = JsonConvert.DeserializeObject<SkillMatrixLegendConfiguration>(result.Message);
@@ -186,7 +187,7 @@ namespace WebApp.Controllers
             legendConfig.CompanyId = companyId.Value;
             legendConfig.Version = legendConfig.Version + 1;
 
-            var result = await _connector.PostCall($"/v1/company/{companyId}/skillmatrixlegend", legendConfig.ToJsonFromObject());
+            var result = await _connector.PostCall(string.Format(SkillMatrixLegendConstants.GetLegendConfiguration, companyId), legendConfig.ToJsonFromObject());
             if (result.StatusCode == HttpStatusCode.OK)
             {
                 return Ok(new { success = true, version = legendConfig.Version });
@@ -226,7 +227,7 @@ namespace WebApp.Controllers
                 return BadRequest(new { errors = validationErrors });
             }
 
-            var result = await _connector.PostCall($"/v1/company/{companyId}/skillmatrixlegend/item", legendItem.ToJsonFromObject());
+            var result = await _connector.PostCall(string.Format(SkillMatrixLegendConstants.UpdateLegendItem, companyId), legendItem.ToJsonFromObject());
             if (result.StatusCode == HttpStatusCode.OK)
             {
                 return Ok(new { success = true });
@@ -259,14 +260,12 @@ namespace WebApp.Controllers
                 return StatusCode((int)HttpStatusCode.Forbidden, new { error = "Only team leaders and managers can reset the legend configuration" });
             }
 
-            var defaultConfig = SkillMatrixLegendConfiguration.CreateDefault();
-            defaultConfig.CompanyId = companyId.Value;
-            defaultConfig.Version = 1;
-
-            var result = await _connector.PostCall($"/v1/company/{companyId}/skillmatrixlegend", defaultConfig.ToJsonFromObject());
+            var result = await _connector.PostCall(string.Format(SkillMatrixLegendConstants.ResetLegendConfiguration, companyId), string.Empty);
             if (result.StatusCode == HttpStatusCode.OK)
             {
-                return Ok(defaultConfig);
+                // API returns the reset configuration
+                var resetConfig = JsonConvert.DeserializeObject<SkillMatrixLegendConfiguration>(result.Message);
+                return Ok(resetConfig);
             }
 
             return StatusCode((int)result.StatusCode, result.Message);
