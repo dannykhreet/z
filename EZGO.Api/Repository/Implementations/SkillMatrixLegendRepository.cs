@@ -12,6 +12,7 @@ namespace EZGO.Api.Repository.Implementations
 {
     /// <summary>
     /// Repository implementation for Skills Matrix Legend Configuration operations
+    /// Uses PostgreSQL compatible SQL syntax
     /// </summary>
     public class SkillMatrixLegendRepository : ISkillMatrixLegendRepository
     {
@@ -30,9 +31,11 @@ namespace EZGO.Api.Repository.Implementations
             try
             {
                 const string configSql = @"
-                    SELECT Id, CompanyId, Version, CreatedAt, UpdatedAt, CreatedBy, UpdatedBy
-                    FROM SkillMatrixLegendConfiguration
-                    WHERE CompanyId = @CompanyId";
+                    SELECT id AS ""Id"", company_id AS ""CompanyId"", version AS ""Version"",
+                           created_at AS ""CreatedAt"", updated_at AS ""UpdatedAt"",
+                           created_by AS ""CreatedBy"", updated_by AS ""UpdatedBy""
+                    FROM skill_matrix_legend_configuration
+                    WHERE company_id = @CompanyId";
 
                 var configuration = await _connection.QueryFirstOrDefaultAsync<SkillMatrixLegendConfiguration>(
                     configSql, new { CompanyId = companyId });
@@ -43,12 +46,16 @@ namespace EZGO.Api.Repository.Implementations
                 }
 
                 const string itemsSql = @"
-                    SELECT Id, ConfigurationId, SkillLevelId, SkillType, Label, Description,
-                           IconColor, BackgroundColor, [Order], ScoreValue, IconClass, IsDefault,
-                           CreatedAt, UpdatedAt
-                    FROM SkillMatrixLegendItem
-                    WHERE ConfigurationId = @ConfigurationId
-                    ORDER BY SkillType, [Order]";
+                    SELECT id AS ""Id"", configuration_id AS ""ConfigurationId"",
+                           skill_level_id AS ""SkillLevelId"", skill_type AS ""SkillType"",
+                           label AS ""Label"", description AS ""Description"",
+                           icon_color AS ""IconColor"", background_color AS ""BackgroundColor"",
+                           sort_order AS ""Order"", score_value AS ""ScoreValue"",
+                           icon_class AS ""IconClass"", is_default AS ""IsDefault"",
+                           created_at AS ""CreatedAt"", updated_at AS ""UpdatedAt""
+                    FROM skill_matrix_legend_item
+                    WHERE configuration_id = @ConfigurationId
+                    ORDER BY skill_type, sort_order";
 
                 var items = await _connection.QueryAsync<SkillMatrixLegendItem>(
                     itemsSql, new { ConfigurationId = configuration.Id });
@@ -72,11 +79,11 @@ namespace EZGO.Api.Repository.Implementations
             try
             {
                 const string insertConfigSql = @"
-                    INSERT INTO SkillMatrixLegendConfiguration
-                        (CompanyId, Version, CreatedAt, CreatedBy)
+                    INSERT INTO skill_matrix_legend_configuration
+                        (company_id, version, created_at, created_by)
                     VALUES
-                        (@CompanyId, @Version, @CreatedAt, @CreatedBy);
-                    SELECT CAST(SCOPE_IDENTITY() as int)";
+                        (@CompanyId, @Version, @CreatedAt, @CreatedBy)
+                    RETURNING id";
 
                 configuration.CreatedAt = DateTime.UtcNow;
                 configuration.Id = await _connection.ExecuteScalarAsync<int>(insertConfigSql, new
@@ -105,11 +112,11 @@ namespace EZGO.Api.Repository.Implementations
             try
             {
                 const string updateConfigSql = @"
-                    UPDATE SkillMatrixLegendConfiguration
-                    SET Version = @Version,
-                        UpdatedAt = @UpdatedAt,
-                        UpdatedBy = @UpdatedBy
-                    WHERE CompanyId = @CompanyId";
+                    UPDATE skill_matrix_legend_configuration
+                    SET version = @Version,
+                        updated_at = @UpdatedAt,
+                        updated_by = @UpdatedBy
+                    WHERE company_id = @CompanyId";
 
                 configuration.UpdatedAt = DateTime.UtcNow;
                 await _connection.ExecuteAsync(updateConfigSql, new
@@ -122,15 +129,15 @@ namespace EZGO.Api.Repository.Implementations
 
                 // Delete existing items and insert new ones
                 const string deleteItemsSql = @"
-                    DELETE FROM SkillMatrixLegendItem
-                    WHERE ConfigurationId = (
-                        SELECT Id FROM SkillMatrixLegendConfiguration WHERE CompanyId = @CompanyId
+                    DELETE FROM skill_matrix_legend_item
+                    WHERE configuration_id = (
+                        SELECT id FROM skill_matrix_legend_configuration WHERE company_id = @CompanyId
                     )";
 
                 await _connection.ExecuteAsync(deleteItemsSql, new { configuration.CompanyId });
 
                 // Get the configuration ID
-                const string getIdSql = "SELECT Id FROM SkillMatrixLegendConfiguration WHERE CompanyId = @CompanyId";
+                const string getIdSql = "SELECT id FROM skill_matrix_legend_configuration WHERE company_id = @CompanyId";
                 configuration.Id = await _connection.ExecuteScalarAsync<int>(getIdSql, new { configuration.CompanyId });
 
                 await InsertItemsAsync(configuration);
@@ -150,21 +157,21 @@ namespace EZGO.Api.Repository.Implementations
             try
             {
                 const string updateItemSql = @"
-                    UPDATE i
-                    SET i.Label = @Label,
-                        i.Description = @Description,
-                        i.IconColor = @IconColor,
-                        i.BackgroundColor = @BackgroundColor,
-                        i.[Order] = @Order,
-                        i.ScoreValue = @ScoreValue,
-                        i.IconClass = @IconClass,
-                        i.IsDefault = 0,
-                        i.UpdatedAt = @UpdatedAt
-                    FROM SkillMatrixLegendItem i
-                    INNER JOIN SkillMatrixLegendConfiguration c ON i.ConfigurationId = c.Id
-                    WHERE c.CompanyId = @CompanyId
-                      AND i.SkillLevelId = @SkillLevelId
-                      AND i.SkillType = @SkillType";
+                    UPDATE skill_matrix_legend_item
+                    SET label = @Label,
+                        description = @Description,
+                        icon_color = @IconColor,
+                        background_color = @BackgroundColor,
+                        sort_order = @Order,
+                        score_value = @ScoreValue,
+                        icon_class = @IconClass,
+                        is_default = false,
+                        updated_at = @UpdatedAt
+                    WHERE configuration_id = (
+                        SELECT id FROM skill_matrix_legend_configuration WHERE company_id = @CompanyId
+                    )
+                    AND skill_level_id = @SkillLevelId
+                    AND skill_type = @SkillType";
 
                 item.UpdatedAt = DateTime.UtcNow;
                 item.IsDefault = false;
@@ -186,9 +193,9 @@ namespace EZGO.Api.Repository.Implementations
 
                 // Update configuration version
                 const string updateVersionSql = @"
-                    UPDATE SkillMatrixLegendConfiguration
-                    SET Version = Version + 1, UpdatedAt = @UpdatedAt
-                    WHERE CompanyId = @CompanyId";
+                    UPDATE skill_matrix_legend_configuration
+                    SET version = version + 1, updated_at = @UpdatedAt
+                    WHERE company_id = @CompanyId";
 
                 await _connection.ExecuteAsync(updateVersionSql, new { CompanyId = companyId, item.UpdatedAt });
 
@@ -207,14 +214,14 @@ namespace EZGO.Api.Repository.Implementations
             try
             {
                 const string deleteItemsSql = @"
-                    DELETE FROM SkillMatrixLegendItem
-                    WHERE ConfigurationId = (
-                        SELECT Id FROM SkillMatrixLegendConfiguration WHERE CompanyId = @CompanyId
+                    DELETE FROM skill_matrix_legend_item
+                    WHERE configuration_id = (
+                        SELECT id FROM skill_matrix_legend_configuration WHERE company_id = @CompanyId
                     )";
 
                 const string deleteConfigSql = @"
-                    DELETE FROM SkillMatrixLegendConfiguration
-                    WHERE CompanyId = @CompanyId";
+                    DELETE FROM skill_matrix_legend_configuration
+                    WHERE company_id = @CompanyId";
 
                 await _connection.ExecuteAsync(deleteItemsSql, new { CompanyId = companyId });
                 var rows = await _connection.ExecuteAsync(deleteConfigSql, new { CompanyId = companyId });
@@ -231,7 +238,7 @@ namespace EZGO.Api.Repository.Implementations
         /// <inheritdoc/>
         public async Task<bool> ExistsAsync(int companyId)
         {
-            const string sql = "SELECT COUNT(1) FROM SkillMatrixLegendConfiguration WHERE CompanyId = @CompanyId";
+            const string sql = "SELECT COUNT(1) FROM skill_matrix_legend_configuration WHERE company_id = @CompanyId";
             var count = await _connection.ExecuteScalarAsync<int>(sql, new { CompanyId = companyId });
             return count > 0;
         }
@@ -239,7 +246,7 @@ namespace EZGO.Api.Repository.Implementations
         /// <inheritdoc/>
         public async Task<int> GetVersionAsync(int companyId)
         {
-            const string sql = "SELECT ISNULL(Version, 0) FROM SkillMatrixLegendConfiguration WHERE CompanyId = @CompanyId";
+            const string sql = "SELECT COALESCE(version, 0) FROM skill_matrix_legend_configuration WHERE company_id = @CompanyId";
             return await _connection.ExecuteScalarAsync<int>(sql, new { CompanyId = companyId });
         }
 
@@ -249,9 +256,9 @@ namespace EZGO.Api.Repository.Implementations
         private async Task InsertItemsAsync(SkillMatrixLegendConfiguration configuration)
         {
             const string insertItemSql = @"
-                INSERT INTO SkillMatrixLegendItem
-                    (ConfigurationId, SkillLevelId, SkillType, Label, Description,
-                     IconColor, BackgroundColor, [Order], ScoreValue, IconClass, IsDefault, CreatedAt)
+                INSERT INTO skill_matrix_legend_item
+                    (configuration_id, skill_level_id, skill_type, label, description,
+                     icon_color, background_color, sort_order, score_value, icon_class, is_default, created_at)
                 VALUES
                     (@ConfigurationId, @SkillLevelId, @SkillType, @Label, @Description,
                      @IconColor, @BackgroundColor, @Order, @ScoreValue, @IconClass, @IsDefault, @CreatedAt)";
