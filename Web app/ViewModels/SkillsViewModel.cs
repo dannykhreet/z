@@ -28,7 +28,7 @@ namespace WebApp.ViewModels
         public SkillsMatrix CurrentSkillsMatrix { get; set; }
         public List<SkillsMatrix> SkillsMatrices { get; set; }
         public List<Area> Areas { get; set; }
-        public List<SkillAssessmentTemplateWorkInstructionTemplate> WorkInstructionTemplates { get; set; } 
+        public List<SkillAssessmentTemplateWorkInstructionTemplate> WorkInstructionTemplates { get; set; }
         public List<Models.User.UserProfile> Users { get; set; }
         public TagsViewModel Tags { get; set; } = new TagsViewModel();
         public UserProfile CurrentUser { get; set; }
@@ -38,5 +38,15 @@ namespace WebApp.ViewModels
         public ExtractionModel ExtractionData { get; set; }
 
         public IMediaService MediaService { get; set; }
+
+        /// <summary>
+        /// Skills Matrix Legend configuration for customizable skill level display
+        /// </summary>
+        public SkillMatrixLegendConfiguration LegendConfiguration { get; set; }
+
+        /// <summary>
+        /// Indicates if the current user can edit the legend (team leaders and managers only)
+        /// </summary>
+        public bool CanEditLegend { get; set; }
     }
 }
