@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using WebApp.Logic.Interfaces;
 using WebApp.ViewModels;
@@ -134,10 +135,10 @@ namespace WebApp.Controllers
 
         [HttpPost]
         [Route("companysettings/legend")]
-        public async Task<IActionResult> SaveLegendConfiguration([FromBody] object configuration)
+        public async Task<IActionResult> SaveLegendConfiguration([FromBody] JsonElement configuration)
         {
             var companyId = this.User.GetProfile().Company.Id;
-            var result = await _connector.PostCall(string.Format(Logic.Constants.Skills.SkillMatrixLegendUrl, companyId), configuration.ToJsonFromObject());
+            var result = await _connector.PostCall(string.Format(Logic.Constants.Skills.SkillMatrixLegendUrl, companyId), configuration.GetRawText());
             if (result.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 return Ok(result.Message);
@@ -150,10 +151,10 @@ namespace WebApp.Controllers
 
         [HttpPost]
         [Route("companysettings/legend/item")]
-        public async Task<IActionResult> UpdateLegendItem([FromBody] object item)
+        public async Task<IActionResult> UpdateLegendItem([FromBody] JsonElement item)
         {
             var companyId = this.User.GetProfile().Company.Id;
-            var result = await _connector.PostCall(string.Format(Logic.Constants.Skills.SkillMatrixLegendItemUrl, companyId), item.ToJsonFromObject());
+            var result = await _connector.PostCall(string.Format(Logic.Constants.Skills.SkillMatrixLegendItemUrl, companyId), item.GetRawText());
             if (result.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 return Ok(result.Message);
