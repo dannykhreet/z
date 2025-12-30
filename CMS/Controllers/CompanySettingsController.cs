@@ -117,6 +117,7 @@ namespace WebApp.Controllers
 
         #region Legend Configuration
         [HttpGet]
+        [Route("legend")]
         public async Task<IActionResult> GetLegendConfiguration()
         {
             var companyId = this.User.GetProfile().Company.Id;
@@ -132,6 +133,7 @@ namespace WebApp.Controllers
         }
 
         [HttpPost]
+        [Route("legend")]
         public async Task<IActionResult> SaveLegendConfiguration([FromBody] object configuration)
         {
             var companyId = this.User.GetProfile().Company.Id;
@@ -147,6 +149,7 @@ namespace WebApp.Controllers
         }
 
         [HttpPost]
+        [Route("legend/item")]
         public async Task<IActionResult> UpdateLegendItem([FromBody] object item)
         {
             var companyId = this.User.GetProfile().Company.Id;
@@ -162,6 +165,7 @@ namespace WebApp.Controllers
         }
 
         [HttpPost]
+        [Route("legend/reset")]
         public async Task<IActionResult> ResetLegendToDefault()
         {
             var companyId = this.User.GetProfile().Company.Id;
