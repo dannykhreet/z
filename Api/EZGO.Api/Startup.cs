@@ -72,6 +72,9 @@ namespace EZGO.Api
             {
                 options.ModelBinderProviders.RemoveType<DateTimeModelBinderProvider>(); //remove datetime binder due to incompatibility
                 options.Filters.Add<FeatureGlobalFilter>(); //add feature filter
+            }).AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
             }); //.NetCore controller usage.
 
             //TODO refactor a bit
