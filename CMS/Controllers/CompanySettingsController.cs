@@ -114,5 +114,67 @@ namespace WebApp.Controllers
                 return StatusCode((int)result.StatusCode);
             }
         }
+
+        #region Legend Configuration
+        [HttpGet]
+        public async Task<IActionResult> GetLegendConfiguration()
+        {
+            var companyId = this.User.GetProfile().Company.Id;
+            var result = await _connector.GetCall(string.Format(Logic.Constants.Matrix.SkillMatrixLegendUrl, companyId));
+            if (result.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return Ok(result.Message);
+            }
+            else
+            {
+                return StatusCode((int)result.StatusCode);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveLegendConfiguration([FromBody] object configuration)
+        {
+            var companyId = this.User.GetProfile().Company.Id;
+            var result = await _connector.PostCall(string.Format(Logic.Constants.Matrix.SkillMatrixLegendUrl, companyId), configuration.ToJsonFromObject());
+            if (result.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return Ok(result.Message);
+            }
+            else
+            {
+                return StatusCode((int)result.StatusCode);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateLegendItem([FromBody] object item)
+        {
+            var companyId = this.User.GetProfile().Company.Id;
+            var result = await _connector.PostCall(string.Format(Logic.Constants.Matrix.SkillMatrixLegendItemUrl, companyId), item.ToJsonFromObject());
+            if (result.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return Ok(result.Message);
+            }
+            else
+            {
+                return StatusCode((int)result.StatusCode);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetLegendToDefault()
+        {
+            var companyId = this.User.GetProfile().Company.Id;
+            var result = await _connector.PostCall(string.Format(Logic.Constants.Matrix.SkillMatrixLegendResetUrl, companyId), "{}");
+            if (result.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return Ok(result.Message);
+            }
+            else
+            {
+                return StatusCode((int)result.StatusCode);
+            }
+        }
+        #endregion
     }
 }
