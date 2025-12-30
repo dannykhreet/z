@@ -125,7 +125,7 @@ namespace WebApp.Controllers
             var result = await _connector.GetCall(string.Format(Logic.Constants.Skills.SkillMatrixLegendUrl, companyId));
             if (result.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                return Ok(result.Message);
+                return Content(result.Message, "application/json");
             }
             else
             {
@@ -141,7 +141,7 @@ namespace WebApp.Controllers
             var result = await _connector.PostCall(string.Format(Logic.Constants.Skills.SkillMatrixLegendUrl, companyId), configuration.GetRawText());
             if (result.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                return Ok(result.Message);
+                return Content(result.Message, "application/json");
             }
             else
             {
@@ -157,7 +157,7 @@ namespace WebApp.Controllers
             var result = await _connector.PostCall(string.Format(Logic.Constants.Skills.SkillMatrixLegendItemUrl, companyId), item.GetRawText());
             if (result.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                return Ok(result.Message);
+                return Content(result.Message, "application/json");
             }
             else
             {
@@ -173,7 +173,7 @@ namespace WebApp.Controllers
             var result = await _connector.PostCall(string.Format(Logic.Constants.Skills.SkillMatrixLegendResetUrl, companyId), "{}");
             if (result.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                return Ok(result.Message);
+                return Content(result.Message, "application/json");
             }
             else
             {
