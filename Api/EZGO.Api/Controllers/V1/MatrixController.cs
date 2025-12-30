@@ -1019,5 +1019,87 @@ namespace EZGO.Api.Controllers.V1
 
         #endregion
 
+        #region - legend configuration -
+        [Authorize(Roles = AuthenticationSettings.AUTHORIZATION_SHIFTLEADER_MANAGER_ADMINISTRATOR_ROLES)]
+        [Route("skillsmatrix/legend/{companyId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetLegendConfiguration([FromRoute] int companyId)
+        {
+            Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
+
+            var config = await _matrixManager.GetLegendConfigurationAsync(companyId);
+
+            AppendCapturedExceptionToApm(_matrixManager.GetPossibleExceptions());
+
+            Agent.Tracer.CurrentSpan.End();
+
+            return StatusCode((int)HttpStatusCode.OK, config.ToJsonFromObject());
+        }
+
+        [Authorize(Roles = AuthenticationSettings.AUTHORIZATION_SHIFTLEADER_MANAGER_ADMINISTRATOR_ROLES)]
+        [Route("skillsmatrix/legend/{companyId}")]
+        [HttpPost]
+        public async Task<IActionResult> SaveLegendConfiguration([FromRoute] int companyId, [FromBody] SkillMatrixLegendConfiguration configuration)
+        {
+            if (!this.IsCmsRequest)
+            {
+                return StatusCode((int)HttpStatusCode.NotFound, "".ToJsonFromObject());
+            }
+
+            Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
+
+            configuration.CompanyId = companyId;
+            var result = await _matrixManager.SaveLegendConfigurationAsync(configuration, await this.CurrentApplicationUser.GetAndSetUserIdAsync());
+
+            AppendCapturedExceptionToApm(_matrixManager.GetPossibleExceptions());
+
+            Agent.Tracer.CurrentSpan.End();
+
+            return StatusCode((int)HttpStatusCode.OK, result.ToJsonFromObject());
+        }
+
+        [Authorize(Roles = AuthenticationSettings.AUTHORIZATION_SHIFTLEADER_MANAGER_ADMINISTRATOR_ROLES)]
+        [Route("skillsmatrix/legend/{companyId}/item")]
+        [HttpPost]
+        public async Task<IActionResult> UpdateLegendItem([FromRoute] int companyId, [FromBody] SkillMatrixLegendItem item)
+        {
+            if (!this.IsCmsRequest)
+            {
+                return StatusCode((int)HttpStatusCode.NotFound, "".ToJsonFromObject());
+            }
+
+            Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
+
+            var result = await _matrixManager.UpdateLegendItemAsync(companyId, item);
+
+            AppendCapturedExceptionToApm(_matrixManager.GetPossibleExceptions());
+
+            Agent.Tracer.CurrentSpan.End();
+
+            return StatusCode((int)HttpStatusCode.OK, result.ToJsonFromObject());
+        }
+
+        [Authorize(Roles = AuthenticationSettings.AUTHORIZATION_SHIFTLEADER_MANAGER_ADMINISTRATOR_ROLES)]
+        [Route("skillsmatrix/legend/{companyId}/reset")]
+        [HttpPost]
+        public async Task<IActionResult> ResetLegendToDefault([FromRoute] int companyId)
+        {
+            if (!this.IsCmsRequest)
+            {
+                return StatusCode((int)HttpStatusCode.NotFound, "".ToJsonFromObject());
+            }
+
+            Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
+
+            var result = await _matrixManager.ResetLegendToDefaultAsync(companyId, await this.CurrentApplicationUser.GetAndSetUserIdAsync());
+
+            AppendCapturedExceptionToApm(_matrixManager.GetPossibleExceptions());
+
+            Agent.Tracer.CurrentSpan.End();
+
+            return StatusCode((int)HttpStatusCode.OK, result.ToJsonFromObject());
+        }
+        #endregion
+
     }
 }

@@ -47,5 +47,12 @@ namespace EZGO.Api.Interfaces.Managers
         Task<List<AssessmentScoreItem>> GetMatrixAssessmentScoreItemsAsync(int companyId, int userId, int matrixId);
         List<Exception> GetPossibleExceptions();
 
+        #region Legend Configuration
+        Task<SkillMatrixLegendConfiguration> GetLegendConfigurationAsync(int companyId);
+        Task<SkillMatrixLegendConfiguration> SaveLegendConfigurationAsync(SkillMatrixLegendConfiguration configuration, int userId);
+        Task<SkillMatrixLegendItem> UpdateLegendItemAsync(int companyId, SkillMatrixLegendItem item);
+        Task<SkillMatrixLegendConfiguration> ResetLegendToDefaultAsync(int companyId, int userId);
+        #endregion
+
     }
 }

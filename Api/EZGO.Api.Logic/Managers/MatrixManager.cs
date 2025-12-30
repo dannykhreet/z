@@ -9,6 +9,7 @@ using EZGO.Api.Models.Enumerations;
 using EZGO.Api.Models.Filters;
 using EZGO.Api.Models.Relations;
 using EZGO.Api.Models.Skills;
+using EZGO.Api.Repository.Interfaces;
 using EZGO.Api.Settings.Helpers;
 using EZGO.Api.Utils.Converters;
 using EZGO.Api.Utils.Data;
@@ -29,16 +30,18 @@ namespace EZGO.Api.Logic.Managers
         private readonly IConfigurationHelper _configurationHelper;
         private readonly IUserStandingManager _userStandingManager;
         private readonly IAreaManager _areaManager;
+        private readonly ISkillMatrixLegendRepository _legendRepository;
         #endregion
 
         #region - constructor(s) -
-        public MatrixManager(IDatabaseAccessHelper manager, ITaskManager taskManager, IAreaManager areaManager, IConfigurationHelper configurationHelper, IDataAuditing dataAuditing, IUserStandingManager userStandingManager, ILogger<MatrixManager> logger) : base(logger)
+        public MatrixManager(IDatabaseAccessHelper manager, ITaskManager taskManager, IAreaManager areaManager, IConfigurationHelper configurationHelper, IDataAuditing dataAuditing, IUserStandingManager userStandingManager, ISkillMatrixLegendRepository legendRepository, ILogger<MatrixManager> logger) : base(logger)
         {
             _manager = manager;
             _dataAuditing = dataAuditing;
             _configurationHelper = configurationHelper;
             _userStandingManager = userStandingManager;
             _areaManager = areaManager;
+            _legendRepository = legendRepository;
         }
         #endregion
 
@@ -1159,6 +1162,92 @@ namespace EZGO.Api.Logic.Managers
                 listEx.Add(ex);
             }
             return listEx;
+        }
+        #endregion
+
+        #region - legend configuration -
+        public async Task<SkillMatrixLegendConfiguration> GetLegendConfigurationAsync(int companyId)
+        {
+            try
+            {
+                var config = await _legendRepository.GetByCompanyIdAsync(companyId);
+                return config ?? SkillMatrixLegendConfiguration.CreateDefault(companyId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.GetLegendConfigurationAsync(): ", ex.Message));
+                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
+                return SkillMatrixLegendConfiguration.CreateDefault(companyId);
+            }
+        }
+
+        public async Task<SkillMatrixLegendConfiguration> SaveLegendConfigurationAsync(SkillMatrixLegendConfiguration configuration, int userId)
+        {
+            try
+            {
+                configuration.UpdatedBy = userId;
+                configuration.UpdatedAt = DateTime.UtcNow;
+
+                var exists = await _legendRepository.ExistsAsync(configuration.CompanyId);
+                if (exists)
+                {
+                    return await _legendRepository.UpdateAsync(configuration);
+                }
+                else
+                {
+                    configuration.CreatedBy = userId;
+                    configuration.CreatedAt = DateTime.UtcNow;
+                    return await _legendRepository.CreateAsync(configuration);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.SaveLegendConfigurationAsync(): ", ex.Message));
+                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
+                return configuration;
+            }
+        }
+
+        public async Task<SkillMatrixLegendItem> UpdateLegendItemAsync(int companyId, SkillMatrixLegendItem item)
+        {
+            try
+            {
+                return await _legendRepository.UpdateItemAsync(companyId, item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.UpdateLegendItemAsync(): ", ex.Message));
+                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
+                return item;
+            }
+        }
+
+        public async Task<SkillMatrixLegendConfiguration> ResetLegendToDefaultAsync(int companyId, int userId)
+        {
+            try
+            {
+                var defaultConfig = SkillMatrixLegendConfiguration.CreateDefault(companyId);
+                defaultConfig.UpdatedBy = userId;
+                defaultConfig.UpdatedAt = DateTime.UtcNow;
+
+                var exists = await _legendRepository.ExistsAsync(companyId);
+                if (exists)
+                {
+                    return await _legendRepository.UpdateAsync(defaultConfig);
+                }
+                else
+                {
+                    defaultConfig.CreatedBy = userId;
+                    defaultConfig.CreatedAt = DateTime.UtcNow;
+                    return await _legendRepository.CreateAsync(defaultConfig);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.ResetLegendToDefaultAsync(): ", ex.Message));
+                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
+                return SkillMatrixLegendConfiguration.CreateDefault(companyId);
+            }
         }
         #endregion
     }
