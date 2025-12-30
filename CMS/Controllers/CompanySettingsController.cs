@@ -117,11 +117,11 @@ namespace WebApp.Controllers
 
         #region Legend Configuration
         [HttpGet]
-        [Route("legend")]
+        [Route("companysettings/legend")]
         public async Task<IActionResult> GetLegendConfiguration()
         {
             var companyId = this.User.GetProfile().Company.Id;
-            var result = await _connector.GetCall(string.Format(Logic.Constants.Matrix.SkillMatrixLegendUrl, companyId));
+            var result = await _connector.GetCall(string.Format(Logic.Constants.Skills.SkillMatrixLegendUrl, companyId));
             if (result.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 return Ok(result.Message);
@@ -133,11 +133,11 @@ namespace WebApp.Controllers
         }
 
         [HttpPost]
-        [Route("legend")]
+        [Route("companysettings/legend")]
         public async Task<IActionResult> SaveLegendConfiguration([FromBody] object configuration)
         {
             var companyId = this.User.GetProfile().Company.Id;
-            var result = await _connector.PostCall(string.Format(Logic.Constants.Matrix.SkillMatrixLegendUrl, companyId), configuration.ToJsonFromObject());
+            var result = await _connector.PostCall(string.Format(Logic.Constants.Skills.SkillMatrixLegendUrl, companyId), configuration.ToJsonFromObject());
             if (result.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 return Ok(result.Message);
@@ -149,11 +149,11 @@ namespace WebApp.Controllers
         }
 
         [HttpPost]
-        [Route("legend/item")]
+        [Route("companysettings/legend/item")]
         public async Task<IActionResult> UpdateLegendItem([FromBody] object item)
         {
             var companyId = this.User.GetProfile().Company.Id;
-            var result = await _connector.PostCall(string.Format(Logic.Constants.Matrix.SkillMatrixLegendItemUrl, companyId), item.ToJsonFromObject());
+            var result = await _connector.PostCall(string.Format(Logic.Constants.Skills.SkillMatrixLegendItemUrl, companyId), item.ToJsonFromObject());
             if (result.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 return Ok(result.Message);
@@ -165,11 +165,11 @@ namespace WebApp.Controllers
         }
 
         [HttpPost]
-        [Route("legend/reset")]
+        [Route("companysettings/legend/reset")]
         public async Task<IActionResult> ResetLegendToDefault()
         {
             var companyId = this.User.GetProfile().Company.Id;
-            var result = await _connector.PostCall(string.Format(Logic.Constants.Matrix.SkillMatrixLegendResetUrl, companyId), "{}");
+            var result = await _connector.PostCall(string.Format(Logic.Constants.Skills.SkillMatrixLegendResetUrl, companyId), "{}");
             if (result.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 return Ok(result.Message);
