@@ -9,7 +9,6 @@ using EZGO.Api.Models.Enumerations;
 using EZGO.Api.Models.Filters;
 using EZGO.Api.Models.Relations;
 using EZGO.Api.Models.Skills;
-using EZGO.Api.Repository.Interfaces;
 using EZGO.Api.Settings.Helpers;
 using EZGO.Api.Utils.Converters;
 using EZGO.Api.Utils.Data;
@@ -30,18 +29,16 @@ namespace EZGO.Api.Logic.Managers
         private readonly IConfigurationHelper _configurationHelper;
         private readonly IUserStandingManager _userStandingManager;
         private readonly IAreaManager _areaManager;
-        private readonly ISkillMatrixLegendRepository _legendRepository;
         #endregion
 
         #region - constructor(s) -
-        public MatrixManager(IDatabaseAccessHelper manager, ITaskManager taskManager, IAreaManager areaManager, IConfigurationHelper configurationHelper, IDataAuditing dataAuditing, IUserStandingManager userStandingManager, ISkillMatrixLegendRepository legendRepository, ILogger<MatrixManager> logger) : base(logger)
+        public MatrixManager(IDatabaseAccessHelper manager, ITaskManager taskManager, IAreaManager areaManager, IConfigurationHelper configurationHelper, IDataAuditing dataAuditing, IUserStandingManager userStandingManager, ILogger<MatrixManager> logger) : base(logger)
         {
             _manager = manager;
             _dataAuditing = dataAuditing;
             _configurationHelper = configurationHelper;
             _userStandingManager = userStandingManager;
             _areaManager = areaManager;
-            _legendRepository = legendRepository;
         }
         #endregion
 
@@ -1168,17 +1165,86 @@ namespace EZGO.Api.Logic.Managers
         #region - legend configuration -
         public async Task<SkillMatrixLegendConfiguration> GetLegendConfigurationAsync(int companyId)
         {
+            SkillMatrixLegendConfiguration config = null;
+            NpgsqlDataReader dr = null;
             try
             {
-                var config = await _legendRepository.GetByCompanyIdAsync(companyId);
-                return config ?? SkillMatrixLegendConfiguration.CreateDefault(companyId);
+                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
+                parameters.Add(new NpgsqlParameter("@_company_id", companyId));
+
+                using (dr = await _manager.GetDataReader("get_skill_matrix_legend_configuration", commandType: System.Data.CommandType.StoredProcedure, parameters: parameters))
+                {
+                    if (await dr.ReadAsync())
+                    {
+                        config = new SkillMatrixLegendConfiguration
+                        {
+                            Id = dr.GetInt32(dr.GetOrdinal("id")),
+                            CompanyId = dr.GetInt32(dr.GetOrdinal("company_id")),
+                            Version = dr.GetInt32(dr.GetOrdinal("version")),
+                            CreatedAt = dr.GetDateTime(dr.GetOrdinal("created_at")),
+                            CreatedBy = dr.IsDBNull(dr.GetOrdinal("created_by")) ? null : dr.GetInt32(dr.GetOrdinal("created_by")),
+                            UpdatedAt = dr.IsDBNull(dr.GetOrdinal("updated_at")) ? null : dr.GetDateTime(dr.GetOrdinal("updated_at")),
+                            UpdatedBy = dr.IsDBNull(dr.GetOrdinal("updated_by")) ? null : dr.GetInt32(dr.GetOrdinal("updated_by"))
+                        };
+                    }
+                }
+
+                if (config != null)
+                {
+                    config.MandatorySkills = await GetLegendItemsAsync(config.Id, "mandatory");
+                    config.OperationalSkills = await GetLegendItemsAsync(config.Id, "operational");
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogError(exception: ex, message: string.Concat("MatrixManager.GetLegendConfigurationAsync(): ", ex.Message));
                 if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
-                return SkillMatrixLegendConfiguration.CreateDefault(companyId);
             }
+
+            return config ?? SkillMatrixLegendConfiguration.CreateDefault(companyId);
+        }
+
+        private async Task<List<SkillMatrixLegendItem>> GetLegendItemsAsync(int configurationId, string skillType)
+        {
+            var items = new List<SkillMatrixLegendItem>();
+            NpgsqlDataReader dr = null;
+            try
+            {
+                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
+                parameters.Add(new NpgsqlParameter("@_configuration_id", configurationId));
+                parameters.Add(new NpgsqlParameter("@_skill_type", skillType));
+
+                using (dr = await _manager.GetDataReader("get_skill_matrix_legend_items", commandType: System.Data.CommandType.StoredProcedure, parameters: parameters))
+                {
+                    while (await dr.ReadAsync())
+                    {
+                        items.Add(new SkillMatrixLegendItem
+                        {
+                            Id = dr.GetInt32(dr.GetOrdinal("id")),
+                            ConfigurationId = dr.GetInt32(dr.GetOrdinal("configuration_id")),
+                            SkillLevelId = dr.GetInt32(dr.GetOrdinal("skill_level_id")),
+                            SkillType = dr.GetString(dr.GetOrdinal("skill_type")),
+                            Label = dr.IsDBNull(dr.GetOrdinal("label")) ? null : dr.GetString(dr.GetOrdinal("label")),
+                            Description = dr.IsDBNull(dr.GetOrdinal("description")) ? null : dr.GetString(dr.GetOrdinal("description")),
+                            IconColor = dr.IsDBNull(dr.GetOrdinal("icon_color")) ? null : dr.GetString(dr.GetOrdinal("icon_color")),
+                            BackgroundColor = dr.IsDBNull(dr.GetOrdinal("background_color")) ? null : dr.GetString(dr.GetOrdinal("background_color")),
+                            Order = dr.GetInt32(dr.GetOrdinal("sort_order")),
+                            ScoreValue = dr.IsDBNull(dr.GetOrdinal("score_value")) ? null : dr.GetInt32(dr.GetOrdinal("score_value")),
+                            IconClass = dr.IsDBNull(dr.GetOrdinal("icon_class")) ? null : dr.GetString(dr.GetOrdinal("icon_class")),
+                            IsDefault = dr.GetBoolean(dr.GetOrdinal("is_default")),
+                            CreatedAt = dr.GetDateTime(dr.GetOrdinal("created_at")),
+                            UpdatedAt = dr.IsDBNull(dr.GetOrdinal("updated_at")) ? null : dr.GetDateTime(dr.GetOrdinal("updated_at"))
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.GetLegendItemsAsync(): ", ex.Message));
+                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
+            }
+
+            return items;
         }
 
         public async Task<SkillMatrixLegendConfiguration> SaveLegendConfigurationAsync(SkillMatrixLegendConfiguration configuration, int userId)
@@ -1188,23 +1254,78 @@ namespace EZGO.Api.Logic.Managers
                 configuration.UpdatedBy = userId;
                 configuration.UpdatedAt = DateTime.UtcNow;
 
-                var exists = await _legendRepository.ExistsAsync(configuration.CompanyId);
+                var existingConfig = await GetLegendConfigurationAsync(configuration.CompanyId);
+                bool exists = existingConfig != null && existingConfig.Id > 0;
+
                 if (exists)
                 {
-                    return await _legendRepository.UpdateAsync(configuration);
+                    configuration.Version = existingConfig.Version + 1;
+                    List<NpgsqlParameter> updateParams = new List<NpgsqlParameter>();
+                    updateParams.Add(new NpgsqlParameter("@_company_id", configuration.CompanyId));
+                    updateParams.Add(new NpgsqlParameter("@_version", configuration.Version));
+                    updateParams.Add(new NpgsqlParameter("@_updated_by", userId));
+
+                    await _manager.ExecuteScalarAsync("update_skill_matrix_legend_configuration", parameters: updateParams, commandType: System.Data.CommandType.StoredProcedure);
+
+                    // Delete existing items
+                    List<NpgsqlParameter> deleteParams = new List<NpgsqlParameter>();
+                    deleteParams.Add(new NpgsqlParameter("@_configuration_id", existingConfig.Id));
+                    await _manager.ExecuteScalarAsync("delete_skill_matrix_legend_items", parameters: deleteParams, commandType: System.Data.CommandType.StoredProcedure);
+
+                    configuration.Id = existingConfig.Id;
                 }
                 else
                 {
                     configuration.CreatedBy = userId;
                     configuration.CreatedAt = DateTime.UtcNow;
-                    return await _legendRepository.CreateAsync(configuration);
+                    configuration.Version = 1;
+
+                    List<NpgsqlParameter> insertParams = new List<NpgsqlParameter>();
+                    insertParams.Add(new NpgsqlParameter("@_company_id", configuration.CompanyId));
+                    insertParams.Add(new NpgsqlParameter("@_version", configuration.Version));
+                    insertParams.Add(new NpgsqlParameter("@_created_by", userId));
+
+                    var result = await _manager.ExecuteScalarAsync("insert_skill_matrix_legend_configuration", parameters: insertParams, commandType: System.Data.CommandType.StoredProcedure);
+                    configuration.Id = Convert.ToInt32(result);
                 }
+
+                // Insert all items
+                await InsertLegendItemsAsync(configuration);
             }
             catch (Exception ex)
             {
                 _logger.LogError(exception: ex, message: string.Concat("MatrixManager.SaveLegendConfigurationAsync(): ", ex.Message));
                 if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
-                return configuration;
+            }
+
+            return configuration;
+        }
+
+        private async Task InsertLegendItemsAsync(SkillMatrixLegendConfiguration configuration)
+        {
+            var allItems = new List<SkillMatrixLegendItem>();
+            if (configuration.MandatorySkills != null) allItems.AddRange(configuration.MandatorySkills);
+            if (configuration.OperationalSkills != null) allItems.AddRange(configuration.OperationalSkills);
+
+            foreach (var item in allItems)
+            {
+                item.ConfigurationId = configuration.Id;
+                item.CreatedAt = DateTime.UtcNow;
+
+                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
+                parameters.Add(new NpgsqlParameter("@_configuration_id", item.ConfigurationId));
+                parameters.Add(new NpgsqlParameter("@_skill_level_id", item.SkillLevelId));
+                parameters.Add(new NpgsqlParameter("@_skill_type", item.SkillType));
+                parameters.Add(new NpgsqlParameter("@_label", (object)item.Label ?? DBNull.Value));
+                parameters.Add(new NpgsqlParameter("@_description", (object)item.Description ?? DBNull.Value));
+                parameters.Add(new NpgsqlParameter("@_icon_color", (object)item.IconColor ?? DBNull.Value));
+                parameters.Add(new NpgsqlParameter("@_background_color", (object)item.BackgroundColor ?? DBNull.Value));
+                parameters.Add(new NpgsqlParameter("@_sort_order", item.Order));
+                parameters.Add(new NpgsqlParameter("@_score_value", (object)item.ScoreValue ?? DBNull.Value));
+                parameters.Add(new NpgsqlParameter("@_icon_class", (object)item.IconClass ?? DBNull.Value));
+                parameters.Add(new NpgsqlParameter("@_is_default", item.IsDefault));
+
+                await _manager.ExecuteScalarAsync("insert_skill_matrix_legend_item", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure);
             }
         }
 
@@ -1212,42 +1333,36 @@ namespace EZGO.Api.Logic.Managers
         {
             try
             {
-                return await _legendRepository.UpdateItemAsync(companyId, item);
+                item.UpdatedAt = DateTime.UtcNow;
+                item.IsDefault = false;
+
+                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
+                parameters.Add(new NpgsqlParameter("@_company_id", companyId));
+                parameters.Add(new NpgsqlParameter("@_skill_level_id", item.SkillLevelId));
+                parameters.Add(new NpgsqlParameter("@_skill_type", item.SkillType));
+                parameters.Add(new NpgsqlParameter("@_label", (object)item.Label ?? DBNull.Value));
+                parameters.Add(new NpgsqlParameter("@_description", (object)item.Description ?? DBNull.Value));
+                parameters.Add(new NpgsqlParameter("@_icon_color", (object)item.IconColor ?? DBNull.Value));
+                parameters.Add(new NpgsqlParameter("@_background_color", (object)item.BackgroundColor ?? DBNull.Value));
+                parameters.Add(new NpgsqlParameter("@_sort_order", item.Order));
+                parameters.Add(new NpgsqlParameter("@_score_value", (object)item.ScoreValue ?? DBNull.Value));
+                parameters.Add(new NpgsqlParameter("@_icon_class", (object)item.IconClass ?? DBNull.Value));
+
+                await _manager.ExecuteScalarAsync("update_skill_matrix_legend_item", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure);
             }
             catch (Exception ex)
             {
                 _logger.LogError(exception: ex, message: string.Concat("MatrixManager.UpdateLegendItemAsync(): ", ex.Message));
                 if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
-                return item;
             }
+
+            return item;
         }
 
         public async Task<SkillMatrixLegendConfiguration> ResetLegendToDefaultAsync(int companyId, int userId)
         {
-            try
-            {
-                var defaultConfig = SkillMatrixLegendConfiguration.CreateDefault(companyId);
-                defaultConfig.UpdatedBy = userId;
-                defaultConfig.UpdatedAt = DateTime.UtcNow;
-
-                var exists = await _legendRepository.ExistsAsync(companyId);
-                if (exists)
-                {
-                    return await _legendRepository.UpdateAsync(defaultConfig);
-                }
-                else
-                {
-                    defaultConfig.CreatedBy = userId;
-                    defaultConfig.CreatedAt = DateTime.UtcNow;
-                    return await _legendRepository.CreateAsync(defaultConfig);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.ResetLegendToDefaultAsync(): ", ex.Message));
-                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
-                return SkillMatrixLegendConfiguration.CreateDefault(companyId);
-            }
+            var defaultConfig = SkillMatrixLegendConfiguration.CreateDefault(companyId);
+            return await SaveLegendConfigurationAsync(defaultConfig, userId);
         }
         #endregion
     }
