@@ -1163,12 +1163,15 @@ namespace EZGO.Api.Logic.Managers
         #endregion
 
         #region - legend configuration -
-        public async Task<SkillMatrixLegendConfiguration> GetLegendConfigurationAsync(int companyId)
+        public async Task<SkillMatrixLegendConfiguration> GetLegendConfigurationAsync(int companyId, int userId)
         {
             SkillMatrixLegendConfiguration config = null;
             NpgsqlDataReader dr = null;
             try
             {
+                // Ensure configuration exists (creates with defaults if not)
+                await EnsureConfigurationExistsAsync(companyId, userId);
+
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
                 parameters.Add(new NpgsqlParameter("@_company_id", companyId));
 
@@ -1194,17 +1197,11 @@ namespace EZGO.Api.Logic.Managers
                     config.MandatorySkills = await GetLegendItemsAsync(config.Id, "mandatory");
                     config.OperationalSkills = await GetLegendItemsAsync(config.Id, "operational");
                 }
-                else
-                {
-                    // Configuration doesn't exist - return default values (not saved yet)
-                    config = SkillMatrixLegendConfiguration.CreateDefault(companyId);
-                }
             }
             catch (Exception ex)
             {
                 _logger.LogError(exception: ex, message: string.Concat("MatrixManager.GetLegendConfigurationAsync(): ", ex.Message));
                 if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
-                config = SkillMatrixLegendConfiguration.CreateDefault(companyId);
             }
 
             return config;
@@ -1395,7 +1392,7 @@ namespace EZGO.Api.Logic.Managers
             try
             {
                 // Ensure configuration exists
-                var configId = await EnsureConfigurationExistsAsync(companyId, userId);
+                await EnsureConfigurationExistsAsync(companyId, userId);
 
                 // Reset all items to default values
                 var defaultConfig = SkillMatrixLegendConfiguration.CreateDefault(companyId);
@@ -1426,11 +1423,6 @@ namespace EZGO.Api.Logic.Managers
                 updateParams.Add(new NpgsqlParameter("@_company_id", companyId));
                 updateParams.Add(new NpgsqlParameter("@_updated_by", userId));
                 await _manager.ExecuteScalarAsync("update_skill_matrix_legend_configuration", parameters: updateParams, commandType: System.Data.CommandType.StoredProcedure);
-
-                defaultConfig.Id = configId;
-                defaultConfig.UpdatedBy = userId;
-                defaultConfig.UpdatedAt = DateTime.UtcNow;
-                return defaultConfig;
             }
             catch (Exception ex)
             {
@@ -1438,7 +1430,8 @@ namespace EZGO.Api.Logic.Managers
                 if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
             }
 
-            return SkillMatrixLegendConfiguration.CreateDefault(companyId);
+            // Return the configuration from database
+            return await GetLegendConfigurationAsync(companyId, userId);
         }
         #endregion
     }
