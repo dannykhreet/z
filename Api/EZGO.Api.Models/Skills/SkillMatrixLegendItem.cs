@@ -76,10 +76,10 @@ namespace EZGO.Api.Models.Skills
         public bool IsDefault { get; set; }
 
         /// <summary>
-        /// Reference to the parent configuration
+        /// Company ID this item belongs to
         /// </summary>
-        [JsonPropertyName("configurationId")]
-        public int ConfigurationId { get; set; }
+        [JsonPropertyName("companyId")]
+        public int CompanyId { get; set; }
 
         /// <summary>
         /// Timestamp when the item was created
@@ -92,5 +92,17 @@ namespace EZGO.Api.Models.Skills
         /// </summary>
         [JsonPropertyName("updatedAt")]
         public DateTime? UpdatedAt { get; set; }
+
+        /// <summary>
+        /// User ID who created this item
+        /// </summary>
+        [JsonPropertyName("createdBy")]
+        public int? CreatedBy { get; set; }
+
+        /// <summary>
+        /// User ID who last updated this item
+        /// </summary>
+        [JsonPropertyName("updatedBy")]
+        public int? UpdatedBy { get; set; }
     }
 }

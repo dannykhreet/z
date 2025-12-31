@@ -1165,39 +1165,24 @@ namespace EZGO.Api.Logic.Managers
         #region - legend configuration -
         public async Task<SkillMatrixLegendConfiguration> GetLegendConfigurationAsync(int companyId, int userId)
         {
-            SkillMatrixLegendConfiguration config = null;
-            NpgsqlDataReader dr = null;
+            var config = new SkillMatrixLegendConfiguration { CompanyId = companyId };
+
             try
             {
-                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
-                parameters.Add(new NpgsqlParameter("@_company_id", companyId));
+                // Check if legend items exist for this company
+                List<NpgsqlParameter> checkParams = new List<NpgsqlParameter>();
+                checkParams.Add(new NpgsqlParameter("@_company_id", companyId));
+                var exists = Convert.ToBoolean(await _manager.ExecuteScalarAsync("check_skill_matrix_legend_exists", parameters: checkParams, commandType: System.Data.CommandType.StoredProcedure));
 
-                using (dr = await _manager.GetDataReader("get_skill_matrix_legend_configuration", commandType: System.Data.CommandType.StoredProcedure, parameters: parameters))
+                if (!exists)
                 {
-                    if (await dr.ReadAsync())
-                    {
-                        config = new SkillMatrixLegendConfiguration
-                        {
-                            Id = dr.GetInt32(dr.GetOrdinal("id")),
-                            CompanyId = dr.GetInt32(dr.GetOrdinal("company_id")),
-                            CreatedAt = dr.GetDateTime(dr.GetOrdinal("created_at")),
-                            CreatedBy = dr.IsDBNull(dr.GetOrdinal("created_by")) ? null : dr.GetInt32(dr.GetOrdinal("created_by")),
-                            UpdatedAt = dr.IsDBNull(dr.GetOrdinal("updated_at")) ? null : dr.GetDateTime(dr.GetOrdinal("updated_at")),
-                            UpdatedBy = dr.IsDBNull(dr.GetOrdinal("updated_by")) ? null : dr.GetInt32(dr.GetOrdinal("updated_by"))
-                        };
-                    }
+                    // No items exist - create defaults
+                    await CreateDefaultLegendItemsAsync(companyId, userId);
                 }
 
-                if (config == null)
-                {
-                    // Configuration doesn't exist - create with defaults
-                    config = await CreateDefaultConfigurationAsync(companyId, userId);
-                }
-                else
-                {
-                    config.MandatorySkills = await GetLegendItemsAsync(config.Id, "mandatory");
-                    config.OperationalSkills = await GetLegendItemsAsync(config.Id, "operational");
-                }
+                // Load items
+                config.MandatorySkills = await GetLegendItemsAsync(companyId, "mandatory");
+                config.OperationalSkills = await GetLegendItemsAsync(companyId, "operational");
             }
             catch (Exception ex)
             {
@@ -1208,30 +1193,13 @@ namespace EZGO.Api.Logic.Managers
             return config;
         }
 
-        private async Task<SkillMatrixLegendConfiguration> CreateDefaultConfigurationAsync(int companyId, int userId)
+        private async Task CreateDefaultLegendItemsAsync(int companyId, int userId)
         {
-            var config = new SkillMatrixLegendConfiguration
-            {
-                CompanyId = companyId,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = userId
-            };
-
-            List<NpgsqlParameter> insertParams = new List<NpgsqlParameter>();
-            insertParams.Add(new NpgsqlParameter("@_company_id", companyId));
-            insertParams.Add(new NpgsqlParameter("@_created_by", userId));
-
-            var result = await _manager.ExecuteScalarAsync("insert_skill_matrix_legend_configuration", parameters: insertParams, commandType: System.Data.CommandType.StoredProcedure);
-            config.Id = Convert.ToInt32(result);
-
             var defaultItems = GetDefaultLegendItems();
             foreach (var item in defaultItems)
             {
-                item.ConfigurationId = config.Id;
-                item.CreatedAt = DateTime.UtcNow;
-
                 List<NpgsqlParameter> itemParams = new List<NpgsqlParameter>();
-                itemParams.Add(new NpgsqlParameter("@_configuration_id", item.ConfigurationId));
+                itemParams.Add(new NpgsqlParameter("@_company_id", companyId));
                 itemParams.Add(new NpgsqlParameter("@_skill_level_id", item.SkillLevelId));
                 itemParams.Add(new NpgsqlParameter("@_skill_type", item.SkillType));
                 itemParams.Add(new NpgsqlParameter("@_label", (object)item.Label ?? DBNull.Value));
@@ -1242,24 +1210,20 @@ namespace EZGO.Api.Logic.Managers
                 itemParams.Add(new NpgsqlParameter("@_score_value", (object)item.ScoreValue ?? DBNull.Value));
                 itemParams.Add(new NpgsqlParameter("@_icon_class", (object)item.IconClass ?? DBNull.Value));
                 itemParams.Add(new NpgsqlParameter("@_is_default", item.IsDefault));
+                itemParams.Add(new NpgsqlParameter("@_created_by", userId));
 
                 await _manager.ExecuteScalarAsync("insert_skill_matrix_legend_item", parameters: itemParams, commandType: System.Data.CommandType.StoredProcedure);
             }
-
-            config.MandatorySkills = defaultItems.Where(i => i.SkillType == "mandatory").ToList();
-            config.OperationalSkills = defaultItems.Where(i => i.SkillType == "operational").ToList();
-
-            return config;
         }
 
-        private async Task<List<SkillMatrixLegendItem>> GetLegendItemsAsync(int configurationId, string skillType)
+        private async Task<List<SkillMatrixLegendItem>> GetLegendItemsAsync(int companyId, string skillType)
         {
             var items = new List<SkillMatrixLegendItem>();
             NpgsqlDataReader dr = null;
             try
             {
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
-                parameters.Add(new NpgsqlParameter("@_configuration_id", configurationId));
+                parameters.Add(new NpgsqlParameter("@_company_id", companyId));
                 parameters.Add(new NpgsqlParameter("@_skill_type", skillType));
 
                 using (dr = await _manager.GetDataReader("get_skill_matrix_legend_items", commandType: System.Data.CommandType.StoredProcedure, parameters: parameters))
@@ -1269,7 +1233,7 @@ namespace EZGO.Api.Logic.Managers
                         items.Add(new SkillMatrixLegendItem
                         {
                             Id = dr.GetInt32(dr.GetOrdinal("id")),
-                            ConfigurationId = dr.GetInt32(dr.GetOrdinal("configuration_id")),
+                            CompanyId = dr.GetInt32(dr.GetOrdinal("company_id")),
                             SkillLevelId = dr.GetInt32(dr.GetOrdinal("skill_level_id")),
                             SkillType = dr.GetString(dr.GetOrdinal("skill_type")),
                             Label = dr.IsDBNull(dr.GetOrdinal("label")) ? null : dr.GetString(dr.GetOrdinal("label")),
@@ -1281,7 +1245,9 @@ namespace EZGO.Api.Logic.Managers
                             IconClass = dr.IsDBNull(dr.GetOrdinal("icon_class")) ? null : dr.GetString(dr.GetOrdinal("icon_class")),
                             IsDefault = dr.GetBoolean(dr.GetOrdinal("is_default")),
                             CreatedAt = dr.GetDateTime(dr.GetOrdinal("created_at")),
-                            UpdatedAt = dr.IsDBNull(dr.GetOrdinal("updated_at")) ? null : dr.GetDateTime(dr.GetOrdinal("updated_at"))
+                            UpdatedAt = dr.IsDBNull(dr.GetOrdinal("updated_at")) ? null : dr.GetDateTime(dr.GetOrdinal("updated_at")),
+                            CreatedBy = dr.IsDBNull(dr.GetOrdinal("created_by")) ? null : dr.GetInt32(dr.GetOrdinal("created_by")),
+                            UpdatedBy = dr.IsDBNull(dr.GetOrdinal("updated_by")) ? null : dr.GetInt32(dr.GetOrdinal("updated_by"))
                         });
                     }
                 }
@@ -1316,12 +1282,6 @@ namespace EZGO.Api.Logic.Managers
         {
             try
             {
-                // Update configuration timestamp
-                List<NpgsqlParameter> updateParams = new List<NpgsqlParameter>();
-                updateParams.Add(new NpgsqlParameter("@_company_id", configuration.CompanyId));
-                updateParams.Add(new NpgsqlParameter("@_updated_by", userId));
-                await _manager.ExecuteScalarAsync("update_skill_matrix_legend_configuration", parameters: updateParams, commandType: System.Data.CommandType.StoredProcedure);
-
                 // Update each item
                 var allItems = new List<SkillMatrixLegendItem>();
                 if (configuration.MandatorySkills != null) allItems.AddRange(configuration.MandatorySkills);
@@ -1329,11 +1289,8 @@ namespace EZGO.Api.Logic.Managers
 
                 foreach (var item in allItems)
                 {
-                    await UpdateLegendItemAsync(configuration.CompanyId, item);
+                    await UpdateLegendItemAsync(configuration.CompanyId, item, userId);
                 }
-
-                configuration.UpdatedBy = userId;
-                configuration.UpdatedAt = DateTime.UtcNow;
             }
             catch (Exception ex)
             {
@@ -1344,11 +1301,12 @@ namespace EZGO.Api.Logic.Managers
             return configuration;
         }
 
-        public async Task<SkillMatrixLegendItem> UpdateLegendItemAsync(int companyId, SkillMatrixLegendItem item)
+        public async Task<SkillMatrixLegendItem> UpdateLegendItemAsync(int companyId, SkillMatrixLegendItem item, int userId)
         {
             try
             {
                 item.UpdatedAt = DateTime.UtcNow;
+                item.UpdatedBy = userId;
                 item.IsDefault = false;
 
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
@@ -1362,6 +1320,7 @@ namespace EZGO.Api.Logic.Managers
                 parameters.Add(new NpgsqlParameter("@_sort_order", item.Order));
                 parameters.Add(new NpgsqlParameter("@_score_value", (object)item.ScoreValue ?? DBNull.Value));
                 parameters.Add(new NpgsqlParameter("@_icon_class", (object)item.IconClass ?? DBNull.Value));
+                parameters.Add(new NpgsqlParameter("@_updated_by", userId));
 
                 await _manager.ExecuteScalarAsync("update_skill_matrix_legend_item", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure);
             }
