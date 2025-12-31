@@ -164,22 +164,6 @@ namespace WebApp.Controllers
                 return StatusCode((int)result.StatusCode);
             }
         }
-
-        [HttpPost]
-        [Route("companysettings/legend/reset")]
-        public async Task<IActionResult> ResetLegendToDefault()
-        {
-            var companyId = this.User.GetProfile().Company.Id;
-            var result = await _connector.PostCall(string.Format(Logic.Constants.Skills.SkillMatrixLegendResetUrl, companyId), "{}");
-            if (result.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                return Content(result.Message, "application/json");
-            }
-            else
-            {
-                return StatusCode((int)result.StatusCode);
-            }
-        }
         #endregion
     }
 }

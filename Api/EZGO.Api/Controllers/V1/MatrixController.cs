@@ -1078,27 +1078,6 @@ namespace EZGO.Api.Controllers.V1
 
             return StatusCode((int)HttpStatusCode.OK, result.ToJsonFromObject());
         }
-
-        [Authorize(Roles = AuthenticationSettings.AUTHORIZATION_SHIFTLEADER_MANAGER_ADMINISTRATOR_ROLES)]
-        [Route("skillsmatrix/legend/{companyId}/reset")]
-        [HttpPost]
-        public async Task<IActionResult> ResetLegendToDefault([FromRoute] int companyId)
-        {
-            if (!this.IsCmsRequest)
-            {
-                return StatusCode((int)HttpStatusCode.NotFound, "".ToJsonFromObject());
-            }
-
-            Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
-
-            var result = await _matrixManager.ResetLegendToDefaultAsync(companyId, await this.CurrentApplicationUser.GetAndSetUserIdAsync());
-
-            AppendCapturedExceptionToApm(_matrixManager.GetPossibleExceptions());
-
-            Agent.Tracer.CurrentSpan.End();
-
-            return StatusCode((int)HttpStatusCode.OK, result.ToJsonFromObject());
-        }
         #endregion
 
     }

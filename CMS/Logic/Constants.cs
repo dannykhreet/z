@@ -413,7 +413,6 @@ namespace WebApp.Logic
             // Legend Configuration
             public const string SkillMatrixLegendUrl = @"/v1/skillsmatrix/legend/{0}";
             public const string SkillMatrixLegendItemUrl = @"/v1/skillsmatrix/legend/{0}/item";
-            public const string SkillMatrixLegendResetUrl = @"/v1/skillsmatrix/legend/{0}/reset";
 
             public const string UserSkills = @"/v1/userskills";
             public const string UploadPictureUrl = @"/v1/media/image/upload/{0}/0";

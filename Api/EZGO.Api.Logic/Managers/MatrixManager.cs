@@ -1393,49 +1393,6 @@ namespace EZGO.Api.Logic.Managers
 
             return item;
         }
-
-        public async Task<SkillMatrixLegendConfiguration> ResetLegendToDefaultAsync(int companyId, int userId)
-        {
-            try
-            {
-                // Ensure configuration exists
-                await EnsureConfigurationExistsAsync(companyId, userId);
-
-                // Reset all items to default values
-                var defaultItems = GetDefaultLegendItems();
-
-                foreach (var item in defaultItems)
-                {
-                    List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
-                    parameters.Add(new NpgsqlParameter("@_company_id", companyId));
-                    parameters.Add(new NpgsqlParameter("@_skill_level_id", item.SkillLevelId));
-                    parameters.Add(new NpgsqlParameter("@_skill_type", item.SkillType));
-                    parameters.Add(new NpgsqlParameter("@_label", (object)item.Label ?? DBNull.Value));
-                    parameters.Add(new NpgsqlParameter("@_description", (object)item.Description ?? DBNull.Value));
-                    parameters.Add(new NpgsqlParameter("@_icon_color", (object)item.IconColor ?? DBNull.Value));
-                    parameters.Add(new NpgsqlParameter("@_background_color", (object)item.BackgroundColor ?? DBNull.Value));
-                    parameters.Add(new NpgsqlParameter("@_sort_order", item.Order));
-                    parameters.Add(new NpgsqlParameter("@_score_value", (object)item.ScoreValue ?? DBNull.Value));
-                    parameters.Add(new NpgsqlParameter("@_icon_class", (object)item.IconClass ?? DBNull.Value));
-
-                    await _manager.ExecuteScalarAsync("update_skill_matrix_legend_item", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure);
-                }
-
-                // Update configuration timestamp
-                List<NpgsqlParameter> updateParams = new List<NpgsqlParameter>();
-                updateParams.Add(new NpgsqlParameter("@_company_id", companyId));
-                updateParams.Add(new NpgsqlParameter("@_updated_by", userId));
-                await _manager.ExecuteScalarAsync("update_skill_matrix_legend_configuration", parameters: updateParams, commandType: System.Data.CommandType.StoredProcedure);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.ResetLegendToDefaultAsync(): ", ex.Message));
-                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
-            }
-
-            // Return the configuration from database
-            return await GetLegendConfigurationAsync(companyId, userId);
-        }
         #endregion
     }
 }

@@ -51,7 +51,6 @@ namespace EZGO.Api.Interfaces.Managers
         Task<SkillMatrixLegendConfiguration> GetLegendConfigurationAsync(int companyId, int userId);
         Task<SkillMatrixLegendConfiguration> SaveLegendConfigurationAsync(SkillMatrixLegendConfiguration configuration, int userId);
         Task<SkillMatrixLegendItem> UpdateLegendItemAsync(int companyId, SkillMatrixLegendItem item);
-        Task<SkillMatrixLegendConfiguration> ResetLegendToDefaultAsync(int companyId, int userId);
         #endregion
 
     }
