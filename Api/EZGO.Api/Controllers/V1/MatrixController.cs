@@ -1070,7 +1070,7 @@ namespace EZGO.Api.Controllers.V1
 
             Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
 
-            var result = await _matrixManager.UpdateLegendItemAsync(companyId, item);
+            var result = await _matrixManager.UpdateLegendItemAsync(companyId, item, await this.CurrentApplicationUser.GetAndSetUserIdAsync());
 
             AppendCapturedExceptionToApm(_matrixManager.GetPossibleExceptions());
 
