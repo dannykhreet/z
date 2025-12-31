@@ -1279,9 +1279,27 @@ namespace EZGO.Api.Logic.Managers
                     configId = Convert.ToInt32(result);
 
                     // Insert default items
-                    var defaultConfig = SkillMatrixLegendConfiguration.CreateDefault(companyId);
-                    defaultConfig.Id = configId;
-                    await InsertLegendItemsAsync(defaultConfig);
+                    var defaultItems = GetDefaultLegendItems();
+                    foreach (var item in defaultItems)
+                    {
+                        item.ConfigurationId = configId;
+                        item.CreatedAt = DateTime.UtcNow;
+
+                        List<NpgsqlParameter> itemParams = new List<NpgsqlParameter>();
+                        itemParams.Add(new NpgsqlParameter("@_configuration_id", item.ConfigurationId));
+                        itemParams.Add(new NpgsqlParameter("@_skill_level_id", item.SkillLevelId));
+                        itemParams.Add(new NpgsqlParameter("@_skill_type", item.SkillType));
+                        itemParams.Add(new NpgsqlParameter("@_label", (object)item.Label ?? DBNull.Value));
+                        itemParams.Add(new NpgsqlParameter("@_description", (object)item.Description ?? DBNull.Value));
+                        itemParams.Add(new NpgsqlParameter("@_icon_color", (object)item.IconColor ?? DBNull.Value));
+                        itemParams.Add(new NpgsqlParameter("@_background_color", (object)item.BackgroundColor ?? DBNull.Value));
+                        itemParams.Add(new NpgsqlParameter("@_sort_order", item.Order));
+                        itemParams.Add(new NpgsqlParameter("@_score_value", (object)item.ScoreValue ?? DBNull.Value));
+                        itemParams.Add(new NpgsqlParameter("@_icon_class", (object)item.IconClass ?? DBNull.Value));
+                        itemParams.Add(new NpgsqlParameter("@_is_default", item.IsDefault));
+
+                        await _manager.ExecuteScalarAsync("insert_skill_matrix_legend_item", parameters: itemParams, commandType: System.Data.CommandType.StoredProcedure);
+                    }
                 }
             }
             catch (Exception ex)
@@ -1291,6 +1309,23 @@ namespace EZGO.Api.Logic.Managers
             }
 
             return configId;
+        }
+
+        private List<SkillMatrixLegendItem> GetDefaultLegendItems()
+        {
+            return new List<SkillMatrixLegendItem>
+            {
+                // Mandatory skills
+                new SkillMatrixLegendItem { SkillLevelId = 1, SkillType = "mandatory", Label = "Masters the skill", Description = "User has mastered this mandatory skill", IconColor = "#008000", BackgroundColor = "#DDF7DD", Order = 1, IconClass = "thumbsup", IsDefault = true },
+                new SkillMatrixLegendItem { SkillLevelId = 2, SkillType = "mandatory", Label = "Almost expired", Description = "Skill certification is about to expire", IconColor = "#FFA500", BackgroundColor = "#FFF0D4", Order = 2, IconClass = "warning", IsDefault = true },
+                new SkillMatrixLegendItem { SkillLevelId = 3, SkillType = "mandatory", Label = "Expired", Description = "Skill certification has expired", IconColor = "#CB0000", BackgroundColor = "#FFEAEA", Order = 3, IconClass = "thumbsdown", IsDefault = true },
+                // Operational skills
+                new SkillMatrixLegendItem { SkillLevelId = 1, SkillType = "operational", Label = "Doesn't know the theory", Description = "User does not have theoretical knowledge", IconColor = "#CB0000", BackgroundColor = "#FFEAEA", Order = 1, ScoreValue = 1, IsDefault = true },
+                new SkillMatrixLegendItem { SkillLevelId = 2, SkillType = "operational", Label = "Knows the theory", Description = "User has theoretical knowledge", IconColor = "#FF4500", BackgroundColor = "#FFE4DA", Order = 2, ScoreValue = 2, IsDefault = true },
+                new SkillMatrixLegendItem { SkillLevelId = 3, SkillType = "operational", Label = "Is able to apply this in the standard situations", Description = "User can apply skill in standard conditions", IconColor = "#FFA500", BackgroundColor = "#FFF0D4", Order = 3, ScoreValue = 3, IsDefault = true },
+                new SkillMatrixLegendItem { SkillLevelId = 4, SkillType = "operational", Label = "Is able to apply this in the non-standard conditions", Description = "User can apply skill in non-standard conditions", IconColor = "#8DA304", BackgroundColor = "#F2F5DD", Order = 4, ScoreValue = 4, IsDefault = true },
+                new SkillMatrixLegendItem { SkillLevelId = 5, SkillType = "operational", Label = "Can educate others", Description = "User can train and educate other team members", IconColor = "#008000", BackgroundColor = "#DDF7DD", Order = 5, ScoreValue = 5, IsDefault = true }
+            };
         }
 
         public async Task<SkillMatrixLegendConfiguration> SaveLegendConfigurationAsync(SkillMatrixLegendConfiguration configuration, int userId)
@@ -1327,34 +1362,6 @@ namespace EZGO.Api.Logic.Managers
             }
 
             return configuration;
-        }
-
-        private async Task InsertLegendItemsAsync(SkillMatrixLegendConfiguration configuration)
-        {
-            var allItems = new List<SkillMatrixLegendItem>();
-            if (configuration.MandatorySkills != null) allItems.AddRange(configuration.MandatorySkills);
-            if (configuration.OperationalSkills != null) allItems.AddRange(configuration.OperationalSkills);
-
-            foreach (var item in allItems)
-            {
-                item.ConfigurationId = configuration.Id;
-                item.CreatedAt = DateTime.UtcNow;
-
-                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
-                parameters.Add(new NpgsqlParameter("@_configuration_id", item.ConfigurationId));
-                parameters.Add(new NpgsqlParameter("@_skill_level_id", item.SkillLevelId));
-                parameters.Add(new NpgsqlParameter("@_skill_type", item.SkillType));
-                parameters.Add(new NpgsqlParameter("@_label", (object)item.Label ?? DBNull.Value));
-                parameters.Add(new NpgsqlParameter("@_description", (object)item.Description ?? DBNull.Value));
-                parameters.Add(new NpgsqlParameter("@_icon_color", (object)item.IconColor ?? DBNull.Value));
-                parameters.Add(new NpgsqlParameter("@_background_color", (object)item.BackgroundColor ?? DBNull.Value));
-                parameters.Add(new NpgsqlParameter("@_sort_order", item.Order));
-                parameters.Add(new NpgsqlParameter("@_score_value", (object)item.ScoreValue ?? DBNull.Value));
-                parameters.Add(new NpgsqlParameter("@_icon_class", (object)item.IconClass ?? DBNull.Value));
-                parameters.Add(new NpgsqlParameter("@_is_default", item.IsDefault));
-
-                await _manager.ExecuteScalarAsync("insert_skill_matrix_legend_item", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure);
-            }
         }
 
         public async Task<SkillMatrixLegendItem> UpdateLegendItemAsync(int companyId, SkillMatrixLegendItem item)
@@ -1395,14 +1402,10 @@ namespace EZGO.Api.Logic.Managers
                 await EnsureConfigurationExistsAsync(companyId, userId);
 
                 // Reset all items to default values
-                var defaultConfig = SkillMatrixLegendConfiguration.CreateDefault(companyId);
-                var allItems = new List<SkillMatrixLegendItem>();
-                if (defaultConfig.MandatorySkills != null) allItems.AddRange(defaultConfig.MandatorySkills);
-                if (defaultConfig.OperationalSkills != null) allItems.AddRange(defaultConfig.OperationalSkills);
+                var defaultItems = GetDefaultLegendItems();
 
-                foreach (var item in allItems)
+                foreach (var item in defaultItems)
                 {
-                    item.IsDefault = true;
                     List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
                     parameters.Add(new NpgsqlParameter("@_company_id", companyId));
                     parameters.Add(new NpgsqlParameter("@_skill_level_id", item.SkillLevelId));
