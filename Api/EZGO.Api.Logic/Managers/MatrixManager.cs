@@ -1194,14 +1194,20 @@ namespace EZGO.Api.Logic.Managers
                     config.MandatorySkills = await GetLegendItemsAsync(config.Id, "mandatory");
                     config.OperationalSkills = await GetLegendItemsAsync(config.Id, "operational");
                 }
+                else
+                {
+                    // Configuration doesn't exist - return default values (not saved yet)
+                    config = SkillMatrixLegendConfiguration.CreateDefault(companyId);
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogError(exception: ex, message: string.Concat("MatrixManager.GetLegendConfigurationAsync(): ", ex.Message));
                 if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
+                config = SkillMatrixLegendConfiguration.CreateDefault(companyId);
             }
 
-            return config ?? SkillMatrixLegendConfiguration.CreateDefault(companyId);
+            return config;
         }
 
         private async Task<List<SkillMatrixLegendItem>> GetLegendItemsAsync(int configurationId, string skillType)
@@ -1247,50 +1253,75 @@ namespace EZGO.Api.Logic.Managers
             return items;
         }
 
+        private async Task<int> EnsureConfigurationExistsAsync(int companyId, int userId)
+        {
+            int configId = 0;
+            NpgsqlDataReader dr = null;
+            try
+            {
+                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
+                parameters.Add(new NpgsqlParameter("@_company_id", companyId));
+
+                using (dr = await _manager.GetDataReader("get_skill_matrix_legend_configuration", commandType: System.Data.CommandType.StoredProcedure, parameters: parameters))
+                {
+                    if (await dr.ReadAsync())
+                    {
+                        configId = dr.GetInt32(dr.GetOrdinal("id"));
+                    }
+                }
+
+                if (configId == 0)
+                {
+                    // Configuration doesn't exist - create it with default items
+                    List<NpgsqlParameter> insertParams = new List<NpgsqlParameter>();
+                    insertParams.Add(new NpgsqlParameter("@_company_id", companyId));
+                    insertParams.Add(new NpgsqlParameter("@_version", 1));
+                    insertParams.Add(new NpgsqlParameter("@_created_by", userId));
+
+                    var result = await _manager.ExecuteScalarAsync("insert_skill_matrix_legend_configuration", parameters: insertParams, commandType: System.Data.CommandType.StoredProcedure);
+                    configId = Convert.ToInt32(result);
+
+                    // Insert default items
+                    var defaultConfig = SkillMatrixLegendConfiguration.CreateDefault(companyId);
+                    defaultConfig.Id = configId;
+                    await InsertLegendItemsAsync(defaultConfig);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.EnsureConfigurationExistsAsync(): ", ex.Message));
+                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
+            }
+
+            return configId;
+        }
+
         public async Task<SkillMatrixLegendConfiguration> SaveLegendConfigurationAsync(SkillMatrixLegendConfiguration configuration, int userId)
         {
             try
             {
+                // Ensure configuration exists (creates with defaults if not)
+                var configId = await EnsureConfigurationExistsAsync(configuration.CompanyId, userId);
+                configuration.Id = configId;
+
+                // Update configuration timestamp
+                List<NpgsqlParameter> updateParams = new List<NpgsqlParameter>();
+                updateParams.Add(new NpgsqlParameter("@_company_id", configuration.CompanyId));
+                updateParams.Add(new NpgsqlParameter("@_updated_by", userId));
+                await _manager.ExecuteScalarAsync("update_skill_matrix_legend_configuration", parameters: updateParams, commandType: System.Data.CommandType.StoredProcedure);
+
+                // Update each item individually
+                var allItems = new List<SkillMatrixLegendItem>();
+                if (configuration.MandatorySkills != null) allItems.AddRange(configuration.MandatorySkills);
+                if (configuration.OperationalSkills != null) allItems.AddRange(configuration.OperationalSkills);
+
+                foreach (var item in allItems)
+                {
+                    await UpdateLegendItemAsync(configuration.CompanyId, item);
+                }
+
                 configuration.UpdatedBy = userId;
                 configuration.UpdatedAt = DateTime.UtcNow;
-
-                var existingConfig = await GetLegendConfigurationAsync(configuration.CompanyId);
-                bool exists = existingConfig != null && existingConfig.Id > 0;
-
-                if (exists)
-                {
-                    configuration.Version = existingConfig.Version + 1;
-                    List<NpgsqlParameter> updateParams = new List<NpgsqlParameter>();
-                    updateParams.Add(new NpgsqlParameter("@_company_id", configuration.CompanyId));
-                    updateParams.Add(new NpgsqlParameter("@_version", configuration.Version));
-                    updateParams.Add(new NpgsqlParameter("@_updated_by", userId));
-
-                    await _manager.ExecuteScalarAsync("update_skill_matrix_legend_configuration", parameters: updateParams, commandType: System.Data.CommandType.StoredProcedure);
-
-                    // Delete existing items
-                    List<NpgsqlParameter> deleteParams = new List<NpgsqlParameter>();
-                    deleteParams.Add(new NpgsqlParameter("@_configuration_id", existingConfig.Id));
-                    await _manager.ExecuteScalarAsync("delete_skill_matrix_legend_items", parameters: deleteParams, commandType: System.Data.CommandType.StoredProcedure);
-
-                    configuration.Id = existingConfig.Id;
-                }
-                else
-                {
-                    configuration.CreatedBy = userId;
-                    configuration.CreatedAt = DateTime.UtcNow;
-                    configuration.Version = 1;
-
-                    List<NpgsqlParameter> insertParams = new List<NpgsqlParameter>();
-                    insertParams.Add(new NpgsqlParameter("@_company_id", configuration.CompanyId));
-                    insertParams.Add(new NpgsqlParameter("@_version", configuration.Version));
-                    insertParams.Add(new NpgsqlParameter("@_created_by", userId));
-
-                    var result = await _manager.ExecuteScalarAsync("insert_skill_matrix_legend_configuration", parameters: insertParams, commandType: System.Data.CommandType.StoredProcedure);
-                    configuration.Id = Convert.ToInt32(result);
-                }
-
-                // Insert all items
-                await InsertLegendItemsAsync(configuration);
             }
             catch (Exception ex)
             {
@@ -1361,8 +1392,53 @@ namespace EZGO.Api.Logic.Managers
 
         public async Task<SkillMatrixLegendConfiguration> ResetLegendToDefaultAsync(int companyId, int userId)
         {
-            var defaultConfig = SkillMatrixLegendConfiguration.CreateDefault(companyId);
-            return await SaveLegendConfigurationAsync(defaultConfig, userId);
+            try
+            {
+                // Ensure configuration exists
+                var configId = await EnsureConfigurationExistsAsync(companyId, userId);
+
+                // Reset all items to default values
+                var defaultConfig = SkillMatrixLegendConfiguration.CreateDefault(companyId);
+                var allItems = new List<SkillMatrixLegendItem>();
+                if (defaultConfig.MandatorySkills != null) allItems.AddRange(defaultConfig.MandatorySkills);
+                if (defaultConfig.OperationalSkills != null) allItems.AddRange(defaultConfig.OperationalSkills);
+
+                foreach (var item in allItems)
+                {
+                    item.IsDefault = true;
+                    List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
+                    parameters.Add(new NpgsqlParameter("@_company_id", companyId));
+                    parameters.Add(new NpgsqlParameter("@_skill_level_id", item.SkillLevelId));
+                    parameters.Add(new NpgsqlParameter("@_skill_type", item.SkillType));
+                    parameters.Add(new NpgsqlParameter("@_label", (object)item.Label ?? DBNull.Value));
+                    parameters.Add(new NpgsqlParameter("@_description", (object)item.Description ?? DBNull.Value));
+                    parameters.Add(new NpgsqlParameter("@_icon_color", (object)item.IconColor ?? DBNull.Value));
+                    parameters.Add(new NpgsqlParameter("@_background_color", (object)item.BackgroundColor ?? DBNull.Value));
+                    parameters.Add(new NpgsqlParameter("@_sort_order", item.Order));
+                    parameters.Add(new NpgsqlParameter("@_score_value", (object)item.ScoreValue ?? DBNull.Value));
+                    parameters.Add(new NpgsqlParameter("@_icon_class", (object)item.IconClass ?? DBNull.Value));
+
+                    await _manager.ExecuteScalarAsync("update_skill_matrix_legend_item", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure);
+                }
+
+                // Update configuration timestamp
+                List<NpgsqlParameter> updateParams = new List<NpgsqlParameter>();
+                updateParams.Add(new NpgsqlParameter("@_company_id", companyId));
+                updateParams.Add(new NpgsqlParameter("@_updated_by", userId));
+                await _manager.ExecuteScalarAsync("update_skill_matrix_legend_configuration", parameters: updateParams, commandType: System.Data.CommandType.StoredProcedure);
+
+                defaultConfig.Id = configId;
+                defaultConfig.UpdatedBy = userId;
+                defaultConfig.UpdatedAt = DateTime.UtcNow;
+                return defaultConfig;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.ResetLegendToDefaultAsync(): ", ex.Message));
+                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
+            }
+
+            return SkillMatrixLegendConfiguration.CreateDefault(companyId);
         }
         #endregion
     }
