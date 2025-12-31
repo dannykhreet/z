@@ -1169,9 +1169,6 @@ namespace EZGO.Api.Logic.Managers
             NpgsqlDataReader dr = null;
             try
             {
-                // Ensure configuration exists (creates with defaults if not)
-                await EnsureConfigurationExistsAsync(companyId, userId);
-
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
                 parameters.Add(new NpgsqlParameter("@_company_id", companyId));
 
@@ -1191,7 +1188,12 @@ namespace EZGO.Api.Logic.Managers
                     }
                 }
 
-                if (config != null)
+                if (config == null)
+                {
+                    // Configuration doesn't exist - create with defaults
+                    config = await CreateDefaultConfigurationAsync(companyId, userId);
+                }
+                else
                 {
                     config.MandatorySkills = await GetLegendItemsAsync(config.Id, "mandatory");
                     config.OperationalSkills = await GetLegendItemsAsync(config.Id, "operational");
@@ -1202,6 +1204,50 @@ namespace EZGO.Api.Logic.Managers
                 _logger.LogError(exception: ex, message: string.Concat("MatrixManager.GetLegendConfigurationAsync(): ", ex.Message));
                 if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
             }
+
+            return config;
+        }
+
+        private async Task<SkillMatrixLegendConfiguration> CreateDefaultConfigurationAsync(int companyId, int userId)
+        {
+            var config = new SkillMatrixLegendConfiguration
+            {
+                CompanyId = companyId,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = userId
+            };
+
+            List<NpgsqlParameter> insertParams = new List<NpgsqlParameter>();
+            insertParams.Add(new NpgsqlParameter("@_company_id", companyId));
+            insertParams.Add(new NpgsqlParameter("@_created_by", userId));
+
+            var result = await _manager.ExecuteScalarAsync("insert_skill_matrix_legend_configuration", parameters: insertParams, commandType: System.Data.CommandType.StoredProcedure);
+            config.Id = Convert.ToInt32(result);
+
+            var defaultItems = GetDefaultLegendItems();
+            foreach (var item in defaultItems)
+            {
+                item.ConfigurationId = config.Id;
+                item.CreatedAt = DateTime.UtcNow;
+
+                List<NpgsqlParameter> itemParams = new List<NpgsqlParameter>();
+                itemParams.Add(new NpgsqlParameter("@_configuration_id", item.ConfigurationId));
+                itemParams.Add(new NpgsqlParameter("@_skill_level_id", item.SkillLevelId));
+                itemParams.Add(new NpgsqlParameter("@_skill_type", item.SkillType));
+                itemParams.Add(new NpgsqlParameter("@_label", (object)item.Label ?? DBNull.Value));
+                itemParams.Add(new NpgsqlParameter("@_description", (object)item.Description ?? DBNull.Value));
+                itemParams.Add(new NpgsqlParameter("@_icon_color", (object)item.IconColor ?? DBNull.Value));
+                itemParams.Add(new NpgsqlParameter("@_background_color", (object)item.BackgroundColor ?? DBNull.Value));
+                itemParams.Add(new NpgsqlParameter("@_sort_order", item.Order));
+                itemParams.Add(new NpgsqlParameter("@_score_value", (object)item.ScoreValue ?? DBNull.Value));
+                itemParams.Add(new NpgsqlParameter("@_icon_class", (object)item.IconClass ?? DBNull.Value));
+                itemParams.Add(new NpgsqlParameter("@_is_default", item.IsDefault));
+
+                await _manager.ExecuteScalarAsync("insert_skill_matrix_legend_item", parameters: itemParams, commandType: System.Data.CommandType.StoredProcedure);
+            }
+
+            config.MandatorySkills = defaultItems.Where(i => i.SkillType == "mandatory").ToList();
+            config.OperationalSkills = defaultItems.Where(i => i.SkillType == "operational").ToList();
 
             return config;
         }
@@ -1249,66 +1295,6 @@ namespace EZGO.Api.Logic.Managers
             return items;
         }
 
-        private async Task<int> EnsureConfigurationExistsAsync(int companyId, int userId)
-        {
-            int configId = 0;
-            NpgsqlDataReader dr = null;
-            try
-            {
-                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
-                parameters.Add(new NpgsqlParameter("@_company_id", companyId));
-
-                using (dr = await _manager.GetDataReader("get_skill_matrix_legend_configuration", commandType: System.Data.CommandType.StoredProcedure, parameters: parameters))
-                {
-                    if (await dr.ReadAsync())
-                    {
-                        configId = dr.GetInt32(dr.GetOrdinal("id"));
-                    }
-                }
-
-                if (configId == 0)
-                {
-                    // Configuration doesn't exist - create it with default items
-                    List<NpgsqlParameter> insertParams = new List<NpgsqlParameter>();
-                    insertParams.Add(new NpgsqlParameter("@_company_id", companyId));
-                    insertParams.Add(new NpgsqlParameter("@_created_by", userId));
-
-                    var result = await _manager.ExecuteScalarAsync("insert_skill_matrix_legend_configuration", parameters: insertParams, commandType: System.Data.CommandType.StoredProcedure);
-                    configId = Convert.ToInt32(result);
-
-                    // Insert default items
-                    var defaultItems = GetDefaultLegendItems();
-                    foreach (var item in defaultItems)
-                    {
-                        item.ConfigurationId = configId;
-                        item.CreatedAt = DateTime.UtcNow;
-
-                        List<NpgsqlParameter> itemParams = new List<NpgsqlParameter>();
-                        itemParams.Add(new NpgsqlParameter("@_configuration_id", item.ConfigurationId));
-                        itemParams.Add(new NpgsqlParameter("@_skill_level_id", item.SkillLevelId));
-                        itemParams.Add(new NpgsqlParameter("@_skill_type", item.SkillType));
-                        itemParams.Add(new NpgsqlParameter("@_label", (object)item.Label ?? DBNull.Value));
-                        itemParams.Add(new NpgsqlParameter("@_description", (object)item.Description ?? DBNull.Value));
-                        itemParams.Add(new NpgsqlParameter("@_icon_color", (object)item.IconColor ?? DBNull.Value));
-                        itemParams.Add(new NpgsqlParameter("@_background_color", (object)item.BackgroundColor ?? DBNull.Value));
-                        itemParams.Add(new NpgsqlParameter("@_sort_order", item.Order));
-                        itemParams.Add(new NpgsqlParameter("@_score_value", (object)item.ScoreValue ?? DBNull.Value));
-                        itemParams.Add(new NpgsqlParameter("@_icon_class", (object)item.IconClass ?? DBNull.Value));
-                        itemParams.Add(new NpgsqlParameter("@_is_default", item.IsDefault));
-
-                        await _manager.ExecuteScalarAsync("insert_skill_matrix_legend_item", parameters: itemParams, commandType: System.Data.CommandType.StoredProcedure);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.EnsureConfigurationExistsAsync(): ", ex.Message));
-                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
-            }
-
-            return configId;
-        }
-
         private List<SkillMatrixLegendItem> GetDefaultLegendItems()
         {
             return new List<SkillMatrixLegendItem>
@@ -1330,17 +1316,13 @@ namespace EZGO.Api.Logic.Managers
         {
             try
             {
-                // Ensure configuration exists (creates with defaults if not)
-                var configId = await EnsureConfigurationExistsAsync(configuration.CompanyId, userId);
-                configuration.Id = configId;
-
                 // Update configuration timestamp
                 List<NpgsqlParameter> updateParams = new List<NpgsqlParameter>();
                 updateParams.Add(new NpgsqlParameter("@_company_id", configuration.CompanyId));
                 updateParams.Add(new NpgsqlParameter("@_updated_by", userId));
                 await _manager.ExecuteScalarAsync("update_skill_matrix_legend_configuration", parameters: updateParams, commandType: System.Data.CommandType.StoredProcedure);
 
-                // Update each item individually
+                // Update each item
                 var allItems = new List<SkillMatrixLegendItem>();
                 if (configuration.MandatorySkills != null) allItems.AddRange(configuration.MandatorySkills);
                 if (configuration.OperationalSkills != null) allItems.AddRange(configuration.OperationalSkills);
