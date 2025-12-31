@@ -1183,7 +1183,6 @@ namespace EZGO.Api.Logic.Managers
                         {
                             Id = dr.GetInt32(dr.GetOrdinal("id")),
                             CompanyId = dr.GetInt32(dr.GetOrdinal("company_id")),
-                            Version = dr.GetInt32(dr.GetOrdinal("version")),
                             CreatedAt = dr.GetDateTime(dr.GetOrdinal("created_at")),
                             CreatedBy = dr.IsDBNull(dr.GetOrdinal("created_by")) ? null : dr.GetInt32(dr.GetOrdinal("created_by")),
                             UpdatedAt = dr.IsDBNull(dr.GetOrdinal("updated_at")) ? null : dr.GetDateTime(dr.GetOrdinal("updated_at")),
@@ -1272,7 +1271,6 @@ namespace EZGO.Api.Logic.Managers
                     // Configuration doesn't exist - create it with default items
                     List<NpgsqlParameter> insertParams = new List<NpgsqlParameter>();
                     insertParams.Add(new NpgsqlParameter("@_company_id", companyId));
-                    insertParams.Add(new NpgsqlParameter("@_version", 1));
                     insertParams.Add(new NpgsqlParameter("@_created_by", userId));
 
                     var result = await _manager.ExecuteScalarAsync("insert_skill_matrix_legend_configuration", parameters: insertParams, commandType: System.Data.CommandType.StoredProcedure);

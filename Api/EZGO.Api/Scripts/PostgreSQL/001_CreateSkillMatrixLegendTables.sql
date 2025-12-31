@@ -4,7 +4,6 @@
 CREATE TABLE IF NOT EXISTS skill_matrix_legend_configuration (
     id SERIAL PRIMARY KEY,
     company_id INTEGER NOT NULL UNIQUE,
-    version INTEGER NOT NULL DEFAULT 1,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE NULL,
     created_by INTEGER NULL,
@@ -33,7 +32,7 @@ CREATE TABLE IF NOT EXISTS skill_matrix_legend_item (
 DROP FUNCTION IF EXISTS public.get_skill_matrix_legend_configuration(int4);
 
 CREATE OR REPLACE FUNCTION public.get_skill_matrix_legend_configuration(_company_id integer)
- RETURNS TABLE(id integer, company_id integer, version integer, created_at timestamp with time zone, updated_at timestamp with time zone, created_by integer, updated_by integer)
+ RETURNS TABLE(id integer, company_id integer, created_at timestamp with time zone, updated_at timestamp with time zone, created_by integer, updated_by integer)
  LANGUAGE plpgsql
  STABLE
 AS $function$
@@ -42,7 +41,6 @@ BEGIN
     SELECT
         c.id,
         c.company_id,
-        c.version,
         c.created_at,
         c.updated_at,
         c.created_by,
@@ -85,17 +83,17 @@ END$function$
 ;
 
 
-DROP FUNCTION IF EXISTS public.insert_skill_matrix_legend_configuration(int4, int4, int4);
+DROP FUNCTION IF EXISTS public.insert_skill_matrix_legend_configuration(int4, int4);
 
-CREATE OR REPLACE FUNCTION public.insert_skill_matrix_legend_configuration(_company_id integer, _version integer, _created_by integer)
+CREATE OR REPLACE FUNCTION public.insert_skill_matrix_legend_configuration(_company_id integer, _created_by integer)
  RETURNS integer
  LANGUAGE plpgsql
 AS $function$
 DECLARE
     v_id integer;
 BEGIN
-    INSERT INTO skill_matrix_legend_configuration (company_id, version, created_at, created_by)
-    VALUES (_company_id, _version, NOW(), _created_by)
+    INSERT INTO skill_matrix_legend_configuration (company_id, created_at, created_by)
+    VALUES (_company_id, NOW(), _created_by)
     RETURNING id INTO v_id;
     RETURN v_id;
 END$function$

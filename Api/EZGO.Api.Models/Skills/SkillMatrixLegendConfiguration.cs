@@ -6,7 +6,6 @@ namespace EZGO.Api.Models.Skills
 {
     /// <summary>
     /// Contains the complete legend configuration for a company's Skills Matrix.
-    /// Supports version tracking for configuration updates.
     /// </summary>
     public class SkillMatrixLegendConfiguration
     {
@@ -21,12 +20,6 @@ namespace EZGO.Api.Models.Skills
         /// </summary>
         [JsonPropertyName("companyId")]
         public int CompanyId { get; set; }
-
-        /// <summary>
-        /// Version number that increments on updates for tracking changes
-        /// </summary>
-        [JsonPropertyName("version")]
-        public int Version { get; set; }
 
         /// <summary>
         /// List of mandatory skill legend items
