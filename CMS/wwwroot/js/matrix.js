@@ -2248,25 +2248,17 @@ var matrix = {
             var levelId = mandatoryScoreToLevel[value];
 
             if (levelId && mandatoryColors[levelId]) {
-                btn.css({
-                    'background-color': mandatoryColors[levelId].backgroundColor,
-                    'border-color': mandatoryColors[levelId].iconColor,
-                    'color': mandatoryColors[levelId].iconColor
-                });
+                btn.attr('style', 'background-color: ' + mandatoryColors[levelId].backgroundColor + ' !important; border-color: ' + mandatoryColors[levelId].iconColor + ' !important; color: ' + mandatoryColors[levelId].iconColor + ' !important;');
             }
         });
 
-        // Apply to operational skill cells (buttons without data-popup but with numeric values 1-5)
-        $('.buttoncell .circlebtn:not([data-popup])').each(function () {
+        // Apply to operational skill cells (identified by data-popup="score")
+        $('.buttoncell .circlebtn[data-popup="score"]').each(function () {
             var btn = $(this);
             var value = parseInt(btn.attr('data-value'));
 
             if (value >= 1 && value <= 5 && operationalColors[value]) {
-                btn.css({
-                    'background-color': operationalColors[value].backgroundColor,
-                    'border-color': operationalColors[value].iconColor,
-                    'color': operationalColors[value].iconColor
-                });
+                btn.attr('style', 'font-size: 22px !important; background-color: ' + operationalColors[value].backgroundColor + ' !important; border-color: ' + operationalColors[value].iconColor + ' !important; color: ' + operationalColors[value].iconColor + ' !important;');
             }
         });
     }
