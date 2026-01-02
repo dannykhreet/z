@@ -88,6 +88,7 @@ var matrix = {
     skillEdited: false,
     groupEdited: false,
     relationChanged: false,
+    legendConfiguration: null,
     language: {
         userSkills: "User skills - ",
         expiryInDays: "Expiry in days: ",
@@ -117,6 +118,7 @@ var matrix = {
         matrix.initGroupHandlers();
 
         $('#btnViewModalLegend').on('click', function () {
+            matrix.loadAndApplyLegendConfiguration();
             $('#MatrixLegendModal').modal('show');
         });
 
@@ -2132,6 +2134,65 @@ var matrix = {
             },
             contentType: "application/json; charset=utf-8"
         });
+    },
+    loadAndApplyLegendConfiguration: function () {
+        // If already loaded, just apply it
+        if (matrix.legendConfiguration) {
+            matrix.applyLegendConfiguration(matrix.legendConfiguration);
+            return;
+        }
+
+        // Load legend configuration from API
+        $.ajax({
+            url: '/companysettings/legend',
+            type: 'GET',
+            success: function (response) {
+                matrix.legendConfiguration = response;
+                matrix.applyLegendConfiguration(response);
+            },
+            error: function (xhr, status, error) {
+                console.error('Failed to load legend configuration:', error);
+            }
+        });
+    },
+    applyLegendConfiguration: function (config) {
+        if (!config) return;
+
+        // Apply mandatory skills configuration
+        if (config.mandatorySkills) {
+            config.mandatorySkills.forEach(function (item) {
+                var btn = $('.legend-btn-mandatory[data-skill-level-id="' + item.skillLevelId + '"]');
+                var label = $('.legend-label-mandatory[data-skill-level-id="' + item.skillLevelId + '"]');
+                if (btn.length) {
+                    btn.css({
+                        'background-color': item.backgroundColor,
+                        'border-color': item.iconColor,
+                        'color': item.iconColor
+                    });
+                }
+                if (label.length && item.label) {
+                    label.text(item.label);
+                }
+            });
+        }
+
+        // Apply operational skills configuration
+        if (config.operationalSkills) {
+            config.operationalSkills.forEach(function (item) {
+                var btn = $('.legend-btn-operational[data-skill-level-id="' + item.skillLevelId + '"]');
+                var label = $('.legend-label-operational[data-skill-level-id="' + item.skillLevelId + '"]');
+                if (btn.length) {
+                    btn.css({
+                        'background-color': item.backgroundColor,
+                        'border-color': item.iconColor,
+                        'color': item.iconColor
+                    });
+                }
+                if (label.length && item.label) {
+                    label.text(item.label);
+                }
+            });
+        }
     }
 } 
 
