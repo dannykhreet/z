@@ -88,6 +88,8 @@ var matrix = {
     skillEdited: false,
     groupEdited: false,
     relationChanged: false,
+    legendConfiguration: null,
+    legendLoaded: false,
     language: {
         userSkills: "User skills - ",
         expiryInDays: "Expiry in days: ",
@@ -107,6 +109,7 @@ var matrix = {
         if (matrixId != null) {
             matrix.currentMatrixId = parseInt(matrixId);
         }
+        matrix.loadLegendConfiguration();
         matrix.calculateMatrix();
     },
     initDisplay: function () {
@@ -117,7 +120,7 @@ var matrix = {
         matrix.initGroupHandlers();
 
         $('#btnViewModalLegend').on('click', function () {
-            $('#MatrixLegendModal').modal('show');
+            matrix.loadAndShowLegend();
         });
 
         $('#UserSkillValuesModalContent').on('click', '.editSkillValue', function (event) {
@@ -2131,6 +2134,140 @@ var matrix = {
                 toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
             },
             contentType: "application/json; charset=utf-8"
+        });
+    },
+    loadAndShowLegend: function () {
+        if (matrix.legendLoaded && matrix.legendConfiguration) {
+            matrix.applyLegendToModal(matrix.legendConfiguration);
+            $('#MatrixLegendModal').modal('show');
+            return;
+        }
+
+        $.ajax({
+            url: '/companysettings/legend',
+            type: 'GET',
+            success: function (response) {
+                matrix.legendConfiguration = response;
+                matrix.legendLoaded = true;
+                matrix.applyLegendToModal(response);
+                $('#MatrixLegendModal').modal('show');
+            },
+            error: function (xhr, status, error) {
+                console.error('Failed to load legend configuration:', error);
+                $('#MatrixLegendModal').modal('show');
+            }
+        });
+    },
+    applyLegendToModal: function (config) {
+        if (!config) return;
+
+        // Apply mandatory skills
+        if (config.mandatorySkills) {
+            config.mandatorySkills.forEach(function (item) {
+                var btn = $('.legend-btn-mandatory[data-skill-level-id="' + item.skillLevelId + '"]');
+                var label = $('.legend-label-mandatory[data-skill-level-id="' + item.skillLevelId + '"]');
+
+                if (btn.length) {
+                    btn.css({
+                        'background-color': item.backgroundColor,
+                        'border-color': item.iconColor,
+                        'color': item.iconColor
+                    });
+                }
+                if (label.length && item.label) {
+                    label.text(item.label);
+                }
+            });
+        }
+
+        // Apply operational skills
+        if (config.operationalSkills) {
+            config.operationalSkills.forEach(function (item) {
+                var btn = $('.legend-btn-operational[data-skill-level-id="' + item.skillLevelId + '"]');
+                var label = $('.legend-label-operational[data-skill-level-id="' + item.skillLevelId + '"]');
+
+                if (btn.length) {
+                    btn.css({
+                        'background-color': item.backgroundColor,
+                        'border-color': item.iconColor,
+                        'color': item.iconColor
+                    });
+                }
+                if (label.length && item.label) {
+                    label.text(item.label);
+                }
+            });
+        }
+    },
+    loadLegendConfiguration: function () {
+        $.ajax({
+            url: '/companysettings/legend',
+            type: 'GET',
+            success: function (response) {
+                matrix.legendConfiguration = response;
+                matrix.legendLoaded = true;
+                matrix.applyLegendToMatrix(response);
+            },
+            error: function (xhr, status, error) {
+                console.error('Failed to load legend configuration:', error);
+            }
+        });
+    },
+    applyLegendToMatrix: function (config) {
+        if (!config) return;
+
+        // Create a mapping of skill level to colors for quick lookup
+        var mandatoryColors = {};
+        var operationalColors = {};
+
+        if (config.mandatorySkills) {
+            config.mandatorySkills.forEach(function (item) {
+                mandatoryColors[item.skillLevelId] = {
+                    backgroundColor: item.backgroundColor,
+                    iconColor: item.iconColor
+                };
+            });
+        }
+
+        if (config.operationalSkills) {
+            config.operationalSkills.forEach(function (item) {
+                operationalColors[item.scoreValue || item.skillLevelId] = {
+                    backgroundColor: item.backgroundColor,
+                    iconColor: item.iconColor
+                };
+            });
+        }
+
+        // Apply to mandatory skill cells (identified by data-popup="thumbs")
+        // Score mapping: 1=Expired (skillLevelId 3), 2=Mastered (skillLevelId 1), 5=Almost expired (skillLevelId 2)
+        var mandatoryScoreToLevel = { 1: 3, 2: 1, 5: 2 };
+
+        $('.buttoncell .circlebtn[data-popup="thumbs"]').each(function () {
+            var btn = $(this);
+            var value = parseInt(btn.attr('data-value'));
+            var levelId = mandatoryScoreToLevel[value];
+
+            if (levelId && mandatoryColors[levelId]) {
+                btn.css({
+                    'background-color': mandatoryColors[levelId].backgroundColor,
+                    'border-color': mandatoryColors[levelId].iconColor,
+                    'color': mandatoryColors[levelId].iconColor
+                });
+            }
+        });
+
+        // Apply to operational skill cells (buttons without data-popup but with numeric values 1-5)
+        $('.buttoncell .circlebtn:not([data-popup])').each(function () {
+            var btn = $(this);
+            var value = parseInt(btn.attr('data-value'));
+
+            if (value >= 1 && value <= 5 && operationalColors[value]) {
+                btn.css({
+                    'background-color': operationalColors[value].backgroundColor,
+                    'border-color': operationalColors[value].iconColor,
+                    'color': operationalColors[value].iconColor
+                });
+            }
         });
     }
 } 
