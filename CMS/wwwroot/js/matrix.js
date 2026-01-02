@@ -109,6 +109,7 @@ var matrix = {
             matrix.currentMatrixId = parseInt(matrixId);
         }
         matrix.calculateMatrix();
+        matrix.loadAndApplyLegendConfiguration();
     },
     initDisplay: function () {
         $('[data-containertype="dialog_skilldetails"]').hide();
@@ -2158,7 +2159,7 @@ var matrix = {
     applyLegendConfiguration: function (config) {
         if (!config) return;
 
-        // Apply mandatory skills configuration
+        // Apply mandatory skills configuration to legend modal
         if (config.mandatorySkills) {
             config.mandatorySkills.forEach(function (item) {
                 var btn = $('.legend-btn-mandatory[data-skill-level-id="' + item.skillLevelId + '"]');
@@ -2176,7 +2177,7 @@ var matrix = {
             });
         }
 
-        // Apply operational skills configuration
+        // Apply operational skills configuration to legend modal
         if (config.operationalSkills) {
             config.operationalSkills.forEach(function (item) {
                 var btn = $('.legend-btn-operational[data-skill-level-id="' + item.skillLevelId + '"]');
@@ -2190,6 +2191,50 @@ var matrix = {
                 }
                 if (label.length && item.label) {
                     label.text(item.label);
+                }
+            });
+        }
+
+        // Apply colors to matrix cells
+        matrix.applyLegendToMatrixCells(config);
+    },
+    applyLegendToMatrixCells: function (config) {
+        if (!config) return;
+
+        // Apply mandatory skills colors to matrix cells
+        // Mapping: data-value 1 = expired (skillLevelId 3), data-value 2 = masters (skillLevelId 1), data-value 5 = almost expired (skillLevelId 2)
+        if (config.mandatorySkills) {
+            var mandatoryMapping = { '1': 3, '2': 1, '5': 2 };
+            $('[data-popup="thumbs"][data-value]').each(function () {
+                var value = $(this).attr('data-value');
+                var skillLevelId = mandatoryMapping[value];
+                if (skillLevelId) {
+                    var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === skillLevelId; });
+                    if (item) {
+                        $(this).css({
+                            'background-color': item.backgroundColor,
+                            'border-color': item.iconColor,
+                            'color': item.iconColor
+                        });
+                    }
+                }
+            });
+        }
+
+        // Apply operational skills colors to matrix cells
+        // Mapping: data-value 1-5 maps directly to skillLevelId 1-5
+        if (config.operationalSkills) {
+            $('[data-popup="score"][data-value]').each(function () {
+                var value = parseInt($(this).attr('data-value'));
+                if (value >= 1 && value <= 5) {
+                    var item = config.operationalSkills.find(function (i) { return i.skillLevelId === value; });
+                    if (item) {
+                        $(this).css({
+                            'background-color': item.backgroundColor,
+                            'border-color': item.iconColor,
+                            'color': item.iconColor
+                        });
+                    }
                 }
             });
         }
