@@ -2270,6 +2270,31 @@ var matrix = {
                 }
             });
         }
+
+        // Apply mandatory skills colors to operational skill expiry indicators
+        // These are small icons that appear beside operational skills when they expire
+        if (config.mandatorySkills) {
+            // Expired indicators (skillLevelId 3)
+            $('[title="Operational skill expired"]').each(function () {
+                var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === 3; });
+                if (item) {
+                    $(this).css({
+                        'border-color': item.iconColor,
+                        'background-color': item.backgroundColor
+                    });
+                }
+            });
+            // Almost expired indicators (skillLevelId 2)
+            $('[title="Operational almost expired"]').each(function () {
+                var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === 2; });
+                if (item) {
+                    $(this).css({
+                        'border-color': item.iconColor,
+                        'background-color': item.backgroundColor
+                    });
+                }
+            });
+        }
     }
 } 
 
