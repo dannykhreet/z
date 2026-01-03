@@ -2162,7 +2162,6 @@ var matrix = {
         // Icon class mapping from config iconClass to Font Awesome class
         var iconClassMapping = {
             'thumbsup': 'fa-thumbs-up',
-            'thumbsdown': 'fa-thumbs-down',
             'warning': 'fa-exclamation-triangle'
         };
 
@@ -2182,7 +2181,7 @@ var matrix = {
                         var faClass = iconClassMapping[item.iconClass] || 'fa-' + item.iconClass;
                         var icon = btn.find('i');
                         if (icon.length) {
-                            icon.removeClass('fa-thumbs-up fa-thumbs-down fa-exclamation-triangle');
+                            icon.removeClass('fa-thumbs-up fa-exclamation-triangle');
                             icon.addClass(faClass);
                         }
                     }
@@ -2220,7 +2219,6 @@ var matrix = {
         // Icon class mapping from config iconClass to Font Awesome class
         var iconClassMapping = {
             'thumbsup': 'fa-thumbs-up',
-            'thumbsdown': 'fa-thumbs-down',
             'warning': 'fa-exclamation-triangle'
         };
 
@@ -2242,13 +2240,13 @@ var matrix = {
                         // Update icon class on the button itself and Font Awesome icon if present
                         if (item.iconClass) {
                             // CSS background icons
-                            $(this).removeClass('thumbsup thumbsdown warning');
+                            $(this).removeClass('thumbsup warning');
                             $(this).addClass(item.iconClass);
                             // Font Awesome icon inside the button
                             var faClass = iconClassMapping[item.iconClass] || 'fa-' + item.iconClass;
                             var icon = $(this).find('i');
                             if (icon.length) {
-                                icon.removeClass('fa-thumbs-up fa-thumbs-down fa-exclamation-triangle');
+                                icon.removeClass('fa-thumbs-up fa-exclamation-triangle');
                                 icon.addClass(faClass);
                             }
                         }
