@@ -2159,12 +2159,6 @@ var matrix = {
     applyLegendConfiguration: function (config) {
         if (!config) return;
 
-        // Icon class mapping from config iconClass to Font Awesome class
-        var iconClassMapping = {
-            'thumbsup': 'fa-thumbs-up',
-            'warning': 'fa-exclamation-triangle'
-        };
-
         // Apply mandatory skills configuration to legend modal
         if (config.mandatorySkills) {
             config.mandatorySkills.forEach(function (item) {
@@ -2176,15 +2170,6 @@ var matrix = {
                         'border-color': item.iconColor,
                         'color': item.iconColor
                     });
-                    // Update icon if iconClass is specified
-                    if (item.iconClass) {
-                        var faClass = iconClassMapping[item.iconClass] || 'fa-' + item.iconClass;
-                        var icon = btn.find('i');
-                        if (icon.length) {
-                            icon.removeClass('fa-thumbs-up fa-exclamation-triangle');
-                            icon.addClass(faClass);
-                        }
-                    }
                 }
                 if (label.length && item.label) {
                     label.text(item.label);
@@ -2216,13 +2201,7 @@ var matrix = {
     applyLegendToMatrixCells: function (config) {
         if (!config) return;
 
-        // Icon class mapping from config iconClass to Font Awesome class
-        var iconClassMapping = {
-            'thumbsup': 'fa-thumbs-up',
-            'warning': 'fa-exclamation-triangle'
-        };
-
-        // Apply mandatory skills colors and icons to matrix cells
+        // Apply mandatory skills colors to matrix cells
         // Mapping: data-value 1 = expired (skillLevelId 3), data-value 2 = masters (skillLevelId 1), data-value 5 = almost expired (skillLevelId 2)
         if (config.mandatorySkills) {
             var mandatoryMapping = { '1': 3, '2': 1, '5': 2 };
@@ -2237,19 +2216,6 @@ var matrix = {
                             'border-color': item.iconColor,
                             'color': item.iconColor
                         });
-                        // Update icon class on the button itself and Font Awesome icon if present
-                        if (item.iconClass) {
-                            // CSS background icons
-                            $(this).removeClass('thumbsup warning');
-                            $(this).addClass(item.iconClass);
-                            // Font Awesome icon inside the button
-                            var faClass = iconClassMapping[item.iconClass] || 'fa-' + item.iconClass;
-                            var icon = $(this).find('i');
-                            if (icon.length) {
-                                icon.removeClass('fa-thumbs-up fa-exclamation-triangle');
-                                icon.addClass(faClass);
-                            }
-                        }
                     }
                 }
             });
