@@ -88,6 +88,7 @@ var matrix = {
     skillEdited: false,
     groupEdited: false,
     relationChanged: false,
+    legendConfiguration: null,
     language: {
         userSkills: "User skills - ",
         expiryInDays: "Expiry in days: ",
@@ -108,6 +109,7 @@ var matrix = {
             matrix.currentMatrixId = parseInt(matrixId);
         }
         matrix.calculateMatrix();
+        matrix.loadAndApplyLegendConfiguration();
     },
     initDisplay: function () {
         $('[data-containertype="dialog_skilldetails"]').hide();
@@ -117,6 +119,7 @@ var matrix = {
         matrix.initGroupHandlers();
 
         $('#btnViewModalLegend').on('click', function () {
+            matrix.loadAndApplyLegendConfiguration();
             $('#MatrixLegendModal').modal('show');
         });
 
@@ -2132,6 +2135,134 @@ var matrix = {
             },
             contentType: "application/json; charset=utf-8"
         });
+    },
+    loadAndApplyLegendConfiguration: function () {
+        // If already loaded, just apply it
+        if (matrix.legendConfiguration) {
+            matrix.applyLegendConfiguration(matrix.legendConfiguration);
+            return;
+        }
+
+        // Load legend configuration from API
+        $.ajax({
+            url: '/companysettings/legend',
+            type: 'GET',
+            success: function (response) {
+                matrix.legendConfiguration = response;
+                matrix.applyLegendConfiguration(response);
+            },
+            error: function (xhr, status, error) {
+                console.error('Failed to load legend configuration:', error);
+            }
+        });
+    },
+    applyLegendConfiguration: function (config) {
+        if (!config) return;
+
+        // Apply mandatory skills configuration to legend modal
+        if (config.mandatorySkills) {
+            config.mandatorySkills.forEach(function (item) {
+                var btn = $('.legend-btn-mandatory[data-skill-level-id="' + item.skillLevelId + '"]');
+                var label = $('.legend-label-mandatory[data-skill-level-id="' + item.skillLevelId + '"]');
+                if (btn.length) {
+                    btn.css({
+                        'background-color': item.backgroundColor,
+                        'border-color': item.iconColor,
+                        'color': item.iconColor
+                    });
+                }
+                if (label.length && item.label) {
+                    label.text(item.label);
+                }
+            });
+        }
+
+        // Apply operational skills configuration to legend modal
+        if (config.operationalSkills) {
+            config.operationalSkills.forEach(function (item) {
+                var btn = $('.legend-btn-operational[data-skill-level-id="' + item.skillLevelId + '"]');
+                var label = $('.legend-label-operational[data-skill-level-id="' + item.skillLevelId + '"]');
+                if (btn.length) {
+                    btn.css({
+                        'background-color': item.backgroundColor,
+                        'border-color': item.iconColor,
+                        'color': item.iconColor
+                    });
+                }
+                if (label.length && item.label) {
+                    label.text(item.label);
+                }
+            });
+        }
+
+        // Apply colors to matrix cells
+        matrix.applyLegendToMatrixCells(config);
+    },
+    applyLegendToMatrixCells: function (config) {
+        if (!config) return;
+
+        // Apply mandatory skills colors to matrix cells
+        // Mapping: data-value 1 = expired (skillLevelId 3), data-value 2 = masters (skillLevelId 1), data-value 5 = almost expired (skillLevelId 2)
+        if (config.mandatorySkills) {
+            var mandatoryMapping = { '1': 3, '2': 1, '5': 2 };
+            $('[data-popup="thumbs"][data-value]').each(function () {
+                var value = $(this).attr('data-value');
+                var skillLevelId = mandatoryMapping[value];
+                if (skillLevelId) {
+                    var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === skillLevelId; });
+                    if (item) {
+                        $(this).css({
+                            'background-color': item.backgroundColor,
+                            'border-color': item.iconColor,
+                            'color': item.iconColor
+                        });
+                    }
+                }
+            });
+        }
+
+        // Apply operational skills colors to matrix cells
+        // Mapping: data-value 1-5 maps directly to skillLevelId 1-5
+        if (config.operationalSkills) {
+            $('[data-popup="score"][data-value]').each(function () {
+                var value = parseInt($(this).attr('data-value'));
+                if (value >= 1 && value <= 5) {
+                    var item = config.operationalSkills.find(function (i) { return i.skillLevelId === value; });
+                    if (item) {
+                        $(this).css({
+                            'background-color': item.backgroundColor,
+                            'border-color': item.iconColor,
+                            'color': item.iconColor
+                        });
+                    }
+                }
+            });
+        }
+
+        // Apply mandatory skills colors to operational skill expiry indicators
+        // These are small icons that appear beside operational skills when they expire
+        if (config.mandatorySkills) {
+            // Expired indicators (skillLevelId 3)
+            $('[title="Operational skill expired"]').each(function () {
+                var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === 3; });
+                if (item) {
+                    $(this).css({
+                        'border-color': item.iconColor,
+                        'background-color': item.backgroundColor
+                    });
+                }
+            });
+            // Almost expired indicators (skillLevelId 2)
+            $('[title="Operational almost expired"]').each(function () {
+                var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === 2; });
+                if (item) {
+                    $(this).css({
+                        'border-color': item.iconColor,
+                        'background-color': item.backgroundColor
+                    });
+                }
+            });
+        }
     }
 } 
 

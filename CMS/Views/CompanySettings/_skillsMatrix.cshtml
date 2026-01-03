@@ -310,8 +310,6 @@
                 },
                 error: function (xhr, status, error) {
                     console.error('Failed to load legend configuration:', error);
-                    // Use defaults on error
-                    legendConfiguration = getDefaultLegendConfiguration();
                 }
             });
         }
@@ -351,24 +349,6 @@
                     }
                 });
             }
-        }
-
-        // Get default legend configuration
-        function getDefaultLegendConfiguration() {
-            return {
-                mandatorySkills: [
-                    { skillLevelId: 1, label: 'Masters the skill', iconColor: '#008000', backgroundColor: '#DDF7DD', iconClass: 'thumbsup' },
-                    { skillLevelId: 2, label: 'Almost expired', iconColor: '#FFA500', backgroundColor: '#FFF0D4', iconClass: 'warning' },
-                    { skillLevelId: 3, label: 'Expired', iconColor: '#CB0000', backgroundColor: '#FFEAEA', iconClass: 'thumbsdown' }
-                ],
-                operationalSkills: [
-                    { skillLevelId: 1, label: "Doesn't know the theory", iconColor: '#CB0000', backgroundColor: '#FFEAEA', scoreValue: 1 },
-                    { skillLevelId: 2, label: 'Knows the theory', iconColor: '#FF4500', backgroundColor: '#FFE4DA', scoreValue: 2 },
-                    { skillLevelId: 3, label: 'Is able to apply this in the standard situations', iconColor: '#FFA500', backgroundColor: '#FFF0D4', scoreValue: 3 },
-                    { skillLevelId: 4, label: 'Is able to apply this in the non-standard conditions', iconColor: '#8DA304', backgroundColor: '#F2F5DD', scoreValue: 4 },
-                    { skillLevelId: 5, label: 'Can educate others', iconColor: '#008000', backgroundColor: '#DDF7DD', scoreValue: 5 }
-                ]
-            };
         }
 
         // Legend item click handler - open color picker modal
