@@ -2239,13 +2239,12 @@ var matrix = {
                             'border-color': item.iconColor,
                             'color': item.iconColor
                         });
-                        // Update icon class on the button itself (for CSS background icons)
+                        // Update icon class on the button itself and Font Awesome icon if present
                         if (item.iconClass) {
+                            // CSS background icons
                             $(this).removeClass('thumbsup thumbsdown warning');
                             $(this).addClass(item.iconClass);
-                        }
-                        // Also update Font Awesome icon if present inside the button
-                        if (item.iconClass) {
+                            // Font Awesome icon inside the button
                             var faClass = iconClassMapping[item.iconClass] || 'fa-' + item.iconClass;
                             var icon = $(this).find('i');
                             if (icon.length) {
