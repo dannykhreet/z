@@ -2217,7 +2217,7 @@ var matrix = {
                             'color': item.iconColor
                         });
                         if (item.iconClass) {
-                            $(this).removeClass('thumbsup warning').addClass(item.iconClass);
+                            $(this).addClass(item.iconClass);
                         }
                         if (item.label) {
                             $(this).attr('title', item.label);
