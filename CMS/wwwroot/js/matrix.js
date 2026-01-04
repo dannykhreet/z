@@ -2216,6 +2216,9 @@ var matrix = {
                             'border-color': item.iconColor,
                             'color': item.iconColor
                         });
+                        if (item.label) {
+                            $(this).attr('title', item.label);
+                        }
                     }
                 }
             });
