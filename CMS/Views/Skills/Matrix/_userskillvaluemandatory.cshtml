@@ -54,7 +54,9 @@
             score = (int)userSkillValue.Score;
         }
 
-        string statusclass = score == 1 ? "btn-red thumbsdown" : score == 2 ? "btn-green thumbsup" : score == 5 ? "btn-orange warning" : "";
+        // Default colors and icon (will be overridden by legend config via JavaScript)
+        string statusclass = score == 1 ? "btn-red" : score == 2 ? "btn-green" : score == 5 ? "btn-orange" : "";
+        string iconClass = score == 1 ? "fa-exclamation-triangle" : score == 2 ? "fa-thumbs-up" : score == 5 ? "fa-exclamation-triangle" : "";
         int[] validScores = new[] { 0, 1, 2, 5 };
         string dataValueAttr = validScores.Contains(score) ? $"data-value={score}" : "";
     }
@@ -127,7 +129,7 @@
                         data-isrequired="@((Model.Applicability == null || Model.Applicability.IsApplicable).ToString().ToLowerInvariant())"
                         data-certifiedat="@(userSkillValue == null ? "" : userSkillValue.ValueDate.ToString("ddd, dd MMM yyyy"))"
                         data-iso8601certifiedat="@(userSkillValue == null ? "" : userSkillValue.ValueDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))"
-                        @dataValueAttr></button>
+                        @dataValueAttr>@if(!string.IsNullOrEmpty(iconClass)){<i class="fa @iconClass"></i>}</button>
             </div>
             <div class="buttoncell circlebtn editSkillValue"
                  style="position: absolute; border: 1px solid #A6A6A6; height: 19px; width: 19px; right: 12px; bottom: 0px; font-size: 10px !important; border-radius: 19px; float: right; background-color: #FAFAFA; color: #212529"
