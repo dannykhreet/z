@@ -2305,13 +2305,17 @@ var matrix = {
         // Apply mandatory skills colors to operational skill expiry indicators
         // These are small icons that appear beside operational skills when they expire
         if (config.mandatorySkills) {
+            // Tag elements with data attribute based on original title (only on first run)
+            $('[title="Operational skill expired"]:not([data-expiry-type])').attr('data-expiry-type', 'expired');
+            $('[title="Operational almost expired"]:not([data-expiry-type])').attr('data-expiry-type', 'almost-expired');
+
             // Expired indicators (skillLevelId 3)
-            $('[title="Operational skill expired"]').each(function () {
+            $('[data-expiry-type="expired"]').each(function () {
                 var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === 3; });
                 if (item) {
                     $(this).css({
                         'border-color': item.iconColor,
-                        'background-color': item.backgroundColor
+                        'background': 'url(/images/icons/v2/warning.png) center / 10px no-repeat ' + item.backgroundColor
                     });
                     if (item.label) {
                         $(this).attr('title', item.label);
@@ -2319,12 +2323,12 @@ var matrix = {
                 }
             });
             // Almost expired indicators (skillLevelId 2)
-            $('[title="Operational almost expired"]').each(function () {
+            $('[data-expiry-type="almost-expired"]').each(function () {
                 var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === 2; });
                 if (item) {
                     $(this).css({
                         'border-color': item.iconColor,
-                        'background-color': item.backgroundColor
+                        'background': 'url(/images/icons/v2/warning.png) center / 10px no-repeat ' + item.backgroundColor
                     });
                     if (item.label) {
                         $(this).attr('title', item.label);
