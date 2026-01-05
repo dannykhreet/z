@@ -1503,6 +1503,11 @@ var matrix = {
                     matrix.initDateRangePicker(elem);
                 });
 
+                // Apply legend configuration to modal buttons
+                if (matrix.legendConfiguration) {
+                    matrix.applyLegendToMatrixCells(matrix.legendConfiguration);
+                }
+
                 ezgomediafetcher.preloadImagesAndVideos();
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -2219,7 +2224,8 @@ var matrix = {
                 'thumbsup': 'fa-thumbs-up',
                 'warning': 'fa-exclamation-triangle'
             };
-            $('[data-popup="thumbs"][data-value]').each(function () {
+            // Apply to matrix cells and user skill values modal mandatory buttons
+            $('[data-popup="thumbs"][data-value], #UserSkillValuesModalBodyMandatory .circlebtnNoHover[data-value]').each(function () {
                 var value = $(this).attr('data-value');
                 var skillLevelId = mandatoryMapping[value];
                 if (skillLevelId) {
@@ -2252,16 +2258,21 @@ var matrix = {
         // Apply operational skills colors to matrix cells
         // Mapping: data-value 1-5 maps directly to skillLevelId 1-5
         if (config.operationalSkills) {
-            $('[data-popup="score"][data-value]').each(function () {
+            // Apply to matrix cells and user skill values modal operational buttons
+            $('[data-popup="score"][data-value], #UserSkillValuesModalBodyOperational .circlebtnNoHover[data-value]').each(function () {
                 var value = parseInt($(this).attr('data-value'));
                 if (value >= 1 && value <= 5) {
                     var item = config.operationalSkills.find(function (i) { return i.skillLevelId === value; });
                     if (item) {
+                        $(this).removeClass('btn-red btn-orangered btn-orange btn-orangegreen btn-green');
                         $(this).css({
                             'background-color': item.backgroundColor,
                             'border-color': item.iconColor,
                             'color': item.iconColor
                         });
+                        if (item.label) {
+                            $(this).attr('title', item.label);
+                        }
                     }
                 }
             });
