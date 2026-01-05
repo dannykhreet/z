@@ -2256,6 +2256,9 @@ var matrix = {
                         'border-color': item.iconColor,
                         'background-color': item.backgroundColor
                     });
+                    if (item.label) {
+                        $(this).attr('title', item.label);
+                    }
                 }
             });
             // Almost expired indicators (skillLevelId 2)
@@ -2266,6 +2269,9 @@ var matrix = {
                         'border-color': item.iconColor,
                         'background-color': item.backgroundColor
                     });
+                    if (item.label) {
+                        $(this).attr('title', item.label);
+                    }
                 }
             });
         }
