@@ -407,6 +407,16 @@ var matrix = {
             }
         });
 
+        $('#UserSkillValuesModal').on('hidden.bs.modal', function () {
+            // Refresh the matrix view when the modal is closed
+            matrix.calculateMatrix();
+
+            // Apply legend configuration to update colors and icons
+            if (matrix.legendConfiguration) {
+                matrix.applyLegendToMatrixCells(matrix.legendConfiguration);
+            }
+        });
+
         $("#matrixBody").scroll(function () {
             if ($('.user-title').first().offset().top <= $('#matrixBody').first().offset().top) {
                 //user groups overlay
