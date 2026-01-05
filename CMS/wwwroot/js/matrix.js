@@ -2215,19 +2215,31 @@ var matrix = {
         // Mapping: data-value 1 = expired (skillLevelId 3), data-value 2 = masters (skillLevelId 1), data-value 5 = almost expired (skillLevelId 2)
         if (config.mandatorySkills) {
             var mandatoryMapping = { '1': 3, '2': 1, '5': 2 };
+            var iconMapping = {
+                'thumbsup': 'fa-thumbs-up',
+                'warning': 'fa-exclamation-triangle'
+            };
             $('[data-popup="thumbs"][data-value]').each(function () {
                 var value = $(this).attr('data-value');
                 var skillLevelId = mandatoryMapping[value];
                 if (skillLevelId) {
                     var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === skillLevelId; });
                     if (item) {
+                        // Remove CSS icon classes and add Font Awesome icon
+                        $(this).removeClass('thumbsup thumbsdown warning btn-red btn-green btn-orange');
                         $(this).css({
                             'background-color': item.backgroundColor,
                             'border-color': item.iconColor,
                             'color': item.iconColor
                         });
+                        // Add Font Awesome icon inside button
                         if (item.iconClass) {
-                            $(this).addClass(item.iconClass);
+                            var faClass = iconMapping[item.iconClass] || 'fa-' + item.iconClass;
+                            if (!$(this).find('i.fa').length) {
+                                $(this).html('<i class="fa ' + faClass + '"></i>');
+                            } else {
+                                $(this).find('i.fa').removeClass('fa-thumbs-up fa-thumbs-down fa-exclamation-triangle').addClass(faClass);
+                            }
                         }
                         if (item.label) {
                             $(this).attr('title', item.label);
