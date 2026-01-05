@@ -8,11 +8,21 @@ var activeBtn = null;
 const setValue = (e) => {
     activeBtn.innerHTML = e.target.innerHTML;
     activeBtn.className = 'btn circlebtn';
-    //activeBtn.classList.add('itemSelected');
-    activeBtn.classList.add(e.target.classList[1]);
-    activeBtn.classList.add(e.target.classList[2]);
-    activeBtn.style.backgoundColor = e.target.style.backgroundColor;
     activeBtn.setAttribute('data-value', e.target.getAttribute('data-actionvalue'));
+
+    // Apply legend colors from config
+    var value = parseInt(e.target.getAttribute('data-actionvalue'));
+    if (matrix.legendConfiguration && matrix.legendConfiguration.operationalSkills && value >= 1 && value <= 5) {
+        var item = matrix.legendConfiguration.operationalSkills.find(function (i) { return i.skillLevelId === value; });
+        if (item) {
+            activeBtn.style.backgroundColor = item.backgroundColor;
+            activeBtn.style.borderColor = item.iconColor;
+            activeBtn.style.color = item.iconColor;
+            if (item.label) {
+                activeBtn.setAttribute('title', item.label);
+            }
+        }
+    }
     activeBtn = null;
 }
 
