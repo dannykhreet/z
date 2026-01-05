@@ -1088,7 +1088,23 @@
             downloadLinkElement: {}
         };
 
-        domtoimage.toBlob(document.getElementById('matrixWrapper'), { bgcolor: '#FFFFFF'})
+        // Load legend configuration then generate image
+        $.ajax({
+            url: '/companysettings/legend',
+            type: 'GET',
+            success: function (response) {
+                matrix.legendConfiguration = response;
+                matrix.applyLegendToMatrixCells(response);
+                generateMatrixImage();
+            },
+            error: function () {
+                // Generate image even if legend load fails
+                generateMatrixImage();
+            }
+        });
+
+        function generateMatrixImage() {
+            domtoimage.toBlob(document.getElementById('matrixWrapper'), { bgcolor: '#FFFFFF'})
         .then(function (blob) {
             var dataUrl = URL.createObjectURL(blob)
 
@@ -1105,11 +1121,12 @@
         .catch(function (error) {
             console.log(error);
         });
-        
+        }
+
         function downloadMatrixImage() {
             matrixExporter.downloadLinkElement.click();
         }
-        
+
     </script>
 </body>
 </html>
