@@ -22,6 +22,12 @@ const setValue = (e) => {
                 activeBtn.setAttribute('title', item.label);
             }
         }
+    } else {
+        // Reset styles for empty/0 value
+        activeBtn.style.backgroundColor = '';
+        activeBtn.style.borderColor = '';
+        activeBtn.style.color = '';
+        activeBtn.removeAttribute('title');
     }
     activeBtn = null;
 }
