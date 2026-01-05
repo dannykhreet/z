@@ -216,15 +216,26 @@ var matrix = {
                     $(`#mandatorySkillDetails-${userSkillId}-${userId}`).html(data);
                     matrix.initDateRangePicker($(`#valuedate-${matrix.currentMatrixId}-${userSkillId}`));
 
-                    let buttons = $('[data-userid="' + userId + '"][data-skillid="' + userSkillId + '"]');
+                    let buttons = $('[data-userid="' + userId + ''][data-skillid="' + userSkillId + '']');
                     //update matrix UI;
                     buttons.each(function () {
                         buttons.attr('class', 'btn circlebtn');
                         buttons.attr('data-value', 0);
+                        // Reset inline styles
+                        $(this).css({
+                            'background-color': '',
+                            'border-color': '',
+                            'color': ''
+                        });
+                        $(this).html('');
                     });
 
                     matrix.calculateMatrix();
 
+                    // Apply legend configuration
+                    if (matrix.legendConfiguration) {
+                        matrix.applyLegendToMatrixCells(matrix.legendConfiguration);
+                    }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
@@ -263,16 +274,10 @@ var matrix = {
 
                     matrix.calculateMatrix();
 
-                    //todo update matrix
-                    //let buttons = $('[data-userid="' + userId + '"][data-skillid="' + userSkillId + '"]');
-                    ////update matrix UI;
-                    //buttons.each(function () {
-                    //    buttons.attr('class', 'btn circlebtn');
-                    //    buttons.attr('data-value', 0);
-                    //});
-
-                    //ezgomediafetcher.preloadImagesAndVideos();
-                    //update/load operational skill row?
+                    // Apply legend configuration
+                    if (matrix.legendConfiguration) {
+                        matrix.applyLegendToMatrixCells(matrix.legendConfiguration);
+                    }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
@@ -308,17 +313,10 @@ var matrix = {
 
                     matrix.calculateMatrix();
 
-                    //todo update matrix
-                    //let buttons = $('[data-userid="' + userId + '"][data-skillid="' + userSkillId + '"]');
-                    ////update matrix UI;
-                    //buttons.each(function () {
-                    //    buttons.attr('class', 'btn circlebtn');
-                    //    buttons.attr('data-value', 0);
-                    //});
-
-                    //matrix.calculateMatrix();
-                    //ezgomediafetcher.preloadImagesAndVideos();
-                    //update/load operational skill row?
+                    // Apply legend configuration
+                    if (matrix.legendConfiguration) {
+                        matrix.applyLegendToMatrixCells(matrix.legendConfiguration);
+                    }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
@@ -350,6 +348,11 @@ var matrix = {
                     $(`#operationalSkillDetails-${userSkillId}-${userId}`).html(data);
 
                     matrix.calculateMatrix();
+
+                    // Apply legend configuration
+                    if (matrix.legendConfiguration) {
+                        matrix.applyLegendToMatrixCells(matrix.legendConfiguration);
+                    }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
@@ -386,20 +389,10 @@ var matrix = {
 
                     matrix.calculateMatrix();
 
-                    //TODO: update matrix score display with new custom target (goal might not be met anymore)
-                    //also calculateMatrix (still has to be edited)
-                    /*
-                    
-                    let buttons = $('[data-userid="' + userId + '"][data-skillid="' + userSkillId + '"]');
-                    //update matrix UI;
-                    buttons.each(function () {
-                        buttons.attr('class', 'btn circlebtn');
-                        buttons.attr('data-value', 0);
-                    });
-
-                    matrix.calculateMatrix();
-
-                    */
+                    // Apply legend configuration
+                    if (matrix.legendConfiguration) {
+                        matrix.applyLegendToMatrixCells(matrix.legendConfiguration);
+                    }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
@@ -2150,6 +2143,11 @@ var matrix = {
                 });
 
                 matrix.calculateMatrix();
+
+                // Apply legend configuration to update colors and icons
+                if (matrix.legendConfiguration) {
+                    matrix.applyLegendToMatrixCells(matrix.legendConfiguration);
+                }
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
@@ -2305,6 +2303,11 @@ var matrix = {
         // Apply mandatory skills colors to operational skill expiry indicators
         // These are small icons that appear beside operational skills when they expire
         if (config.mandatorySkills) {
+            var iconMapping = {
+                'thumbsup': 'fa-thumbs-up',
+                'warning': 'fa-exclamation-triangle'
+            };
+
             // Tag elements with data attribute based on original title (only on first run)
             $('[title="Operational skill expired"]:not([data-expiry-type])').attr('data-expiry-type', 'expired');
             $('[title="Operational almost expired"]:not([data-expiry-type])').attr('data-expiry-type', 'almost-expired');
@@ -2315,8 +2318,20 @@ var matrix = {
                 if (item) {
                     $(this).css({
                         'border-color': item.iconColor,
-                        'background': 'url(/images/icons/v2/warning.png) center / 10px no-repeat ' + item.backgroundColor
+                        'background-color': item.backgroundColor,
+                        'background-image': 'none',
+                        'color': item.iconColor,
+                        'display': 'flex',
+                        'align-items': 'center',
+                        'justify-content': 'center'
                     });
+                    // Add Font Awesome icon if not already present
+                    if (item.iconClass) {
+                        var faClass = iconMapping[item.iconClass] || 'fa-' + item.iconClass;
+                        if (!$(this).find('i.fa').length) {
+                            $(this).html('<i class="fa ' + faClass + '" style="font-size: 10px;"></i>');
+                        }
+                    }
                     if (item.label) {
                         $(this).attr('title', item.label);
                     }
@@ -2328,8 +2343,20 @@ var matrix = {
                 if (item) {
                     $(this).css({
                         'border-color': item.iconColor,
-                        'background': 'url(/images/icons/v2/warning.png) center / 10px no-repeat ' + item.backgroundColor
+                        'background-color': item.backgroundColor,
+                        'background-image': 'none',
+                        'color': item.iconColor,
+                        'display': 'flex',
+                        'align-items': 'center',
+                        'justify-content': 'center'
                     });
+                    // Add Font Awesome icon if not already present
+                    if (item.iconClass) {
+                        var faClass = iconMapping[item.iconClass] || 'fa-' + item.iconClass;
+                        if (!$(this).find('i.fa').length) {
+                            $(this).html('<i class="fa ' + faClass + '" style="font-size: 10px;"></i>');
+                        }
+                    }
                     if (item.label) {
                         $(this).attr('title', item.label);
                     }
