@@ -2243,6 +2243,24 @@ var matrix = {
                     }
                 }
             });
+
+            // Apply operational skills colors to score popup
+            $('.popUpScore .item[data-actionvalue]').each(function () {
+                var value = parseInt($(this).attr('data-actionvalue'));
+                if (value >= 1 && value <= 5) {
+                    var item = config.operationalSkills.find(function (i) { return i.skillLevelId === value; });
+                    if (item) {
+                        $(this).css({
+                            'background-color': item.backgroundColor,
+                            'border-color': item.iconColor,
+                            'color': item.iconColor
+                        });
+                        if (item.label) {
+                            $(this).attr('title', item.label);
+                        }
+                    }
+                }
+            });
         }
 
         // Apply mandatory skills colors to operational skill expiry indicators
