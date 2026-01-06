@@ -351,6 +351,9 @@
                             'border-color': item.iconColor,
                             'color': item.iconColor
                         });
+                        // Also update data attributes for consistency
+                        btn.data('icon-color', item.iconColor);
+                        btn.data('bg-color', item.backgroundColor);
                     }
                 });
             }
@@ -367,6 +370,9 @@
                             'border-color': item.iconColor,
                             'color': item.iconColor
                         });
+                        // Also update data attributes for consistency
+                        btn.data('icon-color', item.iconColor);
+                        btn.data('bg-color', item.backgroundColor);
                     }
                 });
             }
@@ -376,7 +382,7 @@
         $('.legend-preview-btn').on('click', function () {
             var row = $(this).closest('.legend-item-row');
             var skillType = row.data('skill-type');
-            var skillLevelId = row.data('skill-level-id');
+            var skillLevelId = parseInt(row.data('skill-level-id')); // Ensure integer
             var scoreValue = row.data('score-value');
             var iconClass = $(this).data('icon-class');
             var currentLabel = row.find('.legend-label-input').val();
@@ -389,12 +395,12 @@
                 iconClass: iconClass
             };
 
-            // Find current configuration
+            // Find current configuration from legendConfiguration object
             var currentItem = null;
             if (legendConfiguration) {
                 var skillList = skillType === 'mandatory' ? legendConfiguration.mandatorySkills : legendConfiguration.operationalSkills;
                 if (skillList) {
-                    currentItem = skillList.find(function (item) { return item.skillLevelId === skillLevelId; });
+                    currentItem = skillList.find(function (item) { return parseInt(item.skillLevelId) === skillLevelId; });
                 }
             }
 
@@ -408,6 +414,11 @@
             if (currentItem) {
                 setColorPickerValue('icon', currentItem.iconColor);
                 setColorPickerValue('bg', currentItem.backgroundColor);
+            } else {
+                // Fallback to data attributes if no config item found
+                var btn = $(this);
+                setColorPickerValue('icon', btn.data('icon-color') || '#52AC52');
+                setColorPickerValue('bg', btn.data('bg-color') || '#E5F3E5');
             }
 
             // Update preview
@@ -446,12 +457,16 @@
             });
             // Also update the icon color inside the button
             btn.find('i').css('color', newIconColor);
+            // Update data attributes for consistency
+            btn.data('icon-color', newIconColor);
+            btn.data('bg-color', newBgColor);
 
-            // Update configuration
+            // Update configuration using parseInt for comparison
+            var targetSkillLevelId = parseInt(currentEditingItem.skillLevelId);
             if (legendConfiguration) {
                 var skillList = currentEditingItem.skillType === 'mandatory' ? legendConfiguration.mandatorySkills : legendConfiguration.operationalSkills;
                 if (skillList) {
-                    var item = skillList.find(function (item) { return item.skillLevelId === currentEditingItem.skillLevelId; });
+                    var item = skillList.find(function (item) { return parseInt(item.skillLevelId) === targetSkillLevelId; });
                     if (item) {
                         item.label = newLabel;
                         item.iconColor = newIconColor;
@@ -489,13 +504,13 @@
         $('.legend-label-input').on('change', function () {
             var row = $(this).closest('.legend-item-row');
             var skillType = row.data('skill-type');
-            var skillLevelId = row.data('skill-level-id');
+            var skillLevelId = parseInt(row.data('skill-level-id')); // Ensure integer
             var newLabel = $(this).val();
 
             if (legendConfiguration) {
                 var skillList = skillType === 'mandatory' ? legendConfiguration.mandatorySkills : legendConfiguration.operationalSkills;
                 if (skillList) {
-                    var item = skillList.find(function (item) { return item.skillLevelId === skillLevelId; });
+                    var item = skillList.find(function (item) { return parseInt(item.skillLevelId) === skillLevelId; });
                     if (item) {
                         item.label = newLabel;
                     }
