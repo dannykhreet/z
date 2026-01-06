@@ -2227,8 +2227,10 @@ var matrix = {
         // Apply colors to matrix cells
         matrix.applyLegendToMatrixCells(config);
     },
-    applyLegendToMatrixCells: function (config) {
+    applyLegendToMatrixCells: function (config, options) {
         if (!config) return;
+        options = options || {};
+        var skipFontAwesome = options.skipFontAwesome || false;
 
         // Apply mandatory skills colors to matrix cells
         // Mapping: data-value 1 = expired (skillLevelId 3), data-value 2 = masters (skillLevelId 1), data-value 5 = almost expired (skillLevelId 2)
@@ -2245,15 +2247,15 @@ var matrix = {
                 if (skillLevelId) {
                     var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === skillLevelId; });
                     if (item) {
-                        // Remove CSS icon classes and add Font Awesome icon
+                        // Remove CSS icon classes and apply colors
                         $(this).removeClass('thumbsup thumbsdown warning btn-red btn-green btn-orange');
                         $(this).css({
                             'background-color': item.backgroundColor,
                             'border-color': item.iconColor,
                             'color': item.iconColor
                         });
-                        // Add Font Awesome icon inside button
-                        if (item.iconClass) {
+                        // Add Font Awesome icon inside button (skip for PDF export)
+                        if (item.iconClass && !skipFontAwesome) {
                             var faClass = iconMapping[item.iconClass] || 'fa-' + item.iconClass;
                             if (!$(this).find('i.fa').length) {
                                 $(this).html('<i class="fa ' + faClass + '"></i>');
@@ -2326,17 +2328,21 @@ var matrix = {
             $('[data-expiry-type="expired"]').each(function () {
                 var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === 3; });
                 if (item) {
-                    $(this).css({
+                    var cssProps = {
                         'border-color': item.iconColor,
                         'background-color': item.backgroundColor,
-                        'background-image': 'none',
                         'color': item.iconColor,
                         'display': 'flex',
                         'align-items': 'center',
                         'justify-content': 'center'
-                    });
-                    // Add Font Awesome icon if not already present
-                    if (item.iconClass) {
+                    };
+                    // Only remove background-image if we're adding Font Awesome icons
+                    if (!skipFontAwesome) {
+                        cssProps['background-image'] = 'none';
+                    }
+                    $(this).css(cssProps);
+                    // Add Font Awesome icon if not already present (skip for PDF export)
+                    if (item.iconClass && !skipFontAwesome) {
                         var faClass = iconMapping[item.iconClass] || 'fa-' + item.iconClass;
                         if (!$(this).find('i.fa').length) {
                             $(this).html('<i class="fa ' + faClass + '" style="font-size: 10px;"></i>');
@@ -2351,17 +2357,21 @@ var matrix = {
             $('[data-expiry-type="almost-expired"]').each(function () {
                 var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === 2; });
                 if (item) {
-                    $(this).css({
+                    var cssProps = {
                         'border-color': item.iconColor,
                         'background-color': item.backgroundColor,
-                        'background-image': 'none',
                         'color': item.iconColor,
                         'display': 'flex',
                         'align-items': 'center',
                         'justify-content': 'center'
-                    });
-                    // Add Font Awesome icon if not already present
-                    if (item.iconClass) {
+                    };
+                    // Only remove background-image if we're adding Font Awesome icons
+                    if (!skipFontAwesome) {
+                        cssProps['background-image'] = 'none';
+                    }
+                    $(this).css(cssProps);
+                    // Add Font Awesome icon if not already present (skip for PDF export)
+                    if (item.iconClass && !skipFontAwesome) {
                         var faClass = iconMapping[item.iconClass] || 'fa-' + item.iconClass;
                         if (!$(this).find('i.fa').length) {
                             $(this).html('<i class="fa ' + faClass + '" style="font-size: 10px;"></i>');

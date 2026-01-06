@@ -1094,12 +1094,18 @@
             type: 'GET',
             success: function (response) {
                 matrix.legendConfiguration = response;
-                matrix.applyLegendToMatrixCells(response);
-                generateMatrixImage();
+                // Skip Font Awesome icons for PDF export - dom-to-image has issues with web fonts
+                matrix.applyLegendToMatrixCells(response, { skipFontAwesome: true });
+                // Small delay to ensure DOM has re-rendered with colors
+                setTimeout(function () {
+                    generateMatrixImage();
+                }, 100);
             },
             error: function () {
                 // Generate image even if legend load fails
-                generateMatrixImage();
+                setTimeout(function () {
+                    generateMatrixImage();
+                }, 100);
             }
         });
 
