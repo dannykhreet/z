@@ -1114,12 +1114,7 @@ namespace EZGO.Api.Logic.Managers
                     }
                 }
 
-                // Serialize with camelCase for JavaScript compatibility
-                var jsonOptions = new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                };
-                var jsonValue = JsonSerializer.Serialize(configuration, jsonOptions);
+                var jsonValue = JsonSerializer.Serialize(configuration);
 
                 // Use IGeneralManager to save the setting with ResourceId 134
                 var settingItem = new Models.Settings.SettingResourceItem

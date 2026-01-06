@@ -294,26 +294,26 @@
             });
         }
 
-        // Get default legend configuration from the UI
+        // Get default legend configuration from the UI (PascalCase to match API)
         function getDefaultLegendConfiguration() {
             var config = {
-                mandatorySkills: [],
-                operationalSkills: []
+                MandatorySkills: [],
+                OperationalSkills: []
             };
 
             // Read mandatory skills defaults from UI
             $('.legend-item-row[data-skill-type="mandatory"]').each(function() {
                 var row = $(this);
                 var btn = row.find('.legend-preview-btn');
-                config.mandatorySkills.push({
-                    skillLevelId: row.data('skill-level-id'),
-                    skillType: 'mandatory',
-                    label: row.find('.legend-label-input').val(),
-                    iconColor: btn.data('icon-color') || '#52AC52',
-                    backgroundColor: btn.data('bg-color') || '#E5F3E5',
-                    iconClass: btn.data('icon-class') || 'thumbsup',
-                    order: row.data('skill-level-id'),
-                    isDefault: true
+                config.MandatorySkills.push({
+                    SkillLevelId: row.data('skill-level-id'),
+                    SkillType: 'mandatory',
+                    Label: row.find('.legend-label-input').val(),
+                    IconColor: btn.data('icon-color') || '#52AC52',
+                    BackgroundColor: btn.data('bg-color') || '#E5F3E5',
+                    IconClass: btn.data('icon-class') || 'thumbsup',
+                    Order: row.data('skill-level-id'),
+                    IsDefault: true
                 });
             });
 
@@ -321,59 +321,59 @@
             $('.legend-item-row[data-skill-type="operational"]').each(function() {
                 var row = $(this);
                 var btn = row.find('.legend-preview-btn');
-                config.operationalSkills.push({
-                    skillLevelId: row.data('skill-level-id'),
-                    skillType: 'operational',
-                    label: row.find('.legend-label-input').val(),
-                    iconColor: btn.data('icon-color') || '#52AC52',
-                    backgroundColor: btn.data('bg-color') || '#E5F3E5',
-                    scoreValue: row.data('score-value'),
-                    order: row.data('skill-level-id'),
-                    isDefault: true
+                config.OperationalSkills.push({
+                    SkillLevelId: row.data('skill-level-id'),
+                    SkillType: 'operational',
+                    Label: row.find('.legend-label-input').val(),
+                    IconColor: btn.data('icon-color') || '#52AC52',
+                    BackgroundColor: btn.data('bg-color') || '#E5F3E5',
+                    ScoreValue: row.data('score-value'),
+                    Order: row.data('skill-level-id'),
+                    IsDefault: true
                 });
             });
 
             return config;
         }
 
-        // Apply legend configuration to UI
+        // Apply legend configuration to UI (PascalCase property names from API)
         function applyLegendConfiguration(config) {
             if (!config) return;
 
             // Apply mandatory skills
-            if (config.mandatorySkills) {
-                config.mandatorySkills.forEach(function (item) {
-                    var row = $('.legend-item-row[data-skill-type="mandatory"][data-skill-level-id="' + item.skillLevelId + '"]');
+            if (config.MandatorySkills) {
+                config.MandatorySkills.forEach(function (item) {
+                    var row = $('.legend-item-row[data-skill-type="mandatory"][data-skill-level-id="' + item.SkillLevelId + '"]');
                     if (row.length) {
-                        row.find('.legend-label-input').val(item.label);
+                        row.find('.legend-label-input').val(item.Label);
                         var btn = row.find('.legend-preview-btn');
                         btn.css({
-                            'background-color': item.backgroundColor,
-                            'border-color': item.iconColor,
-                            'color': item.iconColor
+                            'background-color': item.BackgroundColor,
+                            'border-color': item.IconColor,
+                            'color': item.IconColor
                         });
                         // Also update data attributes for consistency
-                        btn.data('icon-color', item.iconColor);
-                        btn.data('bg-color', item.backgroundColor);
+                        btn.data('icon-color', item.IconColor);
+                        btn.data('bg-color', item.BackgroundColor);
                     }
                 });
             }
 
             // Apply operational skills
-            if (config.operationalSkills) {
-                config.operationalSkills.forEach(function (item) {
-                    var row = $('.legend-item-row[data-skill-type="operational"][data-skill-level-id="' + item.skillLevelId + '"]');
+            if (config.OperationalSkills) {
+                config.OperationalSkills.forEach(function (item) {
+                    var row = $('.legend-item-row[data-skill-type="operational"][data-skill-level-id="' + item.SkillLevelId + '"]');
                     if (row.length) {
-                        row.find('.legend-label-input').val(item.label);
+                        row.find('.legend-label-input').val(item.Label);
                         var btn = row.find('.legend-preview-btn');
                         btn.css({
-                            'background-color': item.backgroundColor,
-                            'border-color': item.iconColor,
-                            'color': item.iconColor
+                            'background-color': item.BackgroundColor,
+                            'border-color': item.IconColor,
+                            'color': item.IconColor
                         });
                         // Also update data attributes for consistency
-                        btn.data('icon-color', item.iconColor);
-                        btn.data('bg-color', item.backgroundColor);
+                        btn.data('icon-color', item.IconColor);
+                        btn.data('bg-color', item.BackgroundColor);
                     }
                 });
             }
@@ -396,12 +396,12 @@
                 iconClass: iconClass
             };
 
-            // Find current configuration from legendConfiguration object
+            // Find current configuration from legendConfiguration object (PascalCase)
             var currentItem = null;
             if (legendConfiguration) {
-                var skillList = skillType === 'mandatory' ? legendConfiguration.mandatorySkills : legendConfiguration.operationalSkills;
+                var skillList = skillType === 'mandatory' ? legendConfiguration.MandatorySkills : legendConfiguration.OperationalSkills;
                 if (skillList) {
-                    currentItem = skillList.find(function (item) { return parseInt(item.skillLevelId) === skillLevelId; });
+                    currentItem = skillList.find(function (item) { return parseInt(item.SkillLevelId) === skillLevelId; });
                 }
             }
 
@@ -413,8 +413,8 @@
             $('#legendLevelText').val(currentLabel);
 
             if (currentItem) {
-                setColorPickerValue('icon', currentItem.iconColor);
-                setColorPickerValue('bg', currentItem.backgroundColor);
+                setColorPickerValue('icon', currentItem.IconColor);
+                setColorPickerValue('bg', currentItem.BackgroundColor);
             } else {
                 // Fallback to data attributes if no config item found
                 var btn = $(this);
@@ -462,16 +462,16 @@
             btn.data('icon-color', newIconColor);
             btn.data('bg-color', newBgColor);
 
-            // Update configuration using parseInt for comparison
+            // Update configuration using parseInt for comparison (PascalCase)
             var targetSkillLevelId = parseInt(currentEditingItem.skillLevelId);
             if (legendConfiguration) {
-                var skillList = currentEditingItem.skillType === 'mandatory' ? legendConfiguration.mandatorySkills : legendConfiguration.operationalSkills;
+                var skillList = currentEditingItem.skillType === 'mandatory' ? legendConfiguration.MandatorySkills : legendConfiguration.OperationalSkills;
                 if (skillList) {
-                    var item = skillList.find(function (item) { return parseInt(item.skillLevelId) === targetSkillLevelId; });
+                    var item = skillList.find(function (item) { return parseInt(item.SkillLevelId) === targetSkillLevelId; });
                     if (item) {
-                        item.label = newLabel;
-                        item.iconColor = newIconColor;
-                        item.backgroundColor = newBgColor;
+                        item.Label = newLabel;
+                        item.IconColor = newIconColor;
+                        item.BackgroundColor = newBgColor;
                     }
                 }
             }
@@ -501,7 +501,7 @@
             });
         }
 
-        // Label input change handler - debounced save
+        // Label input change handler - debounced save (PascalCase)
         $('.legend-label-input').on('change', function () {
             var row = $(this).closest('.legend-item-row');
             var skillType = row.data('skill-type');
@@ -509,11 +509,11 @@
             var newLabel = $(this).val();
 
             if (legendConfiguration) {
-                var skillList = skillType === 'mandatory' ? legendConfiguration.mandatorySkills : legendConfiguration.operationalSkills;
+                var skillList = skillType === 'mandatory' ? legendConfiguration.MandatorySkills : legendConfiguration.OperationalSkills;
                 if (skillList) {
-                    var item = skillList.find(function (item) { return parseInt(item.skillLevelId) === skillLevelId; });
+                    var item = skillList.find(function (item) { return parseInt(item.SkillLevelId) === skillLevelId; });
                     if (item) {
-                        item.label = newLabel;
+                        item.Label = newLabel;
                     }
                 }
             }
