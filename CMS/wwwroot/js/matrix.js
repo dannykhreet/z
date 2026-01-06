@@ -2240,11 +2240,6 @@ var matrix = {
                 'thumbsup': 'fa-thumbs-up',
                 'warning': 'fa-exclamation-triangle'
             };
-            // Inline SVG icons for PDF export (dom-to-image can capture these properly)
-            var svgIconMapping = {
-                'thumbsup': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width:22px;height:22px;fill:currentColor"><path d="M313.4 32.9c26 5.2 42.9 30.5 37.7 56.5l-2.3 11.4c-5.3 26.7-15.1 52.1-28.8 75.2H464c26.5 0 48 21.5 48 48c0 18.5-10.5 34.6-25.9 42.6C497 275.4 504 288.9 504 304c0 23.4-16.8 42.9-38.9 47.1c4.4 7.3 6.9 15.8 6.9 24.9c0 21.3-13.9 39.4-33.1 45.6c.7 3.3 1.1 6.8 1.1 10.4c0 26.5-21.5 48-48 48H294.5c-19 0-37.5-5.6-53.3-16.1l-38.5-25.7C176 420.4 160 390.4 160 358.3V320 272 247.1c0-29.2 13.3-56.7 36-75l7.4-5.9c26.5-21.2 44.6-51 51.2-84.2l2.3-11.4c5.2-26 30.5-42.9 56.5-37.7zM32 192H96c17.7 0 32 14.3 32 32V448c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32V224c0-17.7 14.3-32 32-32z"/></svg>',
-                'warning': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width:22px;height:22px;fill:currentColor"><path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg>'
-            };
             // Apply to matrix cells and user skill values modal mandatory buttons
             $('[data-popup="thumbs"][data-value], #UserSkillValuesModalBodyMandatory .circlebtnNoHover[data-value]').each(function () {
                 var value = $(this).attr('data-value');
@@ -2252,22 +2247,23 @@ var matrix = {
                 if (skillLevelId) {
                     var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === skillLevelId; });
                     if (item) {
-                        // Remove CSS icon classes and apply colors
-                        $(this).removeClass('thumbsup thumbsdown warning btn-red btn-green btn-orange');
-                        $(this).css({
-                            'background-color': item.backgroundColor,
-                            'border-color': item.iconColor,
-                            'color': item.iconColor
-                        });
-
-                        // Add icon inside button
-                        if (item.iconClass) {
-                            if (skipFontAwesome) {
-                                // For PDF export: use inline SVG (dom-to-image captures these properly)
-                                var svgIcon = svgIconMapping[item.iconClass] || svgIconMapping['warning'];
-                                $(this).html(svgIcon);
-                            } else {
-                                // For normal display: use Font Awesome icons
+                        if (skipFontAwesome) {
+                            // For PDF export: only remove color classes, keep icon classes for background images
+                            $(this).removeClass('btn-red btn-green btn-orange');
+                            $(this).css({
+                                'border-color': item.iconColor,
+                                'color': item.iconColor
+                            });
+                        } else {
+                            // For normal display: remove all classes and use Font Awesome icons
+                            $(this).removeClass('thumbsup thumbsdown warning btn-red btn-green btn-orange');
+                            $(this).css({
+                                'background-color': item.backgroundColor,
+                                'border-color': item.iconColor,
+                                'color': item.iconColor
+                            });
+                            // Add Font Awesome icon inside button
+                            if (item.iconClass) {
                                 var faClass = iconMapping[item.iconClass] || 'fa-' + item.iconClass;
                                 if (!$(this).find('i.fa').length) {
                                     $(this).html('<i class="fa ' + faClass + '"></i>');
@@ -2332,11 +2328,6 @@ var matrix = {
                 'thumbsup': 'fa-thumbs-up',
                 'warning': 'fa-exclamation-triangle'
             };
-            // Inline SVG icons for PDF export (smaller size for expiry indicators)
-            var svgIconMapping = {
-                'thumbsup': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width:10px;height:10px;fill:currentColor"><path d="M313.4 32.9c26 5.2 42.9 30.5 37.7 56.5l-2.3 11.4c-5.3 26.7-15.1 52.1-28.8 75.2H464c26.5 0 48 21.5 48 48c0 18.5-10.5 34.6-25.9 42.6C497 275.4 504 288.9 504 304c0 23.4-16.8 42.9-38.9 47.1c4.4 7.3 6.9 15.8 6.9 24.9c0 21.3-13.9 39.4-33.1 45.6c.7 3.3 1.1 6.8 1.1 10.4c0 26.5-21.5 48-48 48H294.5c-19 0-37.5-5.6-53.3-16.1l-38.5-25.7C176 420.4 160 390.4 160 358.3V320 272 247.1c0-29.2 13.3-56.7 36-75l7.4-5.9c26.5-21.2 44.6-51 51.2-84.2l2.3-11.4c5.2-26 30.5-42.9 56.5-37.7zM32 192H96c17.7 0 32 14.3 32 32V448c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32V224c0-17.7 14.3-32 32-32z"/></svg>',
-                'warning': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width:10px;height:10px;fill:currentColor"><path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg>'
-            };
 
             // Tag elements with data attribute based on original title (only on first run)
             $('[title="Operational skill expired"]:not([data-expiry-type])').attr('data-expiry-type', 'expired');
@@ -2346,23 +2337,25 @@ var matrix = {
             $('[data-expiry-type="expired"]').each(function () {
                 var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === 3; });
                 if (item) {
-                    $(this).css({
-                        'border-color': item.iconColor,
-                        'background-color': item.backgroundColor,
-                        'background-image': 'none',
-                        'color': item.iconColor,
-                        'display': 'flex',
-                        'align-items': 'center',
-                        'justify-content': 'center'
-                    });
-                    // Add icon
-                    if (item.iconClass) {
-                        if (skipFontAwesome) {
-                            // For PDF export: use inline SVG
-                            var svgIcon = svgIconMapping[item.iconClass] || svgIconMapping['warning'];
-                            $(this).html(svgIcon);
-                        } else {
-                            // For normal display: use Font Awesome
+                    if (skipFontAwesome) {
+                        // For PDF export: only apply colors, keep original background image
+                        $(this).css({
+                            'border-color': item.iconColor,
+                            'color': item.iconColor
+                        });
+                    } else {
+                        // For normal display: apply all styles and use Font Awesome
+                        $(this).css({
+                            'border-color': item.iconColor,
+                            'background-color': item.backgroundColor,
+                            'background-image': 'none',
+                            'color': item.iconColor,
+                            'display': 'flex',
+                            'align-items': 'center',
+                            'justify-content': 'center'
+                        });
+                        // Add Font Awesome icon
+                        if (item.iconClass) {
                             var faClass = iconMapping[item.iconClass] || 'fa-' + item.iconClass;
                             if (!$(this).find('i.fa').length) {
                                 $(this).html('<i class="fa ' + faClass + '" style="font-size: 10px;"></i>');
@@ -2378,23 +2371,25 @@ var matrix = {
             $('[data-expiry-type="almost-expired"]').each(function () {
                 var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === 2; });
                 if (item) {
-                    $(this).css({
-                        'border-color': item.iconColor,
-                        'background-color': item.backgroundColor,
-                        'background-image': 'none',
-                        'color': item.iconColor,
-                        'display': 'flex',
-                        'align-items': 'center',
-                        'justify-content': 'center'
-                    });
-                    // Add icon
-                    if (item.iconClass) {
-                        if (skipFontAwesome) {
-                            // For PDF export: use inline SVG
-                            var svgIcon = svgIconMapping[item.iconClass] || svgIconMapping['warning'];
-                            $(this).html(svgIcon);
-                        } else {
-                            // For normal display: use Font Awesome
+                    if (skipFontAwesome) {
+                        // For PDF export: only apply colors, keep original background image
+                        $(this).css({
+                            'border-color': item.iconColor,
+                            'color': item.iconColor
+                        });
+                    } else {
+                        // For normal display: apply all styles and use Font Awesome
+                        $(this).css({
+                            'border-color': item.iconColor,
+                            'background-color': item.backgroundColor,
+                            'background-image': 'none',
+                            'color': item.iconColor,
+                            'display': 'flex',
+                            'align-items': 'center',
+                            'justify-content': 'center'
+                        });
+                        // Add Font Awesome icon
+                        if (item.iconClass) {
                             var faClass = iconMapping[item.iconClass] || 'fa-' + item.iconClass;
                             if (!$(this).find('i.fa').length) {
                                 $(this).html('<i class="fa ' + faClass + '" style="font-size: 10px;"></i>');
