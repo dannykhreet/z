@@ -41,7 +41,7 @@ namespace EZGO.Api.Interfaces.Managers
         Task<bool> SaveMatrixUserSkillValue(int companyId, int userId, int matrixId, SkillsMatrixItemValue matrixItemValue);
 
         // Legend Configuration Methods
-        Task<SkillMatrixLegendConfiguration> GetLegendConfigurationAsync(int companyId);
+        Task<SkillMatrixLegendConfiguration?> GetLegendConfigurationAsync(int companyId);
         Task<bool> SaveLegendConfigurationAsync(int companyId, int userId, SkillMatrixLegendConfiguration configuration);
         Task<bool> UpdateLegendItemAsync(int companyId, int userId, SkillMatrixLegendItem item);
 

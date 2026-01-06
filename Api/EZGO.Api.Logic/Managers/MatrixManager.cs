@@ -1050,9 +1050,9 @@ namespace EZGO.Api.Logic.Managers
 
         #region - legend configuration -
         /// <summary>
-        /// Gets the legend configuration for a company. Returns default if none exists.
+        /// Gets the legend configuration for a company. Returns null if none exists (frontend handles defaults).
         /// </summary>
-        public async Task<SkillMatrixLegendConfiguration> GetLegendConfigurationAsync(int companyId)
+        public async Task<SkillMatrixLegendConfiguration?> GetLegendConfigurationAsync(int companyId)
         {
             try
             {
@@ -1075,8 +1075,8 @@ namespace EZGO.Api.Logic.Managers
                 if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
             }
 
-            // Return default configuration if none exists
-            return GetDefaultLegendConfiguration(companyId);
+            // Return null if no configuration exists - frontend handles default values
+            return null;
         }
 
         /// <summary>
@@ -1130,13 +1130,20 @@ namespace EZGO.Api.Logic.Managers
         }
 
         /// <summary>
-        /// Updates a single legend item.
+        /// Updates a single legend item. Requires existing configuration - use SaveLegendConfigurationAsync for initial setup.
         /// </summary>
         public async Task<bool> UpdateLegendItemAsync(int companyId, int userId, SkillMatrixLegendItem item)
         {
             try
             {
                 var config = await GetLegendConfigurationAsync(companyId);
+
+                // Return false if no configuration exists - frontend should use SaveLegendConfigurationAsync first
+                if (config == null)
+                {
+                    _logger.LogWarning("MatrixManager.UpdateLegendItemAsync(): No legend configuration exists for company {CompanyId}. Use SaveLegendConfigurationAsync first.", companyId);
+                    return false;
+                }
 
                 // Find and update the item
                 var targetList = item.SkillType == "mandatory" ? config.MandatorySkills : config.OperationalSkills;
@@ -1168,32 +1175,6 @@ namespace EZGO.Api.Logic.Managers
                 if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
                 return false;
             }
-        }
-
-        /// <summary>
-        /// Gets the default legend configuration with standard colors and labels.
-        /// </summary>
-        private SkillMatrixLegendConfiguration GetDefaultLegendConfiguration(int companyId)
-        {
-            var now = DateTime.UtcNow;
-            return new SkillMatrixLegendConfiguration
-            {
-                CompanyId = companyId,
-                MandatorySkills = new List<SkillMatrixLegendItem>
-                {
-                    new SkillMatrixLegendItem { SkillLevelId = 1, SkillType = "mandatory", Label = "Masters the skill", IconColor = "#52AC52", BackgroundColor = "#E5F3E5", IconClass = "thumbsup", IsDefault = true, Order = 1, CompanyId = companyId, CreatedAt = now },
-                    new SkillMatrixLegendItem { SkillLevelId = 2, SkillType = "mandatory", Label = "Almost expired", IconColor = "#FF8800", BackgroundColor = "#FFF3E0", IconClass = "warning", IsDefault = true, Order = 2, CompanyId = companyId, CreatedAt = now },
-                    new SkillMatrixLegendItem { SkillLevelId = 3, SkillType = "mandatory", Label = "Expired", IconColor = "#D9534F", BackgroundColor = "#FDECEA", IconClass = "warning", IsDefault = true, Order = 3, CompanyId = companyId, CreatedAt = now }
-                },
-                OperationalSkills = new List<SkillMatrixLegendItem>
-                {
-                    new SkillMatrixLegendItem { SkillLevelId = 1, SkillType = "operational", Label = "Doesn't know the theory", IconColor = "#D9534F", BackgroundColor = "#FDECEA", ScoreValue = 1, IsDefault = true, Order = 1, CompanyId = companyId, CreatedAt = now },
-                    new SkillMatrixLegendItem { SkillLevelId = 2, SkillType = "operational", Label = "Knows the theory", IconColor = "#E95420", BackgroundColor = "#FEEEE8", ScoreValue = 2, IsDefault = true, Order = 2, CompanyId = companyId, CreatedAt = now },
-                    new SkillMatrixLegendItem { SkillLevelId = 3, SkillType = "operational", Label = "Is able to apply this in the standard situations", IconColor = "#FF8800", BackgroundColor = "#FFF3E0", ScoreValue = 3, IsDefault = true, Order = 3, CompanyId = companyId, CreatedAt = now },
-                    new SkillMatrixLegendItem { SkillLevelId = 4, SkillType = "operational", Label = "Is able to apply this in the non-standard conditions", IconColor = "#A5C43C", BackgroundColor = "#F5F9E6", ScoreValue = 4, IsDefault = true, Order = 4, CompanyId = companyId, CreatedAt = now },
-                    new SkillMatrixLegendItem { SkillLevelId = 5, SkillType = "operational", Label = "Can educate others", IconColor = "#52AC52", BackgroundColor = "#E5F3E5", ScoreValue = 5, IsDefault = true, Order = 5, CompanyId = companyId, CreatedAt = now }
-                }
-            };
         }
         #endregion
 
