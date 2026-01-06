@@ -89,13 +89,13 @@ namespace EZGO.Api.Utils.BusinessValidators
                     if (!succes) messageBuilder.AppendLine(string.Format("Picture Uri [{0}] is not valid.", user.Picture));
                 }
 
-                if (succes && !string.IsNullOrEmpty(user.Email)) { user.Email = TextValidator.StripRogueDataFromText(user.Email, true); }
+                if (succes && !string.IsNullOrEmpty(user.Email)) { user.Email = TextValidator.StripRogueDataFromText(user.Email, ignoreEmailChar: true); }
                 if (succes && !string.IsNullOrEmpty(user.FirstName)) { user.FirstName = TextValidator.StripRogueDataFromText(user.FirstName); }
                 if (succes && !string.IsNullOrEmpty(user.LastName)) { user.LastName = TextValidator.StripRogueDataFromText(user.LastName); }
                 if (succes && !string.IsNullOrEmpty(user.Role)) { user.Role = TextValidator.StripRogueDataFromText(user.Role); }
-                if (succes && !string.IsNullOrEmpty(user.UPN)) { user.UPN = TextValidator.StripRogueDataFromText(user.UPN, true); }
-                if (succes && !string.IsNullOrEmpty(user.UserName)) { user.UserName = TextValidator.StripRogueDataFromText(user.UserName, true); }
-                if (succes && !string.IsNullOrEmpty(user.SapPmUsername)) { user.SapPmUsername = TextValidator.StripRogueDataFromText(user.SapPmUsername); }
+                if (succes && !string.IsNullOrEmpty(user.UPN)) { user.UPN = TextValidator.StripRogueDataFromText(user.UPN, ignoreEmailChar:true, ignoreMinusChar: true); }
+                if (succes && !string.IsNullOrEmpty(user.UserName)) { user.UserName = TextValidator.StripRogueDataFromText(user.UserName, ignoreEmailChar: true, ignoreMinusChar: true); }
+                if (succes && !string.IsNullOrEmpty(user.SapPmUsername)) { user.SapPmUsername = TextValidator.StripRogueDataFromText(user.SapPmUsername, ignoreMinusChar: true); }
             }
             catch (Exception ex)
             {
@@ -153,7 +153,7 @@ namespace EZGO.Api.Utils.BusinessValidators
                 if (succes && !string.IsNullOrEmpty(userExtendedDetails.Bio)) { userExtendedDetails.Bio = TextValidator.StripRogueDataFromText(userExtendedDetails.Bio); }
                 if (succes && !string.IsNullOrEmpty(userExtendedDetails.Description)) { userExtendedDetails.Description = TextValidator.StripRogueDataFromText(userExtendedDetails.Description); }
                 if (succes && !string.IsNullOrEmpty(userExtendedDetails.EmployeeFunction)) { userExtendedDetails.EmployeeFunction = TextValidator.StripRogueDataFromText(userExtendedDetails.EmployeeFunction); }    
-                if (succes && !string.IsNullOrEmpty(userExtendedDetails.EmployeeId)) { userExtendedDetails.EmployeeId = TextValidator.StripRogueDataFromText(userExtendedDetails.EmployeeId); }
+                if (succes && !string.IsNullOrEmpty(userExtendedDetails.EmployeeId)) { userExtendedDetails.EmployeeId = TextValidator.StripRogueDataFromText(userExtendedDetails.EmployeeId, ignoreMinusChar: true); }
             }
             catch (Exception ex)
             {

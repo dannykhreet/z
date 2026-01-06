@@ -113,8 +113,8 @@ namespace EZGO.Api.Data.Users
 
                         while (await dr.ReadAsync())
                         {
-                            usercompany.CompanyId = Convert.ToInt16(dr["company_id"]);
-                            usercompany.UserId = Convert.ToInt16(dr["user_id"]);
+                            usercompany.CompanyId = Convert.ToInt32(dr["company_id"]);
+                            usercompany.UserId = Convert.ToInt32(dr["user_id"]);
                         }
                         return usercompany;
                     }

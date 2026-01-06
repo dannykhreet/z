@@ -19,12 +19,12 @@ namespace EZGO.Api.Interfaces.Reporting
         Task<List<StatisticGenericItem>> GetAverageStatisticsCollectionAsync(int companyId, string storedProcedureReference, int? areaId = null, int? auditTemplateId = null, int? checklistTemplateId = null, int? taskTemplateId = null, int ? timespanInDays = null);
 
         Task<TasksReport> GetTasksStatisticsAsync(int companyId, DateTime? timestamp = null, int? areaId = null);
-        Task<AuditsReport> GetAuditsStatisticsAsync(int companyId, DateTime? timestamp = null, int? areaId = null);
+        Task<AuditsReport> GetAuditsStatisticsAsync(int companyId, DateTime? timestamp = null, int? areaId = null, int? templateId = null);
         Task<ChecklistsReport> GetChecklistsStatisticsAsync(int companyId, DateTime? timestamp = null, int? areaId = null);
         Task<ActionsReport> GetActionsStatisticsAsync(int companyId, int userId, DateTime? timestamp = null, int? areaId = null);
 
         Task<ChecklistsReportExtended> GetTaskChecklistsStatisticsExtendedAsync(int companyId, DateTime? timestamp = null, int? areaId = null, string periodType = "last12days", string reportType = "task");
-        Task<AuditsReportExtended> GetAuditsStatisticsExtendedAsync(int companyId, DateTime? timestamp = null, int? areaId = null, string periodType = "last12days");
+        Task<AuditsReportExtended> GetAuditsStatisticsExtendedAsync(int companyId, DateTime? timestamp = null, int? areaId = null, string periodType = "last12days", int? templateId = null);
         Task<ActionsReportExtended> GetActionsStatisticsExtendedAsync(int companyId, DateTime? timestamp, int? areaId, string periodType = "last12days");
 
         Task<List<StatisticGenericItem>> GetMyStatisticsCollectionAsync(int companyId, int userId, int? areaId = null, int? timespanInDays = null); //general overview

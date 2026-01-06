@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZ.Connector.Init.Helpers.StartupHelperExtension">
+    <Position X="6" Y="0.5" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAA=</HashCode>
+      <FileName>Helpers\StartupHelperExtension.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZ.Connector.Init.Managers.ConnectorManager">
+    <Position X="0.5" Y="2.5" Width="8" />
+    <TypeIdentifier>
+      <HashCode>IQAAAAAAAAAAAAAAAAAAAAQAEAAAAAAAAAAAQBAAAAA=</HashCode>
+      <FileName>Managers\ConnectorManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="EZ.Connector.Init.Interfaces.IConnectorManager">
+    <Position X="0.5" Y="0.5" Width="5.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAQBAAAAA=</HashCode>
+      <FileName>Interfaces\IConnectorManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

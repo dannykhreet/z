@@ -1017,10 +1017,6 @@
               "target": "Package",
               "version": "[33.1.0, )"
             },
-            "Microsoft.AspNetCore.Http.Abstractions": {
-              "target": "Package",
-              "version": "[2.3.0, )"
-            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[9.0.10, )"

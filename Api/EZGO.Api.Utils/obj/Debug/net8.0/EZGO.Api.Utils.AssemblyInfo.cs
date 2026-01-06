@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EZGO.Api.Utils")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.2509.22133")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+16be2295ac91cde46cba918d39b4cb8d8bde731f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ba779060765ab44a7b384d73c7589c51d354f3e0")]
 [assembly: System.Reflection.AssemblyProductAttribute("EZGO.Api.Utils")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EZGO.Api.Utils")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.2509.22133")]

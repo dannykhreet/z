@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZ.Connector.SAP.Helpers.ActionExtensions">
+    <Position X="10.5" Y="0.5" Width="5.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAABAAAAAAAAAAAAAAAQAAAAACAAAAA=</HashCode>
+      <FileName>Helpers\ActionExtensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZ.Connector.SAP.Helpers.StartupHelperExtension">
+    <Position X="6" Y="0.5" Width="4.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAA=</HashCode>
+      <FileName>Helpers\StartupHelperExtension.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZ.Connector.SAP.Managers.SAPConnector">
+    <Position X="0.5" Y="2.5" Width="5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEAAAAAAAAAAIAAAABCAwAEgIAAAAAA=</HashCode>
+      <FileName>Managers\SAPConnector.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="EZ.Connector.SAP.Models.SAPAction">
+    <Position X="0.5" Y="6" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAFACIgACAAACAAAAAAAAABAAAAAAAAAAAAIAU=</HashCode>
+      <FileName>Models\SAPAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZ.Connector.SAP.Models.SAPActionComment">
+    <Position X="4.25" Y="6" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAFACAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>Models\SAPActionComment.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZ.Connector.SAP.Models.SAPConfig">
+    <Position X="7" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\SAPConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZ.Connector.SAP.Settings.SAPConnectorSettings">
+    <Position X="8.75" Y="6" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAEAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Settings\SAPConnectorSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="EZ.Connector.SAP.Interfaces.ISAPConnector">
+    <Position X="0.5" Y="0.5" Width="5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAwAAgAAAAAAA=</HashCode>
+      <FileName>Interfaces\ISAPConnector.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

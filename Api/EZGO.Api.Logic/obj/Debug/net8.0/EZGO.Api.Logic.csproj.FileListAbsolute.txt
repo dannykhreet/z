@@ -7,6 +7,7 @@ C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\bin\Debug\net8.0\EZGO.Api.Logic.deps.json
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\bin\Debug\net8.0\EZGO.Api.Logic.dll
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\bin\Debug\net8.0\EZGO.Api.Logic.pdb
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\bin\Debug\net8.0\EZGO.Api.Data.Logic.dll
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\bin\Debug\net8.0\EZGO.Api.Interfaces.Data.dll
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\bin\Debug\net8.0\EZGO.Api.Interfaces.dll
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\bin\Debug\net8.0\EZGO.Api.Models.dll
@@ -14,6 +15,7 @@ C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\bin\Debug\net8.0\EZGO.Api.TaskGeneration.dll
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\bin\Debug\net8.0\EZGO.Api.Utils.dll
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\bin\Debug\net8.0\EZGO.Api.Utils.Security.dll
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\bin\Debug\net8.0\EZGO.Api.Data.Logic.pdb
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\bin\Debug\net8.0\EZGO.Api.Interfaces.pdb
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\bin\Debug\net8.0\EZGO.Api.Models.pdb
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\bin\Debug\net8.0\EZGO.Api.Models.xml
@@ -27,5 +29,3 @@ C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\obj\Debug\net8.0\refint\EZGO.Api.Logic.dll
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\obj\Debug\net8.0\EZGO.Api.Logic.pdb
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\obj\Debug\net8.0\ref\EZGO.Api.Logic.dll
-C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\bin\Debug\net8.0\EZGO.Api.Data.Logic.dll
-C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api.Logic\bin\Debug\net8.0\EZGO.Api.Data.Logic.pdb

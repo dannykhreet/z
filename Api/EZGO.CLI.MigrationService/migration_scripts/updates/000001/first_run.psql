@@ -1,0 +1,3 @@
+﻿INSERT INTO logging_log (message, type, eventid, created_on, source) VALUES ('TEST EXECUTION 1', 'INFORMATION', '0', NOW(), 'ezgo.migration');
+ 
+INSERT INTO logging_log (message, type, eventid, created_on, source) VALUES ('TEST EXECUTION 2', 'INFORMATION', '0', NOW(), 'ezgo.migration');

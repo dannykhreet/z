@@ -79,7 +79,7 @@ namespace EZGO.Api.Utils.BusinessValidators
                 }
                 if (!string.IsNullOrEmpty(property.UserValue.UserValue))
                 {
-                    property.UserValue.UserValue = TextValidator.StripRogueDataFromText(property.UserValue.UserValue);
+                    property.UserValue.UserValue = TextValidator.StripRogueDataFromText(property.UserValue.UserValue, ignoreMinusChar:true);
                 }
             }
             catch (Exception ex)

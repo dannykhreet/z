@@ -29,5 +29,6 @@ namespace EZGO.Api.Models.Filters
 
         // Display filters
         public bool? AllowDuplicateTaskInstances;
+        public bool ShowSkippableTaskOverview;
     }
 }

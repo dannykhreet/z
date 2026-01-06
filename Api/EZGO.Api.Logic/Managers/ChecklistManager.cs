@@ -73,11 +73,10 @@ namespace EZGO.Api.Logic.Managers
         private readonly IUserManager _userManager;
         private readonly IFlattenChecklistManager _flattenedChecklistManager;
         private readonly IGeneralManager _generalManager;
-        private readonly ITranslationManager _translationManager;
         #endregion
 
         #region - constructor(s) -
-        public ChecklistManager(IGeneralManager generalManager, IFlattenChecklistManager flattenChecklistManager, IDatabaseAccessHelper manager, IConfigurationHelper configurationHelper, ITagManager tagManager, IUserManager userManager, IPropertyValueManager propertyValueManager, IWorkInstructionManager workInstructionManager, ITaskManager taskManager, IAreaManager areaManager, IActionManager actionManager, IDataAuditing dataAuditing, ITranslationManager translationManager, ILogger<ChecklistManager> logger) : base(logger)
+        public ChecklistManager(IGeneralManager generalManager, IFlattenChecklistManager flattenChecklistManager, IDatabaseAccessHelper manager, IConfigurationHelper configurationHelper, ITagManager tagManager, IUserManager userManager, IPropertyValueManager propertyValueManager, IWorkInstructionManager workInstructionManager, ITaskManager taskManager, IAreaManager areaManager, IActionManager actionManager, IDataAuditing dataAuditing, ILogger<ChecklistManager> logger) : base(logger)
         {
             _manager = manager;
             _taskManager = taskManager;
@@ -91,7 +90,6 @@ namespace EZGO.Api.Logic.Managers
             _userManager = userManager;
             _flattenedChecklistManager = flattenChecklistManager;
             _generalManager = generalManager;
-            _translationManager = translationManager;
         }
         #endregion
 
@@ -108,7 +106,6 @@ namespace EZGO.Api.Logic.Managers
         public async Task<List<Checklist>> GetChecklistsAsync(int companyId, int? userId = null, ChecklistFilters? filters = null, string include = null, bool useStatic = false)
         {
             var output = new List<Checklist>();
-            string language = Culture;
             bool useStaticStorage = useStatic;
 
             NpgsqlDataReader dr = null;
@@ -241,8 +238,6 @@ namespace EZGO.Api.Logic.Managers
                     {
                         output = await ApplyTemplateVersionToChecklists(output, companyId, include);
                     }
-                
-                    if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower())) output = await AppendTranslationsToChecklistsAsync(checklists: output, companyId: companyId, language);
                 }
                 else
                 {
@@ -266,7 +261,6 @@ namespace EZGO.Api.Logic.Managers
         public async Task<Checklist> GetChecklistAsync(int companyId, int checklistId, string include = null, ConnectionKind connectionKind = ConnectionKind.Reader, bool useStatic = false)
         {
             var checklist = new Checklist();
-            string language = Culture;
             bool useStaticStorage = useStatic;
 
             NpgsqlDataReader dr = null;
@@ -316,13 +310,6 @@ namespace EZGO.Api.Logic.Managers
                     {
                         checklist = await ApplyTemplateVersionToChecklist(checklist, companyId, include);
                     }
-                    if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower()))
-                    {
-                        var checkList = new List<Checklist> { checklist };
-                        checkList = await AppendTranslationsToChecklistsAsync(checkList, companyId, language);
-                        checklist = checkList.First();
-                    }
-                    return checklist;
                 }
                 else
                 {
@@ -654,7 +641,6 @@ namespace EZGO.Api.Logic.Managers
         /// <returns>A List of ChecklistsTemplates.</returns>
         public async Task<List<ChecklistTemplate>> GetChecklistTemplatesAsync(int companyId, int? userId = null, ChecklistFilters? filters = null, string include = null)
         {
-            string language = Culture;
             var output = new List<ChecklistTemplate>();
 
             NpgsqlDataReader dr = null;
@@ -779,7 +765,6 @@ namespace EZGO.Api.Logic.Managers
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.OpenFields.ToString().ToLower())) output = await AppendTemplatePropertiesToTemplates(checklisttemplates: output, companyId: companyId, include: include);
                 if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.InstructionRelations.ToString().ToLower()))) output = await AppendWorkInstructionRelationsAsync(checklistTemplates: output, companyId: companyId);
                 if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.Tags.ToString().ToLower()))) output = await AppendTagsToChecklistTemplatesAsync(checklistTemplates: output, companyId: companyId);
-                if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower()))) output = await AppendTranslationsToChecklistTemplatesAsync(companyId: companyId, checklisttemplates: output, language);
             }
 
             return output;
@@ -915,7 +900,6 @@ namespace EZGO.Api.Logic.Managers
         public async Task<ChecklistTemplate> GetChecklistTemplateAsync(int companyId, int checklistTemplateId, string include = null, ConnectionKind connectionKind = ConnectionKind.Reader)
         {
             var checklisttemplate = new ChecklistTemplate();
-            string language = Culture;
 
             NpgsqlDataReader dr = null;
 
@@ -951,12 +935,6 @@ namespace EZGO.Api.Logic.Managers
                 if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.PropertyValues.ToString().ToLower()) || include.Split(",").Contains(IncludesEnum.Properties.ToString().ToLower()) || include.Split(",").Contains(IncludesEnum.PropertyDetails.ToString().ToLower()))) checklisttemplate = await AppendTemplatePropertiesToTaskTemplates(checklisttemplate: checklisttemplate, companyId: companyId, include: include, connectionKind: connectionKind);
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.OpenFields.ToString().ToLower())) checklisttemplate = await AppendTemplatePropertiesToTemplate(checklisttemplate: checklisttemplate, companyId: companyId, include: include, connectionKind: connectionKind);
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Tags.ToString().ToLower())) checklisttemplate.Tags = await _tagManager.GetTagsWithObjectAsync(companyId: companyId, objectType: ObjectTypeEnum.ChecklistTemplate, id: checklisttemplate.Id, connectionKind: connectionKind);
-                if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower()))
-                {
-                    var tempList = new List<ChecklistTemplate> { checklisttemplate };
-                    tempList = await AppendTranslationsToChecklistTemplatesAsync(companyId: companyId, checklisttemplates: tempList, language: language);
-                    checklisttemplate = tempList.First();
-                }
                 return checklisttemplate;
             }
             else
@@ -974,13 +952,11 @@ namespace EZGO.Api.Logic.Managers
         public async Task<Dictionary<int, string>> GetChecklistTemplateNamesAsync (int companyId, List<int> checklistTemplateIds)
         {
             Dictionary<int, string> idsNames = new();
-            string language = Culture;
 
             try
             {
                 List<NpgsqlParameter> parameters = new()
                 {
-                    new NpgsqlParameter("@_language", language),
                     new NpgsqlParameter("@_companyid", companyId),
                     new NpgsqlParameter("@_checklisttemplateids", checklistTemplateIds)
                 };
@@ -1404,25 +1380,6 @@ namespace EZGO.Api.Logic.Managers
             return stageTemplates;
         }
 
-        //private async Task<List<StageTemplate>> AppendTranslationsToStageTemplatesByChecklistTemplateIdAsync(List<StageTemplate> stageTemplates, int companyId, string language)
-        //{
-        //    if (string.IsNullOrEmpty(language) || stageTemplates == null || !stageTemplates.Any())
-        //        return stageTemplates;
-
-        //    foreach (var checklist in stageTemplates)
-        //    {
-        //        var translation = await _translationManager.GetTranslationAsync(
-        //            checklist.ChecklistTemplateId,
-        //            companyId,
-        //            language,
-        //            "public.get_checklisttemplates_translations",
-        //            checklist);
-
-        //    }
-
-        //    return stageTemplates;
-        //}
-
         /// <summary>
         /// AppendTagsToChecklistStagesAsync; append tags to Stages collection.
         /// </summary>
@@ -1469,31 +1426,6 @@ namespace EZGO.Api.Logic.Managers
             return checklists;
         }
 
-        /// <summary>
-        /// Calls the translation manager to fetch translations for all checklists based on their templateID (Names are the same and therefore we use templateID for fetching tranlsations)
-        /// </summary>
-        /// <param name="checklists"></param>
-        /// <param name="companyId"></param>
-        /// <param name="language"></param>
-        /// <returns></returns>
-        private async Task<List<Checklist>> AppendTranslationsToChecklistsAsync(List<Checklist> checklists, int companyId, string language)
-        {
-            if (string.IsNullOrEmpty(language) || checklists == null || !checklists.Any())
-                return checklists;
-
-            foreach (var checklist in checklists)
-            {
-                var translation = await _translationManager.GetTranslationAsync(
-                    checklist.TemplateId,
-                    companyId,
-                    language,
-                    "public.get_checklisttemplates_translations",
-                    checklist);
-
-            }
-
-            return checklists;
-        }
         /// <summary>
         /// AppendUserInformationToChecklistAsync; Append firstname, lastname combinations to objects with checklists which are separately stored. (e.g. modified_by_id etc).
         /// </summary>
@@ -1888,31 +1820,6 @@ namespace EZGO.Api.Logic.Managers
             return checklisttemplates;
         }
 
-        /// <summary>
-        /// Iterates through checklist templates to replace the name and descriptions with the corresponding translated ones.
-        /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="checklisttemplates"></param>
-        /// <param name="language"></param>
-        /// <returns></returns>
-        private async Task<List<ChecklistTemplate>> AppendTranslationsToChecklistTemplatesAsync(int companyId, List<ChecklistTemplate> checklisttemplates, string language)
-        {
-            if (string.IsNullOrEmpty(language) || checklisttemplates == null || !checklisttemplates.Any())
-                return checklisttemplates;
-
-            foreach (var checklistTemplate in checklisttemplates)
-            {
-                var translation = await _translationManager.GetTranslationAsync(
-                    checklistTemplate.Id,
-                    companyId,
-                    language,
-                    "public.get_checklisttemplates_translations",
-                    checklistTemplate);
-
-            }
-
-            return checklisttemplates;
-        }
 
         /// <summary>
         /// CreateOrFillChecklistTemplateFromReader; creates and fills a ChecklistTemplate object from a DataReader.

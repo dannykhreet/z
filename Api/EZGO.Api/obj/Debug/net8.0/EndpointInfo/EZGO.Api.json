@@ -294,20 +294,6 @@
             }
           },
           {
-            "name": "sortBy",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sortDirection",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "User-Agent",
             "in": "header",
             "description": "User-Agent Field, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps.",
@@ -611,20 +597,6 @@
             "schema": {
               "type": "integer",
               "format": "int32"
-            }
-          },
-          {
-            "name": "sortBy",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sortDirection",
-            "in": "query",
-            "schema": {
-              "type": "string"
             }
           },
           {
@@ -934,20 +906,6 @@
             }
           },
           {
-            "name": "sortBy",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sortDirection",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "User-Agent",
             "in": "header",
             "description": "User-Agent Field, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps.",
@@ -1210,20 +1168,6 @@
             }
           },
           {
-            "name": "sortBy",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sortDirection",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "User-Agent",
             "in": "header",
             "description": "User-Agent Field, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps.",
@@ -1483,20 +1427,6 @@
             "schema": {
               "type": "integer",
               "format": "int32"
-            }
-          },
-          {
-            "name": "sortBy",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sortDirection",
-            "in": "query",
-            "schema": {
-              "type": "string"
             }
           },
           {
@@ -1794,20 +1724,6 @@
             }
           },
           {
-            "name": "sortBy",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sortDirection",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "User-Agent",
             "in": "header",
             "description": "User-Agent Field, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps.",
@@ -2102,20 +2018,6 @@
             }
           },
           {
-            "name": "sortBy",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sortDirection",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "User-Agent",
             "in": "header",
             "description": "User-Agent Field, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps.",
@@ -2381,20 +2283,6 @@
             "schema": {
               "type": "integer",
               "format": "int32"
-            }
-          },
-          {
-            "name": "sortBy",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sortDirection",
-            "in": "query",
-            "schema": {
-              "type": "string"
             }
           },
           {
@@ -2682,20 +2570,6 @@
             "schema": {
               "type": "integer",
               "format": "int32"
-            }
-          },
-          {
-            "name": "sortBy",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sortDirection",
-            "in": "query",
-            "schema": {
-              "type": "string"
             }
           },
           {
@@ -2993,20 +2867,6 @@
             }
           },
           {
-            "name": "sortBy",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sortDirection",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "User-Agent",
             "in": "header",
             "description": "User-Agent Field, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps.",
@@ -3298,20 +3158,6 @@
             "schema": {
               "type": "integer",
               "format": "int32"
-            }
-          },
-          {
-            "name": "sortBy",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sortDirection",
-            "in": "query",
-            "schema": {
-              "type": "string"
             }
           },
           {
@@ -23531,6 +23377,168 @@
         }
       }
     },
+    "/v1/skillsmatrix/legend/{companyId}": {
+      "get": {
+        "tags": [
+          "Matrix"
+        ],
+        "summary": " (Auth roles: shift_leader,manager,superuser,staff)",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "description": "User-Agent Field, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps.",
+            "schema": {
+              "type": "string",
+              "description": "String value, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps."
+            }
+          },
+          {
+            "name": "User-Agent-EZ",
+            "in": "header",
+            "description": "User-Agent-EZ, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD].  Connected user must have access to one of these apps. Can be used for web applications that can not modify normal user agent information.",
+            "schema": {
+              "type": "string",
+              "description": "String value, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD].  Connected user must have access to one of these apps. Can be used for web applications that can not modify normal user agent information."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Matrix"
+        ],
+        "summary": " (Auth roles: shift_leader,manager,superuser,staff)",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "description": "User-Agent Field, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps.",
+            "schema": {
+              "type": "string",
+              "description": "String value, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps."
+            }
+          },
+          {
+            "name": "User-Agent-EZ",
+            "in": "header",
+            "description": "User-Agent-EZ, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD].  Connected user must have access to one of these apps. Can be used for web applications that can not modify normal user agent information.",
+            "schema": {
+              "type": "string",
+              "description": "String value, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD].  Connected user must have access to one of these apps. Can be used for web applications that can not modify normal user agent information."
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkillMatrixLegendConfiguration"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkillMatrixLegendConfiguration"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkillMatrixLegendConfiguration"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/skillsmatrix/legend/{companyId}/item": {
+      "post": {
+        "tags": [
+          "Matrix"
+        ],
+        "summary": " (Auth roles: shift_leader,manager,superuser,staff)",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "description": "User-Agent Field, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps.",
+            "schema": {
+              "type": "string",
+              "description": "String value, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps."
+            }
+          },
+          {
+            "name": "User-Agent-EZ",
+            "in": "header",
+            "description": "User-Agent-EZ, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD].  Connected user must have access to one of these apps. Can be used for web applications that can not modify normal user agent information.",
+            "schema": {
+              "type": "string",
+              "description": "String value, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD].  Connected user must have access to one of these apps. Can be used for web applications that can not modify normal user agent information."
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkillMatrixLegendItem"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkillMatrixLegendItem"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkillMatrixLegendItem"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/v1/Matrix/health": {
       "get": {
         "tags": [
@@ -43507,6 +43515,14 @@
             }
           },
           {
+            "name": "deleteoldvalues",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
             "name": "fulloutput",
             "in": "query",
             "schema": {
@@ -43573,6 +43589,14 @@
             "schema": {
               "type": "integer",
               "format": "int32"
+            }
+          },
+          {
+            "name": "deleteoldvalues",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           },
           {
@@ -43738,6 +43762,151 @@
         }
       }
     },
+    "/v1/userskillcustomtargets": {
+      "get": {
+        "tags": [
+          "UserStanding"
+        ],
+        "summary": " (Auth)",
+        "parameters": [
+          {
+            "name": "userid",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "description": "User-Agent Field, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps.",
+            "schema": {
+              "type": "string",
+              "description": "String value, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps."
+            }
+          },
+          {
+            "name": "User-Agent-EZ",
+            "in": "header",
+            "description": "User-Agent-EZ, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD].  Connected user must have access to one of these apps. Can be used for web applications that can not modify normal user agent information.",
+            "schema": {
+              "type": "string",
+              "description": "String value, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD].  Connected user must have access to one of these apps. Can be used for web applications that can not modify normal user agent information."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/userskillcustomtarget/setapplicability": {
+      "post": {
+        "tags": [
+          "UserStanding"
+        ],
+        "summary": " (Auth)",
+        "parameters": [
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "description": "User-Agent Field, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps.",
+            "schema": {
+              "type": "string",
+              "description": "String value, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps."
+            }
+          },
+          {
+            "name": "User-Agent-EZ",
+            "in": "header",
+            "description": "User-Agent-EZ, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD].  Connected user must have access to one of these apps. Can be used for web applications that can not modify normal user agent information.",
+            "schema": {
+              "type": "string",
+              "description": "String value, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD].  Connected user must have access to one of these apps. Can be used for web applications that can not modify normal user agent information."
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSkillCustomTargetApplicability"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSkillCustomTargetApplicability"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSkillCustomTargetApplicability"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/userskillcustomtarget/remove": {
+      "post": {
+        "tags": [
+          "UserStanding"
+        ],
+        "summary": " (Auth)",
+        "parameters": [
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "description": "User-Agent Field, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps.",
+            "schema": {
+              "type": "string",
+              "description": "String value, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps."
+            }
+          },
+          {
+            "name": "User-Agent-EZ",
+            "in": "header",
+            "description": "User-Agent-EZ, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD].  Connected user must have access to one of these apps. Can be used for web applications that can not modify normal user agent information.",
+            "schema": {
+              "type": "string",
+              "description": "String value, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD].  Connected user must have access to one of these apps. Can be used for web applications that can not modify normal user agent information."
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSkillAndUserMetadata"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSkillAndUserMetadata"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSkillAndUserMetadata"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/v1/userskillvalues": {
       "get": {
         "tags": [
@@ -43880,132 +44049,12 @@
         }
       }
     },
-    "/v1/userskillvalues/add": {
+    "/v1/userskillvalues/remove": {
       "post": {
         "tags": [
           "UserStanding"
         ],
-        "summary": " (Auth roles: shift_leader,manager,superuser,staff)",
-        "parameters": [
-          {
-            "name": "fulloutput",
-            "in": "query",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "User-Agent",
-            "in": "header",
-            "description": "User-Agent Field, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps.",
-            "schema": {
-              "type": "string",
-              "description": "String value, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps."
-            }
-          },
-          {
-            "name": "User-Agent-EZ",
-            "in": "header",
-            "description": "User-Agent-EZ, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD].  Connected user must have access to one of these apps. Can be used for web applications that can not modify normal user agent information.",
-            "schema": {
-              "type": "string",
-              "description": "String value, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD].  Connected user must have access to one of these apps. Can be used for web applications that can not modify normal user agent information."
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserSkillValue"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserSkillValue"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserSkillValue"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/v1/userskillvalues/change/byid": {
-      "post": {
-        "tags": [
-          "UserStanding"
-        ],
-        "summary": " (Auth roles: shift_leader,manager,superuser,staff)",
-        "parameters": [
-          {
-            "name": "fulloutput",
-            "in": "query",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "User-Agent",
-            "in": "header",
-            "description": "User-Agent Field, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps.",
-            "schema": {
-              "type": "string",
-              "description": "String value, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD]. Connected user must have access to one of these apps."
-            }
-          },
-          {
-            "name": "User-Agent-EZ",
-            "in": "header",
-            "description": "User-Agent-EZ, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD].  Connected user must have access to one of these apps. Can be used for web applications that can not modify normal user agent information.",
-            "schema": {
-              "type": "string",
-              "description": "String value, must contain one or more valid tags for accessing the application [EZ-GO APP][EZ-GO WEBAPP][MY EZ-GO][EZ-GO DASHBOARD].  Connected user must have access to one of these apps. Can be used for web applications that can not modify normal user agent information."
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserSkillValue"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserSkillValue"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserSkillValue"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/v1/userskillvalues/change/byuserskill": {
-      "post": {
-        "tags": [
-          "UserStanding"
-        ],
-        "summary": " (Auth roles: shift_leader,manager,superuser,staff)",
+        "summary": " (Auth)",
         "parameters": [
           {
             "name": "User-Agent",
@@ -44030,17 +44079,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserSkillValue"
+                "$ref": "#/components/schemas/UserSkillAndUserMetadata"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserSkillValue"
+                "$ref": "#/components/schemas/UserSkillAndUserMetadata"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UserSkillValue"
+                "$ref": "#/components/schemas/UserSkillAndUserMetadata"
               }
             }
           }
@@ -51577,6 +51626,23 @@
         "description": "ScoreTypeEnum; is used within Audits. ScoreType is a lowercase string in the database. In the API we will use this Enum.\r\nIf we need to check something against the database data, use ToString and ToLowercase within the logic to emulate this behavior.\r\nWhen using for submitting to the EZGO API, always use the value (int) for posting.",
         "format": ""
       },
+      "ScoringMethodEnum": {
+        "enum": [
+          {
+            "key": "Manual",
+            "value": 0,
+            "description": ""
+          },
+          {
+            "key": "Assessment",
+            "value": 1,
+            "description": ""
+          }
+        ],
+        "type": "object",
+        "description": "ScoringMethodEnum is used to indicate the method that is used to get the final score of a user skill value",
+        "format": ""
+      },
       "SettingResourceItem": {
         "type": "object",
         "properties": {
@@ -51936,6 +52002,124 @@
         "description": "SignatureTypeEnum; Describes a type of a filled in signature",
         "format": ""
       },
+      "SkillMatrixLegendConfiguration": {
+        "type": "object",
+        "properties": {
+          "companyId": {
+            "type": "integer",
+            "description": "Company ID this configuration belongs to",
+            "format": "int32"
+          },
+          "mandatorySkills": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SkillMatrixLegendItem"
+            },
+            "description": "List of mandatory skill legend items",
+            "nullable": true
+          },
+          "operationalSkills": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SkillMatrixLegendItem"
+            },
+            "description": "List of operational skill legend items",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Contains the complete legend configuration for a company's Skills Matrix.\r\nGroups legend items by skill type."
+      },
+      "SkillMatrixLegendItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier for the legend item",
+            "format": "int32"
+          },
+          "skillLevelId": {
+            "type": "integer",
+            "description": "Skill level identifier (1-5 for operational, 1-3 for mandatory)",
+            "format": "int32"
+          },
+          "skillType": {
+            "type": "string",
+            "description": "Type of skill: \"mandatory\" or \"operational\"",
+            "nullable": true
+          },
+          "label": {
+            "type": "string",
+            "description": "Editable text label for the skill level (supports i18n)",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Editable description for the skill level (supports org-specific terminology)",
+            "nullable": true
+          },
+          "iconColor": {
+            "type": "string",
+            "description": "Color of the number/icon (6-digit HEX, e.g., #FF8800)",
+            "nullable": true
+          },
+          "backgroundColor": {
+            "type": "string",
+            "description": "Background color (6-digit HEX, e.g., #FFFFFF)",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "description": "Display order integer (ascending)",
+            "format": "int32"
+          },
+          "scoreValue": {
+            "type": "integer",
+            "description": "Score value for operational skills (1-5) or null for mandatory",
+            "format": "int32",
+            "nullable": true
+          },
+          "iconClass": {
+            "type": "string",
+            "description": "Icon class name (e.g., \"thumbsup\", \"thumbsdown\", \"warning\")",
+            "nullable": true
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "Whether this is a default system-provided legend item"
+          },
+          "companyId": {
+            "type": "integer",
+            "description": "Company ID this item belongs to",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the item was created",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Timestamp when the item was last updated",
+            "format": "date-time",
+            "nullable": true
+          },
+          "createdBy": {
+            "type": "integer",
+            "description": "User ID who created this item",
+            "format": "int32",
+            "nullable": true
+          },
+          "updatedBy": {
+            "type": "integer",
+            "description": "User ID who last updated this item",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents a customizable skill level entry in the Skills Matrix Legend.\r\nSupports internationalization and custom color schemes."
+      },
       "SkillTypeEnum": {
         "enum": [
           {
@@ -52260,6 +52444,9 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "scoringMethod": {
+            "$ref": "#/components/schemas/ScoringMethodEnum"
           }
         },
         "additionalProperties": false
@@ -54071,6 +54258,74 @@
         },
         "additionalProperties": false
       },
+      "UserSkillAndUserMetadata": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userSkillId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserSkillCustomTargetApplicability": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "companyId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userSkillId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "customTarget": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "isApplicable": {
+            "type": "boolean"
+          },
+          "createdById": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/UserBasic"
+          },
+          "modifiedById": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "modifiedBy": {
+            "$ref": "#/components/schemas/UserBasic"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "UserSkillValue": {
         "type": "object",
         "properties": {
@@ -54117,6 +54372,9 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "scoringMethod": {
+            "$ref": "#/components/schemas/ScoringMethodEnum"
           }
         },
         "additionalProperties": false

@@ -1,0 +1,1 @@
+{"Id": 0,"CompanyId": ||COMPANYID||,"CreatedById": ||USERID||,"DueDate": "||NOW+1M||","Description": "Automated Action Action Field","Comment": "Automated Action Comment Field","Images": [],"Videos": [],"VideoThumbNails": [],"AssignedUsers": [], "AssignedAreas": [], "IsResolved": false, "Tags": [], "SendToUltimo": false, "UltimoStatus": "NONE"}

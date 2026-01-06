@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZ.Connector.Solvace.Helpers.StartupHelperExtension">
+    <Position X="6" Y="0.5" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Helpers\StartupHelperExtension.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZ.Connector.Solvace.Managers.SolvaceConnector">
+    <Position X="0.5" Y="2.5" Width="5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAwAAAAAAAAEA=</HashCode>
+      <FileName>Managers\SolvaceConnector.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="EZ.Connector.Solvace.Models.SolvaceAction">
+    <Position X="0.5" Y="4.75" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAFACIgACAAACAAAAAAAAABAAAAAAAAAAAAIAU=</HashCode>
+      <FileName>Models\SolvaceAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZ.Connector.Solvace.Models.SolvaceActionComment">
+    <Position X="4.5" Y="4.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAFACAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>Models\SolvaceActionComment.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZ.Connector.Solvace.Models.SolvaceConfig">
+    <Position X="7.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\SolvaceConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZ.Connector.Solvace.Settings.SolvaceConnectorSettings">
+    <Position X="9" Y="4.75" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAEAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Settings\SolvaceConnectorSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="EZ.Connector.Solvace.Interfaces.ISolvaceConnector">
+    <Position X="0.5" Y="0.5" Width="5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAwAAAAAAAAEA=</HashCode>
+      <FileName>Interfaces\ISolvaceConnector.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

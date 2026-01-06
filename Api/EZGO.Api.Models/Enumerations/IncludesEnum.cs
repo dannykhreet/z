@@ -48,7 +48,6 @@ namespace EZGO.Api.Models.Enumerations
         InstructionRelations,
         ItemTemplates,
         Items,
-        Language,
         MainParent,
         MutationInformation,
         ObjectProperties,

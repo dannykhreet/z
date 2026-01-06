@@ -1,0 +1,68 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Helpers\Objects\action_edit.json" />
+    <None Remove="Helpers\Objects\action_new.json" />
+    <None Remove="Helpers\Objects\assessmenttemplate_new.json" />
+    <None Remove="Helpers\Objects\audit_add_large.json" />
+    <None Remove="Helpers\Objects\checklist_add_large.json" />
+    <None Remove="Helpers\Objects\workinstructiontemplate_edit.json" />
+    <None Remove="Helpers\Objects\workinstructiontemplate_new.json" />
+    <None Remove="Helpers\Objects\tasktemplate_dailyintervaldynamic_2day_new.json" />
+    <None Remove="Helpers\Objects\tasktemplate_dailyinterval_2_day_new.json" />
+    <None Remove="Helpers\Objects\tasktemplate_month_1_day_1_new.json" />
+    <None Remove="Helpers\Objects\tasktemplate_norecurrency_new.json" />
+    <None Remove="Helpers\Objects\tasktemplate_shifts_all_new.json" />
+    <None Remove="Helpers\Objects\tasktemplate_week_1_monday_new.json" />
+    <None Remove="Helpers\Objects\feed_item_new.json" />
+    <None Remove="Helpers\Objects\feed_item_with_images_new.json" />
+    <None Remove="Helpers\Objects\feed_item_with_video_new.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Helpers\Objects\tasktemplate_dailyintervaldynamic_2day_new.json" />
+    <EmbeddedResource Include="Helpers\Objects\tasktemplate_dailyinterval_2_day_new.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Helpers\Objects\action_edit.json" />
+    <EmbeddedResource Include="Helpers\Objects\action_edit_remove_resource_area.json" />
+    <EmbeddedResource Include="Helpers\Objects\action_new_with_resource_area.json" />
+    <EmbeddedResource Include="Helpers\Objects\action_edit_remove_resource_user.json" />
+    <EmbeddedResource Include="Helpers\Objects\action_new_with_resource_user.json" />
+    <EmbeddedResource Include="Helpers\Objects\action_new.json" />
+    <EmbeddedResource Include="Helpers\Objects\assessmenttemplate_new.json" />
+    <EmbeddedResource Include="Helpers\Objects\audit_add_large.json" />
+    <EmbeddedResource Include="Helpers\Objects\checklisttemplate_new.json" />
+    <EmbeddedResource Include="Helpers\Objects\checklist_add_large.json" />
+    <EmbeddedResource Include="Helpers\Objects\feed_item_new.json" />
+    <EmbeddedResource Include="Helpers\Objects\feed_item_with_images_new.json" />
+    <EmbeddedResource Include="Helpers\Objects\feed_item_with_video_new.json" />
+    <EmbeddedResource Include="Helpers\Objects\tasktemplate_month_1_day_1_new.json" />
+    <EmbeddedResource Include="Helpers\Objects\tasktemplate_norecurrency_new.json" />
+    <EmbeddedResource Include="Helpers\Objects\tasktemplate_shifts_all_new.json" />
+    <EmbeddedResource Include="Helpers\Objects\tasktemplate_week_1_monday_new.json" />
+    <EmbeddedResource Include="Helpers\Objects\workinstructiontemplate_edit.json" />
+    <EmbeddedResource Include="Helpers\Objects\workinstructiontemplate_new.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
+    <PackageReference Include="NUnit" Version="4.4.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
+    <PackageReference Include="NUnit.Analyzers" Version="4.11.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EZGO.Api.Models\EZGO.Api.Models.csproj" />
+  </ItemGroup>
+</Project>

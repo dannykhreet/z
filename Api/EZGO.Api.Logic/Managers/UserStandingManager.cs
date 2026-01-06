@@ -274,20 +274,34 @@ namespace EZGO.Api.Logic.Managers
             var possibleId = Convert.ToInt32(await _manager.ExecuteScalarAsync("add_userskill", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure));
             if (possibleId > 0)
             {
+                //if an assessment template is linked, update user skill values
+                if (userSkill.SkillAssessmentId.HasValue)
+                {
+                    int updatedUserValuesRowsCount = await UpdateUserSkillValuesWithUserSkillAsync(companyId: companyId, userId: userId, userSkillId: possibleId, deleteOldUserSkillValues: false, keepRecentManualValues: false);
+                }
+
                 var mutated = await _manager.GetDataRowAsJson(Models.Enumerations.TableNames.user_skills.ToString(), possibleId);
                 await _dataAuditing.WriteDataAudit(original: string.Empty, mutated: mutated, Models.Enumerations.TableNames.user_skills.ToString(), objectId: possibleId, userId: userId, companyId: companyId, description: "Added user skill.");
             }
             return possibleId;
         }
 
-        public async Task<int> ChangeUserSkill(int companyId, int userId, int userSkillId, UserSkill userSkill)
+        public async Task<int> ChangeUserSkill(int companyId, int userId, int userSkillId, UserSkill userSkill, bool deleteOldUserSkillValues)
         {
             var original = await _manager.GetDataRowAsJson(Models.Enumerations.TableNames.user_skills.ToString(), userSkillId);
 
+            UserSkill originalSkill = await GetUserSkill(companyId, userSkillId);
             var parameters = GetNpgsqlParametersFromUserSkill(companyId, userId, userSkill, isUpdate: true);
             var possibleId = Convert.ToInt32(await _manager.ExecuteScalarAsync("change_userskill", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure));
             if (possibleId > 0)
             {
+                bool assessmentHasChanged = originalSkill.SkillAssessmentId != userSkill.SkillAssessmentId;
+                //if the linked assessment template or expiry in days changed, update user skill values. When assessment didnt change, keep manual values that are newer then assessment values.
+                if (assessmentHasChanged || originalSkill.ExpiryInDays != userSkill.ExpiryInDays)
+                {
+                    int updatedUserValuesRowsCount = await UpdateUserSkillValuesWithUserSkillAsync(companyId: companyId, userId: userId, userSkillId: possibleId, deleteOldUserSkillValues: deleteOldUserSkillValues, keepRecentManualValues: !assessmentHasChanged);
+                }
+
                 var mutated = await _manager.GetDataRowAsJson(Models.Enumerations.TableNames.user_skills.ToString(), possibleId);
                 await _dataAuditing.WriteDataAudit(original: original, mutated: mutated, Models.Enumerations.TableNames.user_skills.ToString(), objectId: possibleId, userId: userId, companyId: companyId, description: "Changed user skill.");
             }
@@ -422,71 +436,167 @@ namespace EZGO.Api.Logic.Managers
             return userSkillValue;
         }
 
-        public async Task<int> AddUserSkillValue(int companyId, int userId, UserSkillValue userSkillValue)
+        public async Task<int> UpdateUserSkillValuesWithAssessmentAsync(int companyId, int userId, int assessmentId, int assessmentCompletedForId)
         {
+            var original = await _manager.GetDataRowAsJson(TableNames.user_skill_uservalues.ToString(), TableFields.user_id.ToString(), assessmentCompletedForId);
+            
+            List<NpgsqlParameter> parameters =
+            [
+                new NpgsqlParameter("@_companyid", companyId),
+                new NpgsqlParameter("@_userid", userId),
+                new NpgsqlParameter("@_assessmentid", assessmentId),
+            ];
+            var rowsAffected = Convert.ToInt32(await _manager.ExecuteScalarAsync("upsert_userskillvalues_by_assessment", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure));
+
+            if (rowsAffected > 0)
+            {
+                var mutated = await _manager.GetDataRowAsJson(TableNames.user_skill_uservalues.ToString(), TableFields.user_id.ToString(), assessmentCompletedForId);
+                await _dataAuditing.WriteDataAudit(original: original, mutated: mutated, TableNames.user_skill_uservalues.ToString(), objectId: assessmentCompletedForId, userId: userId, companyId: companyId, description: "Updated user skill values from assessment. (objectId of user)");
+            }
+
+            return rowsAffected;
+        }
+        #endregion
+
+        #region - publics User skill custom target applicability - 
+
+        public async Task<List<UserSkillCustomTargetApplicability>> GetUserSkillsCustomTargetApplicabilitiesForUser(int companyId, int? userId = null)
+        {
+            var output = new List<UserSkillCustomTargetApplicability>();
+
+            NpgsqlDataReader dr = null;
+
+            try
+            {
+                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
+                parameters.Add(new NpgsqlParameter("@_companyid", companyId));
+                if(userId != null)
+                {
+                    parameters.Add(new NpgsqlParameter("@_userid", userId));
+                }
+
+                using (dr = await _manager.GetDataReader("get_user_skills_custom_target_applicabilities", commandType: System.Data.CommandType.StoredProcedure, parameters: parameters))
+                {
+                    while (await dr.ReadAsync())
+                    {
+                        var applicability = CreateOrFillUserSkillsCustomTargetApplicabilityForUser(dr);
+                        output.Add(applicability);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(exception: ex, message: string.Concat("UserStandingManager.GetUserSkillsCustomTargetApplicabilitiesForUser(): ", ex.Message));
+
+                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
+            }
+
+            return output;
+        }
+        public async Task<int> SetUserSkillCustomTargetApplicability(int companyId, int userId, UserSkillCustomTargetApplicability userSkillCustomTargetApplicability)
+        {
+            //set_user_skill_custom_applicability_for_user(
+            //_companyid integer,
+            //_userid integer,
+            //_mutatinguserid integer,
+            //_userskillid integer,
+            //_customtarget integer,
+            //_applicable boolean)
+
+            var original = await _manager.GetDataRowAsJson(tableName: Models.Enumerations.TableNames.user_skill_user_targets.ToString(), 
+                                                           fieldName: Models.Enumerations.TableFields.user_id.ToString(), 
+                                                           id: userSkillCustomTargetApplicability.UserId, 
+                                                           fieldname2: Models.Enumerations.TableFields.user_skill_id.ToString(), 
+                                                           id2: userSkillCustomTargetApplicability.UserSkillId);
+
             List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
 
             parameters.Add(new NpgsqlParameter(@"_companyid", companyId));
-            parameters.Add(new NpgsqlParameter(@"_user_skill_id", userSkillValue.UserSkillId));
-            parameters.Add(new NpgsqlParameter(@"_user_id", userSkillValue.UserId));
-            parameters.Add(new NpgsqlParameter(@"_score", userSkillValue.Score));
-            parameters.Add(new NpgsqlParameter(@"_score_type", (object)0));
-            parameters.Add(new NpgsqlParameter(@"_value_date", new DateTime(userSkillValue.ValueDate.Ticks)));
-            parameters.Add(new NpgsqlParameter(@"_user_id_creating", userId));
+            parameters.Add(new NpgsqlParameter(@"_userid", userSkillCustomTargetApplicability.UserId));
+            parameters.Add(new NpgsqlParameter(@"_mutatinguserid", userId));
+            parameters.Add(new NpgsqlParameter(@"_userskillid", userSkillCustomTargetApplicability.UserSkillId));
+            
+            if (userSkillCustomTargetApplicability.IsApplicable)
+            {
+                parameters.Add(new NpgsqlParameter(@"_customtarget", userSkillCustomTargetApplicability.CustomTarget));
+                parameters.Add(new NpgsqlParameter(@"_applicable", userSkillCustomTargetApplicability.IsApplicable));
+            }
+            else
+            {
+                var customTargetParameter = new NpgsqlParameter(@"_customtarget", NpgsqlTypes.NpgsqlDbType.Integer);
+                customTargetParameter.Value = DBNull.Value;
 
-            var possibleId = Convert.ToInt32(await _manager.ExecuteScalarAsync("add_userskillvalue", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure));
+                parameters.Add(customTargetParameter);
+                parameters.Add(new NpgsqlParameter(@"_applicable", userSkillCustomTargetApplicability.IsApplicable));
+            }
+
+            var possibleId = Convert.ToInt32(await _manager.ExecuteScalarAsync("set_user_skill_custom_applicability_for_user", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure));
+            
             if (possibleId > 0)
             {
-                var mutated = await _manager.GetDataRowAsJson(Models.Enumerations.TableNames.user_skill_uservalues.ToString(), possibleId);
-                await _dataAuditing.WriteDataAudit(original: string.Empty, mutated: mutated, Models.Enumerations.TableNames.user_skill_uservalues.ToString(), objectId: possibleId, userId: userId, companyId: companyId, description: "Added user skill value.");
+                var mutated = await _manager.GetDataRowAsJson(tableName: Models.Enumerations.TableNames.user_skill_user_targets.ToString(),
+                                                               fieldName: Models.Enumerations.TableFields.user_id.ToString(),
+                                                               id: userSkillCustomTargetApplicability.UserId,
+                                                               fieldname2: Models.Enumerations.TableFields.user_skill_id.ToString(),
+                                                               id2: userSkillCustomTargetApplicability.UserSkillId);
+
+                await _dataAuditing.WriteDataAudit(original: original, mutated: mutated, Models.Enumerations.TableNames.user_skill_user_targets.ToString(), objectId: possibleId, userId: userId, companyId: companyId, description: "Set user skill custom target applicability for user.");
             }
+
             return possibleId;
         }
 
-        public async Task<int> ChangeUserSkillValueById(int companyId, int userId, UserSkillValue userSkillValue)
+        public async Task<int> RemoveCustomTarget(int companyId, int userId, int userSkillId)
         {
-            var original = await _manager.GetDataRowAsJson(Models.Enumerations.TableNames.user_skill_uservalues.ToString(), userSkillValue.Id);
+            //remove_custom_userskill_target_for_user(
+            //_companyid integer,
+            //_userid integer,
+            //_userskillid integer)
+            var original = await _manager.GetDataRowAsJson(tableName: Models.Enumerations.TableNames.user_skill_user_targets.ToString(),
+                                                           fieldName: Models.Enumerations.TableFields.user_id.ToString(),
+                                                           id: userId,
+                                                           fieldname2: Models.Enumerations.TableFields.user_skill_id.ToString(),
+                                                           id2: userSkillId);
+
             List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
 
-            parameters.Add(new NpgsqlParameter(@"_id", userSkillValue.Id));
-
             parameters.Add(new NpgsqlParameter(@"_companyid", companyId));
-            parameters.Add(new NpgsqlParameter(@"_score", userSkillValue.Score));
-            parameters.Add(new NpgsqlParameter(@"_value_date", new DateTime(userSkillValue.ValueDate.Ticks)));
-            parameters.Add(new NpgsqlParameter(@"_user_skill_id", userSkillValue.UserSkillId));
-            parameters.Add(new NpgsqlParameter(@"_user_id", userSkillValue.UserId));
-            parameters.Add(new NpgsqlParameter(@"_user_id_modified", userId));
+            parameters.Add(new NpgsqlParameter(@"_userid", userId));
+            parameters.Add(new NpgsqlParameter(@"_userskillid", userSkillId));
 
-            var possibleId = Convert.ToInt32(await _manager.ExecuteScalarAsync("change_userskillvalue_byid", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure));
+            var possibleId = Convert.ToInt32(await _manager.ExecuteScalarAsync("remove_custom_userskill_target_for_user", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure));
+
             if (possibleId > 0)
             {
-                var mutated = await _manager.GetDataRowAsJson(Models.Enumerations.TableNames.user_skill_uservalues.ToString(), possibleId);
-                await _dataAuditing.WriteDataAudit(original: original, mutated: mutated, Models.Enumerations.TableNames.user_skill_uservalues.ToString(), objectId: possibleId, userId: userId, companyId: companyId, description: "Changed user skill value by id.");
+                await _dataAuditing.WriteDataAudit(original: original, mutated: string.Empty, Models.Enumerations.TableNames.user_skill_user_targets.ToString(), objectId: possibleId, userId: userId, companyId: companyId, description: "Removed user skill custom target for user.");
             }
+
             return possibleId;
         }
 
-        public async Task<int> ChangeUserSkillValueByUserSkill(int companyId, int userId, UserSkillValue userSkillValue)
+        public async Task<int> RemoveUserSkillValueForUserWithSkill(int companyId, int userId, int userSkillId)
         {
+            var original = await _manager.GetDataRowAsJson(tableName: Models.Enumerations.TableNames.user_skill_uservalues.ToString(),
+                                                           fieldName: Models.Enumerations.TableFields.user_id.ToString(),
+                                                           id: userId,
+                                                           fieldname2: Models.Enumerations.TableFields.user_skill_id.ToString(),
+                                                           id2: userSkillId);
+
             List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
 
-            parameters.Add(new NpgsqlParameter(@"_user_id", userSkillValue.UserId));
-            parameters.Add(new NpgsqlParameter(@"_user_skill_id", userSkillValue.UserSkillId));
-
             parameters.Add(new NpgsqlParameter(@"_companyid", companyId));
-            parameters.Add(new NpgsqlParameter(@"_score", userSkillValue.Score));
-            parameters.Add(new NpgsqlParameter(@"_value_date", new DateTime(userSkillValue.ValueDate.Ticks)));
-            parameters.Add(new NpgsqlParameter(@"_user_id_modified", userId));
+            parameters.Add(new NpgsqlParameter(@"_userid", userId));
+            parameters.Add(new NpgsqlParameter(@"_userskillid", userSkillId));
 
-            var possibleId = Convert.ToInt32(await _manager.ExecuteScalarAsync("change_userskillvalue_byuserskill", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure));
-            if (possibleId > 0)
+            var rowcount = Convert.ToInt32(await _manager.ExecuteScalarAsync("remove_userskillvalue_for_user_with_userskill", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure));
+
+            if (rowcount > 0)
             {
-                var mutated = await _manager.GetDataRowAsJson(Models.Enumerations.TableNames.user_skill_uservalues.ToString(), possibleId);
-                await _dataAuditing.WriteDataAudit(original: "unknown", mutated: mutated, Models.Enumerations.TableNames.user_skill_uservalues.ToString(), objectId: possibleId, userId: userId, companyId: companyId, description: "Changed user skill value by user skill.");
+                await _dataAuditing.WriteDataAudit(original: original, mutated: string.Empty, Models.Enumerations.TableNames.user_skill_uservalues.ToString(), objectId: rowcount, userId: userId, companyId: companyId, description: "Removed user skill user value for user.");
             }
-            return possibleId;
-        }
 
+            return rowcount;
+        }
         #endregion
 
         #region - privates UserGroups -
@@ -675,6 +785,29 @@ namespace EZGO.Api.Logic.Managers
         #endregion
 
         #region - privates UserSkillValues -
+        private async Task<int> UpdateUserSkillValuesWithUserSkillAsync(int companyId, int userId, int userSkillId, bool deleteOldUserSkillValues, bool keepRecentManualValues)
+        {
+            var original = await _manager.GetDataRowAsJson(TableNames.user_skill_uservalues.ToString(), TableFields.user_skill_id.ToString(), userSkillId);
+
+            List<NpgsqlParameter> parameters =
+            [
+                new NpgsqlParameter("@_companyid", companyId),
+                new NpgsqlParameter("@_userid", userId),
+                new NpgsqlParameter("@_userskillid", userSkillId),
+                new NpgsqlParameter("@_deleteoldrecords", deleteOldUserSkillValues),
+                new NpgsqlParameter("@_keeprecentmanualvalues", keepRecentManualValues)
+            ];
+            var rowsAffected = Convert.ToInt32(await _manager.ExecuteScalarAsync("update_userskillvalues_by_userskill", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure));
+
+            if ((rowsAffected) > 0)
+            {
+                var mutated = await _manager.GetDataRowAsJson(TableNames.user_skill_uservalues.ToString(), TableFields.user_skill_id.ToString(), userSkillId);
+                await _dataAuditing.WriteDataAudit(original: original, mutated: mutated, TableNames.user_skill_uservalues.ToString(), objectId: userSkillId, userId: userId, companyId: companyId, description: "Updated user skill values for user skill. (objectId of user skill)");
+            }
+
+            return rowsAffected;
+        }
+
         private UserSkillValue CreateOrFillUserSkillValueFromReader(NpgsqlDataReader dr, UserSkillValue userSkillValue = null)
         {
             if (userSkillValue == null) { userSkillValue = new UserSkillValue(); }
@@ -707,6 +840,79 @@ namespace EZGO.Api.Logic.Managers
 
 
 
+        #endregion
+
+        #region - privates - 
+
+        private UserSkillCustomTargetApplicability CreateOrFillUserSkillsCustomTargetApplicabilityForUser(NpgsqlDataReader dr, UserSkillCustomTargetApplicability applicability = null)
+        {
+            if (applicability == null) applicability = new UserSkillCustomTargetApplicability();
+
+            /*
+            public int Id { get; set; }
+            public int CompanyId { get; set; }
+            public int UserSkillId { get; set; }
+            public int UserId { get; set; }
+
+            public int? CustomTarget { get; set; }
+            public bool IsApplicable { get; set; }
+
+            public int CreatedById { get; set; }
+            public UserBasic CreatedBy { get; set; }
+
+            public int ModifiedById { get; set; }
+            public UserBasic ModifiedBy { get; set; }
+
+            public DateTime? CreatedAt { get; set; }
+            public DateTime? ModifiedAt { get; set; }
+            */
+
+            applicability.Id = Convert.ToInt32(dr["id"]);
+            applicability.CompanyId = Convert.ToInt32(dr["company_id"]);
+            applicability.UserSkillId = Convert.ToInt32(dr["user_skill_id"]);
+            applicability.UserId = Convert.ToInt32(dr["user_id"]);
+
+            if (dr.HasColumn("created_by") && dr.HasColumn("created_by_id") && dr.HasColumn("created_by_picture"))
+            {
+                applicability.CreatedById = Convert.ToInt32(dr["created_by_id"]);
+
+                applicability.CreatedBy = new Models.Basic.UserBasic()
+                {
+                    Id = applicability.CreatedById
+                };
+
+                if(dr["created_by"] != DBNull.Value)
+                    applicability.CreatedBy.Name = Convert.ToString(dr["created_by"]);
+
+                if(dr["created_by_picture"] != DBNull.Value)
+                    applicability.CreatedBy.Picture = Convert.ToString(dr["created_by_picture"]);
+            }
+
+            if (dr.HasColumn("modified_by") && dr.HasColumn("modified_by_id") && dr.HasColumn("modified_by_picture"))
+            {
+                applicability.ModifiedById = Convert.ToInt32(dr["modified_by_id"]);
+                
+                applicability.ModifiedBy = new Models.Basic.UserBasic()
+                {
+                    Id = applicability.ModifiedById
+                };
+
+                if(dr["modified_by"] != DBNull.Value)
+                    applicability.ModifiedBy.Name = Convert.ToString(dr["modified_by"]);
+
+                if(dr["modified_by_picture"] != DBNull.Value)
+                    applicability.ModifiedBy.Picture = Convert.ToString(dr["modified_by_picture"]);
+            }
+
+
+            applicability.CustomTarget = dr["custom_target"] == DBNull.Value ? null : Convert.ToInt32(dr["custom_target"]);
+            applicability.IsApplicable = Convert.ToBoolean(dr["is_applicable"]);
+
+            applicability.CreatedAt = Convert.ToDateTime(dr["created_at"]);
+            applicability.ModifiedAt = Convert.ToDateTime(dr["modified_at"]);
+
+            return applicability;
+        }
         #endregion
 
         #region - logging / error handling -

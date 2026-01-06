@@ -1,0 +1,1694 @@
+{
+  "CompanyId": ||COMPANYID||,
+  "TemplateId": 5589,
+  "IsCompleted": true,
+  "Signatures": [
+    {
+      "SignatureImage": null,
+      "SignedAt": "||NOW||",
+      "SignedById": ||USERID||,
+      "SignedBy": "Automated TestUser"
+    }
+  ],
+  "Tasks": [
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67015,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67016,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67017,
+      "PropertyUserValues": [
+        {
+          "PropertyId": 1017,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2154,
+          "UserValueDecimal": 10
+        },
+        {
+          "PropertyId": 1011,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2155,
+          "UserValueDecimal": 10
+        },
+        {
+          "PropertyId": 1007,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2156,
+          "UserValueDecimal": 12
+        },
+        {
+          "PropertyId": 1006,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2157,
+          "UserValueDecimal": 13
+        }
+      ],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67018,
+      "PropertyUserValues": [
+        {
+          "PropertyId": 1005,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2158,
+          "UserValueDecimal": 122
+        },
+        {
+          "PropertyId": 1004,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2159,
+          "UserValueDecimal": 100
+        }
+      ],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67019,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67020,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67021,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67022,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67023,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67024,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67025,
+      "PropertyUserValues": [
+        {
+          "PropertyId": 1008,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2160,
+          "UserValueDecimal": 10
+        },
+        {
+          "PropertyId": 1004,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2161,
+          "UserValueDecimal": 10
+        },
+        {
+          "PropertyId": 1018,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2162,
+          "UserValueDecimal": 10
+        },
+        {
+          "PropertyId": 1011,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2163,
+          "UserValueDecimal": 10
+        }
+      ],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67026,
+      "PropertyUserValues": [
+        {
+          "PropertyId": 1008,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2164,
+          "UserValueDecimal": 10
+        },
+        {
+          "PropertyId": 1004,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2165,
+          "UserValueDecimal": 10
+        },
+        {
+          "PropertyId": 1016,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2166,
+          "UserValueDecimal": 10
+        },
+        {
+          "PropertyId": 1012,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2167,
+          "UserValueDecimal": 10
+        }
+      ],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67027,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67028,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67029,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67030,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67031,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67032,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67033,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67034,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67035,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67036,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67037,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67038,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67039,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67040,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67041,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67042,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67043,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "skipped",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67044,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "skipped",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67045,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67046,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||Z",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67047,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67048,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67049,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67050,
+      "PropertyUserValues": [
+        {
+          "PropertyId": 1016,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2172,
+          "UserValueDecimal": 10
+        },
+        {
+          "PropertyId": 1014,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2173,
+          "UserValueDecimal": 20
+        },
+        {
+          "PropertyId": 1011,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2174,
+          "UserValueDecimal": 30
+        },
+        {
+          "PropertyId": 1012,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2175,
+          "UserValueDecimal": 40
+        }
+      ],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67051,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67052,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67053,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67054,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67055,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67056,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67057,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67058,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67059,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67060,
+      "PropertyUserValues": [
+        {
+          "PropertyId": 1014,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2176,
+          "UserValueDecimal": 122
+        },
+        {
+          "PropertyId": 1011,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2177,
+          "UserValueDecimal": 10
+        },
+        {
+          "PropertyId": 905,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2178,
+          "UserValueDate": "||NOW||"
+        },
+        {
+          "PropertyId": 1015,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2179,
+          "UserValueDecimal": 10
+        }
+      ],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67061,
+      "PropertyUserValues": [
+        {
+          "PropertyId": 1012,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2180,
+          "UserValueDecimal": 1
+        },
+        {
+          "PropertyId": 1006,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2181,
+          "UserValueDecimal": 2
+        },
+        {
+          "PropertyId": 1022,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2182,
+          "UserValueDecimal": 3
+        },
+        {
+          "PropertyId": 1003,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2183,
+          "UserValueDecimal": 4
+        }
+      ],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67062,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67063,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67064,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67065,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67066,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67067,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67068,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67069,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67070,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67071,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67072,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67073,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67074,
+      "PropertyUserValues": [
+        {
+          "PropertyId": 1017,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2184,
+          "UserValueDecimal": 10
+        }
+      ],
+      "PictureProof": {
+        "Id": 0,
+        "Media": [
+          {
+            "UserFullName": "Automated TestUser",
+            "UserId": ||USERID||,
+            "ItemName": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  (60)",
+            "PictureTakenUtc": "||NOW||",
+            "UriPart": "136/pictureproof/0/c0ac304c-aaef-4fcc-84c0-78fdfa3e664e.png",
+            "ThumbUriPart": "136/pictureproof/0/c0ac304c-aaef-4fcc-84c0-78fdfa3e664e.png"
+          }
+        ],
+        "Description": null,
+        "ProofTakenUtc": "||NOW||",
+        "ProofTakenByUserId": ||USERID||
+      },
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67075,
+      "PropertyUserValues": [],
+      "PictureProof": {
+        "Id": 0,
+        "Media": [
+          {
+            "UserFullName": "Automated TestUser",
+            "UserId": ||USERID||,
+            "ItemName": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  (61)",
+            "PictureTakenUtc": "||NOW||",
+            "UriPart": "136/pictureproof/0/405e4e67-323b-43f0-ab61-39024dafa7fe.png",
+            "ThumbUriPart": "136/pictureproof/0/405e4e67-323b-43f0-ab61-39024dafa7fe.png"
+          }
+        ],
+        "Description": null,
+        "ProofTakenUtc": "||NOW||",
+        "ProofTakenByUserId": ||USERID||
+      },
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67076,
+      "PropertyUserValues": [],
+      "PictureProof": {
+        "Id": 0,
+        "Media": [
+          {
+            "UserFullName": "Automated TestUser",
+            "UserId": ||USERID||,
+            "ItemName": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  (62)",
+            "PictureTakenUtc": "||NOW||",
+            "UriPart": "136/pictureproof/0/c73050be-233e-43bf-b9af-e204befc288a.png",
+            "ThumbUriPart": "136/pictureproof/0/c73050be-233e-43bf-b9af-e204befc288a.png"
+          }
+        ],
+        "Description": null,
+        "ProofTakenUtc": "||NOW||",
+        "ProofTakenByUserId": ||USERID||
+      },
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67077,
+      "PropertyUserValues": [
+        {
+          "PropertyId": 1006,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2185,
+          "UserValueDecimal": 3
+        },
+        {
+          "PropertyId": 1020,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2186,
+          "UserValueDecimal": 1
+        },
+        {
+          "PropertyId": 1009,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2187,
+          "UserValueDecimal": 0
+        }
+      ],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67078,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67079,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67080,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67081,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67082,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67083,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67084,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67085,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67086,
+      "PropertyUserValues": [
+        {
+          "PropertyId": 1012,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2188,
+          "UserValueDecimal": 10
+        }
+      ],
+      "PictureProof": {
+        "Id": 0,
+        "Media": [
+          {
+            "UserFullName": "Automated TestUser",
+            "UserId": ||USERID||,
+            "ItemName": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  (72)",
+            "PictureTakenUtc": "||NOW||",
+            "UriPart": "136/pictureproof/0/0eecdc3c-aedb-4299-b2d6-331b1923d336.png",
+            "ThumbUriPart": "136/pictureproof/0/0eecdc3c-aedb-4299-b2d6-331b1923d336.png"
+          }
+        ],
+        "Description": null,
+        "ProofTakenUtc": "||NOW||",
+        "ProofTakenByUserId": ||USERID||
+      },
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67087,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67088,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67089,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "skipped",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67090,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67091,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67092,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67093,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67094,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67095,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67096,
+      "PropertyUserValues": [
+        {
+          "PropertyId": 1006,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2189,
+          "UserValueDecimal": 10
+        },
+        {
+          "PropertyId": 1006,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2190,
+          "UserValueDecimal": 10
+        },
+        {
+          "PropertyId": 1016,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2191,
+          "UserValueDecimal": 22
+        },
+        {
+          "PropertyId": 1015,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2192,
+          "UserValueDecimal": 10
+        }
+      ],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67097,
+      "PropertyUserValues": [],
+      "PictureProof": {
+        "Id": 0,
+        "Media": [
+          {
+            "UserFullName": "Automated TestUser",
+            "UserId": ||USERID||,
+            "ItemName": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  (83)",
+            "PictureTakenUtc": "||NOW||",
+            "UriPart": "136/pictureproof/0/12c33023-3e5f-4cd6-bad5-62f3a94f59ac.png",
+            "ThumbUriPart": "136/pictureproof/0/12c33023-3e5f-4cd6-bad5-62f3a94f59ac.png"
+          }
+        ],
+        "Description": null,
+        "ProofTakenUtc": "||NOW||",
+        "ProofTakenByUserId": ||USERID||
+      },
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67098,
+      "PropertyUserValues": [],
+      "PictureProof": {
+        "Id": 0,
+        "Media": [
+          {
+            "UserFullName": "Automated TestUser",
+            "UserId": ||USERID||,
+            "ItemName": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  (84)",
+            "PictureTakenUtc": "||NOW||",
+            "UriPart": "136/pictureproof/0/c22d2c43-f76c-400a-85e2-36a06abfae5c.png",
+            "ThumbUriPart": "136/pictureproof/0/c22d2c43-f76c-400a-85e2-36a06abfae5c.png"
+          }
+        ],
+        "Description": null,
+        "ProofTakenUtc": "||NOW||",
+        "ProofTakenByUserId": ||USERID||
+      },
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67099,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67100,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67101,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67102,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67103,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67104,
+      "PropertyUserValues": [],
+      "PictureProof": {
+        "Id": 0,
+        "Media": [
+          {
+            "UserFullName": "Automated TestUser",
+            "UserId": ||USERID||,
+            "ItemName": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  (90)",
+            "PictureTakenUtc": "||NOW||",
+            "UriPart": "136/pictureproof/0/685cd783-06eb-408c-bfbf-d318789fff19.png",
+            "ThumbUriPart": "136/pictureproof/0/685cd783-06eb-408c-bfbf-d318789fff19.png"
+          }
+        ],
+        "Description": null,
+        "ProofTakenUtc": "||NOW||",
+        "ProofTakenByUserId": ||USERID||
+      },
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67105,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67106,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67107,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67108,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67109,
+      "PropertyUserValues": [
+        {
+          "PropertyId": 900,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2193,
+          "UserValueString": "12345 text"
+        },
+        {
+          "PropertyId": 904,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2194,
+          "UserValueTime": "11:22"
+        }
+      ],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67110,
+      "PropertyUserValues": [
+        {
+          "PropertyId": 1007,
+          "CompanyId": ||COMPANYID||,
+          "UserId": ||USERID||,
+          "TemplatePropertyId": 2195,
+          "UserValueDecimal": 10
+        }
+      ],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "skipped",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67111,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67112,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67113,
+      "PropertyUserValues": [],
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    },
+    {
+      "Status": "not ok",
+      "CompanyId": ||COMPANYID||,
+      "TemplateId": 67114,
+      "PropertyUserValues": [],
+      "PictureProof": {
+        "Id": 0,
+        "Media": [
+          {
+            "UserFullName": "Automated TestUser",
+            "UserId": ||USERID||,
+            "ItemName": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  (100)",
+            "PictureTakenUtc": "||NOW||",
+            "UriPart": "136/pictureproof/0/c4ba5f01-6113-41a9-93c7-e72166a2700a.png",
+            "ThumbUriPart": "136/pictureproof/0/c4ba5f01-6113-41a9-93c7-e72166a2700a.png"
+          }
+        ],
+        "Description": null,
+        "ProofTakenUtc": "||NOW||",
+        "ProofTakenByUserId": ||USERID||
+      },
+      "Signature": {
+        "SignatureImage": null,
+        "SignedAt": "||NOW||",
+        "SignedById": ||USERID||,
+        "SignedBy": "Automated TestUser"
+      }
+    }
+  ],
+  "OpenFieldsPropertyUserValues": [
+    {
+      "PropertyId": 920,
+      "CompanyId": ||COMPANYID||,
+      "UserId": ||USERID||,
+      "TemplatePropertyId": 415,
+      "UserValueString": "AA175KK12.A"
+    },
+    {
+      "PropertyId": 920,
+      "CompanyId": ||COMPANYID||,
+      "UserId": ||USERID||,
+      "TemplatePropertyId": 416,
+      "UserValueString": "AA175KK12.F"
+    },
+    {
+      "PropertyId": 920,
+      "CompanyId": ||COMPANYID||,
+      "UserId": ||USERID||,
+      "TemplatePropertyId": 417,
+      "UserValueString": "AA175KK12.B"
+    },
+    {
+      "PropertyId": 920,
+      "CompanyId": ||COMPANYID||,
+      "UserId": ||USERID||,
+      "TemplatePropertyId": 418,
+      "UserValueString": "AA175KK12.G"
+    },
+    {
+      "PropertyId": 920,
+      "CompanyId": ||COMPANYID||,
+      "UserId": ||USERID||,
+      "TemplatePropertyId": 419,
+      "UserValueString": "AA175KK12.C"
+    },
+    {
+      "PropertyId": 920,
+      "CompanyId": ||COMPANYID||,
+      "UserId": ||USERID||,
+      "TemplatePropertyId": 420,
+      "UserValueString": "AA175KK12.H"
+    },
+    {
+      "PropertyId": 920,
+      "CompanyId": ||COMPANYID||,
+      "UserId": ||USERID||,
+      "TemplatePropertyId": 421,
+      "UserValueString": "AA175KK12.D"
+    },
+    {
+      "PropertyId": 920,
+      "CompanyId": ||COMPANYID||,
+      "UserId": ||USERID||,
+      "TemplatePropertyId": 422,
+      "UserValueString": "AA175KK12.I"
+    },
+    {
+      "PropertyId": 920,
+      "CompanyId": ||COMPANYID||,
+      "UserId": ||USERID||,
+      "TemplatePropertyId": 423,
+      "UserValueString": "AA175KK12.E"
+    },
+    {
+      "PropertyId": 920,
+      "CompanyId": ||COMPANYID||,
+      "UserId": ||USERID||,
+      "TemplatePropertyId": 424,
+      "UserValueString": "AA175KK12.J"
+    }
+  ]
+}

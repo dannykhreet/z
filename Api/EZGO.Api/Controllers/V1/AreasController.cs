@@ -68,25 +68,6 @@ namespace EZGO.Api.Controllers.V1
 
         }
 
-        //Gets all areas of a company no matter the userId.
-        [Route("areascompany")]
-        [HttpGet]
-        public async Task<IActionResult> GetAreasCompany([FromQuery] bool? allowedonly = null, [FromQuery] int? maxlevel = 3, [FromQuery] bool usetreeview = false, string include = null)
-        {
-            //TODO validate maxlevel + usetreeview
-
-            var filters = new AreaFilters() { AllowedOnly = allowedonly }; //TODO refactor
-
-            Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
-
-            var result = await _manager.GetAreasAsync(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), maxLevel: maxlevel.Value, useTreeview: usetreeview, filters: filters, include: include);
-
-            Agent.Tracer.CurrentSpan.End();
-
-            return StatusCode((int)HttpStatusCode.OK, (result).ToJsonFromObject());
-
-        }
-
         [Route("area/{areaid}")]
         [HttpGet]
         public async Task<IActionResult> GetArea([FromRoute] int areaid, [FromQuery] int? maxlevel = 2, [FromQuery] bool usetreeview = true, string include = null)

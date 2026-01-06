@@ -41,20 +41,18 @@ namespace EZGO.Api.Controllers.V1
         private readonly IUserManager _userManager;
         private readonly ICompanyManager _companyManager;
         private readonly ISharedTemplateManager _sharedTemplateManager;
-        private readonly ITranslationManager _translationManager;
         private readonly IFlattenChecklistManager _flattenedChecklistManager;
         private readonly IGeneralManager _generalManager;
         #endregion
 
         #region - constructor(s) -
-        public ChecklistTemplatesController(IGeneralManager generalManager, IFlattenChecklistManager flattenChecklistManager, ISharedTemplateManager sharedTemplateManager, IUserManager userManager, ICompanyManager companyManager, IChecklistManager manager, IToolsManager toolsManager, IConfigurationHelper configurationHelper, ITranslationManager translationManager, ILogger<ChecklistTemplatesController> logger, IApplicationUser applicationUser) : base(logger, applicationUser, configurationHelper)
+        public ChecklistTemplatesController(IGeneralManager generalManager, IFlattenChecklistManager flattenChecklistManager, ISharedTemplateManager sharedTemplateManager, IUserManager userManager, ICompanyManager companyManager, IChecklistManager manager, IToolsManager toolsManager, IConfigurationHelper configurationHelper, ILogger<ChecklistTemplatesController> logger, IApplicationUser applicationUser) : base(logger, applicationUser, configurationHelper)
         {
             _manager = manager;
             _toolsManager = toolsManager;
             _userManager = userManager;
             _companyManager = companyManager;
             _sharedTemplateManager = sharedTemplateManager;
-            _translationManager = translationManager;
             _flattenedChecklistManager = flattenChecklistManager;
             _generalManager = generalManager;
         }
@@ -221,10 +219,6 @@ namespace EZGO.Api.Controllers.V1
                                                                   userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(),
                                                                   checklistTemplate: checklisttemplate);
 
-
-            await _translationManager.TranslateAndSaveObjectAsync(result, "checklist");
-
-
             if (checklisttemplate.SharedTemplateId.HasValue && checklisttemplate.SharedTemplateId.Value > 0)
             {
                 await _sharedTemplateManager.AcceptSharedTemplateAsync(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), 
@@ -301,9 +295,6 @@ namespace EZGO.Api.Controllers.V1
                                                                     userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(),
                                                                     checklistTemplateId: checklisttemplateid,
                                                                     checklistTemplate: checklisttemplate);
-
-            await _translationManager.TranslateAndSaveObjectAsync(checklisttemplateid, "checklist");
-
 
             ChecklistTemplate resultfull = null;
 

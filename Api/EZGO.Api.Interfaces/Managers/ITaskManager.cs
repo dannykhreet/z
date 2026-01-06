@@ -101,7 +101,7 @@ namespace EZGO.Api.Interfaces.Managers
         List<Exception> GetPossibleExceptions();
         Task<TaskStatisticsOverview> GetTaskLandingPageStats(int companyId, int userId, int areaid);
         Task<TasksWithMetaData> GetTasksGen4Async(int companyId, int userId, Gen4TaskFilters filters, string include);
-        Gen4TaskFilters GetTaskFilters(TaskTimeSpanEnum? timespanType, int? timespanOffset, DateTime? startTimestamp, DateTime? endTimestamp, int areaId, string filtertext, string statusIds, string tagIds, bool? allowDuplicateTaskInstances, int? limit, int? offset);
+        Gen4TaskFilters GetTaskFilters(TaskTimeSpanEnum? timespanType, int? timespanOffset, DateTime? startTimestamp, DateTime? endTimestamp, int areaId, string filtertext, string statusIds, string tagIds, bool? allowDuplicateTaskInstances, int? limit, int? offset, bool ShowSkippableTaskOverview);
     }
 
 }

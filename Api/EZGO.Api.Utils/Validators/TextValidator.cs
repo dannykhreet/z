@@ -30,7 +30,7 @@ namespace EZGO.Api.Utils.Validators
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static string StripRogueDataFromText(string text, bool ignoreEmailChar = false)
+        public static string StripRogueDataFromText(string text, bool ignoreEmailChar = false, bool ignoreMinusChar = false)
         {
             var output = text;
             if(!string.IsNullOrEmpty(output))
@@ -44,7 +44,7 @@ namespace EZGO.Api.Utils.Validators
                 output = output.Replace("<", "˂"); // replace lesser than (U+003C) with arrow left (U+02C2) 
                 output = output.Replace(">", "˃");// replace greater than (U+003E) with arrow right (U+02C3) 
                 output = output.Replace("+", "＋");// replace + with ＋ (U+FF0B)
-                output = output.Replace("-", "−");// replace - with − (U+2212)
+                if (!ignoreMinusChar) output = output.Replace("-", "−");// replace - with − (U+2212)
                 output = output.Replace("=", "꞊");// replace = with ꞊ (U+2261)
                 if(!ignoreEmailChar) output = output.Replace("@", "﹫");// replace @ with ﹫ (U+FE6B)
             }

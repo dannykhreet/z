@@ -1994,6 +1994,21 @@
             Thumbs; in database 'thumbs'.
             </summary>
         </member>
+        <member name="T:EZGO.Api.Models.Enumerations.ScoringMethodEnum">
+            <summary>
+            ScoringMethodEnum is used to indicate the method that is used to get the final score of a user skill value
+            </summary>
+        </member>
+        <member name="F:EZGO.Api.Models.Enumerations.ScoringMethodEnum.Manual">
+            <summary>
+            The score is a manual input by a user and was not calculated by the system
+            </summary>
+        </member>
+        <member name="F:EZGO.Api.Models.Enumerations.ScoringMethodEnum.Assessment">
+            <summary>
+            The score is the result of an assessment and was calculated by the system as the average score of all assessment item scores
+            </summary>
+        </member>
         <member name="T:EZGO.Api.Models.Enumerations.SettingResourceSettingsTypeEnum">
             <summary>
             SettingResourceTypeEnum; A list of settings that are used within the apps, data and api's.
@@ -3846,6 +3861,118 @@
             Version; The version of this instance of the object. Format VyyyyMMddHHmmsss (e.g. V202403131215347 when generated on 13 march 2024 at 13:15:34.7)
             </summary>
         </member>
+        <member name="T:EZGO.Api.Models.Skills.SkillMatrixLegendConfiguration">
+            <summary>
+            Contains the complete legend configuration for a company's Skills Matrix.
+            Groups legend items by skill type.
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendConfiguration.CompanyId">
+            <summary>
+            Company ID this configuration belongs to
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendConfiguration.MandatorySkills">
+            <summary>
+            List of mandatory skill legend items
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendConfiguration.OperationalSkills">
+            <summary>
+            List of operational skill legend items
+            </summary>
+        </member>
+        <member name="M:EZGO.Api.Models.Skills.SkillMatrixLegendConfiguration.#ctor">
+            <summary>
+            Initialize with default collections
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Models.Skills.SkillMatrixLegendItem">
+            <summary>
+            Represents a customizable skill level entry in the Skills Matrix Legend.
+            Supports internationalization and custom color schemes.
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendItem.Id">
+            <summary>
+            Unique identifier for the legend item
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendItem.SkillLevelId">
+            <summary>
+            Skill level identifier (1-5 for operational, 1-3 for mandatory)
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendItem.SkillType">
+            <summary>
+            Type of skill: "mandatory" or "operational"
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendItem.Label">
+            <summary>
+            Editable text label for the skill level (supports i18n)
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendItem.Description">
+            <summary>
+            Editable description for the skill level (supports org-specific terminology)
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendItem.IconColor">
+            <summary>
+            Color of the number/icon (6-digit HEX, e.g., #FF8800)
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendItem.BackgroundColor">
+            <summary>
+            Background color (6-digit HEX, e.g., #FFFFFF)
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendItem.Order">
+            <summary>
+            Display order integer (ascending)
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendItem.ScoreValue">
+            <summary>
+            Score value for operational skills (1-5) or null for mandatory
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendItem.IconClass">
+            <summary>
+            Icon class name (e.g., "thumbsup", "thumbsdown", "warning")
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendItem.IsDefault">
+            <summary>
+            Whether this is a default system-provided legend item
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendItem.CompanyId">
+            <summary>
+            Company ID this item belongs to
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendItem.CreatedAt">
+            <summary>
+            Timestamp when the item was created
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendItem.UpdatedAt">
+            <summary>
+            Timestamp when the item was last updated
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendItem.CreatedBy">
+            <summary>
+            User ID who created this item
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Skills.SkillMatrixLegendItem.UpdatedBy">
+            <summary>
+            User ID who last updated this item
+            </summary>
+        </member>
         <member name="T:EZGO.Api.Models.Skills.SkillsMatrix">
             <summary>
             
@@ -3860,6 +3987,23 @@
         <member name="T:EZGO.Api.Models.Skills.SkillsMatrixUser">
             <summary>
             
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Users.UserGroup.Tags">
+            <summary>
+            Tags; Tags that are added to this user group
+            </summary>
+        </member>
+        <member name="T:EZGO.Api.Models.Users.UserSettings">
+            <summary>
+            UserSettings; Specific user settings (roles etc) that are stored with the extended user details. 
+            These settings can be extended for specific settings that can be used for specific users. 
+            NOTE! this are not 'APP SETTINGS' which users can set them selves. These will be handled by seperate logic. 
+            </summary>
+        </member>
+        <member name="P:EZGO.Api.Models.Users.UserSkill.Tags">
+            <summary>
+            Tags; Tags that are added to this user skill
             </summary>
         </member>
         <member name="T:EZGO.Api.Models.Stage">
@@ -4914,23 +5058,6 @@
         <member name="P:EZGO.Api.Models.UserProfile.MfaTimebasedOneTimePasswordEnabled">
             <summary>
             TimebasedOneTimePasswordEnabled time based one time password enabled true/false (for use with authentication app)
-            </summary>
-        </member>
-        <member name="P:EZGO.Api.Models.Users.UserGroup.Tags">
-            <summary>
-            Tags; Tags that are added to this user group
-            </summary>
-        </member>
-        <member name="T:EZGO.Api.Models.Users.UserSettings">
-            <summary>
-            UserSettings; Specific user settings (roles etc) that are stored with the extended user details. 
-            These settings can be extended for specific settings that can be used for specific users. 
-            NOTE! this are not 'APP SETTINGS' which users can set them selves. These will be handled by seperate logic. 
-            </summary>
-        </member>
-        <member name="P:EZGO.Api.Models.Users.UserSkill.Tags">
-            <summary>
-            Tags; Tags that are added to this user skill
             </summary>
         </member>
         <member name="T:EZGO.Api.Models.WhiteLabel.LabelSettings">

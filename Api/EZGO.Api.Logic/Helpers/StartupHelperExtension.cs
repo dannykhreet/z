@@ -69,7 +69,6 @@ namespace EZGO.Api.Logic.Helpers
             services.AddScoped<IVersionManager, VersionManager>();
             services.AddScoped<ISapPmManager, SapPmManager>();
             services.AddScoped<ISapPmProcessingManager, SapPmProcessingManager>();
-            services.AddScoped<IVirtualTeamLeadManager, VirtualTeamLeadManager>();
             //flatten managers
             services.AddScoped<IFlattenAutomatedManager, FlattenAutomatedManager>();
             services.AddScoped<IFlattenChecklistManager, FlattenChecklistManager>();
@@ -77,7 +76,6 @@ namespace EZGO.Api.Logic.Helpers
             services.AddScoped<IFlattenWorkInstructionManager, FlattenWorkInstructionManager>();
             services.AddScoped<IFlattenAssessmentManager, FlattenAssessmentManager>();
             services.AddScoped<IFlattenTaskManager, FlattenTaskManager>();
-            services.AddScoped <ITranslationManager, TranslationManager>();
         }
     }
 }

@@ -23,6 +23,7 @@ namespace EZGO.Api.Utils.Converters
                 userSkill.ExpiryInDays = matrixUserSkill.ExpiryInDays;
                 userSkill.NotificationWindowInDays = matrixUserSkill.NotificationWindowInDays;
                 userSkill.Goal = matrixUserSkill.Goal;
+                userSkill.DefaultTarget = matrixUserSkill.DefaultTarget;
                 return userSkill;
 
             }

@@ -81,8 +81,6 @@ namespace EZGO.Api.Controllers.V1
         {
             Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
 
-            _manager.Culture = TranslationLanguage;
-
             var filters = new DashboardFilters() { UseStatisticsTotals = false, UseAnnouncements = false, UseCompanyOverview = false, UseCompletedAudits = usecompletedaudits, UseCompletedChecklists = usecompletedchecklists, UseCompletedTasks = usecompletedtasks, UseActions = useactions };
 
             var result = await _manager.GetDashboardCompletedItems(companyId: await CurrentApplicationUser.GetAndSetCompanyIdAsync(), userId: await CurrentApplicationUser.GetAndSetUserIdAsync(), filters);
@@ -101,8 +99,6 @@ namespace EZGO.Api.Controllers.V1
         {
             Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
 
-            _manager.Culture = TranslationLanguage;
-
             var result = await _manager.GetDashboardCompletedAudits(companyId: await CurrentApplicationUser.GetAndSetCompanyIdAsync(), userId: await CurrentApplicationUser.GetAndSetUserIdAsync());
 
             AppendCapturedExceptionToApm(_manager.GetPossibleExceptions());
@@ -118,8 +114,6 @@ namespace EZGO.Api.Controllers.V1
         public async Task<IActionResult> GetDashboardCompletedChecklists()
         {
             Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
-
-            _manager.Culture = TranslationLanguage;
 
             var result = await _manager.GetDashboardCompletedChecklists(companyId: await CurrentApplicationUser.GetAndSetCompanyIdAsync(), userId: await CurrentApplicationUser.GetAndSetUserIdAsync());
 
@@ -137,8 +131,6 @@ namespace EZGO.Api.Controllers.V1
         {
             Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
 
-            _manager.Culture = TranslationLanguage;
-
             var result = await _manager.GetDashboardCompletedTasks(companyId: await CurrentApplicationUser.GetAndSetCompanyIdAsync(), userId: await CurrentApplicationUser.GetAndSetUserIdAsync());
 
             AppendCapturedExceptionToApm(_manager.GetPossibleExceptions());
@@ -154,8 +146,6 @@ namespace EZGO.Api.Controllers.V1
         public async Task<IActionResult> GetDashboardActions()
         {
             Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
-
-            _manager.Culture = TranslationLanguage;
 
             var result = await _manager.GetDashboardActions(companyId: await CurrentApplicationUser.GetAndSetCompanyIdAsync(), userId: await CurrentApplicationUser.GetAndSetUserIdAsync());
 

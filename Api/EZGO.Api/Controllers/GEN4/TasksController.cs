@@ -86,6 +86,8 @@ namespace EZGO.Api.Controllers.GEN4
         /// <param name="statusids">An optional comma-separated list of status identifiers to filter tasks by their status.</param>
         /// <param name="tagids">An optional comma-separated list of tag identifiers to filter tasks by their associated tags.</param>
         /// <param name="include">An optional parameter specifying additional related data to include in the response.</param>
+        /// <param name="allowduplicatetaskinstances">If this parameter is set to True multiple instances of Tasks can be returned</param>
+        /// <param name="returnAllSkippableTasks">If this parameter is set to true a list with all tasks that are skipable is returned. This parameter can't be combined with the limit, offset or statusids parameters</param>
         /// <param name="limit">An optional parameter specifying the maximum number of tasks to return. Defaults to 200 if not
         /// provided.</param>
         /// <param name="offset">An optional parameter specifying the number of tasks to skip before starting to return results. Defaults to
@@ -95,7 +97,7 @@ namespace EZGO.Api.Controllers.GEN4
         /// input or other errors.</returns>
         [Route("tasks")]
         [HttpGet]
-        public async Task<IActionResult> GetTasks([FromQuery] int areaid, [FromQuery] TaskTimeSpanEnum? timespantype, [FromQuery] int? timespanoffset, [FromQuery] DateTime? starttimestamp, [FromQuery] DateTime? endtimestamp, [FromQuery] string? filtertext, [FromQuery] string? statusids, [FromQuery] string? tagids, [FromQuery] string? include, [FromQuery] bool? allowduplicatetaskinstances, [FromQuery] int? limit, [FromQuery] int? offset)
+        public async Task<IActionResult> GetTasks([FromQuery] int areaid, [FromQuery] TaskTimeSpanEnum? timespantype, [FromQuery] int? timespanoffset, [FromQuery] DateTime? starttimestamp, [FromQuery] DateTime? endtimestamp, [FromQuery] string? filtertext, [FromQuery] string? statusids, [FromQuery] string? tagids, [FromQuery] string? include, [FromQuery] bool? allowduplicatetaskinstances, [FromQuery] int? limit, [FromQuery] int? offset, [FromQuery] bool returnAllSkippableTasks = false)
         {
             var result = new TasksWithMetaData();
             DateTime timestamp = DateTime.Now;
@@ -127,8 +129,20 @@ namespace EZGO.Api.Controllers.GEN4
                 return StatusCode((int)HttpStatusCode.BadRequest, "Cannot retrieve duplicates on overdue tasks.");
             }
 
+            if(returnAllSkippableTasks)
+            {
+                if (limit.HasValue || offset.HasValue)
+                {
+                    return StatusCode((int)HttpStatusCode.BadRequest, "Cannot combine returnAllSkippableTasks with limit or offset. All tasks are returned");
+                }
+                if (!string.IsNullOrEmpty(statusids))
+                {
+                    return StatusCode((int)HttpStatusCode.BadRequest, "Cannot combine returnAllSkippableTasks with statusids. Only todo tasks are returned.");
+                }
+            }
 
-            Gen4TaskFilters filters = _manager.GetTaskFilters(timespanType: timespantype, timespanOffset: timespanoffset, startTimestamp: starttimestamp, endTimestamp: endtimestamp, areaId: areaid, filtertext: filtertext, statusIds: statusids, tagIds: tagids, allowDuplicateTaskInstances: allowduplicatetaskinstances, limit: limit, offset:offset);
+
+            Gen4TaskFilters filters = _manager.GetTaskFilters(timespanType: timespantype, timespanOffset: timespanoffset, startTimestamp: starttimestamp, endTimestamp: endtimestamp, areaId: areaid, filtertext: filtertext, statusIds: statusids, tagIds: tagids, allowDuplicateTaskInstances: allowduplicatetaskinstances, limit: limit, offset:offset, ShowSkippableTaskOverview: returnAllSkippableTasks);
 
 
             var uniqueKey = string.Format("GET_TASKS_GEN4_TASKS_{0}_T{1}_C{2}_U{3}_L{4}_O{5}",

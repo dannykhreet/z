@@ -28,7 +28,6 @@ namespace EZGO.Api.Interfaces.Managers
         
         Task<bool> RemoveMatrixUserSkillRelationAsync(int companyId, int userId, int matrixId, int matrixRelationUserSkillId, MatrixRelationUserSkill matrixRelationUserSkill);
         Task<int> AddMatrixUserSkillAsync(int companyId, int userId, int matrixId, SkillsMatrixItem matrixUserSkill);
-        Task<int> ChangeMatrixUserSkillAsync(int companyId, int userId, int matrixId, SkillsMatrixItem matrixUserSkill);
 
         Task<int> AddMatrixUserGroupAsync(int companyId, int userId, int matrixId, SkillsMatrixUserGroup matrixUserGroup);
         Task<int> ChangeMatrixUserGroupAsync(int companyId, int userId, int matrixId, SkillsMatrixUserGroup matrixUserGroup);
@@ -39,19 +38,8 @@ namespace EZGO.Api.Interfaces.Managers
         Task<List<SkillsMatrixUser>> GetMatrixUsersAsync(int companyId, int userId, int matrixId, ConnectionKind connectionKind = ConnectionKind.Reader);
         Task<List<SkillsMatrixItemValue>> GetMatrixUserSkillValuesAsync(int companyId, int userId, int matrixId, ConnectionKind connectionKind = ConnectionKind.Reader);
         Task<SkillsMatrixUserGroup> GetMatrixUserGroupAsync(int companyId, int userId, int matrixId, int matrixUserGroupId, ConnectionKind connectionKind = ConnectionKind.Reader);
-        Task<SkillsMatrixItem> GetMatrixUserSkillAsync(int companyId, int userId, int matrixId, int matrixUserSkillId, SkillTypeEnum skillTypeEnum, ConnectionKind connectionKind = ConnectionKind.Reader);
-        Task<SkillsMatrixUser> GetMatrixUserByUserProfileAsync(int companyId, int userId, int matrixId, int userProfileId, ConnectionKind connectionKind = ConnectionKind.Reader);
-
         Task<bool> SaveMatrixUserSkillValue(int companyId, int userId, int matrixId, SkillsMatrixItemValue matrixItemValue);
-
-        Task<List<AssessmentScoreItem>> GetMatrixAssessmentScoreItemsAsync(int companyId, int userId, int matrixId);
         List<Exception> GetPossibleExceptions();
-
-        #region Legend Configuration
-        Task<SkillMatrixLegendConfiguration> GetLegendConfigurationAsync(int companyId, int userId);
-        Task<SkillMatrixLegendConfiguration> SaveLegendConfigurationAsync(SkillMatrixLegendConfiguration configuration, int userId);
-        Task<SkillMatrixLegendItem> UpdateLegendItemAsync(int companyId, SkillMatrixLegendItem item, int userId);
-        #endregion
 
     }
 }

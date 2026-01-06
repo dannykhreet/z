@@ -1,0 +1,17 @@
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZ.Connector.Solvace\bin\Release\net6.0\EZ.Connector.Solvace.deps.json
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZ.Connector.Solvace\bin\Release\net6.0\EZ.Connector.Solvace.dll
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZ.Connector.Solvace\bin\Release\net6.0\EZ.Connector.Solvace.pdb
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZ.Connector.Solvace\bin\Release\net6.0\EZGO.Api.Models.dll
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZ.Connector.Solvace\bin\Release\net6.0\EZGO.Api.Models.pdb
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZ.Connector.Solvace\bin\Release\net6.0\EZGO.Api.Models.xml
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZ.Connector.Solvace\obj\Release\net6.0\EZ.Connector.Solvace.csproj.AssemblyReference.cache
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZ.Connector.Solvace\obj\Release\net6.0\EZ.Connector.Solvace.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZ.Connector.Solvace\obj\Release\net6.0\EZ.Connector.Solvace.AssemblyInfoInputs.cache
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZ.Connector.Solvace\obj\Release\net6.0\EZ.Connector.Solvace.AssemblyInfo.cs
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZ.Connector.Solvace\obj\Release\net6.0\EZ.Connector.Solvace.csproj.CoreCompileInputs.cache
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZ.Connector.Solvace\obj\Release\net6.0\EZ.Connector.Solvace.sourcelink.json
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZ.Connector.Solvace\obj\Release\net6.0\EZ.Conne.0568B292.Up2Date
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZ.Connector.Solvace\obj\Release\net6.0\EZ.Connector.Solvace.dll
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZ.Connector.Solvace\obj\Release\net6.0\refint\EZ.Connector.Solvace.dll
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZ.Connector.Solvace\obj\Release\net6.0\EZ.Connector.Solvace.pdb
+C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZ.Connector.Solvace\obj\Release\net6.0\ref\EZ.Connector.Solvace.dll

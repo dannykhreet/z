@@ -41,13 +41,12 @@ namespace EZGO.Api.Controllers.V1
         private readonly IUserManager _userManager;
         private readonly ICompanyManager _companyManager;
         private readonly ISharedTemplateManager _sharedTemplateManager;
-        private readonly ITranslationManager _translationManager;
         private readonly IGeneralManager _generalManager;
         private readonly IFlattenAuditManager _flattenedAuditManager;
         #endregion
 
         #region - constructor(s) -
-        public AuditTemplatesController(ICompanyManager companyManager, IGeneralManager generalManager, IFlattenAuditManager flattenAuditManager, ISharedTemplateManager sharedTemplateManager, IUserManager userManager, IAuditManager manager, IToolsManager toolsManager, IConfigurationHelper configurationHelper, ILogger<AuditTemplatesController> logger, IApplicationUser applicationUser, ITranslationManager translationManager) : base(logger, applicationUser, configurationHelper)
+        public AuditTemplatesController(ICompanyManager companyManager, IGeneralManager generalManager, IFlattenAuditManager flattenAuditManager, ISharedTemplateManager sharedTemplateManager, IUserManager userManager, IAuditManager manager, IToolsManager toolsManager, IConfigurationHelper configurationHelper, ILogger<AuditTemplatesController> logger, IApplicationUser applicationUser) : base(logger, applicationUser, configurationHelper)
         {
             _manager = manager;
             _toolsManager = toolsManager;
@@ -56,7 +55,6 @@ namespace EZGO.Api.Controllers.V1
             _sharedTemplateManager = sharedTemplateManager;
             _generalManager = generalManager;
             _flattenedAuditManager = flattenAuditManager;
-            _translationManager = translationManager;
         }
         #endregion
 
@@ -233,9 +231,6 @@ namespace EZGO.Api.Controllers.V1
             var result = await _manager.AddAuditTemplateAsync(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(),
                                                                   userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(),
                                                                   auditTemplate: audittemplate);
-             
-            await _translationManager.TranslateAndSaveObjectAsync(result, "audit"); 
-
 
             AuditTemplate retrievedAuditTemplate = null;
 
@@ -306,8 +301,6 @@ namespace EZGO.Api.Controllers.V1
                                                                   userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(),
                                                                   auditTemplateId: audittemplateid,
                                                                   auditTemplate: audittemplate);
-
-            await _translationManager.TranslateAndSaveObjectAsync(audittemplateid, "audit");
 
             AuditTemplate retrievedAuditTemplate = null;
             //if flatten data on or fulloutput, retrieve audit template for further processing

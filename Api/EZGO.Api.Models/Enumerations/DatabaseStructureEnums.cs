@@ -97,6 +97,7 @@ namespace EZGO.Api.Models.Enumerations
         user_groups,
         user_skills,
         user_skill_uservalues,
+        user_skill_user_targets,
         version_app,
         workinstruction_template_audittemplate,
         workinstruction_template_audittemplate_item,
@@ -123,11 +124,13 @@ namespace EZGO.Api.Models.Enumerations
         comment_id,
         company_id,
         holding_id,
+        matrix_id,
         tag_id,
         task_id,
         tasktemplate_id,
         taskrecurrency_id,
         user_id,
+        user_skill_id,
         workinstruction_template_id
     }
 

@@ -23,16 +23,6 @@ namespace EZGO.Api.Logic.Managers
     public class DashboardsManager : BaseManager<DashboardsManager>, IDashboardsManager
     {
 
-        #region - properties -
-        private string culture;
-        public string Culture
-        {
-            get { return culture; }
-            set { culture = _checklistManager.Culture = _auditManager.Culture = _taskManager.Culture = _actionManager.Culture = value; }
-        }
-
-        #endregion
-
         #region - privates -
         private readonly IStatisticsManager _statsManager;
         private readonly IGeneralManager _generalManager;
@@ -73,16 +63,16 @@ namespace EZGO.Api.Logic.Managers
             if (filters != null && filters.UseCompletedAudits) dashboard.CompletedAudits = await _auditManager.GetAuditsAsync(companyId: companyId,
                                                                                                                               userId: userId,
                                                                                                                               filters: new AuditFilters() { IsCompleted = true, Limit = 5 },
-                                                                                                                              include: "language,tasks,areapaths,properties,propertyvalues,propertyuservalues,openfields,pictureproof",
+                                                                                                                              include: "tasks,areapaths,properties,propertyvalues,propertyuservalues,openfields,pictureproof",
                                                                                                                               useStatic: await _generalManager.GetHasAccessToFeatureByCompany(companyId: companyId,
                                                                                                                                                                                               featurekey: Settings.FeatureSettings.TECH_FEATURE_USE_STATIC_AUDIT_STORAGE));
             if (filters != null && filters.UseCompletedChecklists) dashboard.CompletedChecklists = await _checklistManager.GetChecklistsAsync(companyId: companyId,
                                                                                                                                               userId: userId,
                                                                                                                                               filters: new ChecklistFilters() { IsCompleted = true, Limit = 5 },
-                                                                                                                                              include: "language,tasks,areapaths,properties,propertyvalues,propertyuservalues,openfields,pictureproof",
+                                                                                                                                              include: "tasks,areapaths,properties,propertyvalues,propertyuservalues,openfields,pictureproof",
                                                                                                                                               useStatic: await _generalManager.GetHasAccessToFeatureByCompany(companyId: companyId,
                                                                                                                                                                                                               featurekey: Settings.FeatureSettings.TECH_FEATURE_USE_STATIC_CHECKLIST_STORAGE));
-            if (filters != null && filters.UseCompletedTasks) dashboard.CompletedTasks = await _taskManager.GetLatestTasks(companyId: companyId, 5, include: "language,steps,areapaths,properties,propertyvalues,propertyuservalues,pictureproof");
+            if (filters != null && filters.UseCompletedTasks) dashboard.CompletedTasks = await _taskManager.GetLatestTasks(companyId: companyId, 5, include: "steps,areapaths,properties,propertyvalues,propertyuservalues,pictureproof");
             if (filters != null && filters.UseActions) dashboard.Actions = await _actionManager.GetActionsAsync(companyId: companyId, userId: userId, new ActionFilters() { Limit = 100 });
 
             //add specific sorting.
@@ -144,7 +134,7 @@ namespace EZGO.Api.Logic.Managers
             return await _auditManager.GetAuditsAsync(companyId: companyId,
                                                       userId: userId,
                                                       filters: new AuditFilters() { IsCompleted = true, Limit = 5 },
-                                                      include: "language,tasks,areapaths,properties,propertyvalues,propertyuservalues,openfields,pictureproof",
+                                                      include: "tasks,areapaths,properties,propertyvalues,propertyuservalues,openfields,pictureproof",
                                                       useStatic: await _generalManager.GetHasAccessToFeatureByCompany(companyId: companyId,
                                                                                                                                                                                               featurekey: Settings.FeatureSettings.TECH_FEATURE_USE_STATIC_AUDIT_STORAGE));
         }
@@ -162,7 +152,7 @@ namespace EZGO.Api.Logic.Managers
             return await _checklistManager.GetChecklistsAsync(companyId: companyId,
                                                               userId: userId,
                                                               filters: new ChecklistFilters() { IsCompleted = true, Limit = 5 },
-                                                              include: "tasks,areapaths,properties,propertyvalues,propertyuservalues,openfields,pictureproof,language",
+                                                              include: "tasks,areapaths,properties,propertyvalues,propertyuservalues,openfields,pictureproof",
                                                               useStatic: await _generalManager.GetHasAccessToFeatureByCompany(companyId: companyId,
                                                                                                                                                                                                               featurekey: Settings.FeatureSettings.TECH_FEATURE_USE_STATIC_CHECKLIST_STORAGE));
         }
@@ -177,7 +167,7 @@ namespace EZGO.Api.Logic.Managers
         /// <returns>A dashboard object containing several lists and collections of statistics.</returns>
         public async Task<List<Models.TasksTask>> GetDashboardCompletedTasks(int companyId, int userId)
         {
-            return await _taskManager.GetLatestTasks(companyId: companyId, 5, include: "language,steps,areapaths,properties,propertyvalues,propertyuservalues,pictureproof");
+            return await _taskManager.GetLatestTasks(companyId: companyId, 5, include: "steps,areapaths,properties,propertyvalues,propertyuservalues,pictureproof");
         }
 
         /// <summary>

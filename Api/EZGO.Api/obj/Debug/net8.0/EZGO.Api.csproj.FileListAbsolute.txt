@@ -342,4 +342,3 @@ C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api\obj\Debug\net8.0\EZGO.Api.pdb
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api\obj\Debug\net8.0\EZGO.Api.genruntimeconfig.cache
 C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api\obj\Debug\net8.0\ref\EZGO.Api.dll
-C:\Users\DannyKhreet\Desktop\Project Repos\BackEnd\Api - Task Generator\EZGO.Api\obj\Debug\net8.0\EZGO.Api.MvcApplicationPartsAssemblyInfo.cs

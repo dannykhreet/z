@@ -1,0 +1,39 @@
+{
+  "Id": 0,
+  "Name": "AUTOMATED TEST ADD CHECKLIST TEMPLATE SIMPLE ||NOW|| (DO NOT CHANGE)",
+  "Role": "basic",
+  "AreaId": 7042,
+  "IsDoubleSignatureRequired": false,
+  "IsSignatureRequired": false,
+  "CompanyId": 136,
+  "HasIncompleteChecklists": false,
+  "isNew": false,
+  "StageTemplates": [],
+  "TaskTemplates": [
+    {
+      "Id": 0,
+      "Name": "Checklist in-active-active item 1",
+      "CompanyId": 136,
+      "Type": "checklist",
+      "isNew": false,
+      "Index": 1,
+      "StepsCount": 0,
+      "HasPictureProof": false,
+      "Attachments": [],
+      "Properties": []
+    },
+    {
+      "Id": 0,
+      "Name": "Checklist in-active-active item 2",
+      "CompanyId": 136,
+      "Type": "checklist",
+      "isNew": false,
+      "Index": 2,
+      "StepsCount": 0,
+      "HasPictureProof": false,
+      "Attachments": [],
+      "Properties": []
+    }
+  ],
+  "Tags": []
+}

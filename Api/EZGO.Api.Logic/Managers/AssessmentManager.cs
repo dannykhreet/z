@@ -47,10 +47,11 @@ namespace EZGO.Api.Logic.Managers
         private readonly IGeneralManager _generalManager;
         private readonly IFlattenAssessmentManager _flattenedAssessmentManager;
         private readonly IUserManager _userManager;
+        private readonly IUserStandingManager _userStandingManager;
         #endregion
 
         #region - constructor(s) -
-        public AssessmentManager(IGeneralManager generalManager, IFlattenAssessmentManager flattenedAssessmentManager, IDatabaseAccessHelper manager, IUserManager userManager, ITagManager tagManager, IConfigurationHelper configurationHelper, IAreaManager areaManager, IDataAuditing dataAuditing, ILogger<AssessmentManager> logger) : base(logger)
+        public AssessmentManager(IUserStandingManager userStandingManager, IGeneralManager generalManager, IFlattenAssessmentManager flattenedAssessmentManager, IDatabaseAccessHelper manager, IUserManager userManager, ITagManager tagManager, IConfigurationHelper configurationHelper, IAreaManager areaManager, IDataAuditing dataAuditing, ILogger<AssessmentManager> logger) : base(logger)
         {
             _manager = manager;
             _areaManager = areaManager;
@@ -60,6 +61,7 @@ namespace EZGO.Api.Logic.Managers
             _generalManager = generalManager;
             _flattenedAssessmentManager = flattenedAssessmentManager;
             _userManager = userManager;
+            _userStandingManager = userStandingManager;
         }
         #endregion
 
@@ -135,20 +137,6 @@ namespace EZGO.Api.Logic.Managers
 
         }
 
-        private async Task<Assessment> ApplyTemplateVersionToAssessment(Assessment assessment, int companyId, string include = null)
-        {
-            if (!string.IsNullOrEmpty(assessment.Version))
-            {
-                AssessmentTemplate versionedTemplate = await _flattenedAssessmentManager.RetrieveFlattenData(templateId: assessment.TemplateId, companyId: companyId, version: assessment.Version);
-
-                if (versionedTemplate != null)
-                    assessment.ApplyTemplateVersion(versionedTemplate, include);
-                else
-                    _logger.LogWarning($"ApplyTemplateVersionToAssessment(); Template version not applied because requested version wasn't found. AssessmentTemplateId: {assessment.TemplateId}, version: {assessment.Version}");
-            }
-            return assessment;
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -200,8 +188,12 @@ namespace EZGO.Api.Logic.Managers
                     var rowsEffected = await ChangeAssessmentAddOrChangeSkillInstructionsAsync(companyId: companyId, userId: userId, assessmentId: possibleId, assessment.SkillInstructions);
                 }
 
-                var calcresult = await SetAssessmentCalculatedScoreAsync(companyId: companyId, assessmentId: possibleId);
+                decimal score = await SetAssessmentCalculatedScoreAsync(companyId: companyId, userId: userId, assessmentId: possibleId);
 
+                if (assessment.IsCompleted && assessment.CompletedForId.HasValue)
+                {
+                    int updatedUserValuesRowsCount = await _userStandingManager.UpdateUserSkillValuesWithAssessmentAsync(companyId: companyId, userId: userId, assessmentId: possibleId, assessmentCompletedForId: assessment.CompletedForId.Value);
+                }
             }
 
             if (possibleId > 0)
@@ -238,7 +230,11 @@ namespace EZGO.Api.Logic.Managers
                 var rowsEffected = await ChangeAssessmentAddOrChangeSkillInstructionsAsync(companyId: companyId, userId: userId, assessmentId: assessmentId, assessment.SkillInstructions);
             }
 
-            var calcresult = await SetAssessmentCalculatedScoreAsync(companyId: companyId, assessmentId: assessmentId);
+            decimal score = await SetAssessmentCalculatedScoreAsync(companyId: companyId, userId: userId, assessmentId: assessmentId);
+            if (assessment.IsCompleted && assessment.CompletedForId.HasValue)
+            {
+                int updatedUserValuesRowsCount = await _userStandingManager.UpdateUserSkillValuesWithAssessmentAsync(companyId: companyId, userId: userId, assessmentId: assessmentId, assessmentCompletedForId: assessment.CompletedForId.Value);
+            }
 
             if (rowseffected > 0)
             {
@@ -274,6 +270,21 @@ namespace EZGO.Api.Logic.Managers
             }
 
             return (rowseffected > 0);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="assessmentId"></param>
+        /// <returns></returns>
+        public async Task<bool> FreeLinkedAssessmentInstruction(int companyId, int assessmentId)
+        {
+            List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
+            parameters.Add(new NpgsqlParameter("@_companyid", companyId));
+            parameters.Add(new NpgsqlParameter("@_templateid", assessmentId));
+            var dataeffected = Convert.ToBoolean(await _manager.ExecuteScalarAsync("remove_linked_assessment", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure));
+            return dataeffected;
         }
 
         /// <summary>
@@ -442,39 +453,6 @@ namespace EZGO.Api.Logic.Managers
 
             return output;
         }
-
-        private async Task<List<Assessment>> ApplyTemplateVersionToAssessments(List<Assessment> assessments, int companyId, string include = null)
-        {
-            //cache versioned templates based on template id and version
-            Dictionary<KeyValuePair<int, string>, AssessmentTemplate> VersionedAssessmentsCache = new();
-            foreach (Assessment assessment in assessments)
-            {
-                if (!string.IsNullOrEmpty(assessment.Version) && assessment.Version != await _flattenedAssessmentManager.RetrieveLatestAvailableVersion(assessment.TemplateId, companyId))
-                {
-                    AssessmentTemplate versionedTemplate = null;
-                    KeyValuePair<int, string> TemplateIdVersionPair = new(assessment.TemplateId, assessment.Version);
-
-                    if (VersionedAssessmentsCache.ContainsKey(TemplateIdVersionPair))
-                    {
-                        //get correct version of template from cache if it is already present
-                        versionedTemplate = VersionedAssessmentsCache.GetValueOrDefault(TemplateIdVersionPair);
-                    }
-                    else
-                    {
-                        //retrieve the correct version of the template from the database and add it to the cache
-                        versionedTemplate = await _flattenedAssessmentManager.RetrieveFlattenData(templateId: assessment.TemplateId, companyId: companyId, version: assessment.Version);
-                        VersionedAssessmentsCache.Add(TemplateIdVersionPair, versionedTemplate);
-                    }
-
-                    if (versionedTemplate != null)
-                        assessment.ApplyTemplateVersion(versionedTemplate, include);
-                    else
-                        _logger.LogWarning($"ApplyTemplateVersionToAssessments(); Template version not applied because requested version wasn't found. AssessmentTemplateId: {assessment.TemplateId}, version: {assessment.Version}");
-                }
-            }
-            return assessments;
-        }
-
         #endregion
 
         #region - private assessment (retrieval methods) -
@@ -602,24 +580,22 @@ namespace EZGO.Api.Logic.Managers
             return skillInstructions;
         }
 
-        private async Task<bool> SetAssessmentCalculatedScoreAsync(int companyId, int assessmentId)
+        private async Task<decimal> SetAssessmentCalculatedScoreAsync(int companyId, int userId, int assessmentId)
         {
             var original = await _manager.GetDataRowAsJson(Models.Enumerations.TableNames.assessments.ToString(), assessmentId);
 
-            List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
-            parameters.Add(new NpgsqlParameter("@_companyid", companyId));
-            parameters.Add(new NpgsqlParameter("@_id", assessmentId));
+            List<NpgsqlParameter> parameters = [
+                new("@_companyid", companyId),
+                new("@_userid", userId),
+                new("@_assessmentid", assessmentId)
+            ];
 
-            var rowseffected = Convert.ToInt32(await _manager.ExecuteScalarAsync("set_assessment_calculated_score", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure));
+            var score = Convert.ToInt32(await _manager.ExecuteScalarAsync("set_assessment_calculated_score", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure));
 
-            if (rowseffected > 0)
-            {
-                var mutated = await _manager.GetDataRowAsJson(Models.Enumerations.TableNames.assessments.ToString(), assessmentId);
-                await _dataAuditing.WriteDataAudit(original: original, mutated: mutated, Models.Enumerations.TableNames.assessments.ToString(), objectId: assessmentId, userId: 0, companyId: companyId, description: "Changed assessment score.");
+            var mutated = await _manager.GetDataRowAsJson(Models.Enumerations.TableNames.assessments.ToString(), assessmentId);
+            await _dataAuditing.WriteDataAudit(original: original, mutated: mutated, Models.Enumerations.TableNames.assessments.ToString(), objectId: assessmentId, userId: 0, companyId: companyId, description: "Changed assessment score.");
 
-            }
-
-            return (rowseffected > 0);
+            return score;
         }
         #endregion
 
@@ -1341,6 +1317,54 @@ namespace EZGO.Api.Logic.Managers
                 parameters.Add(new NpgsqlParameter("@_scored_at", assessmentInstructionItem.ScoredAt.Value));
 
             return parameters;
+        }
+        #endregion
+
+        #region - assessment versioning methods -
+        private async Task<Assessment> ApplyTemplateVersionToAssessment(Assessment assessment, int companyId, string include = null)
+        {
+            if (!string.IsNullOrEmpty(assessment.Version))
+            {
+                AssessmentTemplate versionedTemplate = await _flattenedAssessmentManager.RetrieveFlattenData(templateId: assessment.TemplateId, companyId: companyId, version: assessment.Version);
+
+                if (versionedTemplate != null)
+                    assessment.ApplyTemplateVersion(versionedTemplate, include);
+                else
+                    _logger.LogWarning($"ApplyTemplateVersionToAssessment(); Template version not applied because requested version wasn't found. AssessmentTemplateId: {assessment.TemplateId}, version: {assessment.Version}");
+            }
+            return assessment;
+        }
+
+        private async Task<List<Assessment>> ApplyTemplateVersionToAssessments(List<Assessment> assessments, int companyId, string include = null)
+        {
+            //cache versioned templates based on template id and version
+            Dictionary<KeyValuePair<int, string>, AssessmentTemplate> VersionedAssessmentsCache = new();
+            foreach (Assessment assessment in assessments)
+            {
+                if (!string.IsNullOrEmpty(assessment.Version) && assessment.Version != await _flattenedAssessmentManager.RetrieveLatestAvailableVersion(assessment.TemplateId, companyId))
+                {
+                    AssessmentTemplate versionedTemplate = null;
+                    KeyValuePair<int, string> TemplateIdVersionPair = new(assessment.TemplateId, assessment.Version);
+
+                    if (VersionedAssessmentsCache.ContainsKey(TemplateIdVersionPair))
+                    {
+                        //get correct version of template from cache if it is already present
+                        versionedTemplate = VersionedAssessmentsCache.GetValueOrDefault(TemplateIdVersionPair);
+                    }
+                    else
+                    {
+                        //retrieve the correct version of the template from the database and add it to the cache
+                        versionedTemplate = await _flattenedAssessmentManager.RetrieveFlattenData(templateId: assessment.TemplateId, companyId: companyId, version: assessment.Version);
+                        VersionedAssessmentsCache.Add(TemplateIdVersionPair, versionedTemplate);
+                    }
+
+                    if (versionedTemplate != null)
+                        assessment.ApplyTemplateVersion(versionedTemplate, include);
+                    else
+                        _logger.LogWarning($"ApplyTemplateVersionToAssessments(); Template version not applied because requested version wasn't found. AssessmentTemplateId: {assessment.TemplateId}, version: {assessment.Version}");
+                }
+            }
+            return assessments;
         }
         #endregion
 

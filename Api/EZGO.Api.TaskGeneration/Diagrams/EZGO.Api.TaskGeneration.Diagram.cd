@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="EZGO.Api.TaskGeneration.Base.BaseManager&lt;T&gt;">
+    <Position X="1" Y="1" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Base\BaseManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EZGO.Api.Logic.Generation.TaskGenerationManager">
+    <Position X="1" Y="3.5" Width="9" />
+    <TypeIdentifier>
+      <HashCode>AAEAAgCAAAIQAgAAFAAAEkAAAQgAAEAAIgBAAAAAAAA=</HashCode>
+      <FileName>Generation\TaskGenerationManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="EZGO.Api.TaskGeneration.Helpers.StartupHelperExtension">
+    <Position X="5.75" Y="1" Width="4.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Helpers\StartupHelperExtension.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

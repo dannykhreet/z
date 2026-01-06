@@ -1,4 +1,12 @@
-﻿using EEZGO.Api.Utils.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Spreadsheet;
+using EEZGO.Api.Utils.Data;
 using EZGO.Api.Interfaces.Data;
 using EZGO.Api.Interfaces.Reporting;
 using EZGO.Api.Interfaces.Settings;
@@ -11,13 +19,6 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EZGO.Api.Logic.Exporting
 {
@@ -248,10 +249,10 @@ namespace EZGO.Api.Logic.Exporting
             return output;
         }
 
-        public async Task<AuditsReport> GetAuditsStatisticsAsync(int companyId, DateTime? timestamp = null, int? areaId = null)
+        public async Task<AuditsReport> GetAuditsStatisticsAsync(int companyId, DateTime? timestamp = null, int? areaId = null, int? templateId = null)
         {
             var storedProcedureName = "report_statistics_auditsaverage_gen4";
-            var output = new AuditsReport();
+            AuditsReport output = null;
 
             NpgsqlDataReader dr = null;
 
@@ -268,6 +269,11 @@ namespace EZGO.Api.Logic.Exporting
                 if (areaId.HasValue && areaId.Value > 0)
                 {
                     parameters.Add(new NpgsqlParameter("@_areaid", areaId.Value));
+                }
+
+                if(templateId.HasValue && templateId.Value > 0)
+                {
+                    parameters.Add(new NpgsqlParameter("@_templateid", templateId.Value));
                 }
 
                 using (dr = await _manager.GetDataReader(storedProcedureName, commandType: CommandType.StoredProcedure, parameters: parameters))
@@ -461,7 +467,7 @@ namespace EZGO.Api.Logic.Exporting
             return output;
         }
 
-        public async Task<AuditsReportExtended> GetAuditsStatisticsExtendedAsync(int companyId, DateTime? timestamp = null, int? areaId = null, string periodType = "last12days")
+        public async Task<AuditsReportExtended> GetAuditsStatisticsExtendedAsync(int companyId, DateTime? timestamp = null, int? areaId = null, string periodType = "last12days", int? templateId = null)
         {
             var spNameExtendedSP = "report_statistics_auditscount_extended_gen4";
             var spNameDeviationsSP = "report_statistics_auditscount_deviations_gen4";
@@ -494,6 +500,13 @@ namespace EZGO.Api.Logic.Exporting
                     parametersExtendedSP.Add(new NpgsqlParameter("@_timerangetype", periodType));
                     parametersDeviationsSP.Add(new NpgsqlParameter("@_timerangetype", periodType));
                 }
+
+                if (templateId.HasValue && templateId.Value > 0)
+                {
+                    parametersExtendedSP.Add(new NpgsqlParameter("@_templateid", templateId.Value));
+                    parametersDeviationsSP.Add(new NpgsqlParameter("@_templateid", templateId.Value));
+                }
+
 
                 using (dr = await _manager.GetDataReader(spNameExtendedSP, commandType: CommandType.StoredProcedure, parameters: parametersExtendedSP))
                 {
@@ -1948,9 +1961,9 @@ namespace EZGO.Api.Logic.Exporting
                 PeriodStart = Convert.ToDateTime(dr["period_start"]),
                 PeriodEnd = Convert.ToDateTime(dr["period_end"]),
                 LabelText = Convert.ToString(dr["label_text"]),
-                TotalCount = Convert.ToInt16(dr["total_count"]),
-                UnresolvedCount = Convert.ToInt16(dr["unresolved_count"]),
-                ResolvedCount = Convert.ToInt16(dr["resolved_count"])
+                TotalCount = Convert.ToInt32(dr["total_count"]),
+                UnresolvedCount = Convert.ToInt32(dr["unresolved_count"]),
+                ResolvedCount = Convert.ToInt32(dr["resolved_count"])
             };
 
             actionsReportExtended.ActionsStartedAndResolved.Add(statistic);
@@ -1963,10 +1976,10 @@ namespace EZGO.Api.Logic.Exporting
 
             actionsReportExtended.ActionCounts = new ActionCountsStatistic()
             {
-                TotalActions = Convert.ToInt16(dr["total_actions_count"]),
-                ResolvedActions = Convert.ToInt16(dr["resolved_actions_count"]),
-                OpenActions = Convert.ToInt16(dr["open_actions_count"]),
-                OverdueActions = Convert.ToInt16(dr["overdue_actions_count"])
+                TotalActions = Convert.ToInt32(dr["total_actions_count"]),
+                ResolvedActions = Convert.ToInt32(dr["resolved_actions_count"]),
+                OpenActions = Convert.ToInt32(dr["open_actions_count"]),
+                OverdueActions = Convert.ToInt32(dr["overdue_actions_count"])
             };
 
             return actionsReportExtended;
@@ -1981,9 +1994,9 @@ namespace EZGO.Api.Logic.Exporting
 
             ActionsUserStatistic statistic = new ActionsUserStatistic()
             {
-                UserId = Convert.ToInt16(dr["user_id"]),
+                UserId = Convert.ToInt32(dr["user_id"]),
                 FullName = Convert.ToString(dr["user_name"]),
-                Count = Convert.ToInt16(dr["total_count"])
+                Count = Convert.ToInt32(dr["total_count"])
             };
 
             switch (Convert.ToString(dr["top5Type"]))

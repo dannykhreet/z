@@ -110,7 +110,6 @@ namespace EZGO.Api.Logic.Managers
                 var skills = await GetMatrixUserSkillsAsync(companyId: companyId, userId: userId, matrixId: matrixId); //retrieve all skills with matrix
                 var users = await GetMatrixUsersAsync(companyId: companyId, userId: userId, matrixId: matrixId); //retrieve all users with matrix
                 var userValues = await GetMatrixUserSkillValuesAsync(companyId: companyId, userId: userId, matrixId: matrixId); //retrieve all user values (based on user value table) with matrix
-                var assessmentValues = await GetMatrixAssessmentScoreItemsAsync(companyId: companyId, userId: userId, matrixId: matrixId); //retrieve all scores with assessments with skills with matrix
 
                 //set all skill values (user values) for each skill
                 foreach (var skill in skills)
@@ -133,29 +132,6 @@ namespace EZGO.Api.Logic.Managers
                 {
                     var foundUsers = users.Where(x => x.GroupId == group.UserGroupId).ToList();
                     group.Users = foundUsers;
-                }
-
-                //go through all operational skills, check all values that are located with a skill and check if there is a assessment score that is either newer or not available for that skill in the user values with that skill. 
-                //if either older of non existent; update or add that user value with that skill
-                foreach (var skill in matrix.OperationalSkills)
-                {
-                    if (skill.SkillAssessmentId.HasValue && skill.SkillAssessmentId.Value > 0)
-                    {
-                        var assessmentValuesWithSkill = assessmentValues.Where(x => x.AssessmentTemplateId == skill.SkillAssessmentId).OrderByDescending(x => x.ScoreDate);
-                        foreach (var assessmentValue in assessmentValuesWithSkill)
-                        {
-                            var userSkillValue = new SkillsMatrixItemValue()
-                            {
-                                Score = assessmentValue.Score,
-                                UserId = assessmentValue.UserId,
-                                UserSkillId = skill.Id,
-                                ValueDate = assessmentValue.ScoreDate,
-                                ModifiedAt = assessmentValue.ScoreDate,
-                                CreatedAt = assessmentValue.ScoreDate
-                            };
-                            skill.Values.Add(userSkillValue);
-                        }
-                    }
                 }
 
                 //get all operational behaviours
@@ -416,6 +392,7 @@ namespace EZGO.Api.Logic.Managers
         //TODO Add data auditing? How? Unknown id
         public async Task<bool> ChangeMatrixUserGroupRelationAsync(int companyId, int userId, int matrixId, int matrixRelationUserGroupId, MatrixRelationUserGroup matrixRelationUserGroup)
         {
+
             List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
             parameters.Add(new NpgsqlParameter("@_id", matrixRelationUserGroup.Id));
             parameters.Add(new NpgsqlParameter("@_companyid", companyId));
@@ -605,7 +582,6 @@ namespace EZGO.Api.Logic.Managers
             var userValues = new List<SkillsMatrixItemValue>();
             var skills = await GetMatrixUserSkillsAsync(companyId: companyId, userId: userId, matrixId: matrixId); //retrieve all skills with matrix
             var operationalSkills = skills.Where(x => x.SkillType == SkillTypeEnum.Operational)?.OrderBy(x => x.Name).ToList(); //create a list of only operational skills
-            var assessmentValues = await GetMatrixAssessmentScoreItemsAsync(companyId: companyId, userId: userId, matrixId: matrixId); //retrieve all scores with assessments with skills with matrix
 
             NpgsqlDataReader dr = null;
 
@@ -649,6 +625,11 @@ namespace EZGO.Api.Logic.Managers
                         userValue.Score = 0;
                         continue;
                     }
+                    else if(userSkill.ExpiryInDays == null)
+                    {
+                        userValue.Score = 2;
+                        continue;
+                    }
                     else if (userSkill.ExpiryInDays != null && userValue.ValueDate.Year != 1)
                     {
                         var expiryDate = userValue.ValueDate.AddDays(userSkill.ExpiryInDays.Value);
@@ -667,27 +648,6 @@ namespace EZGO.Api.Logic.Managers
                             }
                         }
                         userValue.Score = 2;
-                    }
-                }
-            }
-
-            foreach (var skill in operationalSkills)
-            {
-                if (skill.SkillAssessmentId.HasValue && skill.SkillAssessmentId.Value > 0)
-                {
-                    var assessmentValuesWithSkill = assessmentValues.Where(x => x.AssessmentTemplateId == skill.SkillAssessmentId).OrderByDescending(x => x.ScoreDate);
-                    foreach (var assessmentValue in assessmentValuesWithSkill)
-                    {
-                        var userSkillValue = new SkillsMatrixItemValue()
-                        {
-                            Score = assessmentValue.Score,
-                            UserId = assessmentValue.UserId,
-                            UserSkillId = skill.UserSkillId,
-                            ValueDate = assessmentValue.ScoreDate,
-                            ModifiedAt = assessmentValue.ScoreDate,
-                            CreatedAt = assessmentValue.ScoreDate
-                        };
-                        userValues.Add(userSkillValue);
                     }
                 }
             }
@@ -715,14 +675,16 @@ namespace EZGO.Api.Logic.Managers
             if (possibleId > 0)
             {
                 var mutated = await _manager.GetDataRowAsJson(Models.Enumerations.TableNames.matrix_user_skills.ToString(), matrixId);
-                await _dataAuditing.WriteDataAudit(original: string.Empty, mutated: mutated, Models.Enumerations.TableNames.matrix_user_skills.ToString(), objectId: matrixId, userId: userId, companyId: companyId, description: "Added matrix user skill.");
+                await _dataAuditing.WriteDataAudit(original: string.Empty, mutated: mutated, Models.Enumerations.TableNames.matrix_user_skills.ToString(), objectId: matrixId, userId: userId, companyId: companyId, description: "Added matrix user skill. (objectId of matrix)");
             }
             return possibleId;
         }
 
-        //TODO Add data auditing? How? Unknown id
+
         public async Task<bool> ChangeMatrixUserSkillRelationAsync(int companyId, int userId, int matrixId, int matrixRelationUserSkillId, MatrixRelationUserSkill matrixRelationUserSkill)
         {
+            var original = await _manager.GetDataRowAsJson(TableNames.matrix_user_skills.ToString(), fieldName: TableFields.user_skill_id.ToString(), id: matrixRelationUserSkill.UserSkillId, fieldname2: TableFields.matrix_id.ToString(), id2: matrixId);
+
             List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
             parameters.Add(new NpgsqlParameter("@_id", matrixRelationUserSkill.Id));
             parameters.Add(new NpgsqlParameter("@_companyid", companyId));
@@ -731,18 +693,32 @@ namespace EZGO.Api.Logic.Managers
             parameters.Add(new NpgsqlParameter("@_index", matrixRelationUserSkill.Index));
             var rowseffected = Convert.ToInt32(await _manager.ExecuteScalarAsync("change_matrix_user_skill", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure));
 
+            if (rowseffected > 0)
+            {
+                var mutated = await _manager.GetDataRowAsJson(TableNames.matrix_user_skills.ToString(), fieldName: TableFields.user_skill_id.ToString(), id: matrixRelationUserSkill.UserSkillId, fieldname2: TableFields.matrix_id.ToString(), id2: matrixId);
+                await _dataAuditing.WriteDataAudit(original: original, mutated: mutated, TableNames.matrix_user_skills.ToString(), objectId: matrixId, userId: userId, companyId: companyId, description: "Changed matrix user skill relation. (objectId of matrix)");
+            }
+
             return (rowseffected > 0);
         }
 
-        //TODO Add data auditing? How? Unknown id
+
         public async Task<bool> RemoveMatrixUserSkillRelationAsync(int companyId, int userId, int matrixId, int matrixRelationUserSkillId, MatrixRelationUserSkill matrixRelationUserSkill)
         {
+            var original = await _manager.GetDataRowAsJson(TableNames.matrix_user_skills.ToString(), fieldName: TableFields.user_skill_id.ToString(), id: matrixRelationUserSkill.UserSkillId, fieldname2: TableFields.matrix_id.ToString(), id2: matrixId);
+
             List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
             parameters.Add(new NpgsqlParameter("@_id", matrixRelationUserSkill.Id));
             parameters.Add(new NpgsqlParameter("@_companyid", companyId));
             parameters.Add(new NpgsqlParameter("@_matrixid", matrixId));
             parameters.Add(new NpgsqlParameter("@_userskillid", matrixRelationUserSkill.UserSkillId));
             var rowseffected = Convert.ToInt32(await _manager.ExecuteScalarAsync("remove_matrix_user_skill", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure));
+
+            if (rowseffected > 0)
+            {
+                var mutated = await _manager.GetDataRowAsJson(TableNames.matrix_user_skills.ToString(), fieldName: TableFields.user_skill_id.ToString(), id: matrixRelationUserSkill.UserSkillId, fieldname2: TableFields.matrix_id.ToString(), id2: matrixId);
+                await _dataAuditing.WriteDataAudit(original: original, mutated: mutated, TableNames.matrix_user_skills.ToString(), objectId: matrixId, userId: userId, companyId: companyId, description: "Removed user skill from matrix. (objectId of matrix)");
+            }
 
             return (rowseffected > 0);
         }
@@ -799,114 +775,33 @@ namespace EZGO.Api.Logic.Managers
 
             return -1;
         }
-
-        //TODO Implement
-        public async Task<int> ChangeMatrixUserSkillAsync(int companyId, int userId, int matrixId, SkillsMatrixItem matrixUserSkill)
-        {
-            //var matrixGroups = await GetMatrixUserGroupsAsync(companyId: companyId, userId: userId, matrixId: matrixId);
-            //var possibleGroup = matrixGroups.Where(x => x.UserGroupId == matrixUserGroup.UserGroupId).FirstOrDefault();
-
-            //var result = await _userStandingManager.ChangeUserGroupAsync(companyId: companyId,
-            //                                             userId: userId,
-            //                                             userGroupId: matrixUserGroup.UserGroupId,
-            //                                             userGroup: matrixUserGroup.ToUserGroup());
-
-            //if (matrixUserGroup.Id > 0 || possibleGroup.Id > 0) //check if relation already exists or is supplied, if so update; else insert a new relation.
-            //{
-            //    var relation = new MatrixRelationUserGroup() { Index = 0, MatrixId = matrixId, UserGroupId = matrixUserGroup.Id > 0 ? matrixUserGroup.Id : possibleGroup.Id };
-            //    await ChangeMatrixUserGroupRelationAsync(companyId: companyId, userId: userId, matrixId: matrixId, matrixRelationUserGroupId: relation.Id, matrixRelationUserGroup: relation);
-            //    return relation.Id;
-            //}
-            //else
-            //{
-            //    var newRelation = new MatrixRelationUserGroup() { Index = 0, MatrixId = matrixId, UserGroupId = matrixUserGroup.UserGroupId };
-            //    var possibleMatrixGroupId = await AddMatrixUserGroupRelationAsync(companyId: companyId, userId: userId, matrixId: matrixId, matrixRelationUserGroup: newRelation);
-            //    return possibleMatrixGroupId;
-            //}
-            await Task.CompletedTask;
-            throw new NotImplementedException("Not Yet!");
-
-        }
-
-        //TODO Implement
-        public async Task<SkillsMatrixItem> GetMatrixUserSkillAsync(int companyId, int userId, int matrixId, int id, SkillTypeEnum skillTypeEnum, ConnectionKind connectionKind = ConnectionKind.Reader)
-        {
-            await Task.CompletedTask;
-            throw new NotImplementedException();
-        }
-
-        //TODO Implement
-        public async Task<SkillsMatrixUser> GetMatrixUserByUserProfileAsync(int companyId, int userId, int matrixId, int id, ConnectionKind connectionKind = ConnectionKind.Reader)
-        {
-            await Task.CompletedTask;
-            throw new NotImplementedException();
-        }
         #endregion
 
         #region - values -
         //TODO Add data auditing? How? Unknown id
         public async Task<bool> SaveMatrixUserSkillValue(int companyId, int userId, int matrixId, SkillsMatrixItemValue matrixItemValue)
         {
-            List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
-            parameters.Add(new NpgsqlParameter("@_userskillid", matrixItemValue.UserSkillId));
-            parameters.Add(new NpgsqlParameter("@_companyid", companyId));
-            parameters.Add(new NpgsqlParameter("@_userprofileid", matrixItemValue.UserId));
-            parameters.Add(new NpgsqlParameter("@_score", matrixItemValue.Score));
-            parameters.Add(new NpgsqlParameter("@_valuedate", new DateTime(matrixItemValue.ValueDate.Ticks)));
-            parameters.Add(new NpgsqlParameter("@_userid", userId));
+            var original = await _manager.GetDataRowAsJson(TableNames.user_skill_uservalues.ToString(), fieldName: TableFields.user_skill_id.ToString(), id: matrixItemValue.UserSkillId, fieldname2: TableFields.user_id.ToString(), id2: matrixItemValue.UserId);
+
+            List<NpgsqlParameter> parameters = new()
+            {
+                new NpgsqlParameter("@_userskillid", matrixItemValue.UserSkillId),
+                new NpgsqlParameter("@_companyid", companyId),
+                new NpgsqlParameter("@_userprofileid", matrixItemValue.UserId),
+                new NpgsqlParameter("@_score", matrixItemValue.Score),
+                new NpgsqlParameter("@_valuedate", new DateTime(matrixItemValue.ValueDate.Ticks)),
+                new NpgsqlParameter("@_userid", userId),
+                new NpgsqlParameter("@_scoringmethod", matrixItemValue.IsDynamic ? ScoringMethodEnum.Assessment.ToString().ToLower() : ScoringMethodEnum.Manual.ToString().ToLower())
+            };
             var rowseffected = Convert.ToInt32(await _manager.ExecuteScalarAsync("save_userskillvalue", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure));
+
+            if (rowseffected > 0)
+            {
+                var mutated = await _manager.GetDataRowAsJson(TableNames.user_skill_uservalues.ToString(), fieldName: TableFields.user_skill_id.ToString(), id: matrixItemValue.UserSkillId, fieldname2: TableFields.user_id.ToString(), id2: matrixItemValue.UserId);
+                await _dataAuditing.WriteDataAudit(original: original, mutated: mutated, TableNames.user_skill_uservalues.ToString(), objectId: matrixItemValue.UserSkillId, userId: userId, companyId: companyId, description: "Saved matrix user skill value.");
+            }
+
             return (rowseffected > 0);
-        }
-
-        public async Task<List<AssessmentScoreItem>> GetMatrixAssessmentScoreItemsAsync(int companyId, int userId, int matrixId)
-        {
-            var scoreItems = new List<AssessmentScoreItem>();
-
-            NpgsqlDataReader dr = null;
-
-            try
-            {
-                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
-                parameters.Add(new NpgsqlParameter("@_companyid", companyId));
-                parameters.Add(new NpgsqlParameter("@_matrixid", matrixId));
-
-
-                using (dr = await _manager.GetDataReader("get_matrix_assessment_scores", commandType: System.Data.CommandType.StoredProcedure, parameters: parameters))
-                {
-                    while (await dr.ReadAsync())
-                    {
-                        //"assessment_id" int4, "assessment_template_id" int4, "totalscore" int4, "nr" int4, "resultscore" int4, "completed_at" timestamptz, "completed_for_id" int4
-                        var scoreItem = new AssessmentScoreItem();
-                        scoreItem.AssessmentId = Convert.ToInt32(dr["assessment_id"]);
-                        scoreItem.AssessmentTemplateId = Convert.ToInt32(dr["assessment_template_id"]);
-                        //scoreItem.AssessmentId = Convert.ToInt32(dr["totalscore"]); 
-                        //scoreItem.AssessmentId = Convert.ToInt32(dr["nr"]);
-                        scoreItem.Score = Math.Round(Convert.ToDecimal(dr["resultscore"]), 2);
-                        
-                        if (dr.HasColumn("completed_at") && dr["completed_at"] != DBNull.Value)
-                        {
-                            scoreItem.ScoreDate = Convert.ToDateTime(dr["completed_at"]);
-                        }
-
-                        scoreItem.UserId = Convert.ToInt32(dr["completed_for_id"]);
-
-                        scoreItems.Add(scoreItem);
-                    }
-                }
-
-
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.GetMatrixUserSkillValues(): ", ex.Message));
-                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
-            }
-            finally
-            {
-                if (dr != null) { if (!dr.IsClosed) await dr.CloseAsync(); await dr.DisposeAsync(); }
-            }
-
-            return scoreItems;
         }
         #endregion
 
@@ -1128,7 +1023,7 @@ namespace EZGO.Api.Logic.Managers
             userValue.IsDynamic = userValue.Id > 0;
             if (dr["score"] != DBNull.Value)
             {
-                userValue.Score = Convert.ToInt32(dr["score"]);
+                userValue.Score = Convert.ToDecimal(dr["score"]);
             }
             userValue.UserId = Convert.ToInt32(dr["user_id"]);
             userValue.UserSkillId = Convert.ToInt32(dr["user_skill_id"]);
@@ -1136,6 +1031,10 @@ namespace EZGO.Api.Logic.Managers
             if (dr.HasColumn("value_expiration_date") && dr["value_expiration_date"] != DBNull.Value)
             {
                 userValue.ValueExpirationDate = Convert.ToDateTime(dr["value_expiration_date"]);
+            }
+            if (dr.HasColumn("scoring_method") && dr["scoring_method"] != DBNull.Value && Enum.TryParse(dr["scoring_method"].ToString(), out ScoringMethodEnum scoringMethod))
+            {
+                userValue.ScoringMethod = scoringMethod;
             }
 
             return userValue;
@@ -1159,178 +1058,6 @@ namespace EZGO.Api.Logic.Managers
                 listEx.Add(ex);
             }
             return listEx;
-        }
-        #endregion
-
-        #region - legend configuration -
-        public async Task<SkillMatrixLegendConfiguration> GetLegendConfigurationAsync(int companyId, int userId)
-        {
-            var config = new SkillMatrixLegendConfiguration { CompanyId = companyId };
-
-            try
-            {
-                // Check if legend items exist for this company
-                List<NpgsqlParameter> checkParams = new List<NpgsqlParameter>();
-                checkParams.Add(new NpgsqlParameter("@_company_id", companyId));
-                var exists = Convert.ToBoolean(await _manager.ExecuteScalarAsync("check_skill_matrix_legend_exists", parameters: checkParams, commandType: System.Data.CommandType.StoredProcedure));
-
-                if (!exists)
-                {
-                    // No items exist - create defaults
-                    await CreateDefaultLegendItemsAsync(companyId, userId);
-                }
-
-                // Load items
-                config.MandatorySkills = await GetLegendItemsAsync(companyId, "mandatory");
-                config.OperationalSkills = await GetLegendItemsAsync(companyId, "operational");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.GetLegendConfigurationAsync(): ", ex.Message));
-                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
-            }
-
-            return config;
-        }
-
-        private async Task CreateDefaultLegendItemsAsync(int companyId, int userId)
-        {
-            var defaultItems = GetDefaultLegendItems();
-            foreach (var item in defaultItems)
-            {
-                List<NpgsqlParameter> itemParams = new List<NpgsqlParameter>();
-                itemParams.Add(new NpgsqlParameter("@_company_id", companyId));
-                itemParams.Add(new NpgsqlParameter("@_skill_level_id", item.SkillLevelId));
-                itemParams.Add(new NpgsqlParameter("@_skill_type", item.SkillType));
-                itemParams.Add(new NpgsqlParameter("@_label", (object)item.Label ?? DBNull.Value));
-                itemParams.Add(new NpgsqlParameter("@_description", (object)item.Description ?? DBNull.Value));
-                itemParams.Add(new NpgsqlParameter("@_icon_color", (object)item.IconColor ?? DBNull.Value));
-                itemParams.Add(new NpgsqlParameter("@_background_color", (object)item.BackgroundColor ?? DBNull.Value));
-                itemParams.Add(new NpgsqlParameter("@_sort_order", item.Order));
-                itemParams.Add(new NpgsqlParameter("@_score_value", (object)item.ScoreValue ?? DBNull.Value));
-                itemParams.Add(new NpgsqlParameter("@_icon_class", (object)item.IconClass ?? DBNull.Value));
-                itemParams.Add(new NpgsqlParameter("@_is_default", item.IsDefault));
-                itemParams.Add(new NpgsqlParameter("@_created_by", userId));
-
-                await _manager.ExecuteScalarAsync("insert_skill_matrix_legend_item", parameters: itemParams, commandType: System.Data.CommandType.StoredProcedure);
-            }
-        }
-
-        private async Task<List<SkillMatrixLegendItem>> GetLegendItemsAsync(int companyId, string skillType)
-        {
-            var items = new List<SkillMatrixLegendItem>();
-            NpgsqlDataReader dr = null;
-            try
-            {
-                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
-                parameters.Add(new NpgsqlParameter("@_company_id", companyId));
-                parameters.Add(new NpgsqlParameter("@_skill_type", skillType));
-
-                using (dr = await _manager.GetDataReader("get_skill_matrix_legend_items", commandType: System.Data.CommandType.StoredProcedure, parameters: parameters))
-                {
-                    while (await dr.ReadAsync())
-                    {
-                        items.Add(new SkillMatrixLegendItem
-                        {
-                            Id = dr.GetInt32(dr.GetOrdinal("id")),
-                            CompanyId = dr.GetInt32(dr.GetOrdinal("company_id")),
-                            SkillLevelId = dr.GetInt32(dr.GetOrdinal("skill_level_id")),
-                            SkillType = dr.GetString(dr.GetOrdinal("skill_type")),
-                            Label = dr.IsDBNull(dr.GetOrdinal("label")) ? null : dr.GetString(dr.GetOrdinal("label")),
-                            Description = dr.IsDBNull(dr.GetOrdinal("description")) ? null : dr.GetString(dr.GetOrdinal("description")),
-                            IconColor = dr.IsDBNull(dr.GetOrdinal("icon_color")) ? null : dr.GetString(dr.GetOrdinal("icon_color")),
-                            BackgroundColor = dr.IsDBNull(dr.GetOrdinal("background_color")) ? null : dr.GetString(dr.GetOrdinal("background_color")),
-                            Order = dr.GetInt32(dr.GetOrdinal("sort_order")),
-                            ScoreValue = dr.IsDBNull(dr.GetOrdinal("score_value")) ? null : dr.GetInt32(dr.GetOrdinal("score_value")),
-                            IconClass = dr.IsDBNull(dr.GetOrdinal("icon_class")) ? null : dr.GetString(dr.GetOrdinal("icon_class")),
-                            IsDefault = dr.GetBoolean(dr.GetOrdinal("is_default")),
-                            CreatedAt = dr.GetDateTime(dr.GetOrdinal("created_at")),
-                            UpdatedAt = dr.IsDBNull(dr.GetOrdinal("updated_at")) ? null : dr.GetDateTime(dr.GetOrdinal("updated_at")),
-                            CreatedBy = dr.IsDBNull(dr.GetOrdinal("created_by")) ? null : dr.GetInt32(dr.GetOrdinal("created_by")),
-                            UpdatedBy = dr.IsDBNull(dr.GetOrdinal("updated_by")) ? null : dr.GetInt32(dr.GetOrdinal("updated_by"))
-                        });
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.GetLegendItemsAsync(): ", ex.Message));
-                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
-            }
-
-            return items;
-        }
-
-        private List<SkillMatrixLegendItem> GetDefaultLegendItems()
-        {
-            return new List<SkillMatrixLegendItem>
-            {
-                // Mandatory skills
-                new SkillMatrixLegendItem { SkillLevelId = 1, SkillType = "mandatory", Label = "Masters the skill", Description = "User has mastered this mandatory skill", IconColor = "#008000", BackgroundColor = "#DDF7DD", Order = 1, IconClass = "thumbsup", IsDefault = true },
-                new SkillMatrixLegendItem { SkillLevelId = 2, SkillType = "mandatory", Label = "Almost expired", Description = "Skill certification is about to expire", IconColor = "#FFA500", BackgroundColor = "#FFF0D4", Order = 2, IconClass = "warning", IsDefault = true },
-                new SkillMatrixLegendItem { SkillLevelId = 3, SkillType = "mandatory", Label = "Expired", Description = "Skill certification has expired", IconColor = "#CB0000", BackgroundColor = "#FFEAEA", Order = 3, IconClass = "warning", IsDefault = true },
-                // Operational skills
-                new SkillMatrixLegendItem { SkillLevelId = 1, SkillType = "operational", Label = "Doesn't know the theory", Description = "User does not have theoretical knowledge", IconColor = "#CB0000", BackgroundColor = "#FFEAEA", Order = 1, ScoreValue = 1, IsDefault = true },
-                new SkillMatrixLegendItem { SkillLevelId = 2, SkillType = "operational", Label = "Knows the theory", Description = "User has theoretical knowledge", IconColor = "#FF4500", BackgroundColor = "#FFE4DA", Order = 2, ScoreValue = 2, IsDefault = true },
-                new SkillMatrixLegendItem { SkillLevelId = 3, SkillType = "operational", Label = "Is able to apply this in the standard situations", Description = "User can apply skill in standard conditions", IconColor = "#FFA500", BackgroundColor = "#FFF0D4", Order = 3, ScoreValue = 3, IsDefault = true },
-                new SkillMatrixLegendItem { SkillLevelId = 4, SkillType = "operational", Label = "Is able to apply this in the non-standard conditions", Description = "User can apply skill in non-standard conditions", IconColor = "#8DA304", BackgroundColor = "#F2F5DD", Order = 4, ScoreValue = 4, IsDefault = true },
-                new SkillMatrixLegendItem { SkillLevelId = 5, SkillType = "operational", Label = "Can educate others", Description = "User can train and educate other team members", IconColor = "#008000", BackgroundColor = "#DDF7DD", Order = 5, ScoreValue = 5, IsDefault = true }
-            };
-        }
-
-        public async Task<SkillMatrixLegendConfiguration> SaveLegendConfigurationAsync(SkillMatrixLegendConfiguration configuration, int userId)
-        {
-            try
-            {
-                // Update each item
-                var allItems = new List<SkillMatrixLegendItem>();
-                if (configuration.MandatorySkills != null) allItems.AddRange(configuration.MandatorySkills);
-                if (configuration.OperationalSkills != null) allItems.AddRange(configuration.OperationalSkills);
-
-                foreach (var item in allItems)
-                {
-                    await UpdateLegendItemAsync(configuration.CompanyId, item, userId);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.SaveLegendConfigurationAsync(): ", ex.Message));
-                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
-            }
-
-            return configuration;
-        }
-
-        public async Task<SkillMatrixLegendItem> UpdateLegendItemAsync(int companyId, SkillMatrixLegendItem item, int userId)
-        {
-            try
-            {
-                item.UpdatedAt = DateTime.UtcNow;
-                item.UpdatedBy = userId;
-                item.IsDefault = false;
-
-                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
-                parameters.Add(new NpgsqlParameter("@_company_id", companyId));
-                parameters.Add(new NpgsqlParameter("@_skill_level_id", item.SkillLevelId));
-                parameters.Add(new NpgsqlParameter("@_skill_type", item.SkillType));
-                parameters.Add(new NpgsqlParameter("@_label", (object)item.Label ?? DBNull.Value));
-                parameters.Add(new NpgsqlParameter("@_description", (object)item.Description ?? DBNull.Value));
-                parameters.Add(new NpgsqlParameter("@_icon_color", (object)item.IconColor ?? DBNull.Value));
-                parameters.Add(new NpgsqlParameter("@_background_color", (object)item.BackgroundColor ?? DBNull.Value));
-                parameters.Add(new NpgsqlParameter("@_sort_order", item.Order));
-                parameters.Add(new NpgsqlParameter("@_score_value", (object)item.ScoreValue ?? DBNull.Value));
-                parameters.Add(new NpgsqlParameter("@_icon_class", (object)item.IconClass ?? DBNull.Value));
-                parameters.Add(new NpgsqlParameter("@_updated_by", userId));
-
-                await _manager.ExecuteScalarAsync("update_skill_matrix_legend_item", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.UpdateLegendItemAsync(): ", ex.Message));
-                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
-            }
-
-            return item;
         }
         #endregion
     }

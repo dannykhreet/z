@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EZGO.Api.Models.Enumerations;
+using System;
 using System.Collections.Generic;
 
 namespace EZGO.Api.Models.Users
@@ -15,5 +16,6 @@ namespace EZGO.Api.Models.Users
         public DateTime ValueExpirationDate { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
+        public ScoringMethodEnum? ScoringMethod { get; set; }
     }
 }

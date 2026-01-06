@@ -5,6 +5,7 @@ using EZGO.Api.Interfaces.Managers;
 using EZGO.Api.Interfaces.Settings;
 using EZGO.Api.Models.Enumerations;
 using EZGO.Api.Models.Users;
+using EZGO.Api.Models.Skills;
 using EZGO.Api.Security.Interfaces;
 using EZGO.Api.Settings;
 using EZGO.Api.Settings.Helpers;
@@ -377,7 +378,7 @@ namespace EZGO.Api.Controllers.V1
         [Route("userskill/change/{userSkillId}")]
         [Route("userstanding/skill/change")] //TODO refactory for correct input e.g. specific id supplied. 
         [HttpPost]
-        public async Task<IActionResult> ChangeUserSkill([FromBody] UserSkill userSkill, [FromRoute] int userSkillId, [FromQuery] bool fulloutput = false)
+        public async Task<IActionResult> ChangeUserSkill([FromBody] UserSkill userSkill, [FromRoute] int userSkillId, [FromQuery] bool deleteoldvalues = false,[FromQuery] bool fulloutput = false)
         {
             if (!this.IsCmsRequest)
             {
@@ -403,7 +404,8 @@ namespace EZGO.Api.Controllers.V1
             var result = await _manager.ChangeUserSkill(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(),
                                                                   userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(),
                                                                   userSkillId: userSkillId,
-                                                                  userSkill: userSkill);
+                                                                  userSkill: userSkill,
+                                                                  deleteOldUserSkillValues: deleteoldvalues);
 
             if (fulloutput && result > 0)
             {
@@ -479,6 +481,65 @@ namespace EZGO.Api.Controllers.V1
 
         #endregion
 
+        #region - User skill custom target - 
+        [Route("userskillcustomtargets")]
+        [HttpGet]
+        public async Task<IActionResult> GetApplicabilities([FromQuery] int? userid = null)
+        {
+            Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
+
+            var result = await _manager.GetUserSkillsCustomTargetApplicabilitiesForUser(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), userId: userid);
+
+            AppendCapturedExceptionToApm(_manager.GetPossibleExceptions());
+
+            Agent.Tracer.CurrentSpan.End();
+
+            return StatusCode((int)HttpStatusCode.OK, (result).ToJsonFromObject());
+        }
+
+        [Route("userskillcustomtarget/setapplicability")]
+        [HttpPost]
+        public async Task<IActionResult> SetApplicability([FromBody] UserSkillCustomTargetApplicability userSkillCustomTargetApplicability)
+        {
+            Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
+
+            if (userSkillCustomTargetApplicability == null || userSkillCustomTargetApplicability.UserId <= 0 || userSkillCustomTargetApplicability.UserSkillId <= 0)
+            {
+                await _toolsManager.WriteToLog(domain: string.Concat(Request.Scheme, "//", Request.Host), path: Request.Path, query: Request.QueryString.ToString(), status: ((int)HttpStatusCode.BadRequest).ToString(), header: "N/A", request: userSkillCustomTargetApplicability.ToJsonFromObject(), response: "User skill custom target applicability didn't pass validation.");
+                return StatusCode((int)HttpStatusCode.BadRequest, "User skill custom target applicability didn't pass validation.");
+            }
+
+            var result = await _manager.SetUserSkillCustomTargetApplicability(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(), userSkillCustomTargetApplicability: userSkillCustomTargetApplicability);
+
+            AppendCapturedExceptionToApm(_manager.GetPossibleExceptions());
+
+            Agent.Tracer.CurrentSpan.End();
+
+            return StatusCode((int)HttpStatusCode.OK, (result).ToJsonFromObject());
+        }
+
+        [Route("userskillcustomtarget/remove")]
+        [HttpPost]
+        public async Task<IActionResult> RemoveCustomTarget([FromBody] UserSkillAndUserMetadata userSkillAndUserMetadata)
+        {
+            Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
+
+            if (userSkillAndUserMetadata.UserId <= 0 || userSkillAndUserMetadata.UserSkillId <= 0)
+            {
+                await _toolsManager.WriteToLog(domain: string.Concat(Request.Scheme, "//", Request.Host), path: Request.Path, query: Request.QueryString.ToString(), status: ((int)HttpStatusCode.BadRequest).ToString(), header: "N/A", request: userSkillAndUserMetadata.ToJsonFromObject(), response: "Remove custom target endpoint didn't pass validation.");
+                return StatusCode((int)HttpStatusCode.BadRequest, "Remove custom target endpoint didn't pass validation.");
+            }
+
+            var result = await _manager.RemoveCustomTarget(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), userId: userSkillAndUserMetadata.UserId, userSkillId: userSkillAndUserMetadata.UserSkillId);
+
+            AppendCapturedExceptionToApm(_manager.GetPossibleExceptions());
+
+            Agent.Tracer.CurrentSpan.End();
+
+            return StatusCode((int)HttpStatusCode.OK, (result).ToJsonFromObject());
+        }
+        #endregion
+
         #region - User skill values - 
         [Route("userskillvalues")]
         [HttpGet]
@@ -534,118 +595,26 @@ namespace EZGO.Api.Controllers.V1
         }
 
 
-        [Authorize(Roles = AuthenticationSettings.AUTHORIZATION_SHIFTLEADER_MANAGER_ADMINISTRATOR_ROLES)]
-        [Route("userskillvalues/add")]
+        [Route("userskillvalues/remove")]
         [HttpPost]
-        public async Task<IActionResult> AddUserSkillValue([FromBody] UserSkillValue userSkillValue, [FromQuery] bool fulloutput = false)
+        public async Task<IActionResult> RemoveUserSkillValueForUserWithSkill([FromBody] UserSkillAndUserMetadata userSkillAndUserMetadata)
         {
             Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
 
-            if (!userSkillValue.ValidateAndClean(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(),
-              userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(),
-              messages: out var possibleMessages,
-                                              validUserIds: this.ValidateUserBasedOnCompany ? await _userManager.GetUsersIdsAsync(await this.CurrentApplicationUser.GetAndSetCompanyIdAsync()) : null))
+            if (userSkillAndUserMetadata.UserId <= 0 || userSkillAndUserMetadata.UserId <= 0)
             {
-                await _toolsManager.WriteToLog(domain: string.Concat(Request.Scheme, "//", Request.Host), path: Request.Path, query: Request.QueryString.ToString(), status: ((int)HttpStatusCode.BadRequest).ToString(), header: "N/A", request: userSkillValue.ToJsonFromObject(), response: possibleMessages);
-                return StatusCode((int)HttpStatusCode.BadRequest, possibleMessages.ToJsonFromObject());
+                await _toolsManager.WriteToLog(domain: string.Concat(Request.Scheme, "//", Request.Host), path: Request.Path, query: Request.QueryString.ToString(), status: ((int)HttpStatusCode.BadRequest).ToString(), header: "N/A", request: userSkillAndUserMetadata.ToJsonFromObject(), response: "Remove user skill value for user with skill endpoint didn't pass validation.");
+                return StatusCode((int)HttpStatusCode.BadRequest, "Remove user skill value for user with skill endpoint didn't pass validation.");
             }
 
-            var result = await _manager.AddUserSkillValue(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(),
-                                                          userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(),
-                                                          userSkillValue: userSkillValue);
-
-            if (fulloutput && result > 0)
-            {
-                var resultfull = await _manager.GetUserSkillValue(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), id: result);
-
-                AppendCapturedExceptionToApm(_manager.GetPossibleExceptions());
-
-                Agent.Tracer.CurrentSpan.End();
-
-                return StatusCode((int)HttpStatusCode.OK, (resultfull).ToJsonFromObject());
-
-            }
-            else
-            {
-                AppendCapturedExceptionToApm(_manager.GetPossibleExceptions());
-
-                Agent.Tracer.CurrentSpan.End();
-
-                return StatusCode((int)HttpStatusCode.OK, (result).ToJsonFromObject());
-            }
-        }
-
-        [Authorize(Roles = AuthenticationSettings.AUTHORIZATION_SHIFTLEADER_MANAGER_ADMINISTRATOR_ROLES)]
-        [Route("userskillvalues/change/byid")]
-        [HttpPost]
-        public async Task<IActionResult> ChangeUserSkillValueById([FromBody] UserSkillValue userSkillValue, [FromQuery] bool fulloutput = false)
-        {
-            if (!userSkillValue.ValidateAndClean(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(),
-               userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(),
-               messages: out var possibleMessages, ignoreCreatedByCheck:true,
-                                              validUserIds: this.ValidateUserBasedOnCompany ? await _userManager.GetUsersIdsAsync(await this.CurrentApplicationUser.GetAndSetCompanyIdAsync()) : null))
-            {
-                await _toolsManager.WriteToLog(domain: string.Concat(Request.Scheme, "//", Request.Host), path: Request.Path, query: Request.QueryString.ToString(), status: ((int)HttpStatusCode.BadRequest).ToString(), header: "N/A", request: userSkillValue.ToJsonFromObject(), response: possibleMessages);
-                return StatusCode((int)HttpStatusCode.BadRequest, possibleMessages.ToJsonFromObject());
-            }
-
-            Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
-
-            if (!await this.CurrentApplicationUser.CheckObjectRights(objectId: userSkillValue.Id, objectType: ObjectTypeEnum.UserSkillValue))
-            {
-                return StatusCode((int)HttpStatusCode.Forbidden, AuthenticationSettings.MESSAGE_FORBIDDEN_OBJECT.ToJsonFromObject());
-            }
-
-            var result = await _manager.ChangeUserSkillValueById(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(),
-                                                             userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(),
-                                                             userSkillValue: userSkillValue);
-
-            if (fulloutput && result > 0)
-            {
-                var resultfull = await _manager.GetUserSkillValue(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), id: result);
-
-                AppendCapturedExceptionToApm(_manager.GetPossibleExceptions());
-
-                Agent.Tracer.CurrentSpan.End();
-
-                return StatusCode((int)HttpStatusCode.OK, (resultfull).ToJsonFromObject());
-
-            }
-            else
-            {
-                AppendCapturedExceptionToApm(_manager.GetPossibleExceptions());
-
-                Agent.Tracer.CurrentSpan.End();
-
-                return StatusCode((int)HttpStatusCode.OK, (result).ToJsonFromObject());
-            }
-        }
-
-        [Authorize(Roles = AuthenticationSettings.AUTHORIZATION_SHIFTLEADER_MANAGER_ADMINISTRATOR_ROLES)]
-        [Route("userskillvalues/change/byuserskill")]
-        [HttpPost]
-        public async Task<IActionResult> ChangeUserSkillValueByUserSkill([FromBody] UserSkillValue userSkillValue)
-        {
-            if (!userSkillValue.ValidateAndClean(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(),
-               userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(),
-               messages: out var possibleMessages, ignoreCreatedByCheck: true,
-                                              validUserIds: this.ValidateUserBasedOnCompany ? await _userManager.GetUsersIdsAsync(await this.CurrentApplicationUser.GetAndSetCompanyIdAsync()) : null))
-            {
-                await _toolsManager.WriteToLog(domain: string.Concat(Request.Scheme, "//", Request.Host), path: Request.Path, query: Request.QueryString.ToString(), status: ((int)HttpStatusCode.BadRequest).ToString(), header: "N/A", request: userSkillValue.ToJsonFromObject(), response: possibleMessages);
-                return StatusCode((int)HttpStatusCode.BadRequest, possibleMessages.ToJsonFromObject());
-            }
-
-            Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
-            
-            var result = await _manager.ChangeUserSkillValueByUserSkill(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(),
-                                                             userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(),
-                                                             userSkillValue: userSkillValue);
+            var result = await _manager.RemoveUserSkillValueForUserWithSkill(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), userId: userSkillAndUserMetadata.UserId, userSkillId: userSkillAndUserMetadata.UserSkillId);
 
             AppendCapturedExceptionToApm(_manager.GetPossibleExceptions());
 
             Agent.Tracer.CurrentSpan.End();
-            
+
             return StatusCode((int)HttpStatusCode.OK, (result).ToJsonFromObject());
+
         }
         #endregion
     }

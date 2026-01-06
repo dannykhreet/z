@@ -122,12 +122,11 @@ namespace EZGO.Api.Utils.BusinessValidators
                     if (!succes) messageBuilder.AppendLine(string.Format("Picture Uri [{0}] is not valid.", setupCompany.Picture));
                 }
                 if (!string.IsNullOrEmpty(setupCompany.Description)) setupCompany.Description = TextValidator.StripRogueDataFromText(setupCompany.Description);
-                if (!string.IsNullOrEmpty(setupCompany.Locale)) setupCompany.Locale = TextValidator.StripRogueDataFromText(setupCompany.Locale);
+                if (!string.IsNullOrEmpty(setupCompany.Locale)) setupCompany.Locale = TextValidator.StripRogueDataFromText(setupCompany.Locale, ignoreMinusChar: true);
                 if (!string.IsNullOrEmpty(setupCompany.Name)) setupCompany.Name = TextValidator.StripRogueDataFromText(setupCompany.Name);
                 if (!string.IsNullOrEmpty(setupCompany.PrimaryFirstName)) setupCompany.PrimaryFirstName = TextValidator.StripRogueDataFromText(setupCompany.PrimaryFirstName);
                 if (!string.IsNullOrEmpty(setupCompany.PrimaryLastName)) setupCompany.PrimaryLastName = TextValidator.StripRogueDataFromText(setupCompany.PrimaryLastName);
                 if (!string.IsNullOrEmpty(setupCompany.PrimaryUserName)) setupCompany.PrimaryUserName = TextValidator.StripRogueDataFromText(setupCompany.PrimaryUserName);
-                if (!string.IsNullOrEmpty(setupCompany.PrimaryUserPassword)) setupCompany.PrimaryUserPassword = TextValidator.StripRogueDataFromText(setupCompany.PrimaryUserPassword);
                 if (!string.IsNullOrEmpty(setupCompany.ShiftDays)) setupCompany.ShiftDays = TextValidator.StripRogueDataFromText(setupCompany.ShiftDays);
                 if (!string.IsNullOrEmpty(setupCompany.ShiftStartTime)) setupCompany.ShiftStartTime = TextValidator.StripRogueDataFromText(setupCompany.ShiftStartTime);
                 if (!string.IsNullOrEmpty(setupCompany.TierLevel)) setupCompany.TierLevel = TextValidator.StripRogueDataFromText(setupCompany.TierLevel);
@@ -169,7 +168,7 @@ namespace EZGO.Api.Utils.BusinessValidators
                 {
                     succes = false;
                 }
-                if (!string.IsNullOrEmpty(setupCompanySettings.Locale)) setupCompanySettings.Locale = TextValidator.StripRogueDataFromText(setupCompanySettings.Locale);
+                if (!string.IsNullOrEmpty(setupCompanySettings.Locale)) setupCompanySettings.Locale = TextValidator.StripRogueDataFromText(setupCompanySettings.Locale, ignoreMinusChar: true);
                 if (!string.IsNullOrEmpty(setupCompanySettings.TierLevel)) setupCompanySettings.TierLevel = TextValidator.StripRogueDataFromText(setupCompanySettings.TierLevel);
                 if (!string.IsNullOrEmpty(setupCompanySettings.TimeZone)) setupCompanySettings.TimeZone = TextValidator.StripRogueDataFromText(setupCompanySettings.TimeZone);
 

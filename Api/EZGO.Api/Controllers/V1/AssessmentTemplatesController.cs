@@ -270,7 +270,7 @@ namespace EZGO.Api.Controllers.V1
         [Route("assessmenttemplate/delete/{assessmenttemplateid}")]
         [Route("skillassessmenttemplate/delete/{assessmenttemplateid}")]
         [HttpPost]
-        public async Task<IActionResult> DeleteAssessment([FromRoute] int assessmenttemplateid, [FromBody] object isactive, [FromQuery] bool? useDebug = null)
+        public async Task<IActionResult> DeleteAssessmentAndFreeLinkedInstruction([FromRoute] int assessmenttemplateid, [FromBody] object isactive, [FromQuery] bool? useDebug = null)
         {
             if (!this.IsCmsRequest)
             {
@@ -295,6 +295,8 @@ namespace EZGO.Api.Controllers.V1
             Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
 
             var result = await _assessmentManager.SetAssessmentTemplateActiveAsync(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(), assessmentTemplateId: assessmenttemplateid, isActive: BooleanConverter.ConvertObjectToBoolean(isactive));
+
+            await _assessmentManager.FreeLinkedAssessmentInstruction(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), assessmentId: assessmenttemplateid);
 
             AppendCapturedExceptionToApm(_assessmentManager.GetPossibleExceptions());
 

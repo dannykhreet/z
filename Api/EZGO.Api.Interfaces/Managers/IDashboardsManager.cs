@@ -9,7 +9,6 @@ namespace EZGO.Api.Interfaces.Managers
 {
     public interface IDashboardsManager
     {
-        string Culture { get; set; }
         Task<Dashboard> GetDashboard(int companyId, int userId, DashboardFilters filters = null);
         Task<Dashboard> GetDashboardAnnouncements(int companyId, int userId, DashboardFilters filters = null);
         Task<Dashboard> GetDashboardCompletedItems(int companyId, int userId, DashboardFilters filters = null);

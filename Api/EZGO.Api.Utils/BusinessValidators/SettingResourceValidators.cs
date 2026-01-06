@@ -21,7 +21,7 @@ namespace EZGO.Api.Utils.BusinessValidators
                 }
 
                 if (!string.IsNullOrEmpty(setting.Description)) setting.Description = TextValidator.StripRogueDataFromText(setting.Description);
-                if (!string.IsNullOrEmpty(setting.Value)) setting.Value = TextValidator.StripRogueDataFromText(setting.Value);
+                if (!string.IsNullOrEmpty(setting.Value)) setting.Value = TextValidator.StripRogueDataFromText(setting.Value, ignoreMinusChar: true);
             }
             catch (Exception ex)
             {

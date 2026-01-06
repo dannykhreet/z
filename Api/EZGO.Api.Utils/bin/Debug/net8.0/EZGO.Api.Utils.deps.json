@@ -311,6 +311,42 @@
           }
         }
       },
+      "System.IO.Pipelines/9.0.10": {
+        "runtime": {
+          "lib/net8.0/System.IO.Pipelines.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.1025.47515"
+          }
+        }
+      },
+      "System.Text.Encodings.Web/9.0.10": {
+        "runtime": {
+          "lib/net8.0/System.Text.Encodings.Web.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.1025.47515"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/browser/lib/net8.0/System.Text.Encodings.Web.dll": {
+            "rid": "browser",
+            "assetType": "runtime",
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.1025.47515"
+          }
+        }
+      },
+      "System.Text.Json/9.0.10": {
+        "dependencies": {
+          "System.IO.Pipelines": "9.0.10",
+          "System.Text.Encodings.Web": "9.0.10"
+        },
+        "runtime": {
+          "lib/net8.0/System.Text.Json.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.1025.47515"
+          }
+        }
+      },
       "EZGO.Api.Interfaces/1.0.0": {
         "dependencies": {
           "EZGO.Api.Models": "1.0.0"
@@ -335,6 +371,9 @@
         }
       },
       "EZGO.Api.Models/1.0.0": {
+        "dependencies": {
+          "System.Text.Json": "9.0.10"
+        },
         "runtime": {
           "EZGO.Api.Models.dll": {
             "assemblyVersion": "1.0.2509.22133",
@@ -544,6 +583,27 @@
       "sha512": "sha512-dKlnLbyOKFCLa5rda8yUU6M0HhVLMkB7rf9lEWnXVtHdNlq9A/fJmt7s/OhwbYaUfOO8rxshpQLyPn0Pv1a2lQ==",
       "path": "system.io.packaging/9.0.10",
       "hashPath": "system.io.packaging.9.0.10.nupkg.sha512"
+    },
+    "System.IO.Pipelines/9.0.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-lwI0mhHcCxMtNSxB5ate9Gc9petWovRBUprtjz2yiIDDZPGBIaUiqNzQHJzjPuzTnvNbEMilpAXjDguKsU/2Fg==",
+      "path": "system.io.pipelines/9.0.10",
+      "hashPath": "system.io.pipelines.9.0.10.nupkg.sha512"
+    },
+    "System.Text.Encodings.Web/9.0.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-znmiJFUa0GGwq7t6ShUKBDRlPsNJaudNFI7rVeyGnRBhiRMegBvu2GRcadThP/QX/a5UpGgZbe6tolDooobj/Q==",
+      "path": "system.text.encodings.web/9.0.10",
+      "hashPath": "system.text.encodings.web.9.0.10.nupkg.sha512"
+    },
+    "System.Text.Json/9.0.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-XM02ZBnzxk7Ti6l9YRy8Bp639wANqJzJzw4W4VYiCh+HXY9hBOWkGB4k89OLP/s/RxgM02P4a/mWcJTgFiLf1Q==",
+      "path": "system.text.json/9.0.10",
+      "hashPath": "system.text.json.9.0.10.nupkg.sha512"
     },
     "EZGO.Api.Interfaces/1.0.0": {
       "type": "project",

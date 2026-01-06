@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Wt0i5e7fw90=",
+  "dgSpecHash": "6QNYP1O2WFU=",
   "success": true,
   "projectFilePath": "C:\\Users\\DannyKhreet\\Desktop\\Project Repos\\BackEnd\\Api - Task Generator\\EZGO.Api.Logic\\EZGO.Api.Logic.csproj",
   "expectedPackageFiles": [
@@ -10,8 +10,6 @@
     "C:\\Users\\DannyKhreet\\.nuget\\packages\\documentformat.openxml\\3.1.1\\documentformat.openxml.3.1.1.nupkg.sha512",
     "C:\\Users\\DannyKhreet\\.nuget\\packages\\documentformat.openxml.framework\\3.1.1\\documentformat.openxml.framework.3.1.1.nupkg.sha512",
     "C:\\Users\\DannyKhreet\\.nuget\\packages\\excelnumberformat\\1.1.0\\excelnumberformat.1.1.0.nupkg.sha512",
-    "C:\\Users\\DannyKhreet\\.nuget\\packages\\microsoft.aspnetcore.http.abstractions\\2.3.0\\microsoft.aspnetcore.http.abstractions.2.3.0.nupkg.sha512",
-    "C:\\Users\\DannyKhreet\\.nuget\\packages\\microsoft.aspnetcore.http.features\\2.3.0\\microsoft.aspnetcore.http.features.2.3.0.nupkg.sha512",
     "C:\\Users\\DannyKhreet\\.nuget\\packages\\microsoft.entityframeworkcore\\9.0.10\\microsoft.entityframeworkcore.9.0.10.nupkg.sha512",
     "C:\\Users\\DannyKhreet\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\9.0.10\\microsoft.entityframeworkcore.abstractions.9.0.10.nupkg.sha512",
     "C:\\Users\\DannyKhreet\\.nuget\\packages\\microsoft.entityframeworkcore.analyzers\\9.0.10\\microsoft.entityframeworkcore.analyzers.9.0.10.nupkg.sha512",
@@ -36,8 +34,7 @@
     "C:\\Users\\DannyKhreet\\.nuget\\packages\\system.diagnostics.diagnosticsource\\9.0.10\\system.diagnostics.diagnosticsource.9.0.10.nupkg.sha512",
     "C:\\Users\\DannyKhreet\\.nuget\\packages\\system.drawing.common\\6.0.0\\system.drawing.common.6.0.0.nupkg.sha512",
     "C:\\Users\\DannyKhreet\\.nuget\\packages\\system.identitymodel.tokens.jwt\\8.14.0\\system.identitymodel.tokens.jwt.8.14.0.nupkg.sha512",
-    "C:\\Users\\DannyKhreet\\.nuget\\packages\\system.io.packaging\\9.0.10\\system.io.packaging.9.0.10.nupkg.sha512",
-    "C:\\Users\\DannyKhreet\\.nuget\\packages\\system.text.encodings.web\\8.0.0\\system.text.encodings.web.8.0.0.nupkg.sha512"
+    "C:\\Users\\DannyKhreet\\.nuget\\packages\\system.io.packaging\\9.0.10\\system.io.packaging.9.0.10.nupkg.sha512"
   ],
   "logs": []
 }

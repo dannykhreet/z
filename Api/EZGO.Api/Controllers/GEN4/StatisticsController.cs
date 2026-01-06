@@ -50,7 +50,7 @@ namespace EZGO.Api.Controllers.GEN4
 
         [HttpGet]
         [Route("reporting/statistics/audits")]
-        public async Task<IActionResult> GetAuditsStatistics([FromQuery] string timestamp, [FromQuery] int? areaid = null)
+        public async Task<IActionResult> GetAuditsStatistics([FromQuery] string timestamp, [FromQuery] int? areaid = null, [FromQuery] int? templateid = null)
         {
             DateTime parsedTimeStamp = new DateTime();
             if (!string.IsNullOrEmpty(timestamp))
@@ -62,7 +62,7 @@ namespace EZGO.Api.Controllers.GEN4
                 parsedTimeStamp = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
             }
 
-            var output = await _statsManager.GetAuditsStatisticsAsync(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), timestamp: parsedTimeStamp, areaId: areaid);
+            var output = await _statsManager.GetAuditsStatisticsAsync(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), timestamp: parsedTimeStamp, areaId: areaid, templateId: templateid);
 
             AppendCapturedExceptionToApm(_statsManager.GetPossibleExceptions());
 
@@ -114,16 +114,24 @@ namespace EZGO.Api.Controllers.GEN4
 
         #region second layer graphs
         /// <summary>
-        /// 
+        /// Retrieves extended second-layer statistics for the specified report type.
         /// </summary>
-        /// <param name="reportType"></param>
-        /// <param name="timestamp"></param>
-        /// <param name="areaid"></param>
-        /// <param name="periodType"></param>
-        /// <returns></returns>
+        /// <remarks>This method validates the input parameters and retrieves the corresponding statistics
+        /// based on the specified report type and filters. If the parameters are invalid, an appropriate error message
+        /// is returned.</remarks>
+        /// <param name="reportType">The type of report to generate. Valid values are "tasks", "checklists", "audits", or "actions".</param>
+        /// <param name="timestamp">The timestamp used as a reference point for the statistics, in the format "dd-MM-yyyy HH:mm:ss". If not
+        /// provided, the current UTC time is used.</param>
+        /// <param name="areaid">An optional area identifier to filter the statistics. If not provided, statistics are not filtered by area.</param>
+        /// <param name="periodType">The time period for the statistics. Valid values are "last12days", "last12weeks", "last12months", or
+        /// "thisyear". Defaults to "last12days".</param>
+        /// <param name="templateid">An optional template identifier. This parameter is only valid when the <paramref name="reportType"/> is
+        /// "audits".</param>
+        /// <returns>An <see cref="IActionResult"/> containing the extended statistics for the specified report type and
+        /// parameters. Returns a <see cref="BadRequestResult"/> if the input parameters are invalid.</returns>
         [HttpGet]
         [Route("reporting/statistics/{reportType}/extended")]
-        public async Task<IActionResult> GetSecondLayerStatistics([FromRoute] string reportType, [FromQuery] string timestamp, [FromQuery] int? areaid = null, [FromQuery] string periodType = "last12days")
+        public async Task<IActionResult> GetSecondLayerStatistics([FromRoute] string reportType, [FromQuery] string timestamp, [FromQuery] int? areaid = null, [FromQuery] string periodType = "last12days", [FromQuery] int? templateid = null)
         {
 
             DateTime parsedTimeStamp = DateTime.MinValue;
@@ -153,6 +161,11 @@ namespace EZGO.Api.Controllers.GEN4
                     return BadRequest("Period invalid, must be last12days, last12weeks, last12months or thisyear");
             }
 
+            if(templateid.HasValue && templateid.Value != 0 && reportType != "audits")
+            {
+                return BadRequest("TemplateId parameter is only valid for audits report type");
+            }
+
             switch (reportType)
             {
                 case "tasks":
@@ -163,7 +176,7 @@ namespace EZGO.Api.Controllers.GEN4
 
                     return Ok(tcOutput.ToJsonFromObject());
                 case "audits":
-                    var auditOutput = await _statsManager.GetAuditsStatisticsExtendedAsync(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), timestamp: parsedTimeStamp, areaId: areaid, periodType: periodType);
+                    var auditOutput = await _statsManager.GetAuditsStatisticsExtendedAsync(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), timestamp: parsedTimeStamp, areaId: areaid, periodType: periodType, templateId: templateid);
 
                     AppendCapturedExceptionToApm(_statsManager.GetPossibleExceptions());
 

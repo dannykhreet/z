@@ -77,11 +77,10 @@ namespace EZGO.Api.Logic.Managers
         private readonly IFlattenTaskManager _flattenTaskManager;
         private readonly IShiftManager _shiftManager;
         private readonly ICompanyManager _companyManager;
-        private readonly ITranslationManager _translationManager;
         #endregion
 
         #region - constructor(s) -
-        public TaskManager(IDatabaseAccessHelper manager, IFlattenTaskManager flattenTaskManager, IGeneralManager generalManager, ITagManager tagManager, IUserManager userManager, IPropertyValueManager propertyValueManager, IWorkInstructionManager workInstructionManager, IActionManager actionManager, IAreaManager areaManager, IAreaBasicManager areaBasicManager, ITaskGenerationManager taskGenerationManager, IDataAuditing dataAuditing, IConfigurationHelper configurationHelper, IUserAccessManager userAccessManager, ILogger<TaskManager> logger, IMemoryCache memoryCache, IShiftManager shiftManager, ICompanyManager companyManager, ITranslationManager translationManager) : base(logger)
+        public TaskManager(IDatabaseAccessHelper manager, IFlattenTaskManager flattenTaskManager, IGeneralManager generalManager, ITagManager tagManager, IUserManager userManager, IPropertyValueManager propertyValueManager, IWorkInstructionManager workInstructionManager, IActionManager actionManager, IAreaManager areaManager, IAreaBasicManager areaBasicManager, ITaskGenerationManager taskGenerationManager, IDataAuditing dataAuditing, IConfigurationHelper configurationHelper, IUserAccessManager userAccessManager, ILogger<TaskManager> logger, IMemoryCache memoryCache, IShiftManager shiftManager, ICompanyManager companyManager) : base(logger)
         {
             _cache = memoryCache;
             _manager = manager;
@@ -100,7 +99,6 @@ namespace EZGO.Api.Logic.Managers
             _flattenTaskManager = flattenTaskManager;
             _shiftManager = shiftManager;
             _companyManager = companyManager;
-            _translationManager = translationManager;
         }
         #endregion
 
@@ -121,7 +119,7 @@ namespace EZGO.Api.Logic.Managers
             }
 
             var output = new List<TasksTask>();
-            string language = Culture;
+
             NpgsqlDataReader dr = null;
 
             try
@@ -210,7 +208,7 @@ namespace EZGO.Api.Logic.Managers
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.PictureProof.ToString().ToLower())) output = await AppendPictureProof(tasks: output, companyId: companyId);
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Tags.ToString().ToLower())) output = await AppendTagsToTasksAsync(tasks: output, companyId: companyId, fromTemplates: true);
                 if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.UserInformation.ToString().ToLower()))) output = await AppendUserInformationToTasksAsync(tasks: output, companyId: companyId);
-                if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower())) output = await AppendTranslationsToTasksAsync(tasks: output, companyId: companyId, language);
+
                 if (await _generalManager.GetHasAccessToFeatureByCompany(companyId: companyId, featurekey: "TECH_FLATTEN_DATA"))
                 {
                     output = await ApplyTemplateVersionToTasks(output, companyId, include);
@@ -268,7 +266,7 @@ namespace EZGO.Api.Logic.Managers
         public async Task<List<TasksTask>> GetTasksSplitByTypeAsync(int companyId, int userId, DateTime? timestamp = null, DateTime? starttimestamp = null, DateTime? endtimestamp = null, TaskFilters? filters = null, string include = null)
         {
             var output = new List<TasksTask>();
-            string language = Culture;
+
             NpgsqlDataReader dr = null;
 
             try
@@ -372,10 +370,26 @@ namespace EZGO.Api.Logic.Managers
 
         public async Task<TasksWithMetaData> GetTasksGen4Async(int companyId, int userId, Gen4TaskFilters filters, string include = null)
         {
-            var sp = "get_tasks_g4_v3";
+            string sp;
             if (filters.Timespan == TaskTimeSpanEnum.Overdue)
             {
-                sp = "get_tasks_overdue_g4";
+                if (filters.ShowSkippableTaskOverview)
+                {
+                    sp = "get_tasks_overdue_g4_light";
+                } else
+                {
+                    sp = "get_tasks_overdue_g4";
+                }                    
+            } else
+            {
+                if (filters.ShowSkippableTaskOverview)
+                {
+                    sp = "get_tasks_g4_light";
+                }
+                else
+                {
+                    sp = "get_tasks_g4_v3";
+                }
             }
 
             TasksWithMetaData output = new TasksWithMetaData();
@@ -394,7 +408,14 @@ namespace EZGO.Api.Logic.Managers
                 {
                     while (await dr.ReadAsync())
                     {
-                        output.Data.Add(CreateOrFillTaskFromReader(dr));
+                        if (filters.ShowSkippableTaskOverview)
+                        {
+                            output.Data.Add(CreateOrFillTaskLightFromReader(dr));
+                        }
+                        else
+                        {
+                            output.Data.Add(CreateOrFillTaskFromReader(dr));
+                        }
                     }
                 }
             }
@@ -493,7 +514,7 @@ namespace EZGO.Api.Logic.Managers
         public async Task<List<TasksTask>> GetTasksByDayAsync(int companyId, int userId, DateTime timestamp, TaskFilters? filters = null, string include = null)
         {
             var output = new List<TasksTask>();
-            string language = Culture;
+
             NpgsqlDataReader dr = null;
 
             try
@@ -578,8 +599,6 @@ namespace EZGO.Api.Logic.Managers
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.PictureProof.ToString().ToLower())) output = await AppendPictureProof(tasks: output, companyId: companyId);
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Tags.ToString().ToLower())) output = await AppendTagsToTasksAsync(tasks: output, companyId: companyId, fromTemplates: true);
                 if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.UserInformation.ToString().ToLower()))) output = await AppendUserInformationToTasksAsync(tasks: output, companyId: companyId);
-                if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower())) output = await AppendTranslationsToTasksAsync(tasks: output, companyId: companyId, language);
-
                 output = await ReplacePropertiesWithPropertiesGen4(output, companyId);
             }
 
@@ -602,7 +621,7 @@ namespace EZGO.Api.Logic.Managers
             }
 
             var output = new List<TasksTask>();
-            string language = Culture;
+
             NpgsqlDataReader dr = null;
 
             try
@@ -665,9 +684,6 @@ namespace EZGO.Api.Logic.Managers
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.PictureProof.ToString().ToLower())) output = await AppendPictureProof(tasks: output, companyId: companyId);
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Tags.ToString().ToLower())) output = await AppendTagsToTasksAsync(tasks: output, companyId: companyId, fromTemplates: true);
                 if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.UserInformation.ToString().ToLower()))) output = await AppendUserInformationToTasksAsync(tasks: output, companyId: companyId);
-                if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower())) output = await AppendTranslationsToTasksAsync(tasks: output, companyId: companyId, language);
-
-            
 
                 if (await _generalManager.GetHasAccessToFeatureByCompany(companyId: companyId, featurekey: "TECH_FLATTEN_DATA"))
                 {
@@ -698,7 +714,6 @@ namespace EZGO.Api.Logic.Managers
             }
 
             var output = new List<TasksTask>();
-            string language = Culture;
             NpgsqlDataReader dr = null;
 
             try
@@ -772,7 +787,7 @@ namespace EZGO.Api.Logic.Managers
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.PictureProof.ToString().ToLower())) output = await AppendPictureProof(tasks: output, companyId: companyId);
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Tags.ToString().ToLower())) output = await AppendTagsToTasksAsync(tasks: output, companyId: companyId, fromTemplates: true);
                 if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.UserInformation.ToString().ToLower()))) output = await AppendUserInformationToTasksAsync(tasks: output, companyId: companyId);
-                if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower())) output = await AppendTranslationsToTasksAsync(tasks: output, companyId: companyId, language);
+
                 if (await _generalManager.GetHasAccessToFeatureByCompany(companyId: companyId, featurekey: "TECH_FLATTEN_DATA"))
                 {
                     output = await ApplyTemplateVersionToTasks(output, companyId, include);
@@ -802,7 +817,6 @@ namespace EZGO.Api.Logic.Managers
             }
 
             var output = new List<TasksTask>();
-            string language = Culture;
             NpgsqlDataReader dr = null;
 
             try
@@ -880,7 +894,7 @@ namespace EZGO.Api.Logic.Managers
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.PictureProof.ToString().ToLower())) output = await AppendPictureProof(tasks: output, companyId: companyId);
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Tags.ToString().ToLower())) output = await AppendTagsToTasksAsync(tasks: output, companyId: companyId, fromTemplates: true);
                 if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.UserInformation.ToString().ToLower()))) output = await AppendUserInformationToTasksAsync(tasks: output, companyId: companyId);
-                if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower())) output = await AppendTranslationsToTasksAsync(tasks: output, companyId: companyId, language);
+
                 if (await _generalManager.GetHasAccessToFeatureByCompany(companyId: companyId, featurekey: "TECH_FLATTEN_DATA"))
                 {
                     output = await ApplyTemplateVersionToTasks(output, companyId, include);
@@ -910,7 +924,6 @@ namespace EZGO.Api.Logic.Managers
             }
 
             var output = new List<TasksTask>();
-            string language = Culture;
 
             var cacheKey = CacheHelpers.GenerateCacheKey(CacheSettings.CacheKeyTasksYesterday, companyId,
                                              "timestamp", timestamp.Value.ToString("dd-MM-yyyy"),
@@ -1012,7 +1025,7 @@ namespace EZGO.Api.Logic.Managers
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.PictureProof.ToString().ToLower())) output = await AppendPictureProof(tasks: output, companyId: companyId);
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Tags.ToString().ToLower())) output = await AppendTagsToTasksAsync(tasks: output, companyId: companyId, fromTemplates: true);
                 if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.UserInformation.ToString().ToLower()))) output = await AppendUserInformationToTasksAsync(tasks: output, companyId: companyId);
-                if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower())) output = await AppendTranslationsToTasksAsync(tasks: output, companyId: companyId, language);
+
                 if (await _generalManager.GetHasAccessToFeatureByCompany(companyId: companyId, featurekey: "TECH_FLATTEN_DATA"))
                 {
                     output = await ApplyTemplateVersionToTasks(output, companyId, include);
@@ -1040,7 +1053,7 @@ namespace EZGO.Api.Logic.Managers
         public async Task<List<TasksTask>> GetTasksPeriodAsync(int companyId, int? userId = null, DateTime? from = null, DateTime? to = null, TaskFilters? filters = null, string include = null)
         {
             var output = new List<TasksTask>();
-            string language = Culture;
+
             NpgsqlDataReader dr = null;
 
             try
@@ -1119,7 +1132,7 @@ namespace EZGO.Api.Logic.Managers
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.PictureProof.ToString().ToLower())) output = await AppendPictureProof(tasks: output, companyId: companyId);
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Tags.ToString().ToLower())) output = await AppendTagsToTasksAsync(tasks: output, companyId: companyId, fromTemplates: true);
                 if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.UserInformation.ToString().ToLower()))) output = await AppendUserInformationToTasksAsync(tasks: output, companyId: companyId);
-                if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower())) output = await AppendTranslationsToTasksAsync(tasks: output, companyId: companyId, language);
+
                 if (await _generalManager.GetHasAccessToFeatureByCompany(companyId: companyId, featurekey: "TECH_FLATTEN_DATA"))
                 {
                     output = await ApplyTemplateVersionToTasks(output, companyId, include);
@@ -1149,7 +1162,6 @@ namespace EZGO.Api.Logic.Managers
             }
 
             var output = new List<TasksTask>();
-            string language = Culture;
 
             var cacheKey = CacheHelpers.GenerateCacheKey(CacheSettings.CacheKeyTasksWeekly, companyId,
                                                          "timestamp", timestamp.Value.ToString("dd-MM-yyyy"),
@@ -1253,7 +1265,7 @@ namespace EZGO.Api.Logic.Managers
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.PictureProof.ToString().ToLower())) output = await AppendPictureProof(tasks: output, companyId: companyId);
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Tags.ToString().ToLower())) output = await AppendTagsToTasksAsync(tasks: output, companyId: companyId, fromTemplates: true);
                 if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.UserInformation.ToString().ToLower()))) output = await AppendUserInformationToTasksAsync(tasks: output, companyId: companyId);
-                if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower())) output = await AppendTranslationsToTasksAsync(tasks: output, companyId: companyId, language);
+
                 if (await _generalManager.GetHasAccessToFeatureByCompany(companyId: companyId, featurekey: "TECH_FLATTEN_DATA"))
                 {
                     output = await ApplyTemplateVersionToTasks(output, companyId, include);
@@ -1277,7 +1289,6 @@ namespace EZGO.Api.Logic.Managers
         public async Task<List<TasksTask>> GetTasksActionsAsync(int companyId, int? userId = null, TaskFilters? filters = null, string include = null)
         {
             var output = new List<TasksTask>();
-            string language = Culture;
             NpgsqlDataReader dr = null;
 
             try
@@ -1341,7 +1352,6 @@ namespace EZGO.Api.Logic.Managers
         public async Task<List<TasksTask>> GetTasksAuditActionsAsync(int companyId, int? userId = null, TaskFilters? filters = null, string include = null)
         {
             var output = new List<TasksTask>();
-            string language = Culture;
             NpgsqlDataReader dr = null;
 
             try
@@ -1405,7 +1415,7 @@ namespace EZGO.Api.Logic.Managers
         public async Task<List<TasksTask>> GetTasksChecklistActionsAsync(int companyId, int? userId = null, TaskFilters? filters = null, string include = null)
         {
             var output = new List<TasksTask>();
-            string language = Culture;
+
             NpgsqlDataReader dr = null;
 
             try
@@ -1771,7 +1781,6 @@ namespace EZGO.Api.Logic.Managers
         {
             var output = new List<TasksTask>();
             NpgsqlDataReader dr = null;
-            string language = Culture;
 
             try
             {
@@ -2913,7 +2922,6 @@ namespace EZGO.Api.Logic.Managers
         public async Task<List<TaskTemplate>> GetTaskTemplatesAsync(int companyId, int? userId = null, TaskFilters? filters = null, string include = null)
         {
             var output = new List<TaskTemplate>();
-            string language = Culture;
             NpgsqlDataReader dr = null;
 
             try
@@ -3073,8 +3081,6 @@ namespace EZGO.Api.Logic.Managers
                 if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.PropertyValues.ToString().ToLower()) || include.Split(",").Contains(IncludesEnum.Properties.ToString().ToLower()) || include.Split(",").Contains(IncludesEnum.PropertyDetails.ToString().ToLower()))) output = await AppendTemplatePropertiesToTaskTemplates(taskstemplates: output, companyId: companyId, include: include);
                 if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.InstructionRelations.ToString().ToLower()))) output = await AppendWorkInstructionRelations(taskTemplates: output, companyId: companyId);
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Tags.ToString().ToLower())) output = await AppendTagsToTaskTemplatesAsync(taskTemplates: output, companyId: companyId);
-                if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower()))) output = await AppendTranslationsToTaskTemplatesAsync(companyId: companyId, taskTemplates: output, language);
-
             }
 
             return output;
@@ -3329,7 +3335,6 @@ namespace EZGO.Api.Logic.Managers
         public async Task<TaskTemplate> GetTaskTemplateAsync(int companyId, int taskTemplateId, string include = null, ConnectionKind connectionKind = ConnectionKind.Reader)
         {
             var tasktemplate = new TaskTemplate();
-            string language = Culture;
             NpgsqlDataReader dr = null;
 
             try
@@ -3366,12 +3371,7 @@ namespace EZGO.Api.Logic.Managers
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.InstructionRelations.ToString().ToLower())) tasktemplate.WorkInstructionRelations = await GetWorkInstructionRelationsAsync(companyId: companyId, taskTemplateId: tasktemplate.Id);
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Instructions.ToString().ToLower())) tasktemplate.WorkInstructions = await GetWorkInstructionsByTaskTemplateIdAsync(companyId: companyId, taskTemplateId: tasktemplate.Id);
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Tags.ToString().ToLower())) tasktemplate.Tags = await _tagManager.GetTagsWithObjectAsync(companyId: companyId, objectType: ObjectTypeEnum.TaskTemplate, id: tasktemplate.Id);
-                if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower()))
-                {
-                    var tempList = new List<TaskTemplate> { tasktemplate };
-                    tempList = await AppendTranslationsToTaskTemplatesAsync(companyId, tempList, language);
-                    tasktemplate = tempList.First();
-                }
+
                 return tasktemplate;
             }
             return null;
@@ -5429,12 +5429,29 @@ namespace EZGO.Api.Logic.Managers
         /// <param name="dr">DataReader containing the relevant data.</param>
         /// <param name="task">TaskTasks object that is going to be filled. If object is not supplied it will be created.</param>
         /// <returns>A filled TasksTask object.</returns>
+        /// 
+        private TasksTask CreateOrFillTaskLightFromReader(NpgsqlDataReader dr, TasksTask task = null)
+        {
+            task ??= new TasksTask();
+
+            task.Id = Convert.ToInt32(dr["id"]);
+            task.CompanyId = Convert.ToInt32(dr["company_id"]);
+            task.TemplateId = Convert.ToInt32(dr["template_id"]);
+            task.Name = dr["name"].ToString();
+            task.DueAt = Convert.ToDateTime(dr["due_at"]);
+            
+
+            return task;
+        }
+
+
         private TasksTask CreateOrFillTaskFromReader(NpgsqlDataReader dr, TasksTask task = null)
         {
             if (task == null) task = new TasksTask();
 
             task.Id = Convert.ToInt32(dr["id"]);
             task.CompanyId = Convert.ToInt32(dr["company_id"]);
+
             if (dr["deviance"] != DBNull.Value)
             {
                 task.Deviance = Convert.ToInt32(dr["deviance"]);
@@ -6389,32 +6406,6 @@ namespace EZGO.Api.Logic.Managers
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="tasks"></param>
-        /// <param name="companyId"></param>
-        /// <param name="language"></param>
-        /// <returns></returns>
-        private async Task<List<TasksTask>> AppendTranslationsToTasksAsync(List<TasksTask> tasks, int companyId, string language)
-        {
-            if (string.IsNullOrEmpty(language) || tasks == null || !tasks.Any())
-                return tasks;
-
-            foreach (var task in tasks)
-            {
-                var translation = await _translationManager.GetTranslationAsync(
-                    task.TemplateId,
-                    companyId,
-                    language,
-                    "public.get_tasktemplate_translations",
-                    task);
-
-            }
-
-            return tasks;
-        }
-
-        /// <summary>
         /// AppendUserInformationToTaskAsync; Append firstname, lastname combinations to objects with task which are separately stored. (e.g. modified_by_id etc).
         /// </summary>
         /// <param name="companyId">CompanyId of all users that need to be retrieved.</param>
@@ -6621,6 +6612,17 @@ namespace EZGO.Api.Logic.Managers
                 result.Add(new NpgsqlParameter("@_endtimestamp", filters.EndTimestamp));
             }
 
+            //skippable tasks filters
+            if (filters.ShowSkippableTaskOverview)
+            {
+                //Only show Todo tasks in skippable task overview
+                filters.Statuses = new List<TaskStatusEnum>(){TaskStatusEnum.Todo};
+
+                //Don't use limit and offset in skippable task overview
+                filters.Limit = null;
+                filters.Offset = null;
+            }
+
             //required filters
             result.Add(new NpgsqlParameter("@_areaid", filters.AreaId));
 
@@ -6635,7 +6637,7 @@ namespace EZGO.Api.Logic.Managers
             }
             if (filters.Statuses != null && filters.Statuses.Count > 0)
             {
-                result.Add(new NpgsqlParameter("@_statuses", filters.Statuses.Select(status => status.ToString().ToLower()).ToArray()));
+                result.Add(new NpgsqlParameter("@_statuses", filters.Statuses.Select(status => status.ToString().ToLower().Replace("notok","not ok")).ToArray())); //JvG 2025-12-12 - Fugly fix for NotOk enum mapping issue to DB 'not ok'
             }
             if (filters.RecurrencyTypes != null && filters.RecurrencyTypes.Count > 0)
             {
@@ -7052,32 +7054,6 @@ namespace EZGO.Api.Logic.Managers
                     }
 
                 }
-            }
-
-            return taskTemplates;
-        }
-
-        /// <summary>
-        /// Iterates through tasks templates to replace the name and descriptions with the corresponding tranlslated ones.
-        /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="auditTemplates"></param>
-        /// <param name="language"></param>
-        /// <returns></returns>
-        private async Task<List<TaskTemplate>> AppendTranslationsToTaskTemplatesAsync(int companyId, List<TaskTemplate> taskTemplates, string language)
-        {
-            if (string.IsNullOrEmpty(language) || taskTemplates == null || !taskTemplates.Any())
-                return taskTemplates;
-
-            foreach (var tasktemplate in taskTemplates)
-            {
-                var translation = await _translationManager.GetTranslationAsync(
-                    tasktemplate.Id,
-                    companyId,
-                    language,
-                    "public.get_tasktemplate_translations",
-                    tasktemplate);
-
             }
 
             return taskTemplates;
@@ -8094,7 +8070,7 @@ namespace EZGO.Api.Logic.Managers
         /// <param name="limit">The maximum number of tasks to return. Defaults to a predefined maximum if null.</param>
         /// <param name="offset">The number of tasks to skip before returning results. Defaults to 0 if null.</param>
         /// <returns>A <see cref="Gen4TaskFilters"/> object containing the specified filtering criteria.</returns>
-        public Gen4TaskFilters GetTaskFilters(TaskTimeSpanEnum? timespanType, int? timespanOffset, DateTime? startTimestamp, DateTime? endTimestamp, int areaId, string filtertext, string statusIds, string tagIds, bool? allowDuplicateTaskInstances, int? limit, int? offset)
+        public Gen4TaskFilters GetTaskFilters(TaskTimeSpanEnum? timespanType, int? timespanOffset, DateTime? startTimestamp, DateTime? endTimestamp, int areaId, string filtertext, string statusIds, string tagIds, bool? allowDuplicateTaskInstances, int? limit, int? offset, bool ShowSkippableTaskOverview)
         {
             Gen4TaskFilters result = new Gen4TaskFilters()
             {
@@ -8108,7 +8084,8 @@ namespace EZGO.Api.Logic.Managers
                 TagIds = string.IsNullOrEmpty(tagIds) ? null : tagIds.Split(",").Select(id => Convert.ToInt32(id)).ToArray(),
                 Limit = limit ?? ApiSettings.DEFAULT_MAX_NUMBER_OF_TASK_RETURN_ITEMS,
                 Offset = offset ?? 0,
-                AllowDuplicateTaskInstances = allowDuplicateTaskInstances
+                AllowDuplicateTaskInstances = allowDuplicateTaskInstances,
+                ShowSkippableTaskOverview = ShowSkippableTaskOverview
             };
 
             return result;
@@ -8195,7 +8172,7 @@ namespace EZGO.Api.Logic.Managers
         public async Task<List<TasksTask>> GetLatestTasks(int companyId, int limit, int offset = 0, int templateId = 0, string include = null)
         {
             var output = new List<TasksTask>();
-            string language = Culture;
+
             NpgsqlDataReader dr = null;
 
             try
@@ -8239,7 +8216,6 @@ namespace EZGO.Api.Logic.Managers
                 if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.PropertyValues.ToString().ToLower()) || include.Split(",").Contains(IncludesEnum.Properties.ToString().ToLower()) || include.Split(",").Contains(IncludesEnum.PropertyDetails.ToString().ToLower()))) output = await AppendTemplatePropertiesToTasks(tasks: output, companyId: companyId, include: include);
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.InstructionRelations.ToString().ToLower())) output = await AppendWorkInstructionRelations(tasks: output, companyId: companyId);
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.PictureProof.ToString().ToLower())) output = await AppendPictureProof(tasks: output, companyId: companyId);
-                if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower()))) output = await AppendTranslationsToTasksAsync(tasks: output, companyId: companyId, language);
 
                 if (await _generalManager.GetHasAccessToFeatureByCompany(companyId: companyId, featurekey: "TECH_FLATTEN_DATA"))
                 {

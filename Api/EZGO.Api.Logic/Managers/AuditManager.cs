@@ -73,11 +73,10 @@ namespace EZGO.Api.Logic.Managers
         private readonly IUserManager _userManager;
         private readonly IGeneralManager _generalManager;
         private readonly IFlattenAuditManager _flattenedAuditManager;
-        private readonly ITranslationManager _translationManager;
         #endregion
 
         #region - constructor(s) -
-        public AuditManager(IGeneralManager generalManager, IFlattenAuditManager flattenAuditManager, IDatabaseAccessHelper manager, ITagManager tagManager, IUserManager userManager, ITaskManager taskManager, IConfigurationHelper configurationHelper, IPropertyValueManager propertyValueManager, IWorkInstructionManager workInstructionManager, IAreaManager areaManager, IAreaBasicManager areaBasicManager, IActionManager actionManager, IDataAuditing dataAuditing, IUserAccessManager userAccessManager, ITranslationManager translationManager, ILogger<AuditManager> logger) : base(logger)
+        public AuditManager(IGeneralManager generalManager, IFlattenAuditManager flattenAuditManager, IDatabaseAccessHelper manager, ITagManager tagManager, IUserManager userManager, ITaskManager taskManager, IConfigurationHelper configurationHelper, IPropertyValueManager propertyValueManager, IWorkInstructionManager workInstructionManager, IAreaManager areaManager, IAreaBasicManager areaBasicManager, IActionManager actionManager, IDataAuditing dataAuditing, IUserAccessManager userAccessManager,ILogger<AuditManager> logger) : base(logger)
         {
             _manager = manager;
             _taskManager = taskManager;
@@ -93,7 +92,6 @@ namespace EZGO.Api.Logic.Managers
             _generalManager = generalManager;
             _flattenedAuditManager = flattenAuditManager;
             _areaBasicManager = areaBasicManager;
-            _translationManager = translationManager;
         }
         #endregion
 
@@ -111,7 +109,6 @@ namespace EZGO.Api.Logic.Managers
         public async Task<List<Audit>> GetAuditsAsync(int companyId, int? userId = null, AuditFilters? filters = null, string include = null, bool useStatic = false)
         {
             var output = new List<Audit>();
-            string language = Culture;
             bool useStaticStorage = useStatic;
 
             NpgsqlDataReader dr = null;
@@ -223,7 +220,6 @@ namespace EZGO.Api.Logic.Managers
                     if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.OpenFields.ToString().ToLower())) output = await AppendPropertiesToAudits(audits: output, companyId: companyId, include: include);
                     if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.Tags.ToString().ToLower()))) output = await AppendTagsToAuditsAsync(audits: output, companyId: companyId);
                     if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.UserInformation.ToString().ToLower()))) output = await AppendUserInformationToAuditsAsync(audits: output, companyId: companyId);
-                    if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower())) output = await AppendTranslationsToAuditsAsync(audits: output, companyId: companyId, language);
 
                     if (await _generalManager.GetHasAccessToFeatureByCompany(companyId: companyId, featurekey: "TECH_FLATTEN_DATA"))
                     {
@@ -287,7 +283,6 @@ namespace EZGO.Api.Logic.Managers
         public async Task<Audit> GetAuditAsync(int companyId, int auditId, string include = null, ConnectionKind connectionKind = ConnectionKind.Reader, bool useStatic = false)
         {
             var audit = new Audit();
-            string language = Culture;
             bool useStaticStorage = useStatic;
 
             NpgsqlDataReader dr = null;
@@ -338,14 +333,6 @@ namespace EZGO.Api.Logic.Managers
                     {
                         audit = await ApplyTemplateVersionToAudit(audit, companyId, include);
                     }
-                
-                    if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower()))
-                    {
-                        var auditList = new List<Audit> { audit };
-                        auditList = await AppendTranslationsToAuditlistsAsync(auditList, companyId, language);
-                        audit = auditList.First();
-                    }
-                    return audit;
                 }
                 else
                 {
@@ -829,7 +816,6 @@ namespace EZGO.Api.Logic.Managers
         {
             var output = new List<AuditTemplate>();
 
-            string language = Culture;
             NpgsqlDataReader dr = null;
 
             try
@@ -950,8 +936,6 @@ namespace EZGO.Api.Logic.Managers
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.OpenFields.ToString().ToLower())) output = await AppendTemplatePropertiesToTemplates(audittemplates: output, companyId: companyId, include: include);
                 if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.InstructionRelations.ToString().ToLower()))) output = await AppendWorkInstructionRelationsAsync(auditTemplates: output, companyId: companyId);
                 if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.Tags.ToString().ToLower()))) output = await AppendTagsToAuditTemplatesAsync(auditTemplates: output, companyId: companyId);
-                if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower()))) output = await AppendTranslationsToAuditTemplatesAsync(companyId: companyId, auditTemplates: output, language);
-
             }
 
             return output;
@@ -1089,7 +1073,6 @@ namespace EZGO.Api.Logic.Managers
         public async Task<AuditTemplate> GetAuditTemplateAsync(int companyId, int auditTemplateId, string include = null, ConnectionKind connectionKind = ConnectionKind.Reader)
         {
             var audittemplate = new AuditTemplate();
-            string language = Culture;
 
             NpgsqlDataReader dr = null;
 
@@ -1125,12 +1108,7 @@ namespace EZGO.Api.Logic.Managers
                 if (!string.IsNullOrEmpty(include) && (include.Split(",").Contains(IncludesEnum.PropertyValues.ToString().ToLower()) || include.Split(",").Contains(IncludesEnum.Properties.ToString().ToLower()) || include.Split(",").Contains(IncludesEnum.PropertyDetails.ToString().ToLower()))) audittemplate = await AppendTemplatePropertiesToTaskTemplates(audittemplate: audittemplate, companyId: companyId, include:include);
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.OpenFields.ToString().ToLower())) audittemplate = await AppendTemplatePropertiesToTemplate(audittemplate: audittemplate, companyId: companyId, include: include);
                 if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Tags.ToString().ToLower())) audittemplate.Tags = await _tagManager.GetTagsWithObjectAsync(companyId: companyId, objectType: ObjectTypeEnum.AuditTemplate, id: auditTemplateId);
-                if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Language.ToString().ToLower()))
-                {
-                    var tempList = new List<AuditTemplate> { audittemplate };
-                    tempList = await AppendTranslationsToAuditTemplatesAsync(companyId: companyId, auditTemplates: tempList, language: language);
-                    audittemplate = tempList.First();
-                }
+
                 return audittemplate;
             }
             else
@@ -1142,13 +1120,11 @@ namespace EZGO.Api.Logic.Managers
         public async Task<Dictionary<int, string>> GetAuditTemplateNamesAsync(int companyId, List<int> audittemplateIds)
         {
             Dictionary<int, string> idsNames = new();
-            string language = Culture;
 
             try
             {
                 List<NpgsqlParameter> parameters = new()
                 {
-                    new NpgsqlParameter("@_language", language),
                     new NpgsqlParameter("@_companyid", companyId),
                     new NpgsqlParameter("@_audittemplateids", audittemplateIds)
                 };
@@ -1943,32 +1919,6 @@ namespace EZGO.Api.Logic.Managers
                 }
             }
             return audittemplates;
-        }
-
-        /// <summary>
-        /// Iterates through checklist templates to replace the name and descriptions with the corresponding tranlslated ones.
-        /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="audittemplates"></param>
-        /// <param name="language"></param>
-        /// <returns></returns>
-        private async Task<List<AuditTemplate>> AppendTranslationsToAuditTemplatesAsync(int companyId, List<AuditTemplate> auditTemplates, string language)
-        {
-            if (string.IsNullOrEmpty(language) || auditTemplates == null || !auditTemplates.Any())
-                return auditTemplates;
-
-            foreach (var audittemplate in auditTemplates)
-            {
-                var translation = await _translationManager.GetTranslationAsync(
-                    audittemplate.Id,
-                    companyId,
-                    language,
-                    "public.get_audittemplate_translations",
-                    audittemplate);
-
-            }
-
-            return auditTemplates;
         }
 
         /// <summary>
@@ -2998,32 +2948,6 @@ namespace EZGO.Api.Logic.Managers
         }
 
         /// <summary>
-        /// Calls the translation manager to fetch translations for all audits  based on their templateID (Names are the same and therefore we use templateID for fetching tranlsations)
-        /// </summary>
-        /// <param name="audits"></param>
-        /// <param name="companyId"></param>
-        /// <param name="language"></param>
-        /// <returns></returns>
-        private async Task<List<Audit>> AppendTranslationsToAuditsAsync(List<Audit> audits, int companyId, string language)
-        {
-            if (string.IsNullOrEmpty(language) || audits == null || !audits.Any())
-                return audits;
-
-            foreach (var audit in audits)
-            {
-                var translation = await _translationManager.GetTranslationAsync(
-                    audit.TemplateId,
-                    companyId,
-                    language,
-                    "public.get_audittemplate_translations",
-                    audit);
-
-            }
-
-            return audits;
-        }
-
-        /// <summary>
         /// AppendUserInformationToAuditAsync; Append firstname, lastname combinations to objects with audit which are separately stored. (e.g. modified_by_id etc).
         /// </summary>
         /// <param name="companyId">CompanyId of all users that need to be retrieved.</param>
@@ -3086,25 +3010,6 @@ namespace EZGO.Api.Logic.Managers
             }
 
             return audit;
-        }
-
-        private async Task<List<Audit>> AppendTranslationsToAuditlistsAsync(List<Audit> auditlists, int companyId, string language)
-        {
-            if (string.IsNullOrEmpty(language) || auditlists == null || !auditlists.Any())
-                return auditlists;
-
-            foreach (var auditlist in auditlists)
-            {
-                var translation = await _translationManager.GetTranslationAsync(
-                    auditlist.TemplateId,
-                    companyId,
-                    language,
-                    "public.get_audittemplate_translations",
-                    auditlist);
-
-            }
-
-            return auditlists;
         }
         #endregion
 

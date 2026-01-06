@@ -45,12 +45,11 @@ namespace EZGO.Api.Controllers.V1
         private readonly ISharedTemplateManager _sharedTemplateManager;
         private readonly IFlattenTaskManager _flattenTaskManager;
         private readonly IGeneralManager _generalManager;
-        private readonly ITranslationManager _translationManager;
 
         #endregion
 
         #region - contructor(s) -
-        public TaskTemplatesController(IGeneralManager generalManager, IFlattenTaskManager flattenTaskManager, ISharedTemplateManager sharedTemplateManager, ICompanyManager companyManager, IUserManager userManager, ITaskManager manager, ITaskGenerationManager taskGenerationManager, IToolsManager toolsManager, IConfigurationHelper configurationHelper, ITranslationManager translationManager, ILogger<TaskTemplatesController> logger, IApplicationUser applicationUser) : base(logger, applicationUser, configurationHelper)
+        public TaskTemplatesController(IGeneralManager generalManager, IFlattenTaskManager flattenTaskManager, ISharedTemplateManager sharedTemplateManager, ICompanyManager companyManager, IUserManager userManager, ITaskManager manager, ITaskGenerationManager taskGenerationManager, IToolsManager toolsManager, IConfigurationHelper configurationHelper, ILogger<TaskTemplatesController> logger, IApplicationUser applicationUser) : base(logger, applicationUser, configurationHelper)
         {
             _manager = manager;
             _taskGenerationManager = taskGenerationManager;
@@ -60,7 +59,6 @@ namespace EZGO.Api.Controllers.V1
             _sharedTemplateManager = sharedTemplateManager;
             _flattenTaskManager = flattenTaskManager;
             _generalManager = generalManager;
-            _translationManager = translationManager;
         }
         #endregion
 
@@ -239,8 +237,6 @@ namespace EZGO.Api.Controllers.V1
 
             var result = await _manager.AddTaskTemplateAsync(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(), taskTemplate: tasktemplate);
 
-            await _translationManager.TranslateAndSaveObjectAsync(result, "task");
-
             if (tasktemplate.SharedTemplateId.HasValue && tasktemplate.SharedTemplateId.Value > 0)
                 await _sharedTemplateManager.AcceptSharedTemplateAsync(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(), sharedTemplateId: tasktemplate.SharedTemplateId.Value);
 
@@ -322,8 +318,6 @@ namespace EZGO.Api.Controllers.V1
             }
 
             var result = await _manager.ChangeTaskTemplateAsync(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(), taskTemplateId: tasktemplateid,taskTemplate: tasktemplate);
-
-            await _translationManager.TranslateAndSaveObjectAsync(tasktemplateid, "task");
 
             TaskTemplate resultfull = null;
 

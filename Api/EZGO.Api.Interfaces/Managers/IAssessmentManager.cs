@@ -19,6 +19,7 @@ namespace EZGO.Api.Interfaces.Managers
         Task<int> AddAssessmentAsync(int companyId, int userId, Assessment assessment);
         Task<bool> ChangeAssessmentAsync(int companyId, int userId, int assessmentId, Assessment assessment);
         Task<bool> SetAssessmentActiveAsync(int companyId, int userId, int assessmentId, bool isActive = true);
+        Task<bool> FreeLinkedAssessmentInstruction(int companyId, int assessmentId);
         Task<bool> SetAssessmentCompletedAsync(int companyId, int userId, int assessmentId, bool isCompleted = true);
         #endregion
         #region - templates-

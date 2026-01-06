@@ -70,23 +70,6 @@ namespace EZGO.Api.Controllers.V1
 
         }
 
-        //Gets all usperprofiles of a company no matter the userId.
-        [Route("userprofilescompany")]
-        [HttpGet]
-        public async Task<IActionResult> GetUsersCompany([FromQuery] bool? isstaff, [FromQuery] bool? issuperuser, [FromQuery] RoleTypeEnum? role, [FromQuery] string include)
-        {
-            var filters = new UserFilters() { IsStaff = isstaff, IsSuperUser = issuperuser, RoleType = role };
-
-            Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
-
-            var result = await _manager.GetUsersBasicAsync(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync());
-
-            Agent.Tracer.CurrentSpan.End();
-
-            return StatusCode((int)HttpStatusCode.OK, (result).ToJsonFromObject());
-
-        }
-
         [Route("userprofile/{userid}")]
         [HttpGet]
         public async Task<IActionResult> GetUserProfile([FromRoute]int userid, [FromQuery] string include)

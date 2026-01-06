@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <UserSecretsId>dotnet-EZGO.WorkerService.Exporter-D67F5969-7605-49FF-B9D9-C749876107DB</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <AssemblyVersion>2.0.2509.22133</AssemblyVersion>
+    <StartupObject>EZGO.WorkerService.Exporter.Program</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
+    <PackageReference Include="SSH.NET" Version="2025.1.0" />
+    <PackageReference Include="System.IO.Packaging" Version="9.0.10" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EZGO.Api.Data.Logic\EZGO.Api.Data.Logic.csproj" />
+    <ProjectReference Include="..\EZGO.Api.Interfaces\EZGO.Api.Interfaces.csproj" />
+    <ProjectReference Include="..\EZGO.Api.Logic.Exporting\EZGO.Api.Logic.Exporting.csproj" />
+    <ProjectReference Include="..\EZGO.Api.Settings\EZGO.Api.Settings.csproj" />
+  </ItemGroup>
+</Project>

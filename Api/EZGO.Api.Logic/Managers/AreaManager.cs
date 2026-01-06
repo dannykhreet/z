@@ -105,14 +105,14 @@ namespace EZGO.Api.Logic.Managers
                 if (dr != null) { if (!dr.IsClosed) await dr.CloseAsync(); await dr.DisposeAsync(); }
             }
 
-            if (filters.HasValue && (userId != null))
+            if (filters.HasValue)
             {
                 var currentUser = await _userManager.GetUserProfileAsync(companyId: companyId, userId: userId.Value);
                 if (currentUser != null && currentUser.Role != "manager")
                 {
                     //NOTE: When adding more filters, if they apply to manager, this needs to change
                     //but currently we only the AllowedOnly filter so this solution currently works fine
-                    output = (await FilterAreas(companyId: companyId, filters: filters.Value, nonFilteredCollection: output, userId: userId)).ToList();
+                    output = (await FilterAreas(companyId: companyId, filters: filters.Value, nonFilteredCollection: output, userId: userId.Value)).ToList();
                 }
             }
 
