@@ -1172,7 +1172,7 @@ namespace EZGO.Api.Logic.Managers
                 // Check if legend items exist for this company
                 List<NpgsqlParameter> checkParams = new List<NpgsqlParameter>();
                 checkParams.Add(new NpgsqlParameter("@_company_id", companyId));
-                var exists = Convert.ToBoolean(await _manager.ExecuteScalarAsync("check_skill_matrix_legend_exists", parameters: checkParams, commandType: System.Data.CommandType.StoredProcedure));
+                var exists = Convert.ToBoolean(await _manager.ExecuteScalarAsync("check_matrix_legend_exists", parameters: checkParams, commandType: System.Data.CommandType.StoredProcedure));
 
                 if (!exists)
                 {
@@ -1212,7 +1212,7 @@ namespace EZGO.Api.Logic.Managers
                 itemParams.Add(new NpgsqlParameter("@_is_default", item.IsDefault));
                 itemParams.Add(new NpgsqlParameter("@_created_by", userId));
 
-                await _manager.ExecuteScalarAsync("insert_skill_matrix_legend_item", parameters: itemParams, commandType: System.Data.CommandType.StoredProcedure);
+                await _manager.ExecuteScalarAsync("insert_matrix_legend_item", parameters: itemParams, commandType: System.Data.CommandType.StoredProcedure);
             }
         }
 
@@ -1226,7 +1226,7 @@ namespace EZGO.Api.Logic.Managers
                 parameters.Add(new NpgsqlParameter("@_company_id", companyId));
                 parameters.Add(new NpgsqlParameter("@_skill_type", skillType));
 
-                using (dr = await _manager.GetDataReader("get_skill_matrix_legend_items", commandType: System.Data.CommandType.StoredProcedure, parameters: parameters))
+                using (dr = await _manager.GetDataReader("get_matrix_legend_items", commandType: System.Data.CommandType.StoredProcedure, parameters: parameters))
                 {
                     while (await dr.ReadAsync())
                     {
@@ -1322,7 +1322,7 @@ namespace EZGO.Api.Logic.Managers
                 parameters.Add(new NpgsqlParameter("@_icon_class", (object)item.IconClass ?? DBNull.Value));
                 parameters.Add(new NpgsqlParameter("@_updated_by", userId));
 
-                await _manager.ExecuteScalarAsync("update_skill_matrix_legend_item", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure);
+                await _manager.ExecuteScalarAsync("update_matrix_legend_item", parameters: parameters, commandType: System.Data.CommandType.StoredProcedure);
             }
             catch (Exception ex)
             {

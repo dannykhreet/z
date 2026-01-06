@@ -58,6 +58,7 @@ namespace EZGO.Api.Models.Enumerations
         holdingunit,
         holdingunit_company,
         matrices,
+        matrix_legend_item,
         matrix_user_groups,
         matrix_user_skills,
         picture_proof,
