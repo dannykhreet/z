@@ -524,6 +524,8 @@
             public const string NotifyEndUserSkillMatrixChangeDoneCorrectly = @"CMS_NOTIFY_ENDUSER_SkillMatrix_CHANGE_Correctly";
             public const string NotifyEndUserSkillMatrixChangeNotCorrectly = @"CMS_NOTIFY_ENDUSER_SkillMatrix_CHANGE_Not_Correctly";
 
+            public const string LegendUpdatedSuccessfully = "CMS_COMPANY_SETTING_LEGEND_UPDATED_SUCCESSFULLY";
+            public const string LegendUpdateFailed = "CMS_COMPANY_SETTING_LEGEND_UPDATE_FAILED";
         }
 
         public static class Marketplace
@@ -893,7 +895,16 @@
             public const string DisableSkillMatrixTitle = "DISABLE_SKILLMATRIX_TITLE";
             public const string DisableSkillMatrixDescription = "Disable_SKILLMATRIX_DESCRIPTION";
             public const string EnableSkillMatrixDescription = "ENABLE_SKILLMATRIX_DESCRIPTION";
-        }
+            
+            // Legend Customization
+            public const string CustomizeLegendTitle = "CMS_SETTING_CUSTOMIZE_LEGEND_TITLE";
+            public const string MandatorySkillsTitle = "CMS_SETTING_MANDATORY_SKILLS_TITLE";
+            public const string OperationalSkillsTitle = "CMS_SETTING_OPERATIONAL_SKILLS_TITLE";
+            public const string CustomizeLegendItemTitle = "CMS_SETTING_CUSTOMIZE_LEGEND_ITEM_TITLE";
+            public const string LevelTextLabel = "CMS_SETTING_LEVEL_TEXT_LABEL";
+            public const string ColorOfNumberLabel = "CMS_SETTING_COLOR_OF_NUMBER_LABEL";
+            public const string ColorOfBackgroundLabel = "CMS_SETTING_COLOR_OF_BACKGROUND_LABEL";
+        }   
         public static class Filters
         {
             public const string CardTitle = @"CMS_FILTER_CARD_TITLE";
@@ -1802,6 +1813,8 @@
             public const string SaveBeforeSharing = @"CMS_SHARED_SAVE_BEFORE_SHARING";
             public const string SharingSuccess = @"CMS_SHARED_SHARING_SUCCESS";
             public const string SharingFailed = @"CMS_SHARED_SHARING_FAILED";
+            public const string BtnClose = "CMS_SHARED_BTN_CLOSE";
+            public const string BtnConfirm = "CMS_SHARED_BTN_CONFIRM";
         }
 
         public static class Skills

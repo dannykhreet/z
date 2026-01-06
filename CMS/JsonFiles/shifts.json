@@ -1,0 +1,170 @@
+[
+  {
+    "Id": 1384,
+    "Start": "06:00:00",
+    "End": "14:00:00",
+    "Day": 2,
+    "Weekday": 0,
+    "ShiftNr": 1
+  },
+  {
+    "Id": 1385,
+    "Start": "14:00:00",
+    "End": "22:00:00",
+    "Day": 2,
+    "Weekday": 0,
+    "ShiftNr": 2
+  },
+  {
+    "Id": 1386,
+    "Start": "22:00:00",
+    "End": "06:00:00",
+    "Day": 2,
+    "Weekday": 0,
+    "ShiftNr": 3
+  },
+  {
+    "Id": 1387,
+    "Start": "06:00:00",
+    "End": "14:00:00",
+    "Day": 3,
+    "Weekday": 1,
+    "ShiftNr": 1
+  },
+  {
+    "Id": 1388,
+    "Start": "14:00:00",
+    "End": "22:00:00",
+    "Day": 3,
+    "Weekday": 1,
+    "ShiftNr": 2
+  },
+  {
+    "Id": 1389,
+    "Start": "22:00:00",
+    "End": "06:00:00",
+    "Day": 3,
+    "Weekday": 1,
+    "ShiftNr": 3
+  },
+  {
+    "Id": 1390,
+    "Start": "06:00:00",
+    "End": "14:00:00",
+    "Day": 4,
+    "Weekday": 2,
+    "ShiftNr": 1
+  },
+  {
+    "Id": 1391,
+    "Start": "14:00:00",
+    "End": "22:00:00",
+    "Day": 4,
+    "Weekday": 2,
+    "ShiftNr": 2
+  },
+  {
+    "Id": 1392,
+    "Start": "22:00:00",
+    "End": "06:00:00",
+    "Day": 4,
+    "Weekday": 2,
+    "ShiftNr": 3
+  },
+  {
+    "Id": 1393,
+    "Start": "06:00:00",
+    "End": "14:00:00",
+    "Day": 5,
+    "Weekday": 3,
+    "ShiftNr": 1
+  },
+  {
+    "Id": 1394,
+    "Start": "14:00:00",
+    "End": "22:00:00",
+    "Day": 5,
+    "Weekday": 3,
+    "ShiftNr": 2
+  },
+  {
+    "Id": 1395,
+    "Start": "22:00:00",
+    "End": "06:00:00",
+    "Day": 5,
+    "Weekday": 3,
+    "ShiftNr": 3
+  },
+  {
+    "Id": 1396,
+    "Start": "06:00:00",
+    "End": "14:00:00",
+    "Day": 6,
+    "Weekday": 4,
+    "ShiftNr": 1
+  },
+  {
+    "Id": 1397,
+    "Start": "14:00:00",
+    "End": "22:00:00",
+    "Day": 6,
+    "Weekday": 4,
+    "ShiftNr": 2
+  },
+  {
+    "Id": 1398,
+    "Start": "22:00:00",
+    "End": "06:00:00",
+    "Day": 6,
+    "Weekday": 4,
+    "ShiftNr": 3
+  },
+  {
+    "Id": 1399,
+    "Start": "06:00:00",
+    "End": "14:00:00",
+    "Day": 7,
+    "Weekday": 5,
+    "ShiftNr": 1
+  },
+  {
+    "Id": 1400,
+    "Start": "14:00:00",
+    "End": "22:00:00",
+    "Day": 7,
+    "Weekday": 5,
+    "ShiftNr": 2
+  },
+  {
+    "Id": 1401,
+    "Start": "22:00:00",
+    "End": "06:00:00",
+    "Day": 7,
+    "Weekday": 5,
+    "ShiftNr": 3
+  },
+  {
+    "Id": 1402,
+    "Start": "06:00:00",
+    "End": "14:00:00",
+    "Day": 1,
+    "Weekday": 6,
+    "ShiftNr": 1
+  },
+  {
+    "Id": 1403,
+    "Start": "14:00:00",
+    "End": "22:00:00",
+    "Day": 1,
+    "Weekday": 6,
+    "ShiftNr": 2
+  },
+  {
+    "Id": 1404,
+    "Start": "22:00:00",
+    "End": "06:00:00",
+    "Day": 1,
+    "Weekday": 6,
+    "ShiftNr": 3
+  }
+]

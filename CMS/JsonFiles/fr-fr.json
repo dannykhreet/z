@@ -1,0 +1,37 @@
+{
+  "Language": "fr (FR)",
+  "LanguageCulture": "fr-FR",
+  "LanguageIso": null,
+  "ResourceItems": [
+    {
+      "Description": "Testen",
+      "Guid": "c3c23502fd0641fe8b9019b49d0ef96b",
+      "ResourceKey": "TEST",
+      "ResourceValue": "this is my test (engels) you can change this freely"
+    },
+    {
+      "Description": "successful language update",
+      "Guid": "50775caf9fdd4bfaab008bf82d514ffb",
+      "ResourceKey": "LANGUAGE_UPDATE_SUCCESS",
+      "ResourceValue": "The language key update was successful"
+    },
+    {
+      "Description": "failed action for language action",
+      "Guid": "087bd939aefd4b1685cb1fffda5beee1",
+      "ResourceKey": "LANGUAGE_UPDATE_FAIL",
+      "ResourceValue": "Your action was not successful"
+    },
+    {
+      "Description": "Logout",
+      "Guid": "87b4a8f78a574742a99be06d6be73512",
+      "ResourceKey": "BASE_TEXT_LOGOUT",
+      "ResourceValue": "D\u00E9connecter"
+    },
+    {
+      "Description": "Checklist add new template button title",
+      "Guid": "a485050df6a942fbaaae410a8a5f995d",
+      "ResourceKey": "CHECKLIST_ADD_NEW_TEMPLATE",
+      "ResourceValue": "Add new checklist"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
-@model WebApp.ViewModels.CompanySettingsViewModel
+﻿@model WebApp.ViewModels.CompanySettingsViewModel
 
 <!-- Right Content Area -->
-<div class="col-9 p-4" style="border-radius: 8px; max-width:100%">
+<div class="col-9 p-4" style="border-radius: 8px; max-width:100%; max-height: calc(100vh - 225px); overflow-y: auto;">
     <!-- Rounding Options Section -->
     <div class="btn-group btn-group-toggle" data-toggle="buttons" style="display: flex; justify-content: space-between;">
         <!-- Use Round Down -->
@@ -250,15 +250,22 @@
             e.preventDefault();
             e.stopPropagation();
 
+            // Clear previous debounce timer
             clearTimeout(debounceTimer);
 
+            // Set debounce timer to prevent multiple requests
             debounceTimer = setTimeout(() => {
+                // Remove active class from all buttons
                 $('.btn-group-toggle label').removeClass('active');
+
+                // Add active class to the clicked button
                 $(this).addClass('active');
 
+                // Determine the selected state and update the UI accordingly
                 let settingValue;
 
                 if ($(this).attr('id') === 'RoundDown_label') {
+                    // Enable notifications selected
                     settingValue = false;
                     $('#RoundDown').prop('checked', false);
                     $('#donotRoundDown').prop('checked', true);
@@ -269,13 +276,14 @@
                 }
 
                 updateWorkInstructionChangesStatus(settingValue);
-            }, 300);
+            }, 300); // Debounce delay
         });
 
         // Initialize Work Instructions state properly
         initializeWorkInstructions();
 
         function initializeWorkInstructions() {
+            // Remove 'active' class from both labels
             $('#RoundDown_label').removeClass('active');
             $('#do_not_RoundDown_label').removeClass('active');
 
@@ -677,9 +685,9 @@
         outline: 0 !important;
     }
 
-    .circlebtn i {
-        font-size: 18px;
-    }
+        .circlebtn i {
+            font-size: 18px;
+        }
 
     .legend-item-row {
         padding: 8px 12px;
@@ -689,9 +697,9 @@
         transition: box-shadow 0.2s;
     }
 
-    .legend-item-row:hover {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
+        .legend-item-row:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
 
     .legend-label-input {
         border: 1px solid #e0e0e0;
@@ -699,18 +707,18 @@
         padding: 8px 12px;
     }
 
-    .legend-label-input:focus {
-        border-color: #93C54B;
-        box-shadow: 0 0 0 2px rgba(147, 197, 75, 0.2);
-    }
+        .legend-label-input:focus {
+            border-color: #93C54B;
+            box-shadow: 0 0 0 2px rgba(147, 197, 75, 0.2);
+        }
 
     .legend-preview-btn {
         transition: transform 0.2s;
     }
 
-    .legend-preview-btn:hover {
-        transform: scale(1.1);
-    }
+        .legend-preview-btn:hover {
+            transform: scale(1.1);
+        }
 
     .color-hue-slider::-webkit-slider-thumb {
         -webkit-appearance: none;

@@ -61,7 +61,7 @@
         string dataValueAttr = validScores.Contains(score) ? $"data-value={score}" : "";
     }
     <div class="col-1">
-        @if(Model.Applicability != null && !Model.Applicability.IsApplicable)
+        @if (Model.Applicability != null && !Model.Applicability.IsApplicable)
         {
             <div class="buttoncell" data-containertype="value">
                 <button id="editSkillValuePositioningElement-@Model.MatrixId-@mandatorySkill.UserSkillId"
@@ -129,7 +129,12 @@
                         data-isrequired="@((Model.Applicability == null || Model.Applicability.IsApplicable).ToString().ToLowerInvariant())"
                         data-certifiedat="@(userSkillValue == null ? "" : userSkillValue.ValueDate.ToString("ddd, dd MMM yyyy"))"
                         data-iso8601certifiedat="@(userSkillValue == null ? "" : userSkillValue.ValueDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))"
-                        @dataValueAttr>@if(!string.IsNullOrEmpty(iconClass)){<i class="fa @iconClass"></i>}</button>
+                        @dataValueAttr>
+                    @if (!string.IsNullOrEmpty(iconClass))
+                    {
+                        <i class="fa @iconClass"></i>
+                    }
+                </button>
             </div>
             <div class="buttoncell circlebtn editSkillValue"
                  style="position: absolute; border: 1px solid #A6A6A6; height: 19px; width: 19px; right: 12px; bottom: 0px; font-size: 10px !important; border-radius: 19px; float: right; background-color: #FAFAFA; color: #212529"

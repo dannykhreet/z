@@ -32,27 +32,27 @@ const setValue = (e) => {
     activeBtn = null;
 }
 
-const togglePopUp = (e) =>{
+const togglePopUp = (e) => {
     var popup;
     var x;
     var y;
-    
-    e.stopPropagation();    
-    
-    if (e.pageX || e.pageY) { 
-      x = e.pageX;
-      y = e.pageY;
+
+    e.stopPropagation();
+
+    if (e.pageX || e.pageY) {
+        x = e.pageX;
+        y = e.pageY;
     }
-    else { 
-      x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft; 
-      y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop; 
-    } 
+    else {
+        x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+        y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+    }
     activeBtn = e.target;
 
-    switch(activeBtn.getAttribute('data-popup')){
-        case 'score': 
-         popup = popUpScore;
-        break;
+    switch (activeBtn.getAttribute('data-popup')) {
+        case 'score':
+            popup = popUpScore;
+            break;
     }
 
     //if popup will be displayed too close to the edge of the viewport,
@@ -68,8 +68,8 @@ const togglePopUp = (e) =>{
     popup.style.top = (y+40)+'px';
 }
 
-items.forEach((item)=>{
-    item.addEventListener('click',setValue);
+items.forEach((item) => {
+    item.addEventListener('click', setValue);
 })
 
 btns.forEach((btn) => {
@@ -79,7 +79,7 @@ btns.forEach((btn) => {
 });
 
 
-document.addEventListener('click',(e)=>{
+document.addEventListener('click', (e) => {
     e.stopPropagation();
     if (popUpScore != undefined && popUpScore != null) {
         popUpScore.classList.add('hidePopUp');
@@ -216,7 +216,7 @@ var matrix = {
                     $(`#mandatorySkillDetails-${userSkillId}-${userId}`).html(data);
                     matrix.initDateRangePicker($(`#valuedate-${matrix.currentMatrixId}-${userSkillId}`));
 
-                    let buttons = $('[data-userid="' + userId + ''][data-skillid="' + userSkillId + '']');
+                    let buttons = $('[data-userid="' + userid + '"][data-skillid="' + userskillid + '"]');
                     //update matrix UI;
                     buttons.each(function () {
                         buttons.attr('class', 'btn circlebtn');
@@ -1799,7 +1799,7 @@ var matrix = {
         newGroup.Name = $('#group_name').val();
         newGroup.Description = $('#group_description').val();
         newGroup.IsInMatrix = $('#group_in_matrix').is(':checked');
-        
+
 
         if (newGroup.Id > 0) {
             $('#group_choice option[value="' + newGroup.Id + '"]').remove();
@@ -1838,7 +1838,7 @@ var matrix = {
     },
     addUserWithGroup: function (userid) {
         let groupId = parseInt($('#group_choice').val());
-        
+
         matrix.saveUserWithGroup('add', userid, groupId)
         //document.location.reload();
     },
@@ -1908,7 +1908,7 @@ var matrix = {
             $('#group_choice').val(relation.UserGroupId);
             matrix.displayGroupUserDetails();
         }
-       
+
     },
     // other
     calculateMatrix: function () {
@@ -1916,9 +1916,9 @@ var matrix = {
         matrix.calculateOperationalSkills();
     },
     calculateMandatorySkills : function () {
-       
+
         $('[data-containertype="mandatory_skill_row"]').each(function () {
-            
+
             let goal = parseInt($(this).find('[data-containertype="goal_value"]').text());
             let goal_difference = 0; // $(this).find('[data-containertype="difference_value"]').text();
             let goal_result = 0; // $(this).find('[data-containertype="result_value"]').text();
@@ -2385,4 +2385,3 @@ var matrix = {
         }
     }
 } 
-
