@@ -1041,7 +1041,8 @@ namespace EZGO.Api.Controllers.V1
 
             Agent.Tracer.CurrentSpan.End();
 
-            return StatusCode((int)HttpStatusCode.OK, (output).ToJsonFromObject());
+            // Use camelCase for JavaScript compatibility
+            return StatusCode((int)HttpStatusCode.OK, (output).ToJsonFromObject(useCamelCasingProperties: true));
         }
 
         /// <summary>

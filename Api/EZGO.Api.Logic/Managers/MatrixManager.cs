@@ -1061,7 +1061,12 @@ namespace EZGO.Api.Logic.Managers
 
                 if (!string.IsNullOrEmpty(jsonValue))
                 {
-                    var parsed = JsonSerializer.Deserialize<SkillMatrixLegendConfiguration>(jsonValue);
+                    // Use PropertyNameCaseInsensitive to handle both camelCase and PascalCase JSON
+                    var jsonOptions = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    };
+                    var parsed = JsonSerializer.Deserialize<SkillMatrixLegendConfiguration>(jsonValue, jsonOptions);
                     if (parsed != null)
                     {
                         parsed.CompanyId = companyId;
@@ -1109,7 +1114,12 @@ namespace EZGO.Api.Logic.Managers
                     }
                 }
 
-                var jsonValue = JsonSerializer.Serialize(configuration);
+                // Serialize with camelCase for JavaScript compatibility
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                };
+                var jsonValue = JsonSerializer.Serialize(configuration, jsonOptions);
 
                 // Use IGeneralManager to save the setting with ResourceId 134
                 var settingItem = new Models.Settings.SettingResourceItem
