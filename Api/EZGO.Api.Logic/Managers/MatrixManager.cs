@@ -30,16 +30,21 @@ namespace EZGO.Api.Logic.Managers
         private readonly IConfigurationHelper _configurationHelper;
         private readonly IUserStandingManager _userStandingManager;
         private readonly IAreaManager _areaManager;
+        private readonly IGeneralManager _generalManager;
+
+        // Resource ID for Skill Matrix Legend Options setting
+        private const int SKILL_MATRIX_LEGEND_OPTIONS_RESOURCE_ID = 134;
         #endregion
 
         #region - constructor(s) -
-        public MatrixManager(IDatabaseAccessHelper manager, ITaskManager taskManager, IAreaManager areaManager, IConfigurationHelper configurationHelper, IDataAuditing dataAuditing, IUserStandingManager userStandingManager, ILogger<MatrixManager> logger) : base(logger)
+        public MatrixManager(IDatabaseAccessHelper manager, ITaskManager taskManager, IAreaManager areaManager, IConfigurationHelper configurationHelper, IDataAuditing dataAuditing, IUserStandingManager userStandingManager, IGeneralManager generalManager, ILogger<MatrixManager> logger) : base(logger)
         {
             _manager = manager;
             _dataAuditing = dataAuditing;
             _configurationHelper = configurationHelper;
             _userStandingManager = userStandingManager;
             _areaManager = areaManager;
+            _generalManager = generalManager;
         }
         #endregion
 
@@ -1049,22 +1054,14 @@ namespace EZGO.Api.Logic.Managers
         /// </summary>
         public async Task<SkillMatrixLegendConfiguration> GetLegendConfigurationAsync(int companyId)
         {
-            var config = new SkillMatrixLegendConfiguration { CompanyId = companyId };
-
             try
             {
-                // Try to get company-specific legend configuration from companies_setting
-                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
-                parameters.Add(new NpgsqlParameter("@_companyid", companyId));
+                // Get company-specific legend configuration using IGeneralManager
+                var jsonValue = await _generalManager.GetSettingValueForCompanyByResourceId(companyId, SKILL_MATRIX_LEGEND_OPTIONS_RESOURCE_ID);
 
-                var jsonValue = await _manager.ExecuteScalarAsync(
-                    "SELECT value FROM companies_setting WHERE company_id = @_companyid AND resource_setting_id = (SELECT id FROM resource_settings WHERE settingskey = 'FEATURE_SKILL_MATRIX_LEGEND_OPTIONS' LIMIT 1) LIMIT 1",
-                    parameters: parameters,
-                    commandType: System.Data.CommandType.Text);
-
-                if (jsonValue != null && jsonValue != DBNull.Value && !string.IsNullOrEmpty(jsonValue.ToString()))
+                if (!string.IsNullOrEmpty(jsonValue))
                 {
-                    var parsed = JsonSerializer.Deserialize<SkillMatrixLegendConfiguration>(jsonValue.ToString());
+                    var parsed = JsonSerializer.Deserialize<SkillMatrixLegendConfiguration>(jsonValue);
                     if (parsed != null)
                     {
                         parsed.CompanyId = companyId;
@@ -1114,41 +1111,15 @@ namespace EZGO.Api.Logic.Managers
 
                 var jsonValue = JsonSerializer.Serialize(configuration);
 
-                // Check if setting exists
-                List<NpgsqlParameter> checkParams = new List<NpgsqlParameter>();
-                checkParams.Add(new NpgsqlParameter("@_companyid", companyId));
-
-                var existingId = await _manager.ExecuteScalarAsync(
-                    "SELECT id FROM companies_setting WHERE company_id = @_companyid AND resource_setting_id = (SELECT id FROM resource_settings WHERE settingskey = 'FEATURE_SKILL_MATRIX_LEGEND_OPTIONS' LIMIT 1) LIMIT 1",
-                    parameters: checkParams,
-                    commandType: System.Data.CommandType.Text);
-
-                if (existingId != null && existingId != DBNull.Value)
+                // Use IGeneralManager to save the setting with ResourceId 134
+                var settingItem = new Models.Settings.SettingResourceItem
                 {
-                    // Update existing
-                    List<NpgsqlParameter> updateParams = new List<NpgsqlParameter>();
-                    updateParams.Add(new NpgsqlParameter("@_id", Convert.ToInt32(existingId)));
-                    updateParams.Add(new NpgsqlParameter("@_value", jsonValue));
+                    CompanyId = companyId,
+                    ResourceId = SKILL_MATRIX_LEGEND_OPTIONS_RESOURCE_ID,
+                    Value = jsonValue
+                };
 
-                    await _manager.ExecuteScalarAsync(
-                        "UPDATE companies_setting SET value = @_value WHERE id = @_id",
-                        parameters: updateParams,
-                        commandType: System.Data.CommandType.Text);
-                }
-                else
-                {
-                    // Insert new
-                    List<NpgsqlParameter> insertParams = new List<NpgsqlParameter>();
-                    insertParams.Add(new NpgsqlParameter("@_companyid", companyId));
-                    insertParams.Add(new NpgsqlParameter("@_value", jsonValue));
-
-                    await _manager.ExecuteScalarAsync(
-                        "INSERT INTO companies_setting (company_id, value, resource_setting_id) SELECT @_companyid, @_value, id FROM resource_settings WHERE settingskey = 'FEATURE_SKILL_MATRIX_LEGEND_OPTIONS' LIMIT 1",
-                        parameters: insertParams,
-                        commandType: System.Data.CommandType.Text);
-                }
-
-                return true;
+                return await _generalManager.ChangeSettingResourceCompany(companyid: companyId, setting: settingItem);
             }
             catch (Exception ex)
             {

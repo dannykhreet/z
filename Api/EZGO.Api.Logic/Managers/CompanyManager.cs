@@ -823,13 +823,23 @@ namespace EZGO.Api.Logic.Managers
                 await _generalManager.ChangeSettingResourceCompany(companyid: companySettings.CompanyId.Value, new SettingResourceItem() { CompanyId = companySettings.CompanyId, ResourceId = 121, Value = "" });
             }
 
-            if (!string.IsNullOrEmpty(companySettings.SapPmTimezone)) 
-            { 
-                await _generalManager.ChangeSettingResourceCompany(companyid: companySettings.CompanyId.Value, new SettingResourceItem() { CompanyId = companySettings.CompanyId, ResourceId = 133, Value = companySettings.SapPmTimezone }); 
+            if (!string.IsNullOrEmpty(companySettings.SapPmTimezone))
+            {
+                await _generalManager.ChangeSettingResourceCompany(companyid: companySettings.CompanyId.Value, new SettingResourceItem() { CompanyId = companySettings.CompanyId, ResourceId = 133, Value = companySettings.SapPmTimezone });
             }
             else
             {
                 await _generalManager.ChangeSettingResourceCompany(companyid: companySettings.CompanyId.Value, new SettingResourceItem() { CompanyId = companySettings.CompanyId, ResourceId = 133, Value = "" });
+            }
+
+            // Skill Matrix Legend Options - ResourceId 134
+            if (!string.IsNullOrEmpty(companySettings.SkillMatrixLegendOptions))
+            {
+                await _generalManager.ChangeSettingResourceCompany(companyid: companySettings.CompanyId.Value, new SettingResourceItem() { CompanyId = companySettings.CompanyId, ResourceId = 134, Value = companySettings.SkillMatrixLegendOptions });
+            }
+            else
+            {
+                await _generalManager.ChangeSettingResourceCompany(companyid: companySettings.CompanyId.Value, new SettingResourceItem() { CompanyId = companySettings.CompanyId, ResourceId = 134, Value = "" });
             }
 
         }
