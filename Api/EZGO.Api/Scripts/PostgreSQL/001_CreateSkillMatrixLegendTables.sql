@@ -17,8 +17,30 @@ CREATE TABLE IF NOT EXISTS skill_matrix_legend_item (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE NULL,
     created_by INTEGER NULL,
-    updated_by INTEGER NULL
+    updated_by INTEGER NULL,
+
+    -- Foreign key constraints
+    CONSTRAINT fk_skill_matrix_legend_item_company
+        FOREIGN KEY (company_id) REFERENCES companies_company(id) ON DELETE CASCADE,
+    CONSTRAINT fk_skill_matrix_legend_item_created_by
+        FOREIGN KEY (created_by) REFERENCES profiles_user(id) ON DELETE SET NULL,
+    CONSTRAINT fk_skill_matrix_legend_item_updated_by
+        FOREIGN KEY (updated_by) REFERENCES profiles_user(id) ON DELETE SET NULL,
+
+    -- Unique constraint for company/skill_level_id/skill_type combination
+    CONSTRAINT uq_skill_matrix_legend_item_company_level_type
+        UNIQUE (company_id, skill_level_id, skill_type)
 );
+
+-- Indexes for common query patterns
+CREATE INDEX IF NOT EXISTS idx_skill_matrix_legend_item_company_id
+    ON skill_matrix_legend_item(company_id);
+
+CREATE INDEX IF NOT EXISTS idx_skill_matrix_legend_item_company_skill_type
+    ON skill_matrix_legend_item(company_id, skill_type);
+
+CREATE INDEX IF NOT EXISTS idx_skill_matrix_legend_item_sort_order
+    ON skill_matrix_legend_item(company_id, skill_type, sort_order);
 
 -- Stored Procedures
 
