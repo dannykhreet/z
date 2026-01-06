@@ -1268,7 +1268,7 @@ namespace EZGO.Api.Logic.Managers
                 // Mandatory skills
                 new SkillMatrixLegendItem { SkillLevelId = 1, SkillType = "mandatory", Label = "Masters the skill", Description = "User has mastered this mandatory skill", IconColor = "#008000", BackgroundColor = "#DDF7DD", Order = 1, IconClass = "thumbsup", IsDefault = true },
                 new SkillMatrixLegendItem { SkillLevelId = 2, SkillType = "mandatory", Label = "Almost expired", Description = "Skill certification is about to expire", IconColor = "#FFA500", BackgroundColor = "#FFF0D4", Order = 2, IconClass = "warning", IsDefault = true },
-                new SkillMatrixLegendItem { SkillLevelId = 3, SkillType = "mandatory", Label = "Expired", Description = "Skill certification has expired", IconColor = "#CB0000", BackgroundColor = "#FFEAEA", Order = 3, IconClass = "thumbsdown", IsDefault = true },
+                new SkillMatrixLegendItem { SkillLevelId = 3, SkillType = "mandatory", Label = "Expired", Description = "Skill certification has expired", IconColor = "#CB0000", BackgroundColor = "#FFEAEA", Order = 3, IconClass = "warning", IsDefault = true },
                 // Operational skills
                 new SkillMatrixLegendItem { SkillLevelId = 1, SkillType = "operational", Label = "Doesn't know the theory", Description = "User does not have theoretical knowledge", IconColor = "#CB0000", BackgroundColor = "#FFEAEA", Order = 1, ScoreValue = 1, IsDefault = true },
                 new SkillMatrixLegendItem { SkillLevelId = 2, SkillType = "operational", Label = "Knows the theory", Description = "User has theoretical knowledge", IconColor = "#FF4500", BackgroundColor = "#FFE4DA", Order = 2, ScoreValue = 2, IsDefault = true },

@@ -8,11 +8,27 @@ var activeBtn = null;
 const setValue = (e) => {
     activeBtn.innerHTML = e.target.innerHTML;
     activeBtn.className = 'btn circlebtn';
-    //activeBtn.classList.add('itemSelected');
-    activeBtn.classList.add(e.target.classList[1]);
-    activeBtn.classList.add(e.target.classList[2]);
-    activeBtn.style.backgoundColor = e.target.style.backgroundColor;
     activeBtn.setAttribute('data-value', e.target.getAttribute('data-actionvalue'));
+
+    // Apply legend colors from config
+    var value = parseInt(e.target.getAttribute('data-actionvalue'));
+    if (matrix.legendConfiguration && matrix.legendConfiguration.operationalSkills && value >= 1 && value <= 5) {
+        var item = matrix.legendConfiguration.operationalSkills.find(function (i) { return i.skillLevelId === value; });
+        if (item) {
+            activeBtn.style.backgroundColor = item.backgroundColor;
+            activeBtn.style.borderColor = item.iconColor;
+            activeBtn.style.color = item.iconColor;
+            if (item.label) {
+                activeBtn.setAttribute('title', item.label);
+            }
+        }
+    } else {
+        // Reset styles for empty/0 value
+        activeBtn.style.backgroundColor = '';
+        activeBtn.style.borderColor = '';
+        activeBtn.style.color = '';
+        activeBtn.removeAttribute('title');
+    }
     activeBtn = null;
 }
 
@@ -88,6 +104,7 @@ var matrix = {
     skillEdited: false,
     groupEdited: false,
     relationChanged: false,
+    legendConfiguration: null,
     language: {
         userSkills: "User skills - ",
         expiryInDays: "Expiry in days: ",
@@ -108,6 +125,7 @@ var matrix = {
             matrix.currentMatrixId = parseInt(matrixId);
         }
         matrix.calculateMatrix();
+        matrix.loadAndApplyLegendConfiguration();
     },
     initDisplay: function () {
         $('[data-containertype="dialog_skilldetails"]').hide();
@@ -117,6 +135,7 @@ var matrix = {
         matrix.initGroupHandlers();
 
         $('#btnViewModalLegend').on('click', function () {
+            matrix.loadAndApplyLegendConfiguration();
             $('#MatrixLegendModal').modal('show');
         });
 
@@ -197,15 +216,26 @@ var matrix = {
                     $(`#mandatorySkillDetails-${userSkillId}-${userId}`).html(data);
                     matrix.initDateRangePicker($(`#valuedate-${matrix.currentMatrixId}-${userSkillId}`));
 
-                    let buttons = $('[data-userid="' + userId + '"][data-skillid="' + userSkillId + '"]');
+                    let buttons = $('[data-userid="' + userId + ''][data-skillid="' + userSkillId + '']');
                     //update matrix UI;
                     buttons.each(function () {
                         buttons.attr('class', 'btn circlebtn');
                         buttons.attr('data-value', 0);
+                        // Reset inline styles
+                        $(this).css({
+                            'background-color': '',
+                            'border-color': '',
+                            'color': ''
+                        });
+                        $(this).html('');
                     });
 
                     matrix.calculateMatrix();
 
+                    // Apply legend configuration
+                    if (matrix.legendConfiguration) {
+                        matrix.applyLegendToMatrixCells(matrix.legendConfiguration);
+                    }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
@@ -244,16 +274,10 @@ var matrix = {
 
                     matrix.calculateMatrix();
 
-                    //todo update matrix
-                    //let buttons = $('[data-userid="' + userId + '"][data-skillid="' + userSkillId + '"]');
-                    ////update matrix UI;
-                    //buttons.each(function () {
-                    //    buttons.attr('class', 'btn circlebtn');
-                    //    buttons.attr('data-value', 0);
-                    //});
-
-                    //ezgomediafetcher.preloadImagesAndVideos();
-                    //update/load operational skill row?
+                    // Apply legend configuration
+                    if (matrix.legendConfiguration) {
+                        matrix.applyLegendToMatrixCells(matrix.legendConfiguration);
+                    }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
@@ -289,17 +313,10 @@ var matrix = {
 
                     matrix.calculateMatrix();
 
-                    //todo update matrix
-                    //let buttons = $('[data-userid="' + userId + '"][data-skillid="' + userSkillId + '"]');
-                    ////update matrix UI;
-                    //buttons.each(function () {
-                    //    buttons.attr('class', 'btn circlebtn');
-                    //    buttons.attr('data-value', 0);
-                    //});
-
-                    //matrix.calculateMatrix();
-                    //ezgomediafetcher.preloadImagesAndVideos();
-                    //update/load operational skill row?
+                    // Apply legend configuration
+                    if (matrix.legendConfiguration) {
+                        matrix.applyLegendToMatrixCells(matrix.legendConfiguration);
+                    }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
@@ -331,6 +348,11 @@ var matrix = {
                     $(`#operationalSkillDetails-${userSkillId}-${userId}`).html(data);
 
                     matrix.calculateMatrix();
+
+                    // Apply legend configuration
+                    if (matrix.legendConfiguration) {
+                        matrix.applyLegendToMatrixCells(matrix.legendConfiguration);
+                    }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
@@ -367,20 +389,10 @@ var matrix = {
 
                     matrix.calculateMatrix();
 
-                    //TODO: update matrix score display with new custom target (goal might not be met anymore)
-                    //also calculateMatrix (still has to be edited)
-                    /*
-                    
-                    let buttons = $('[data-userid="' + userId + '"][data-skillid="' + userSkillId + '"]');
-                    //update matrix UI;
-                    buttons.each(function () {
-                        buttons.attr('class', 'btn circlebtn');
-                        buttons.attr('data-value', 0);
-                    });
-
-                    matrix.calculateMatrix();
-
-                    */
+                    // Apply legend configuration
+                    if (matrix.legendConfiguration) {
+                        matrix.applyLegendToMatrixCells(matrix.legendConfiguration);
+                    }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
@@ -392,6 +404,16 @@ var matrix = {
         $('#CustomTargetModal').on('hidden.bs.modal', function () {
             if ($('.modal.show').length) {
                 $('body').addClass('modal-open');
+            }
+        });
+
+        $('#UserSkillValuesModal').on('hidden.bs.modal', function () {
+            // Refresh the matrix view when the modal is closed
+            matrix.calculateMatrix();
+
+            // Apply legend configuration to update colors and icons
+            if (matrix.legendConfiguration) {
+                matrix.applyLegendToMatrixCells(matrix.legendConfiguration);
             }
         });
 
@@ -1490,6 +1512,11 @@ var matrix = {
                     matrix.initDateRangePicker(elem);
                 });
 
+                // Apply legend configuration to modal buttons
+                if (matrix.legendConfiguration) {
+                    matrix.applyLegendToMatrixCells(matrix.legendConfiguration);
+                }
+
                 ezgomediafetcher.preloadImagesAndVideos();
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -2126,12 +2153,236 @@ var matrix = {
                 });
 
                 matrix.calculateMatrix();
+
+                // Apply legend configuration to update colors and icons
+                if (matrix.legendConfiguration) {
+                    matrix.applyLegendToMatrixCells(matrix.legendConfiguration);
+                }
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 toastr.error(jqXHR.responseText + ' (' + jqXHR.status + ')');
             },
             contentType: "application/json; charset=utf-8"
         });
+    },
+    loadAndApplyLegendConfiguration: function () {
+        // If already loaded, just apply it
+        if (matrix.legendConfiguration) {
+            matrix.applyLegendConfiguration(matrix.legendConfiguration);
+            return;
+        }
+
+        // Load legend configuration from API
+        $.ajax({
+            url: '/companysettings/legend',
+            type: 'GET',
+            success: function (response) {
+                matrix.legendConfiguration = response;
+                matrix.applyLegendConfiguration(response);
+            },
+            error: function (xhr, status, error) {
+                console.error('Failed to load legend configuration:', error);
+            }
+        });
+    },
+    applyLegendConfiguration: function (config) {
+        if (!config) return;
+
+        // Apply mandatory skills configuration to legend modal
+        if (config.mandatorySkills) {
+            config.mandatorySkills.forEach(function (item) {
+                var btn = $('.legend-btn-mandatory[data-skill-level-id="' + item.skillLevelId + '"]');
+                var label = $('.legend-label-mandatory[data-skill-level-id="' + item.skillLevelId + '"]');
+                if (btn.length) {
+                    btn.css({
+                        'background-color': item.backgroundColor,
+                        'border-color': item.iconColor,
+                        'color': item.iconColor
+                    });
+                }
+                if (label.length && item.label) {
+                    label.text(item.label);
+                }
+            });
+        }
+
+        // Apply operational skills configuration to legend modal
+        if (config.operationalSkills) {
+            config.operationalSkills.forEach(function (item) {
+                var btn = $('.legend-btn-operational[data-skill-level-id="' + item.skillLevelId + '"]');
+                var label = $('.legend-label-operational[data-skill-level-id="' + item.skillLevelId + '"]');
+                if (btn.length) {
+                    btn.css({
+                        'background-color': item.backgroundColor,
+                        'border-color': item.iconColor,
+                        'color': item.iconColor
+                    });
+                }
+                if (label.length && item.label) {
+                    label.text(item.label);
+                }
+            });
+        }
+
+        // Apply colors to matrix cells
+        matrix.applyLegendToMatrixCells(config);
+    },
+    applyLegendToMatrixCells: function (config, options) {
+        if (!config) return;
+        options = options || {};
+        var skipFontAwesome = options.skipFontAwesome || false;
+
+        // Apply mandatory skills colors to matrix cells
+        // Mapping: data-value 1 = expired (skillLevelId 3), data-value 2 = masters (skillLevelId 1), data-value 5 = almost expired (skillLevelId 2)
+        if (config.mandatorySkills) {
+            var mandatoryMapping = { '1': 3, '2': 1, '5': 2 };
+            var iconMapping = {
+                'thumbsup': 'fa-thumbs-up',
+                'warning': 'fa-exclamation-triangle'
+            };
+            // Apply to matrix cells and user skill values modal mandatory buttons
+            $('[data-popup="thumbs"][data-value], #UserSkillValuesModalBodyMandatory .circlebtnNoHover[data-value]').each(function () {
+                var value = $(this).attr('data-value');
+                var skillLevelId = mandatoryMapping[value];
+                if (skillLevelId) {
+                    var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === skillLevelId; });
+                    if (item) {
+                        // Remove CSS icon classes and apply colors
+                        $(this).removeClass('thumbsup thumbsdown warning btn-red btn-green btn-orange');
+                        $(this).css({
+                            'background-color': item.backgroundColor,
+                            'border-color': item.iconColor,
+                            'color': item.iconColor
+                        });
+                        // Add Font Awesome icon inside button (skip for PDF export)
+                        if (item.iconClass && !skipFontAwesome) {
+                            var faClass = iconMapping[item.iconClass] || 'fa-' + item.iconClass;
+                            if (!$(this).find('i.fa').length) {
+                                $(this).html('<i class="fa ' + faClass + '"></i>');
+                            } else {
+                                $(this).find('i.fa').removeClass('fa-thumbs-up fa-thumbs-down fa-exclamation-triangle').addClass(faClass);
+                            }
+                        }
+                        if (item.label) {
+                            $(this).attr('title', item.label);
+                        }
+                    }
+                }
+            });
+        }
+
+        // Apply operational skills colors to matrix cells
+        // Mapping: data-value 1-5 maps directly to skillLevelId 1-5
+        if (config.operationalSkills) {
+            // Apply to matrix cells and user skill values modal operational buttons
+            $('[data-popup="score"][data-value], #UserSkillValuesModalBodyOperational .circlebtnNoHover[data-value]').each(function () {
+                var value = parseInt($(this).attr('data-value'));
+                if (value >= 1 && value <= 5) {
+                    var item = config.operationalSkills.find(function (i) { return i.skillLevelId === value; });
+                    if (item) {
+                        $(this).removeClass('btn-red btn-orangered btn-orange btn-orangegreen btn-green');
+                        $(this).css({
+                            'background-color': item.backgroundColor,
+                            'border-color': item.iconColor,
+                            'color': item.iconColor
+                        });
+                        if (item.label) {
+                            $(this).attr('title', item.label);
+                        }
+                    }
+                }
+            });
+
+            // Apply operational skills colors to score popup
+            $('.popUpScore .item[data-actionvalue]').each(function () {
+                var value = parseInt($(this).attr('data-actionvalue'));
+                if (value >= 1 && value <= 5) {
+                    var item = config.operationalSkills.find(function (i) { return i.skillLevelId === value; });
+                    if (item) {
+                        $(this).css({
+                            'background-color': item.backgroundColor,
+                            'border-color': item.iconColor,
+                            'color': item.iconColor
+                        });
+                        if (item.label) {
+                            $(this).attr('title', item.label);
+                        }
+                    }
+                }
+            });
+        }
+
+        // Apply mandatory skills colors to operational skill expiry indicators
+        // These are small icons that appear beside operational skills when they expire
+        if (config.mandatorySkills) {
+            var iconMapping = {
+                'thumbsup': 'fa-thumbs-up',
+                'warning': 'fa-exclamation-triangle'
+            };
+
+            // Tag elements with data attribute based on original title (only on first run)
+            $('[title="Operational skill expired"]:not([data-expiry-type])').attr('data-expiry-type', 'expired');
+            $('[title="Operational almost expired"]:not([data-expiry-type])').attr('data-expiry-type', 'almost-expired');
+
+            // Expired indicators (skillLevelId 3)
+            $('[data-expiry-type="expired"]').each(function () {
+                var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === 3; });
+                if (item) {
+                    var cssProps = {
+                        'border-color': item.iconColor,
+                        'background-color': item.backgroundColor,
+                        'color': item.iconColor,
+                        'display': 'flex',
+                        'align-items': 'center',
+                        'justify-content': 'center'
+                    };
+                    // Only remove background-image if we're adding Font Awesome icons
+                    if (!skipFontAwesome) {
+                        cssProps['background-image'] = 'none';
+                    }
+                    $(this).css(cssProps);
+                    // Add Font Awesome icon if not already present (skip for PDF export)
+                    if (item.iconClass && !skipFontAwesome) {
+                        var faClass = iconMapping[item.iconClass] || 'fa-' + item.iconClass;
+                        if (!$(this).find('i.fa').length) {
+                            $(this).html('<i class="fa ' + faClass + '" style="font-size: 10px;"></i>');
+                        }
+                    }
+                    if (item.label) {
+                        $(this).attr('title', item.label);
+                    }
+                }
+            });
+            // Almost expired indicators (skillLevelId 2)
+            $('[data-expiry-type="almost-expired"]').each(function () {
+                var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === 2; });
+                if (item) {
+                    var cssProps = {
+                        'border-color': item.iconColor,
+                        'background-color': item.backgroundColor,
+                        'color': item.iconColor,
+                        'display': 'flex',
+                        'align-items': 'center',
+                        'justify-content': 'center'
+                    };
+                    // Only remove background-image if we're adding Font Awesome icons
+                    if (!skipFontAwesome) {
+                        cssProps['background-image'] = 'none';
+                    }
+                    $(this).css(cssProps);
+                    // Add Font Awesome icon if not already present (skip for PDF export)
+                    if (item.iconClass && !skipFontAwesome) {
+                        var faClass = iconMapping[item.iconClass] || 'fa-' + item.iconClass;
+                        if (!$(this).find('i.fa').length) {
+                            $(this).html('<i class="fa ' + faClass + '" style="font-size: 10px;"></i>');
+                        }
+                    }
+                    if (item.label) {
+                        $(this).attr('title', item.label);
+                    }
+                }
+            });
+        }
     }
 } 
 
