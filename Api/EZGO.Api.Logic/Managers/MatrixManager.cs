@@ -17,6 +17,7 @@ using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace EZGO.Api.Logic.Managers
@@ -1039,6 +1040,189 @@ namespace EZGO.Api.Logic.Managers
 
             return userValue;
 
+        }
+        #endregion
+
+        #region - legend configuration -
+        /// <summary>
+        /// Gets the legend configuration for a company. Returns default if none exists.
+        /// </summary>
+        public async Task<SkillMatrixLegendConfiguration> GetLegendConfigurationAsync(int companyId)
+        {
+            var config = new SkillMatrixLegendConfiguration { CompanyId = companyId };
+
+            try
+            {
+                // Try to get company-specific legend configuration from companies_setting
+                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
+                parameters.Add(new NpgsqlParameter("@_companyid", companyId));
+
+                var jsonValue = await _manager.ExecuteScalarAsync(
+                    "SELECT value FROM companies_setting WHERE company_id = @_companyid AND resource_setting_id = (SELECT id FROM resource_settings WHERE settingskey = 'FEATURE_SKILL_MATRIX_LEGEND_OPTIONS' LIMIT 1) LIMIT 1",
+                    parameters: parameters,
+                    commandType: System.Data.CommandType.Text);
+
+                if (jsonValue != null && jsonValue != DBNull.Value && !string.IsNullOrEmpty(jsonValue.ToString()))
+                {
+                    var parsed = JsonSerializer.Deserialize<SkillMatrixLegendConfiguration>(jsonValue.ToString());
+                    if (parsed != null)
+                    {
+                        parsed.CompanyId = companyId;
+                        return parsed;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.GetLegendConfigurationAsync(): ", ex.Message));
+                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
+            }
+
+            // Return default configuration if none exists
+            return GetDefaultLegendConfiguration(companyId);
+        }
+
+        /// <summary>
+        /// Saves the complete legend configuration for a company.
+        /// </summary>
+        public async Task<bool> SaveLegendConfigurationAsync(int companyId, int userId, SkillMatrixLegendConfiguration configuration)
+        {
+            try
+            {
+                configuration.CompanyId = companyId;
+
+                // Update timestamps for all items
+                var now = DateTime.UtcNow;
+                if (configuration.MandatorySkills != null)
+                {
+                    foreach (var item in configuration.MandatorySkills)
+                    {
+                        item.CompanyId = companyId;
+                        item.UpdatedAt = now;
+                        item.UpdatedBy = userId;
+                    }
+                }
+                if (configuration.OperationalSkills != null)
+                {
+                    foreach (var item in configuration.OperationalSkills)
+                    {
+                        item.CompanyId = companyId;
+                        item.UpdatedAt = now;
+                        item.UpdatedBy = userId;
+                    }
+                }
+
+                var jsonValue = JsonSerializer.Serialize(configuration);
+
+                // Check if setting exists
+                List<NpgsqlParameter> checkParams = new List<NpgsqlParameter>();
+                checkParams.Add(new NpgsqlParameter("@_companyid", companyId));
+
+                var existingId = await _manager.ExecuteScalarAsync(
+                    "SELECT id FROM companies_setting WHERE company_id = @_companyid AND resource_setting_id = (SELECT id FROM resource_settings WHERE settingskey = 'FEATURE_SKILL_MATRIX_LEGEND_OPTIONS' LIMIT 1) LIMIT 1",
+                    parameters: checkParams,
+                    commandType: System.Data.CommandType.Text);
+
+                if (existingId != null && existingId != DBNull.Value)
+                {
+                    // Update existing
+                    List<NpgsqlParameter> updateParams = new List<NpgsqlParameter>();
+                    updateParams.Add(new NpgsqlParameter("@_id", Convert.ToInt32(existingId)));
+                    updateParams.Add(new NpgsqlParameter("@_value", jsonValue));
+
+                    await _manager.ExecuteScalarAsync(
+                        "UPDATE companies_setting SET value = @_value WHERE id = @_id",
+                        parameters: updateParams,
+                        commandType: System.Data.CommandType.Text);
+                }
+                else
+                {
+                    // Insert new
+                    List<NpgsqlParameter> insertParams = new List<NpgsqlParameter>();
+                    insertParams.Add(new NpgsqlParameter("@_companyid", companyId));
+                    insertParams.Add(new NpgsqlParameter("@_value", jsonValue));
+
+                    await _manager.ExecuteScalarAsync(
+                        "INSERT INTO companies_setting (company_id, value, resource_setting_id) SELECT @_companyid, @_value, id FROM resource_settings WHERE settingskey = 'FEATURE_SKILL_MATRIX_LEGEND_OPTIONS' LIMIT 1",
+                        parameters: insertParams,
+                        commandType: System.Data.CommandType.Text);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.SaveLegendConfigurationAsync(): ", ex.Message));
+                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Updates a single legend item.
+        /// </summary>
+        public async Task<bool> UpdateLegendItemAsync(int companyId, int userId, SkillMatrixLegendItem item)
+        {
+            try
+            {
+                var config = await GetLegendConfigurationAsync(companyId);
+
+                // Find and update the item
+                var targetList = item.SkillType == "mandatory" ? config.MandatorySkills : config.OperationalSkills;
+                var existingItem = targetList?.FirstOrDefault(i => i.SkillLevelId == item.SkillLevelId);
+
+                if (existingItem != null)
+                {
+                    existingItem.Label = item.Label;
+                    existingItem.Description = item.Description;
+                    existingItem.IconColor = item.IconColor;
+                    existingItem.BackgroundColor = item.BackgroundColor;
+                    existingItem.IconClass = item.IconClass;
+                    existingItem.UpdatedAt = DateTime.UtcNow;
+                    existingItem.UpdatedBy = userId;
+                }
+                else
+                {
+                    item.CompanyId = companyId;
+                    item.CreatedAt = DateTime.UtcNow;
+                    item.CreatedBy = userId;
+                    targetList?.Add(item);
+                }
+
+                return await SaveLegendConfigurationAsync(companyId, userId, config);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.UpdateLegendItemAsync(): ", ex.Message));
+                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the default legend configuration with standard colors and labels.
+        /// </summary>
+        private SkillMatrixLegendConfiguration GetDefaultLegendConfiguration(int companyId)
+        {
+            var now = DateTime.UtcNow;
+            return new SkillMatrixLegendConfiguration
+            {
+                CompanyId = companyId,
+                MandatorySkills = new List<SkillMatrixLegendItem>
+                {
+                    new SkillMatrixLegendItem { SkillLevelId = 1, SkillType = "mandatory", Label = "Masters the skill", IconColor = "#52AC52", BackgroundColor = "#E5F3E5", IconClass = "thumbsup", IsDefault = true, Order = 1, CompanyId = companyId, CreatedAt = now },
+                    new SkillMatrixLegendItem { SkillLevelId = 2, SkillType = "mandatory", Label = "Almost expired", IconColor = "#FF8800", BackgroundColor = "#FFF3E0", IconClass = "warning", IsDefault = true, Order = 2, CompanyId = companyId, CreatedAt = now },
+                    new SkillMatrixLegendItem { SkillLevelId = 3, SkillType = "mandatory", Label = "Expired", IconColor = "#D9534F", BackgroundColor = "#FDECEA", IconClass = "warning", IsDefault = true, Order = 3, CompanyId = companyId, CreatedAt = now }
+                },
+                OperationalSkills = new List<SkillMatrixLegendItem>
+                {
+                    new SkillMatrixLegendItem { SkillLevelId = 1, SkillType = "operational", Label = "Doesn't know the theory", IconColor = "#D9534F", BackgroundColor = "#FDECEA", ScoreValue = 1, IsDefault = true, Order = 1, CompanyId = companyId, CreatedAt = now },
+                    new SkillMatrixLegendItem { SkillLevelId = 2, SkillType = "operational", Label = "Knows the theory", IconColor = "#E95420", BackgroundColor = "#FEEEE8", ScoreValue = 2, IsDefault = true, Order = 2, CompanyId = companyId, CreatedAt = now },
+                    new SkillMatrixLegendItem { SkillLevelId = 3, SkillType = "operational", Label = "Is able to apply this in the standard situations", IconColor = "#FF8800", BackgroundColor = "#FFF3E0", ScoreValue = 3, IsDefault = true, Order = 3, CompanyId = companyId, CreatedAt = now },
+                    new SkillMatrixLegendItem { SkillLevelId = 4, SkillType = "operational", Label = "Is able to apply this in the non-standard conditions", IconColor = "#A5C43C", BackgroundColor = "#F5F9E6", ScoreValue = 4, IsDefault = true, Order = 4, CompanyId = companyId, CreatedAt = now },
+                    new SkillMatrixLegendItem { SkillLevelId = 5, SkillType = "operational", Label = "Can educate others", IconColor = "#52AC52", BackgroundColor = "#E5F3E5", ScoreValue = 5, IsDefault = true, Order = 5, CompanyId = companyId, CreatedAt = now }
+                }
+            };
         }
         #endregion
 

@@ -39,6 +39,12 @@ namespace EZGO.Api.Interfaces.Managers
         Task<List<SkillsMatrixItemValue>> GetMatrixUserSkillValuesAsync(int companyId, int userId, int matrixId, ConnectionKind connectionKind = ConnectionKind.Reader);
         Task<SkillsMatrixUserGroup> GetMatrixUserGroupAsync(int companyId, int userId, int matrixId, int matrixUserGroupId, ConnectionKind connectionKind = ConnectionKind.Reader);
         Task<bool> SaveMatrixUserSkillValue(int companyId, int userId, int matrixId, SkillsMatrixItemValue matrixItemValue);
+
+        // Legend Configuration Methods
+        Task<SkillMatrixLegendConfiguration> GetLegendConfigurationAsync(int companyId);
+        Task<bool> SaveLegendConfigurationAsync(int companyId, int userId, SkillMatrixLegendConfiguration configuration);
+        Task<bool> UpdateLegendItemAsync(int companyId, int userId, SkillMatrixLegendItem item);
+
         List<Exception> GetPossibleExceptions();
 
     }

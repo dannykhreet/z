@@ -159,58 +159,22 @@
                 <div class="row">
                     <!-- Color of the number/icon -->
                     <div class="col-md-6">
-                        <label>@(Model?.CmsLanguage.GetValue(LanguageKeys.Setting.ColorOfNumberLabel, "Color of the number") ?? "Color of the number")</label>
-                        <div class="color-picker-container mb-3">
-                            <div class="color-picker-gradient" id="iconColorPicker" style="width: 100%; height: 200px; border-radius: 8px; cursor: crosshair; position: relative; background: linear-gradient(to bottom, white, transparent), linear-gradient(to right, transparent, var(--picker-hue, #ff0000)); background-color: var(--picker-hue, #ff0000);">
-                                <div class="color-picker-handle" id="iconColorHandle" style="position: absolute; width: 20px; height: 20px; border: 3px solid white; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 3px rgba(0,0,0,0.5); pointer-events: none;"></div>
-                            </div>
-                            <input type="range" class="form-range mt-2 color-hue-slider" id="iconHueSlider" min="0" max="360" value="120" style="width: 100%; background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000); height: 12px; border-radius: 6px; -webkit-appearance: none; appearance: none;">
-                        </div>
-                        <div class="row mt-2">
-                            <div class="col-4">
-                                <label class="small text-muted">Hex</label>
-                                <input type="text" class="form-control form-control-sm" id="iconColorHex" value="#52AC52" style="border-color: #93C54B;" />
-                            </div>
-                            <div class="col-2">
-                                <label class="small text-muted">R</label>
-                                <input type="number" class="form-control form-control-sm" id="iconColorR" value="82" min="0" max="255" />
-                            </div>
-                            <div class="col-2">
-                                <label class="small text-muted">G</label>
-                                <input type="number" class="form-control form-control-sm" id="iconColorG" value="172" min="0" max="255" />
-                            </div>
-                            <div class="col-2">
-                                <label class="small text-muted">B</label>
-                                <input type="number" class="form-control form-control-sm" id="iconColorB" value="82" min="0" max="255" />
+                        <div class="form-group mb-3">
+                            <label for="iconColorPicker">@(Model?.CmsLanguage.GetValue(LanguageKeys.Setting.ColorOfNumberLabel, "Color of the number/icon") ?? "Color of the number/icon")</label>
+                            <div class="d-flex align-items-center">
+                                <input id="iconColorPicker" type="color" class="form-control form-control-color" value="#52AC52" style="width: 60px; height: 40px; padding: 2px; cursor: pointer;" />
+                                <input type="text" class="form-control form-control-sm ms-2" id="iconColorHex" value="#52AC52" style="width: 100px;" />
                             </div>
                         </div>
                     </div>
 
                     <!-- Color of the background -->
                     <div class="col-md-6">
-                        <label>@(Model?.CmsLanguage.GetValue(LanguageKeys.Setting.ColorOfBackgroundLabel, "Color of the background") ?? "Color of the background")</label>
-                        <div class="color-picker-container mb-3">
-                            <div class="color-picker-gradient" id="bgColorPicker" style="width: 100%; height: 200px; border-radius: 8px; cursor: crosshair; position: relative; background: linear-gradient(to bottom, white, transparent), linear-gradient(to right, transparent, var(--picker-hue, #ff0000)); background-color: var(--picker-hue, #ff0000);">
-                                <div class="color-picker-handle" id="bgColorHandle" style="position: absolute; width: 20px; height: 20px; border: 3px solid white; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 3px rgba(0,0,0,0.5); pointer-events: none;"></div>
-                            </div>
-                            <input type="range" class="form-range mt-2 color-hue-slider" id="bgHueSlider" min="0" max="360" value="120" style="width: 100%; background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000); height: 12px; border-radius: 6px; -webkit-appearance: none; appearance: none;">
-                        </div>
-                        <div class="row mt-2">
-                            <div class="col-4">
-                                <label class="small text-muted">Hex</label>
-                                <input type="text" class="form-control form-control-sm" id="bgColorHex" value="#E5F3E5" style="border-color: #93C54B;" />
-                            </div>
-                            <div class="col-2">
-                                <label class="small text-muted">R</label>
-                                <input type="number" class="form-control form-control-sm" id="bgColorR" value="229" min="0" max="255" />
-                            </div>
-                            <div class="col-2">
-                                <label class="small text-muted">G</label>
-                                <input type="number" class="form-control form-control-sm" id="bgColorG" value="243" min="0" max="255" />
-                            </div>
-                            <div class="col-2">
-                                <label class="small text-muted">B</label>
-                                <input type="number" class="form-control form-control-sm" id="bgColorB" value="229" min="0" max="255" />
+                        <div class="form-group mb-3">
+                            <label for="bgColorPicker">@(Model?.CmsLanguage.GetValue(LanguageKeys.Setting.ColorOfBackgroundLabel, "Color of the background") ?? "Color of the background")</label>
+                            <div class="d-flex align-items-center">
+                                <input id="bgColorPicker" type="color" class="form-control form-control-color" value="#E5F3E5" style="width: 60px; height: 40px; padding: 2px; cursor: pointer;" />
+                                <input type="text" class="form-control form-control-sm ms-2" id="bgColorHex" value="#E5F3E5" style="width: 100px;" />
                             </div>
                         </div>
                     </div>
@@ -495,25 +459,15 @@
             }, 500);
         });
 
-        // Color picker functionality
+        // Native color picker functionality
         function setColorPickerValue(prefix, hexColor) {
-            if (!hexColor || hexColor.length !== 7) return;
-
-            var r = parseInt(hexColor.substr(1, 2), 16);
-            var g = parseInt(hexColor.substr(3, 2), 16);
-            var b = parseInt(hexColor.substr(5, 2), 16);
-
+            if (!hexColor || hexColor.length < 4) return;
+            // Ensure hex color is 7 characters (with #)
+            if (hexColor.length === 4) {
+                hexColor = '#' + hexColor[1] + hexColor[1] + hexColor[2] + hexColor[2] + hexColor[3] + hexColor[3];
+            }
+            $('#' + prefix + 'ColorPicker').val(hexColor);
             $('#' + prefix + 'ColorHex').val(hexColor.toUpperCase());
-            $('#' + prefix + 'ColorR').val(r);
-            $('#' + prefix + 'ColorG').val(g);
-            $('#' + prefix + 'ColorB').val(b);
-
-            // Update hue slider based on color
-            var hsv = rgbToHsv(r, g, b);
-            $('#' + prefix + 'HueSlider').val(hsv.h);
-
-            updatePickerGradient(prefix, hsv.h);
-            updatePickerHandle(prefix, hsv.s, hsv.v);
         }
 
         function updateColorPreview() {
@@ -526,75 +480,11 @@
             });
         }
 
-        function updatePickerGradient(prefix, hue) {
-            var hueColor = hsvToRgb(hue, 1, 1);
-            var hexColor = rgbToHex(hueColor.r, hueColor.g, hueColor.b);
-            $('#' + prefix + 'ColorPicker').css('--picker-hue', hexColor);
-        }
-
-        function updatePickerHandle(prefix, s, v) {
-            var x = s * 100;
-            var y = (1 - v) * 100;
-            $('#' + prefix + 'ColorHandle').css({
-                'left': x + '%',
-                'top': y + '%'
-            });
-        }
-
-        // Hue slider change
-        $('.color-hue-slider').on('input', function () {
-            var prefix = $(this).attr('id').replace('HueSlider', '').toLowerCase();
-            var hue = parseInt($(this).val());
-            updatePickerGradient(prefix, hue);
-
-            // Recalculate color
-            var s = parseFloat($('#' + prefix + 'ColorHandle').css('left')) / $('#' + prefix + 'ColorPicker').width();
-            var v = 1 - (parseFloat($('#' + prefix + 'ColorHandle').css('top')) / $('#' + prefix + 'ColorPicker').height());
-            s = Math.max(0, Math.min(1, s || 0.5));
-            v = Math.max(0, Math.min(1, v || 0.5));
-
-            var rgb = hsvToRgb(hue, s, v);
-            updateColorInputs(prefix, rgb.r, rgb.g, rgb.b);
-            updateColorPreview();
-        });
-
-        // Color picker click/drag
-        $('.color-picker-gradient').on('mousedown', function (e) {
-            var picker = $(this);
-            var prefix = picker.attr('id').replace('ColorPicker', '').toLowerCase();
-
-            function updateFromMouse(e) {
-                var rect = picker[0].getBoundingClientRect();
-                var x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-                var y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
-
-                $('#' + prefix + 'ColorHandle').css({
-                    'left': (x * 100) + '%',
-                    'top': (y * 100) + '%'
-                });
-
-                var hue = parseInt($('#' + prefix + 'HueSlider').val());
-                var rgb = hsvToRgb(hue, x, 1 - y);
-                updateColorInputs(prefix, rgb.r, rgb.g, rgb.b);
-                updateColorPreview();
-            }
-
-            updateFromMouse(e);
-
-            $(document).on('mousemove.colorpicker', updateFromMouse);
-            $(document).on('mouseup.colorpicker', function () {
-                $(document).off('.colorpicker');
-            });
-        });
-
-        // RGB input change
-        $('#iconColorR, #iconColorG, #iconColorB, #bgColorR, #bgColorG, #bgColorB').on('input', function () {
-            var id = $(this).attr('id');
-            var prefix = id.includes('icon') ? 'icon' : 'bg';
-            var r = parseInt($('#' + prefix + 'ColorR').val()) || 0;
-            var g = parseInt($('#' + prefix + 'ColorG').val()) || 0;
-            var b = parseInt($('#' + prefix + 'ColorB').val()) || 0;
-            updateColorInputs(prefix, r, g, b);
+        // Native color picker change event
+        $('#iconColorPicker, #bgColorPicker').on('input change', function () {
+            var prefix = $(this).attr('id').includes('icon') ? 'icon' : 'bg';
+            var hexColor = $(this).val().toUpperCase();
+            $('#' + prefix + 'ColorHex').val(hexColor);
             updateColorPreview();
         });
 
@@ -603,71 +493,10 @@
             var hex = $(this).val();
             if (hex.length === 7 && hex.charAt(0) === '#') {
                 var prefix = $(this).attr('id').includes('icon') ? 'icon' : 'bg';
-                setColorPickerValue(prefix, hex);
+                $('#' + prefix + 'ColorPicker').val(hex);
                 updateColorPreview();
             }
         });
-
-        function updateColorInputs(prefix, r, g, b) {
-            r = Math.max(0, Math.min(255, r));
-            g = Math.max(0, Math.min(255, g));
-            b = Math.max(0, Math.min(255, b));
-
-            $('#' + prefix + 'ColorR').val(r);
-            $('#' + prefix + 'ColorG').val(g);
-            $('#' + prefix + 'ColorB').val(b);
-            $('#' + prefix + 'ColorHex').val(rgbToHex(r, g, b));
-        }
-
-        // Color conversion utilities
-        function rgbToHex(r, g, b) {
-            return '#' + [r, g, b].map(function (x) {
-                var hex = x.toString(16);
-                return hex.length === 1 ? '0' + hex : hex;
-            }).join('').toUpperCase();
-        }
-
-        function rgbToHsv(r, g, b) {
-            r /= 255; g /= 255; b /= 255;
-            var max = Math.max(r, g, b), min = Math.min(r, g, b);
-            var h, s, v = max;
-            var d = max - min;
-            s = max === 0 ? 0 : d / max;
-            if (max === min) {
-                h = 0;
-            } else {
-                switch (max) {
-                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                    case g: h = (b - r) / d + 2; break;
-                    case b: h = (r - g) / d + 4; break;
-                }
-                h /= 6;
-            }
-            return { h: h * 360, s: s, v: v };
-        }
-
-        function hsvToRgb(h, s, v) {
-            var r, g, b;
-            h = h / 360;
-            var i = Math.floor(h * 6);
-            var f = h * 6 - i;
-            var p = v * (1 - s);
-            var q = v * (1 - f * s);
-            var t = v * (1 - (1 - f) * s);
-            switch (i % 6) {
-                case 0: r = v; g = t; b = p; break;
-                case 1: r = q; g = v; b = p; break;
-                case 2: r = p; g = v; b = t; break;
-                case 3: r = p; g = q; b = v; break;
-                case 4: r = t; g = p; b = v; break;
-                case 5: r = v; g = p; b = q; break;
-            }
-            return {
-                r: Math.round(r * 255),
-                g: Math.round(g * 255),
-                b: Math.round(b * 255)
-            };
-        }
     });
 </script>
 
@@ -720,37 +549,18 @@
             transform: scale(1.1);
         }
 
-    .color-hue-slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        background: white;
-        cursor: pointer;
-        border: 2px solid #93C54B;
-        box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+    /* Native color picker styling */
+    .form-control-color {
+        border: 2px solid #dee2e6;
+        border-radius: 4px;
     }
 
-    .color-hue-slider::-moz-range-thumb {
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        background: white;
-        cursor: pointer;
-        border: 2px solid #93C54B;
-        box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
-    }
+        .form-control-color:hover {
+            border-color: #93C54B;
+        }
 
-    .color-picker-gradient::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(to bottom, transparent, black);
-        border-radius: 8px;
-        pointer-events: none;
-    }
+        .form-control-color:focus {
+            border-color: #93C54B;
+            box-shadow: 0 0 0 2px rgba(147, 197, 75, 0.2);
+        }
 </style>

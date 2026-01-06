@@ -1,0 +1,13 @@
+-- ----------------------------
+-- Add resource_setting for Skill Matrix Legend Options
+-- settingstype: 3 = Company Specific Setting
+-- ----------------------------
+INSERT INTO "public"."resource_settings" ("name", "description", "settingskey", "settingstype", "settingvalue")
+SELECT 'Skill Matrix Legend Options',
+       'JSON configuration for customizable skill matrix legend including colors and labels for mandatory and operational skills',
+       'FEATURE_SKILL_MATRIX_LEGEND_OPTIONS',
+       3,
+       NULL
+WHERE NOT EXISTS (
+    SELECT 1 FROM "public"."resource_settings" WHERE "settingskey" = 'FEATURE_SKILL_MATRIX_LEGEND_OPTIONS'
+);

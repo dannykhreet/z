@@ -1019,5 +1019,109 @@ namespace EZGO.Api.Controllers.V1
 
         #endregion
 
+        #region - legend configuration -
+        /// <summary>
+        /// Gets the legend configuration for the current company.
+        /// </summary>
+        [Authorize(Roles = AuthenticationSettings.AUTHORIZATION_SHIFTLEADER_MANAGER_ADMINISTRATOR_ROLES)]
+        [Route("skillsmatrix/legend/{companyId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetLegendConfiguration([FromRoute] int companyId)
+        {
+            if (await this.CurrentApplicationUser.GetAndSetCompanyIdAsync() != companyId)
+            {
+                return StatusCode((int)HttpStatusCode.Forbidden, AuthenticationSettings.MESSAGE_FORBIDDEN_OBJECT.ToJsonFromObject());
+            }
+
+            Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
+
+            var output = await _matrixManager.GetLegendConfigurationAsync(companyId: companyId);
+
+            AppendCapturedExceptionToApm(_matrixManager.GetPossibleExceptions());
+
+            Agent.Tracer.CurrentSpan.End();
+
+            return StatusCode((int)HttpStatusCode.OK, (output).ToJsonFromObject());
+        }
+
+        /// <summary>
+        /// Saves the complete legend configuration for the current company.
+        /// </summary>
+        [Authorize(Roles = AuthenticationSettings.AUTHORIZATION_MANAGER_ADMINISTRATOR_ROLES)]
+        [Route("skillsmatrix/legend/{companyId}")]
+        [HttpPost]
+        public async Task<IActionResult> SaveLegendConfiguration([FromRoute] int companyId, [FromBody] SkillMatrixLegendConfiguration configuration)
+        {
+            if (!this.IsCmsRequest)
+            {
+                return StatusCode((int)HttpStatusCode.NotFound, "".ToJsonFromObject());
+            }
+
+            if (await this.CurrentApplicationUser.GetAndSetCompanyIdAsync() != companyId)
+            {
+                return StatusCode((int)HttpStatusCode.Forbidden, AuthenticationSettings.MESSAGE_FORBIDDEN_OBJECT.ToJsonFromObject());
+            }
+
+            Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
+
+            var output = await _matrixManager.SaveLegendConfigurationAsync(
+                companyId: companyId,
+                userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(),
+                configuration: configuration);
+
+            AppendCapturedExceptionToApm(_matrixManager.GetPossibleExceptions());
+
+            Agent.Tracer.CurrentSpan.End();
+
+            if (output)
+            {
+                return StatusCode((int)HttpStatusCode.OK, new { success = true }.ToJsonFromObject());
+            }
+            else
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new { success = false, message = "Failed to save legend configuration" }.ToJsonFromObject());
+            }
+        }
+
+        /// <summary>
+        /// Updates a single legend item.
+        /// </summary>
+        [Authorize(Roles = AuthenticationSettings.AUTHORIZATION_MANAGER_ADMINISTRATOR_ROLES)]
+        [Route("skillsmatrix/legend/{companyId}/item")]
+        [HttpPost]
+        public async Task<IActionResult> UpdateLegendItem([FromRoute] int companyId, [FromBody] SkillMatrixLegendItem item)
+        {
+            if (!this.IsCmsRequest)
+            {
+                return StatusCode((int)HttpStatusCode.NotFound, "".ToJsonFromObject());
+            }
+
+            if (await this.CurrentApplicationUser.GetAndSetCompanyIdAsync() != companyId)
+            {
+                return StatusCode((int)HttpStatusCode.Forbidden, AuthenticationSettings.MESSAGE_FORBIDDEN_OBJECT.ToJsonFromObject());
+            }
+
+            Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
+
+            var output = await _matrixManager.UpdateLegendItemAsync(
+                companyId: companyId,
+                userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(),
+                item: item);
+
+            AppendCapturedExceptionToApm(_matrixManager.GetPossibleExceptions());
+
+            Agent.Tracer.CurrentSpan.End();
+
+            if (output)
+            {
+                return StatusCode((int)HttpStatusCode.OK, new { success = true }.ToJsonFromObject());
+            }
+            else
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new { success = false, message = "Failed to update legend item" }.ToJsonFromObject());
+            }
+        }
+        #endregion
+
     }
 }

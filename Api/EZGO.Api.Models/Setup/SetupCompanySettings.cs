@@ -32,6 +32,11 @@
         public bool EnableTranslations { get; set; }
         public string TranslationModules { get; set; }
         public string TranslationLanguages { get; set; }
+        /// <summary>
+        /// JSON string containing the Skill Matrix Legend configuration.
+        /// Contains customizable legend settings for mandatory and operational skills.
+        /// </summary>
+        public string SkillMatrixLegendOptions { get; set; }
         #endregion
 
         #region - constructor(s) -
