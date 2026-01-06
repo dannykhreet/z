@@ -2240,6 +2240,12 @@ var matrix = {
                 'thumbsup': 'fa-thumbs-up',
                 'warning': 'fa-exclamation-triangle'
             };
+            // Icon URL mapping for PDF export (keeps background images)
+            var iconUrlMapping = {
+                'thumbsup': '/images/icons/v2/thumbsup.png',
+                'thumbsdown': '/images/icons/v2/thumbsdown.png',
+                'warning': '/images/icons/v2/warning.png'
+            };
             // Apply to matrix cells and user skill values modal mandatory buttons
             $('[data-popup="thumbs"][data-value], #UserSkillValuesModalBodyMandatory .circlebtnNoHover[data-value]').each(function () {
                 var value = $(this).attr('data-value');
@@ -2249,18 +2255,29 @@ var matrix = {
                     if (item) {
                         // Remove CSS icon classes and apply colors
                         $(this).removeClass('thumbsup thumbsdown warning btn-red btn-green btn-orange');
-                        $(this).css({
-                            'background-color': item.backgroundColor,
-                            'border-color': item.iconColor,
-                            'color': item.iconColor
-                        });
-                        // Add Font Awesome icon inside button (skip for PDF export)
-                        if (item.iconClass && !skipFontAwesome) {
-                            var faClass = iconMapping[item.iconClass] || 'fa-' + item.iconClass;
-                            if (!$(this).find('i.fa').length) {
-                                $(this).html('<i class="fa ' + faClass + '"></i>');
-                            } else {
-                                $(this).find('i.fa').removeClass('fa-thumbs-up fa-thumbs-down fa-exclamation-triangle').addClass(faClass);
+
+                        if (skipFontAwesome) {
+                            // For PDF export: use background shorthand to include both image and color
+                            var iconUrl = iconUrlMapping[item.iconClass] || iconUrlMapping['warning'];
+                            $(this).css({
+                                'background': 'url(' + iconUrl + ') center / 26px no-repeat, ' + item.backgroundColor,
+                                'border-color': item.iconColor,
+                                'color': item.iconColor
+                            });
+                        } else {
+                            $(this).css({
+                                'background-color': item.backgroundColor,
+                                'border-color': item.iconColor,
+                                'color': item.iconColor
+                            });
+                            // Add Font Awesome icon inside button
+                            if (item.iconClass) {
+                                var faClass = iconMapping[item.iconClass] || 'fa-' + item.iconClass;
+                                if (!$(this).find('i.fa').length) {
+                                    $(this).html('<i class="fa ' + faClass + '"></i>');
+                                } else {
+                                    $(this).find('i.fa').removeClass('fa-thumbs-up fa-thumbs-down fa-exclamation-triangle').addClass(faClass);
+                                }
                             }
                         }
                         if (item.label) {
