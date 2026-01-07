@@ -1061,7 +1061,12 @@ namespace EZGO.Api.Logic.Managers
 
                 if (!string.IsNullOrEmpty(jsonValue))
                 {
-                    var parsed = JsonSerializer.Deserialize<SkillMatrixLegendConfiguration>(jsonValue);
+                    // Use case-insensitive deserialization to handle both old camelCase and new PascalCase data
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    };
+                    var parsed = JsonSerializer.Deserialize<SkillMatrixLegendConfiguration>(jsonValue, options);
                     if (parsed != null)
                     {
                         parsed.CompanyId = companyId;
