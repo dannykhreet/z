@@ -12,14 +12,14 @@ const setValue = (e) => {
 
     // Apply legend colors from config
     var value = parseInt(e.target.getAttribute('data-actionvalue'));
-    if (matrix.legendConfiguration && matrix.legendConfiguration.operationalSkills && value >= 1 && value <= 5) {
-        var item = matrix.legendConfiguration.operationalSkills.find(function (i) { return i.skillLevelId === value; });
+    if (matrix.legendConfiguration && matrix.legendConfiguration.OperationalSkills && value >= 1 && value <= 5) {
+        var item = matrix.legendConfiguration.OperationalSkills.find(function (i) { return i.SkillLevelId === value; });
         if (item) {
-            activeBtn.style.backgroundColor = item.backgroundColor;
-            activeBtn.style.borderColor = item.iconColor;
-            activeBtn.style.color = item.iconColor;
-            if (item.label) {
-                activeBtn.setAttribute('title', item.label);
+            activeBtn.style.backgroundColor = item.BackgroundColor;
+            activeBtn.style.borderColor = item.IconColor;
+            activeBtn.style.color = item.IconColor;
+            if (item.Label) {
+                activeBtn.setAttribute('title', item.Label);
             }
         }
     } else {
@@ -2189,37 +2189,37 @@ var matrix = {
         if (!config) return;
 
         // Apply mandatory skills configuration to legend modal
-        if (config.mandatorySkills) {
-            config.mandatorySkills.forEach(function (item) {
-                var btn = $('.legend-btn-mandatory[data-skill-level-id="' + item.skillLevelId + '"]');
-                var label = $('.legend-label-mandatory[data-skill-level-id="' + item.skillLevelId + '"]');
+        if (config.MandatorySkills) {
+            config.MandatorySkills.forEach(function (item) {
+                var btn = $('.legend-btn-mandatory[data-skill-level-id="' + item.SkillLevelId + '"]');
+                var label = $('.legend-label-mandatory[data-skill-level-id="' + item.SkillLevelId + '"]');
                 if (btn.length) {
                     btn.css({
-                        'background-color': item.backgroundColor,
-                        'border-color': item.iconColor,
-                        'color': item.iconColor
+                        'background-color': item.BackgroundColor,
+                        'border-color': item.IconColor,
+                        'color': item.IconColor
                     });
                 }
-                if (label.length && item.label) {
-                    label.text(item.label);
+                if (label.length && item.Label) {
+                    label.text(item.Label);
                 }
             });
         }
 
         // Apply operational skills configuration to legend modal
-        if (config.operationalSkills) {
-            config.operationalSkills.forEach(function (item) {
-                var btn = $('.legend-btn-operational[data-skill-level-id="' + item.skillLevelId + '"]');
-                var label = $('.legend-label-operational[data-skill-level-id="' + item.skillLevelId + '"]');
+        if (config.OperationalSkills) {
+            config.OperationalSkills.forEach(function (item) {
+                var btn = $('.legend-btn-operational[data-skill-level-id="' + item.SkillLevelId + '"]');
+                var label = $('.legend-label-operational[data-skill-level-id="' + item.SkillLevelId + '"]');
                 if (btn.length) {
                     btn.css({
-                        'background-color': item.backgroundColor,
-                        'border-color': item.iconColor,
-                        'color': item.iconColor
+                        'background-color': item.BackgroundColor,
+                        'border-color': item.IconColor,
+                        'color': item.IconColor
                     });
                 }
-                if (label.length && item.label) {
-                    label.text(item.label);
+                if (label.length && item.Label) {
+                    label.text(item.Label);
                 }
             });
         }
@@ -2233,8 +2233,8 @@ var matrix = {
         var skipFontAwesome = options.skipFontAwesome || false;
 
         // Apply mandatory skills colors to matrix cells
-        // Mapping: data-value 1 = expired (skillLevelId 3), data-value 2 = masters (skillLevelId 1), data-value 5 = almost expired (skillLevelId 2)
-        if (config.mandatorySkills) {
+        // Mapping: data-value 1 = expired (SkillLevelId 3), data-value 2 = masters (SkillLevelId 1), data-value 5 = almost expired (SkillLevelId 2)
+        if (config.MandatorySkills) {
             var mandatoryMapping = { '1': 3, '2': 1, '5': 2 };
             var iconMapping = {
                 'thumbsup': 'fa-thumbs-up',
@@ -2245,26 +2245,26 @@ var matrix = {
                 var value = $(this).attr('data-value');
                 var skillLevelId = mandatoryMapping[value];
                 if (skillLevelId) {
-                    var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === skillLevelId; });
+                    var item = config.MandatorySkills.find(function (i) { return i.SkillLevelId === skillLevelId; });
                     if (item) {
                         // Remove CSS icon classes and apply colors
                         $(this).removeClass('thumbsup thumbsdown warning btn-red btn-green btn-orange');
                         $(this).css({
-                            'background-color': item.backgroundColor,
-                            'border-color': item.iconColor,
-                            'color': item.iconColor
+                            'background-color': item.BackgroundColor,
+                            'border-color': item.IconColor,
+                            'color': item.IconColor
                         });
                         // Add Font Awesome icon inside button (skip for PDF export)
-                        if (item.iconClass && !skipFontAwesome) {
-                            var faClass = iconMapping[item.iconClass] || 'fa-' + item.iconClass;
+                        if (item.IconClass && !skipFontAwesome) {
+                            var faClass = iconMapping[item.IconClass] || 'fa-' + item.IconClass;
                             if (!$(this).find('i.fa').length) {
                                 $(this).html('<i class="fa ' + faClass + '"></i>');
                             } else {
                                 $(this).find('i.fa').removeClass('fa-thumbs-up fa-thumbs-down fa-exclamation-triangle').addClass(faClass);
                             }
                         }
-                        if (item.label) {
-                            $(this).attr('title', item.label);
+                        if (item.Label) {
+                            $(this).attr('title', item.Label);
                         }
                     }
                 }
@@ -2272,22 +2272,22 @@ var matrix = {
         }
 
         // Apply operational skills colors to matrix cells
-        // Mapping: data-value 1-5 maps directly to skillLevelId 1-5
-        if (config.operationalSkills) {
+        // Mapping: data-value 1-5 maps directly to SkillLevelId 1-5
+        if (config.OperationalSkills) {
             // Apply to matrix cells and user skill values modal operational buttons
             $('[data-popup="score"][data-value], #UserSkillValuesModalBodyOperational .circlebtnNoHover[data-value]').each(function () {
                 var value = parseInt($(this).attr('data-value'));
                 if (value >= 1 && value <= 5) {
-                    var item = config.operationalSkills.find(function (i) { return i.skillLevelId === value; });
+                    var item = config.OperationalSkills.find(function (i) { return i.SkillLevelId === value; });
                     if (item) {
                         $(this).removeClass('btn-red btn-orangered btn-orange btn-orangegreen btn-green');
                         $(this).css({
-                            'background-color': item.backgroundColor,
-                            'border-color': item.iconColor,
-                            'color': item.iconColor
+                            'background-color': item.BackgroundColor,
+                            'border-color': item.IconColor,
+                            'color': item.IconColor
                         });
-                        if (item.label) {
-                            $(this).attr('title', item.label);
+                        if (item.Label) {
+                            $(this).attr('title', item.Label);
                         }
                     }
                 }
@@ -2297,15 +2297,15 @@ var matrix = {
             $('.popUpScore .item[data-actionvalue]').each(function () {
                 var value = parseInt($(this).attr('data-actionvalue'));
                 if (value >= 1 && value <= 5) {
-                    var item = config.operationalSkills.find(function (i) { return i.skillLevelId === value; });
+                    var item = config.OperationalSkills.find(function (i) { return i.SkillLevelId === value; });
                     if (item) {
                         $(this).css({
-                            'background-color': item.backgroundColor,
-                            'border-color': item.iconColor,
-                            'color': item.iconColor
+                            'background-color': item.BackgroundColor,
+                            'border-color': item.IconColor,
+                            'color': item.IconColor
                         });
-                        if (item.label) {
-                            $(this).attr('title', item.label);
+                        if (item.Label) {
+                            $(this).attr('title', item.Label);
                         }
                     }
                 }
@@ -2314,7 +2314,7 @@ var matrix = {
 
         // Apply mandatory skills colors to operational skill expiry indicators
         // These are small icons that appear beside operational skills when they expire
-        if (config.mandatorySkills) {
+        if (config.MandatorySkills) {
             var iconMapping = {
                 'thumbsup': 'fa-thumbs-up',
                 'warning': 'fa-exclamation-triangle'
@@ -2324,14 +2324,14 @@ var matrix = {
             $('[title="Operational skill expired"]:not([data-expiry-type])').attr('data-expiry-type', 'expired');
             $('[title="Operational almost expired"]:not([data-expiry-type])').attr('data-expiry-type', 'almost-expired');
 
-            // Expired indicators (skillLevelId 3)
+            // Expired indicators (SkillLevelId 3)
             $('[data-expiry-type="expired"]').each(function () {
-                var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === 3; });
+                var item = config.MandatorySkills.find(function (i) { return i.SkillLevelId === 3; });
                 if (item) {
                     var cssProps = {
-                        'border-color': item.iconColor,
-                        'background-color': item.backgroundColor,
-                        'color': item.iconColor,
+                        'border-color': item.IconColor,
+                        'background-color': item.BackgroundColor,
+                        'color': item.IconColor,
                         'display': 'flex',
                         'align-items': 'center',
                         'justify-content': 'center'
@@ -2342,25 +2342,25 @@ var matrix = {
                     }
                     $(this).css(cssProps);
                     // Add Font Awesome icon if not already present (skip for PDF export)
-                    if (item.iconClass && !skipFontAwesome) {
-                        var faClass = iconMapping[item.iconClass] || 'fa-' + item.iconClass;
+                    if (item.IconClass && !skipFontAwesome) {
+                        var faClass = iconMapping[item.IconClass] || 'fa-' + item.IconClass;
                         if (!$(this).find('i.fa').length) {
                             $(this).html('<i class="fa ' + faClass + '" style="font-size: 10px;"></i>');
                         }
                     }
-                    if (item.label) {
-                        $(this).attr('title', item.label);
+                    if (item.Label) {
+                        $(this).attr('title', item.Label);
                     }
                 }
             });
-            // Almost expired indicators (skillLevelId 2)
+            // Almost expired indicators (SkillLevelId 2)
             $('[data-expiry-type="almost-expired"]').each(function () {
-                var item = config.mandatorySkills.find(function (i) { return i.skillLevelId === 2; });
+                var item = config.MandatorySkills.find(function (i) { return i.SkillLevelId === 2; });
                 if (item) {
                     var cssProps = {
-                        'border-color': item.iconColor,
-                        'background-color': item.backgroundColor,
-                        'color': item.iconColor,
+                        'border-color': item.IconColor,
+                        'background-color': item.BackgroundColor,
+                        'color': item.IconColor,
                         'display': 'flex',
                         'align-items': 'center',
                         'justify-content': 'center'
@@ -2371,14 +2371,14 @@ var matrix = {
                     }
                     $(this).css(cssProps);
                     // Add Font Awesome icon if not already present (skip for PDF export)
-                    if (item.iconClass && !skipFontAwesome) {
-                        var faClass = iconMapping[item.iconClass] || 'fa-' + item.iconClass;
+                    if (item.IconClass && !skipFontAwesome) {
+                        var faClass = iconMapping[item.IconClass] || 'fa-' + item.IconClass;
                         if (!$(this).find('i.fa').length) {
                             $(this).html('<i class="fa ' + faClass + '" style="font-size: 10px;"></i>');
                         }
                     }
-                    if (item.label) {
-                        $(this).attr('title', item.label);
+                    if (item.Label) {
+                        $(this).attr('title', item.Label);
                     }
                 }
             });
