@@ -2242,12 +2242,8 @@ var matrix = {
                 2: 'fa-exclamation-triangle', // Almost expired
                 3: 'fa-exclamation-triangle'  // Expired
             };
-            // Unicode symbols for PDF export (Font Awesome doesn't work with dom-to-image)
-            var skillLevelUnicodeMapping = {
-                1: '👍',  // Masters - thumbs up
-                2: '⚠',   // Almost expired - warning
-                3: '⚠'    // Expired - warning
-            };
+            // Simple text for PDF (inherits CSS color)
+            var pdfTextMapping = { 1: '✓', 2: '!', 3: '!' };
             // Apply to matrix cells and user skill values modal mandatory buttons
             $('[data-popup="thumbs"][data-value], #UserSkillValuesModalBodyMandatory .circlebtnNoHover[data-value]').each(function () {
                 var value = $(this).attr('data-value');
@@ -2262,12 +2258,11 @@ var matrix = {
                             'border-color': item.IconColor,
                             'color': item.IconColor
                         });
-                        // Add icon: Font Awesome for screen, unicode for PDF
+                        // Add icon: Font Awesome for screen, text for PDF
                         if (skipFontAwesome) {
-                            // Use unicode symbol for PDF export (inherits CSS color)
-                            var unicode = skillLevelUnicodeMapping[skillLevelId];
-                            if (unicode) {
-                                $(this).html('<span style="font-size: 14px;">' + unicode + '</span>');
+                            var txt = pdfTextMapping[skillLevelId];
+                            if (txt) {
+                                $(this).html('<span style="font-size:14px;font-weight:bold;">' + txt + '</span>');
                             }
                         } else {
                             // Use Font Awesome for screen display
@@ -2356,9 +2351,9 @@ var matrix = {
                         'background-image': 'none'
                     };
                     $(this).css(cssProps);
-                    // Add icon: Font Awesome for screen, unicode for PDF
+                    // Add icon: Font Awesome for screen, text for PDF
                     if (skipFontAwesome) {
-                        $(this).html('<span style="font-size: 10px;">⚠</span>');
+                        $(this).html('<span style="font-size:10px;font-weight:bold;">!</span>');
                     } else {
                         var faClass = skillLevelIconMapping[3];
                         if (faClass && !$(this).find('i.fa').length) {
@@ -2384,9 +2379,9 @@ var matrix = {
                         'background-image': 'none'
                     };
                     $(this).css(cssProps);
-                    // Add icon: Font Awesome for screen, unicode for PDF
+                    // Add icon: Font Awesome for screen, text for PDF
                     if (skipFontAwesome) {
-                        $(this).html('<span style="font-size: 10px;">⚠</span>');
+                        $(this).html('<span style="font-size:10px;font-weight:bold;">!</span>');
                     } else {
                         var faClass = skillLevelIconMapping[2];
                         if (faClass && !$(this).find('i.fa').length) {
