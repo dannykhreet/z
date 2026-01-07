@@ -55,8 +55,9 @@
         }
 
         // Default colors and icon (will be overridden by legend config via JavaScript)
-        string statusclass = score == 1 ? "btn-red" : score == 2 ? "btn-green" : score == 5 ? "btn-orange" : "";
-        string iconClass = score == 1 ? "fa-exclamation-triangle" : score == 2 ? "fa-thumbs-up" : score == 5 ? "fa-exclamation-triangle" : "";
+        // Score mapping for mandatory skills: 1=Expired, 2=Masters, 5=Almost expired, 0=No certification yet
+        string statusclass = score == 1 ? "btn-red" : score == 2 ? "btn-green" : score == 5 ? "btn-orange" : score == 0 ? "" : "";
+        string iconClass = score == 1 ? "fa-exclamation-triangle" : score == 2 ? "fa-thumbs-up" : score == 5 ? "fa-exclamation-triangle" : score == 0 ? "fa-minus" : "";
         int[] validScores = new[] { 0, 1, 2, 5 };
         string dataValueAttr = validScores.Contains(score) ? $"data-value={score}" : "";
     }

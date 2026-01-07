@@ -2236,9 +2236,11 @@ var matrix = {
         // Mapping: data-value 1 = expired (SkillLevelId 3), data-value 2 = masters (SkillLevelId 1), data-value 5 = almost expired (SkillLevelId 2)
         if (config.MandatorySkills) {
             var mandatoryMapping = { '1': 3, '2': 1, '5': 2 };
-            var iconMapping = {
-                'thumbsup': 'fa-thumbs-up',
-                'warning': 'fa-exclamation-triangle'
+            // Hardcoded icons per SkillLevelId (icons are fixed, not customizable)
+            var skillLevelIconMapping = {
+                1: 'fa-thumbs-up',           // Masters
+                2: 'fa-exclamation-triangle', // Almost expired
+                3: 'fa-exclamation-triangle'  // Expired
             };
             // Apply to matrix cells and user skill values modal mandatory buttons
             $('[data-popup="thumbs"][data-value], #UserSkillValuesModalBodyMandatory .circlebtnNoHover[data-value]').each(function () {
@@ -2255,8 +2257,8 @@ var matrix = {
                             'color': item.IconColor
                         });
                         // Add Font Awesome icon inside button (skip for PDF export)
-                        if (item.IconClass && !skipFontAwesome) {
-                            var faClass = iconMapping[item.IconClass] || 'fa-' + item.IconClass;
+                        var faClass = skillLevelIconMapping[skillLevelId];
+                        if (faClass && !skipFontAwesome) {
                             if (!$(this).find('i.fa').length) {
                                 $(this).html('<i class="fa ' + faClass + '"></i>');
                             } else {
@@ -2315,9 +2317,10 @@ var matrix = {
         // Apply mandatory skills colors to operational skill expiry indicators
         // These are small icons that appear beside operational skills when they expire
         if (config.MandatorySkills) {
-            var iconMapping = {
-                'thumbsup': 'fa-thumbs-up',
-                'warning': 'fa-exclamation-triangle'
+            // Hardcoded icons per SkillLevelId (icons are fixed, not customizable)
+            var skillLevelIconMapping = {
+                2: 'fa-exclamation-triangle', // Almost expired
+                3: 'fa-exclamation-triangle'  // Expired
             };
 
             // Tag elements with data attribute based on original title (only on first run)
@@ -2342,8 +2345,8 @@ var matrix = {
                     }
                     $(this).css(cssProps);
                     // Add Font Awesome icon if not already present (skip for PDF export)
-                    if (item.IconClass && !skipFontAwesome) {
-                        var faClass = iconMapping[item.IconClass] || 'fa-' + item.IconClass;
+                    var faClass = skillLevelIconMapping[3];
+                    if (faClass && !skipFontAwesome) {
                         if (!$(this).find('i.fa').length) {
                             $(this).html('<i class="fa ' + faClass + '" style="font-size: 10px;"></i>');
                         }
@@ -2371,8 +2374,8 @@ var matrix = {
                     }
                     $(this).css(cssProps);
                     // Add Font Awesome icon if not already present (skip for PDF export)
-                    if (item.IconClass && !skipFontAwesome) {
-                        var faClass = iconMapping[item.IconClass] || 'fa-' + item.IconClass;
+                    var faClass = skillLevelIconMapping[2];
+                    if (faClass && !skipFontAwesome) {
                         if (!$(this).find('i.fa').length) {
                             $(this).html('<i class="fa ' + faClass + '" style="font-size: 10px;"></i>');
                         }
