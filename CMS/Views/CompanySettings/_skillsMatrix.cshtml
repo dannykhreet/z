@@ -1,4 +1,15 @@
-﻿@model WebApp.ViewModels.CompanySettingsViewModel
+@model WebApp.ViewModels.CompanySettingsViewModel
+@{
+    // Helper to get legend item values with defaults
+    var m1 = Model.LegendConfiguration?.GetMandatory(1);
+    var m2 = Model.LegendConfiguration?.GetMandatory(2);
+    var m3 = Model.LegendConfiguration?.GetMandatory(3);
+    var o1 = Model.LegendConfiguration?.GetOperational(1);
+    var o2 = Model.LegendConfiguration?.GetOperational(2);
+    var o3 = Model.LegendConfiguration?.GetOperational(3);
+    var o4 = Model.LegendConfiguration?.GetOperational(4);
+    var o5 = Model.LegendConfiguration?.GetOperational(5);
+}
 
 <!-- Right Content Area -->
 <div class="col-9 p-4" style="border-radius: 8px; max-width:100%; max-height: calc(100vh - 225px); overflow-y: auto;">
@@ -43,34 +54,46 @@
             <!-- Masters the skill -->
             <div class="legend-item-row d-flex align-items-center mb-2" data-skill-type="mandatory" data-skill-level-id="1">
                 <div class="legend-icon-preview mr-3" style="position: relative;">
-                    <button class="btn circlebtn btn-green legend-preview-btn" type="button" data-icon-class="thumbsup" data-icon-color="#52AC52" data-bg-color="#E5F3E5" style="width: 40px; height: 40px; cursor: pointer; background-color: #E5F3E5; border-color: #52AC52; color: #52AC52;"><i class="fa fa-thumbs-up"></i></button>
+                    <button class="btn circlebtn legend-preview-btn" type="button" data-icon-class="thumbsup"
+                            data-icon-color="@(m1?.IconColor ?? "#52AC52")" data-bg-color="@(m1?.BackgroundColor ?? "#E5F3E5")"
+                            style="width: 40px; height: 40px; cursor: pointer; background-color: @(m1?.BackgroundColor ?? "#E5F3E5"); border-color: @(m1?.IconColor ?? "#52AC52"); color: @(m1?.IconColor ?? "#52AC52");">
+                        <i class="fa fa-thumbs-up"></i>
+                    </button>
                     <span class="legend-edit-indicator" style="position: absolute; bottom: -2px; right: -2px; background: #93C54B; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;">
                         <i class="fa fa-pencil" style="font-size: 8px; color: white;"></i>
                     </span>
                 </div>
-                <input type="text" class="form-control legend-label-input" value="@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.ValueMastersTheSkill, "Masters the skill") ?? "Masters the skill")" style="flex: 1;" />
+                <input type="text" class="form-control legend-label-input" value="@(m1?.Label ?? Model?.CmsLanguage.GetValue(LanguageKeys.Skills.ValueMastersTheSkill, "Masters the skill") ?? "Masters the skill")" style="flex: 1;" />
             </div>
 
             <!-- Almost expired -->
             <div class="legend-item-row d-flex align-items-center mb-2" data-skill-type="mandatory" data-skill-level-id="2">
                 <div class="legend-icon-preview mr-3" style="position: relative;">
-                    <button class="btn circlebtn btn-orange legend-preview-btn" type="button" data-icon-class="warning" data-icon-color="#FF8800" data-bg-color="#FFF3E0" style="width: 40px; height: 40px; cursor: pointer; background-color: #FFF3E0; border-color: #FF8800; color: #FF8800;"><i class="fa fa-exclamation-triangle"></i></button>
+                    <button class="btn circlebtn legend-preview-btn" type="button" data-icon-class="warning"
+                            data-icon-color="@(m2?.IconColor ?? "#FF8800")" data-bg-color="@(m2?.BackgroundColor ?? "#FFF3E0")"
+                            style="width: 40px; height: 40px; cursor: pointer; background-color: @(m2?.BackgroundColor ?? "#FFF3E0"); border-color: @(m2?.IconColor ?? "#FF8800"); color: @(m2?.IconColor ?? "#FF8800");">
+                        <i class="fa fa-exclamation-triangle"></i>
+                    </button>
                     <span class="legend-edit-indicator" style="position: absolute; bottom: -2px; right: -2px; background: #93C54B; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;">
                         <i class="fa fa-pencil" style="font-size: 8px; color: white;"></i>
                     </span>
                 </div>
-                <input type="text" class="form-control legend-label-input" value="@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.ValueAlmostExpired, "Almost expired") ?? "Almost expired")" style="flex: 1;" />
+                <input type="text" class="form-control legend-label-input" value="@(m2?.Label ?? Model?.CmsLanguage.GetValue(LanguageKeys.Skills.ValueAlmostExpired, "Almost expired") ?? "Almost expired")" style="flex: 1;" />
             </div>
 
             <!-- Expired -->
             <div class="legend-item-row d-flex align-items-center mb-2" data-skill-type="mandatory" data-skill-level-id="3">
                 <div class="legend-icon-preview mr-3" style="position: relative;">
-                    <button class="btn circlebtn btn-red legend-preview-btn" type="button" data-icon-class="warning" data-icon-color="#D9534F" data-bg-color="#FDECEA" style="width: 40px; height: 40px; cursor: pointer; background-color: #FDECEA; border-color: #D9534F; color: #D9534F;"><i class="fa fa-exclamation-triangle"></i></button>
+                    <button class="btn circlebtn legend-preview-btn" type="button" data-icon-class="warning"
+                            data-icon-color="@(m3?.IconColor ?? "#D9534F")" data-bg-color="@(m3?.BackgroundColor ?? "#FDECEA")"
+                            style="width: 40px; height: 40px; cursor: pointer; background-color: @(m3?.BackgroundColor ?? "#FDECEA"); border-color: @(m3?.IconColor ?? "#D9534F"); color: @(m3?.IconColor ?? "#D9534F");">
+                        <i class="fa fa-exclamation-triangle"></i>
+                    </button>
                     <span class="legend-edit-indicator" style="position: absolute; bottom: -2px; right: -2px; background: #93C54B; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;">
                         <i class="fa fa-pencil" style="font-size: 8px; color: white;"></i>
                     </span>
                 </div>
-                <input type="text" class="form-control legend-label-input" value="@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.ValueExpired, "Expired") ?? "Expired")" style="flex: 1;" />
+                <input type="text" class="form-control legend-label-input" value="@(m3?.Label ?? Model?.CmsLanguage.GetValue(LanguageKeys.Skills.ValueExpired, "Expired") ?? "Expired")" style="flex: 1;" />
             </div>
         </div>
 
@@ -78,59 +101,69 @@
         <div class="mb-3">
             <h6 class="text-muted mb-3">@(Model?.CmsLanguage.GetValue(LanguageKeys.Setting.OperationalSkillsTitle, "Operational skills") ?? "Operational skills")</h6>
 
-            <!-- Score 1 - Doesn't know the theory -->
+            <!-- Score 1 -->
             <div class="legend-item-row d-flex align-items-center mb-2" data-skill-type="operational" data-skill-level-id="1" data-score-value="1">
                 <div class="legend-icon-preview mr-3" style="position: relative;">
-                    <button class="btn circlebtn btn-red legend-preview-btn legend-score-btn" type="button" data-icon-color="#D9534F" data-bg-color="#FDECEA" style="width: 40px; height: 40px; font-size: 18px; cursor: pointer; background-color: #FDECEA; border-color: #D9534F; color: #D9534F;">1</button>
+                    <button class="btn circlebtn legend-preview-btn legend-score-btn" type="button"
+                            data-icon-color="@(o1?.IconColor ?? "#D9534F")" data-bg-color="@(o1?.BackgroundColor ?? "#FDECEA")"
+                            style="width: 40px; height: 40px; font-size: 18px; cursor: pointer; background-color: @(o1?.BackgroundColor ?? "#FDECEA"); border-color: @(o1?.IconColor ?? "#D9534F"); color: @(o1?.IconColor ?? "#D9534F");">1</button>
                     <span class="legend-edit-indicator" style="position: absolute; bottom: -2px; right: -2px; background: #93C54B; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;">
                         <i class="fa fa-pencil" style="font-size: 8px; color: white;"></i>
                     </span>
                 </div>
-                <input type="text" class="form-control legend-label-input" value="@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.ValueNoKnowTheTheory, "Doesn't know the theory") ?? "Doesn't know the theory")" style="flex: 1;" />
+                <input type="text" class="form-control legend-label-input" value="@(o1?.Label ?? Model?.CmsLanguage.GetValue(LanguageKeys.Skills.ValueNoKnowTheTheory, "Doesn't know the theory") ?? "Doesn't know the theory")" style="flex: 1;" />
             </div>
 
-            <!-- Score 2 - Knows the theory -->
+            <!-- Score 2 -->
             <div class="legend-item-row d-flex align-items-center mb-2" data-skill-type="operational" data-skill-level-id="2" data-score-value="2">
                 <div class="legend-icon-preview mr-3" style="position: relative;">
-                    <button class="btn circlebtn btn-orangered legend-preview-btn legend-score-btn" type="button" data-icon-color="#E95420" data-bg-color="#FEEEE8" style="width: 40px; height: 40px; font-size: 18px; cursor: pointer; background-color: #FEEEE8; border-color: #E95420; color: #E95420;">2</button>
+                    <button class="btn circlebtn legend-preview-btn legend-score-btn" type="button"
+                            data-icon-color="@(o2?.IconColor ?? "#E95420")" data-bg-color="@(o2?.BackgroundColor ?? "#FEEEE8")"
+                            style="width: 40px; height: 40px; font-size: 18px; cursor: pointer; background-color: @(o2?.BackgroundColor ?? "#FEEEE8"); border-color: @(o2?.IconColor ?? "#E95420"); color: @(o2?.IconColor ?? "#E95420");">2</button>
                     <span class="legend-edit-indicator" style="position: absolute; bottom: -2px; right: -2px; background: #93C54B; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;">
                         <i class="fa fa-pencil" style="font-size: 8px; color: white;"></i>
                     </span>
                 </div>
-                <input type="text" class="form-control legend-label-input" value="@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.ValueKnowTheTheory, "Knows the theory") ?? "Knows the theory")" style="flex: 1;" />
+                <input type="text" class="form-control legend-label-input" value="@(o2?.Label ?? Model?.CmsLanguage.GetValue(LanguageKeys.Skills.ValueKnowTheTheory, "Knows the theory") ?? "Knows the theory")" style="flex: 1;" />
             </div>
 
-            <!-- Score 3 - Standard situations -->
+            <!-- Score 3 -->
             <div class="legend-item-row d-flex align-items-center mb-2" data-skill-type="operational" data-skill-level-id="3" data-score-value="3">
                 <div class="legend-icon-preview mr-3" style="position: relative;">
-                    <button class="btn circlebtn btn-orange legend-preview-btn legend-score-btn" type="button" data-icon-color="#FF8800" data-bg-color="#FFF3E0" style="width: 40px; height: 40px; font-size: 18px; cursor: pointer; background-color: #FFF3E0; border-color: #FF8800; color: #FF8800;">3</button>
+                    <button class="btn circlebtn legend-preview-btn legend-score-btn" type="button"
+                            data-icon-color="@(o3?.IconColor ?? "#FF8800")" data-bg-color="@(o3?.BackgroundColor ?? "#FFF3E0")"
+                            style="width: 40px; height: 40px; font-size: 18px; cursor: pointer; background-color: @(o3?.BackgroundColor ?? "#FFF3E0"); border-color: @(o3?.IconColor ?? "#FF8800"); color: @(o3?.IconColor ?? "#FF8800");">3</button>
                     <span class="legend-edit-indicator" style="position: absolute; bottom: -2px; right: -2px; background: #93C54B; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;">
                         <i class="fa fa-pencil" style="font-size: 8px; color: white;"></i>
                     </span>
                 </div>
-                <input type="text" class="form-control legend-label-input" value="@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.ValueStandardSituations, "Is able to apply this in the standard situations") ?? "Is able to apply this in the standard situations")" style="flex: 1;" />
+                <input type="text" class="form-control legend-label-input" value="@(o3?.Label ?? Model?.CmsLanguage.GetValue(LanguageKeys.Skills.ValueStandardSituations, "Is able to apply this in the standard situations") ?? "Is able to apply this in the standard situations")" style="flex: 1;" />
             </div>
 
-            <!-- Score 4 - Non-standard conditions -->
+            <!-- Score 4 -->
             <div class="legend-item-row d-flex align-items-center mb-2" data-skill-type="operational" data-skill-level-id="4" data-score-value="4">
                 <div class="legend-icon-preview mr-3" style="position: relative;">
-                    <button class="btn circlebtn btn-orangegreen legend-preview-btn legend-score-btn" type="button" data-icon-color="#A5C43C" data-bg-color="#F5F9E6" style="width: 40px; height: 40px; font-size: 18px; cursor: pointer; background-color: #F5F9E6; border-color: #A5C43C; color: #A5C43C;">4</button>
+                    <button class="btn circlebtn legend-preview-btn legend-score-btn" type="button"
+                            data-icon-color="@(o4?.IconColor ?? "#A5C43C")" data-bg-color="@(o4?.BackgroundColor ?? "#F5F9E6")"
+                            style="width: 40px; height: 40px; font-size: 18px; cursor: pointer; background-color: @(o4?.BackgroundColor ?? "#F5F9E6"); border-color: @(o4?.IconColor ?? "#A5C43C"); color: @(o4?.IconColor ?? "#A5C43C");">4</button>
                     <span class="legend-edit-indicator" style="position: absolute; bottom: -2px; right: -2px; background: #93C54B; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;">
                         <i class="fa fa-pencil" style="font-size: 8px; color: white;"></i>
                     </span>
                 </div>
-                <input type="text" class="form-control legend-label-input" value="@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.ValueNonStandardConditions, "Is able to apply this in the non-standard conditions") ?? "Is able to apply this in the non-standard conditions")" style="flex: 1;" />
+                <input type="text" class="form-control legend-label-input" value="@(o4?.Label ?? Model?.CmsLanguage.GetValue(LanguageKeys.Skills.ValueNonStandardConditions, "Is able to apply this in the non-standard conditions") ?? "Is able to apply this in the non-standard conditions")" style="flex: 1;" />
             </div>
 
-            <!-- Score 5 - Can educate others -->
+            <!-- Score 5 -->
             <div class="legend-item-row d-flex align-items-center mb-2" data-skill-type="operational" data-skill-level-id="5" data-score-value="5">
                 <div class="legend-icon-preview mr-3" style="position: relative;">
-                    <button class="btn circlebtn btn-green legend-preview-btn legend-score-btn" type="button" data-icon-color="#52AC52" data-bg-color="#E5F3E5" style="width: 40px; height: 40px; font-size: 18px; cursor: pointer; background-color: #E5F3E5; border-color: #52AC52; color: #52AC52;">5</button>
+                    <button class="btn circlebtn legend-preview-btn legend-score-btn" type="button"
+                            data-icon-color="@(o5?.IconColor ?? "#52AC52")" data-bg-color="@(o5?.BackgroundColor ?? "#E5F3E5")"
+                            style="width: 40px; height: 40px; font-size: 18px; cursor: pointer; background-color: @(o5?.BackgroundColor ?? "#E5F3E5"); border-color: @(o5?.IconColor ?? "#52AC52"); color: @(o5?.IconColor ?? "#52AC52");">5</button>
                     <span class="legend-edit-indicator" style="position: absolute; bottom: -2px; right: -2px; background: #93C54B; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;">
                         <i class="fa fa-pencil" style="font-size: 8px; color: white;"></i>
                     </span>
                 </div>
-                <input type="text" class="form-control legend-label-input" value="@(Model?.CmsLanguage.GetValue(LanguageKeys.Skills.ValueCanEducateOthers, "Can educate others") ?? "Can educate others")" style="flex: 1;" />
+                <input type="text" class="form-control legend-label-input" value="@(o5?.Label ?? Model?.CmsLanguage.GetValue(LanguageKeys.Skills.ValueCanEducateOthers, "Can educate others") ?? "Can educate others")" style="flex: 1;" />
             </div>
         </div>
     </div>
@@ -202,363 +235,148 @@
 <script>
     jQuery(function($) {
         'use strict';
-        // Debounce timer
-        let debounceTimer;
-        let currentEditingItem = null;
-        let legendConfiguration = null;
+        var debounceTimer;
+        var currentEditingItem = null;
 
-        // Load legend configuration on page load
-        loadLegendConfiguration();
-
-        // Event handler for label clicks (rounding options)
+        // Rounding options toggle
         $('.btn-group-toggle').off('click', 'label').on('click', 'label', function (e) {
             e.preventDefault();
             e.stopPropagation();
-
-            // Clear previous debounce timer
             clearTimeout(debounceTimer);
-
-            // Set debounce timer to prevent multiple requests
             debounceTimer = setTimeout(() => {
-                // Remove active class from all buttons
                 $('.btn-group-toggle label').removeClass('active');
-
-                // Add active class to the clicked button
                 $(this).addClass('active');
-
-                // Determine the selected state and update the UI accordingly
-                let settingValue;
-
-                if ($(this).attr('id') === 'RoundDown_label') {
-                    // Enable notifications selected
-                    settingValue = false;
-                    $('#RoundDown').prop('checked', false);
-                    $('#donotRoundDown').prop('checked', true);
-                } else if ($(this).attr('id') === 'do_not_RoundDown_label') {
-                    settingValue = true;
-                    $('#RoundDown').prop('checked', true);
-                    $('#donotRoundDown').prop('checked', false);
-                }
-
-                updateWorkInstructionChangesStatus(settingValue);
-            }, 300); // Debounce delay
+                var settingValue = $(this).attr('id') === 'do_not_RoundDown_label';
+                $('#RoundDown').prop('checked', !settingValue);
+                $('#donotRoundDown').prop('checked', settingValue);
+                $.ajax({
+                    url: '/CompanySettings/UpdateSkillMatrixChangeScoreStyle',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(settingValue),
+                    success: function () {
+                        toastr.success('@(Model?.CmsLanguage.GetValue(LanguageKeys.CompanySetting.NotifyEndUserSkillMatrixChangeDoneCorrectly, "Skill matrix setting updated correctly") ?? "Skill matrix setting updated correctly")');
+                    }
+                });
+            }, 300);
         });
 
-        // Initialize Work Instructions state properly
-        initializeWorkInstructions();
-
-        function initializeWorkInstructions() {
-            // Remove 'active' class from both labels
-            $('#RoundDown_label').removeClass('active');
-            $('#do_not_RoundDown_label').removeClass('active');
-
-            if ($('#RoundDown').is(':checked')) {
-                $('#RoundDown_label').addClass('active');
-            } else if ($('#donotRoundDown').is(':checked')) {
-                $('#do_not_RoundDown_label').addClass('active');
-            }
-        }
-
-        function updateWorkInstructionChangesStatus(settingValue) {
-            $.ajax({
-                url: '/CompanySettings/UpdateSkillMatrixChangeScoreStyle',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(settingValue),
-                success: function (response) {
-                    toastr.success('@(Model?.CmsLanguage.GetValue(LanguageKeys.CompanySetting.NotifyEndUserSkillMatrixChangeDoneCorrectly, "Skill matrix setting updated correctly") ?? "Skill matrix setting updated correctly")');
-                },
-                error: function (xhr, status, error) { }
-            });
-        }
-
-        // Load legend configuration from API
-        function loadLegendConfiguration() {
-            $.ajax({
-                url: '/companysettings/legend',
-                type: 'GET',
-                success: function (response) {
-                    // If API returns null, initialize with default values from UI
-                    if (!response) {
-                        legendConfiguration = getDefaultLegendConfiguration();
-                    } else {
-                        legendConfiguration = response;
-                    }
-                    applyLegendConfiguration(legendConfiguration);
-                },
-                error: function (xhr, status, error) {
-                    console.error('Failed to load legend configuration:', error);
-                    // On error, also initialize with defaults
-                    legendConfiguration = getDefaultLegendConfiguration();
-                }
-            });
-        }
-
-        // Get legend configuration from the UI - only essential fields
-        function getDefaultLegendConfiguration() {
-            var config = {
-                MandatorySkills: [],
-                OperationalSkills: []
-            };
-
-            // Read mandatory skills from UI
-            $('.legend-item-row[data-skill-type="mandatory"]').each(function() {
-                var row = $(this);
-                var btn = row.find('.legend-preview-btn');
-                config.MandatorySkills.push({
-                    SkillLevelId: parseInt(row.data('skill-level-id')),
-                    Label: row.find('.legend-label-input').val(),
-                    IconColor: btn.data('icon-color') || '#52AC52',
-                    BackgroundColor: btn.data('bg-color') || '#E5F3E5'
-                });
-            });
-
-            // Read operational skills from UI
-            $('.legend-item-row[data-skill-type="operational"]').each(function() {
-                var row = $(this);
-                var btn = row.find('.legend-preview-btn');
-                config.OperationalSkills.push({
-                    SkillLevelId: parseInt(row.data('skill-level-id')),
-                    Label: row.find('.legend-label-input').val(),
-                    IconColor: btn.data('icon-color') || '#52AC52',
-                    BackgroundColor: btn.data('bg-color') || '#E5F3E5'
-                });
-            });
-
-            return config;
-        }
-
-        // Apply legend configuration to UI (PascalCase property names from API)
-        function applyLegendConfiguration(config) {
-            if (!config) return;
-
-            // Apply mandatory skills
-            if (config.MandatorySkills) {
-                config.MandatorySkills.forEach(function (item) {
-                    var row = $('.legend-item-row[data-skill-type="mandatory"][data-skill-level-id="' + item.SkillLevelId + '"]');
-                    if (row.length) {
-                        row.find('.legend-label-input').val(item.Label);
-                        var btn = row.find('.legend-preview-btn');
-                        btn.css({
-                            'background-color': item.BackgroundColor,
-                            'border-color': item.IconColor,
-                            'color': item.IconColor
-                        });
-                        // Also update data attributes for consistency
-                        btn.data('icon-color', item.IconColor);
-                        btn.data('bg-color', item.BackgroundColor);
-                    }
-                });
-            }
-
-            // Apply operational skills
-            if (config.OperationalSkills) {
-                config.OperationalSkills.forEach(function (item) {
-                    var row = $('.legend-item-row[data-skill-type="operational"][data-skill-level-id="' + item.SkillLevelId + '"]');
-                    if (row.length) {
-                        row.find('.legend-label-input').val(item.Label);
-                        var btn = row.find('.legend-preview-btn');
-                        btn.css({
-                            'background-color': item.BackgroundColor,
-                            'border-color': item.IconColor,
-                            'color': item.IconColor
-                        });
-                        // Also update data attributes for consistency
-                        btn.data('icon-color', item.IconColor);
-                        btn.data('bg-color', item.BackgroundColor);
-                    }
-                });
-            }
-        }
-
-        // Legend item click handler - open color picker modal
+        // Color picker modal handler
         $('.legend-preview-btn').on('click', function () {
             var row = $(this).closest('.legend-item-row');
-            var skillType = row.data('skill-type');
-            var skillLevelId = parseInt(row.data('skill-level-id')); // Ensure integer
-            var scoreValue = row.data('score-value');
-            var iconClass = $(this).data('icon-class');
-            var currentLabel = row.find('.legend-label-input').val();
-
+            var btn = $(this);
             currentEditingItem = {
                 row: row,
-                skillType: skillType,
-                skillLevelId: skillLevelId,
-                scoreValue: scoreValue,
-                iconClass: iconClass
+                btn: btn,
+                skillType: row.data('skill-type'),
+                skillLevelId: row.data('skill-level-id'),
+                scoreValue: row.data('score-value'),
+                iconClass: btn.data('icon-class')
             };
 
-            // Find current configuration from legendConfiguration object (PascalCase)
-            var currentItem = null;
-            if (legendConfiguration) {
-                var skillList = skillType === 'mandatory' ? legendConfiguration.MandatorySkills : legendConfiguration.OperationalSkills;
-                if (skillList) {
-                    currentItem = skillList.find(function (item) { return parseInt(item.SkillLevelId) === skillLevelId; });
-                }
-            }
+            $('#legendItemTitle').text(currentEditingItem.skillType === 'operational' ? 'Score ' + currentEditingItem.scoreValue : row.find('.legend-label-input').val());
+            $('#legendLevelText').val(row.find('.legend-label-input').val());
+            setColorPicker('icon', btn.data('icon-color'));
+            setColorPicker('bg', btn.data('bg-color'));
+            updatePreview();
 
-            // Set modal title
-            var titleText = skillType === 'operational' ? 'Score ' + scoreValue + ' operational skills' : currentLabel;
-            $('#legendItemTitle').text(titleText);
-
-            // Set current values
-            $('#legendLevelText').val(currentLabel);
-
-            if (currentItem) {
-                setColorPickerValue('icon', currentItem.IconColor);
-                setColorPickerValue('bg', currentItem.BackgroundColor);
+            if (currentEditingItem.skillType === 'operational') {
+                $('#previewContent').text(currentEditingItem.scoreValue);
             } else {
-                // Fallback to data attributes if no config item found
-                var btn = $(this);
-                setColorPickerValue('icon', btn.data('icon-color') || '#52AC52');
-                setColorPickerValue('bg', btn.data('bg-color') || '#E5F3E5');
-            }
-
-            // Update preview
-            updateColorPreview();
-
-            // Show preview content based on skill type and icon
-            if (skillType === 'operational' && scoreValue) {
-                $('#previewContent').text(scoreValue);
-            } else if (iconClass === 'thumbsup') {
-                $('#previewContent').html('<i class="fa fa-thumbs-up"></i>');
-            } else if (iconClass === 'warning') {
-                $('#previewContent').html('<i class="fa fa-exclamation-triangle"></i>');
-            } else {
-                $('#previewContent').html('<i class="fa fa-thumbs-up"></i>');
+                $('#previewContent').html(currentEditingItem.iconClass === 'thumbsup' ? '<i class="fa fa-thumbs-up"></i>' : '<i class="fa fa-exclamation-triangle"></i>');
             }
 
             $('#LegendColorPickerModal').modal('show');
         });
 
-        // Confirm button handler
+        // Confirm color changes
         $('#btnConfirmLegendColor').on('click', function () {
             if (!currentEditingItem) return;
-
             var newLabel = $('#legendLevelText').val();
             var newIconColor = $('#iconColorHex').val();
             var newBgColor = $('#bgColorHex').val();
 
-            // Update UI
-            var row = currentEditingItem.row;
-            row.find('.legend-label-input').val(newLabel);
-            var btn = row.find('.legend-preview-btn');
-            btn.css({
-                'background-color': newBgColor,
-                'border-color': newIconColor,
-                'color': newIconColor
-            });
-            // Also update the icon color inside the button
-            btn.find('i').css('color', newIconColor);
-            // Update data attributes for consistency
-            btn.data('icon-color', newIconColor);
-            btn.data('bg-color', newBgColor);
+            currentEditingItem.row.find('.legend-label-input').val(newLabel);
+            currentEditingItem.btn.css({ 'background-color': newBgColor, 'border-color': newIconColor, 'color': newIconColor });
+            currentEditingItem.btn.data('icon-color', newIconColor).data('bg-color', newBgColor);
 
-            // Update configuration using parseInt for comparison (PascalCase)
-            var targetSkillLevelId = parseInt(currentEditingItem.skillLevelId);
-            if (legendConfiguration) {
-                var skillList = currentEditingItem.skillType === 'mandatory' ? legendConfiguration.MandatorySkills : legendConfiguration.OperationalSkills;
-                if (skillList) {
-                    var item = skillList.find(function (item) { return parseInt(item.SkillLevelId) === targetSkillLevelId; });
-                    if (item) {
-                        item.Label = newLabel;
-                        item.IconColor = newIconColor;
-                        item.BackgroundColor = newBgColor;
-                    }
-                }
-            }
-
-            // Save to server
-            saveLegendConfiguration();
-
+            saveConfiguration();
             $('#LegendColorPickerModal').modal('hide');
         });
 
-        // Save legend configuration
-        function saveLegendConfiguration() {
-            if (!legendConfiguration) return;
+        // Label change handler
+        $('.legend-label-input').on('change', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(saveConfiguration, 500);
+        });
+
+        // Save configuration to server
+        function saveConfiguration() {
+            var config = { MandatorySkills: [], OperationalSkills: [] };
+            $('.legend-item-row').each(function() {
+                var row = $(this);
+                var btn = row.find('.legend-preview-btn');
+                var item = {
+                    SkillLevelId: parseInt(row.data('skill-level-id')),
+                    Label: row.find('.legend-label-input').val(),
+                    IconColor: btn.data('icon-color'),
+                    BackgroundColor: btn.data('bg-color')
+                };
+                if (row.data('skill-type') === 'mandatory') {
+                    config.MandatorySkills.push(item);
+                } else {
+                    config.OperationalSkills.push(item);
+                }
+            });
 
             $.ajax({
                 url: '/companysettings/legend',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify(legendConfiguration),
-                success: function (response) {
+                data: JSON.stringify(config),
+                success: function () {
                     toastr.success('@(Model?.CmsLanguage.GetValue(LanguageKeys.CompanySetting.LegendUpdatedSuccessfully, "Legend configuration updated successfully") ?? "Legend configuration updated successfully")');
                 },
-                error: function (xhr, status, error) {
-                    console.error('Failed to save legend configuration:', error);
+                error: function () {
                     toastr.error('@(Model?.CmsLanguage.GetValue(LanguageKeys.CompanySetting.LegendUpdateFailed, "Failed to update legend configuration") ?? "Failed to update legend configuration")');
                 }
             });
         }
 
-        // Label input change handler - debounced save (PascalCase)
-        $('.legend-label-input').on('change', function () {
-            var row = $(this).closest('.legend-item-row');
-            var skillType = row.data('skill-type');
-            var skillLevelId = parseInt(row.data('skill-level-id')); // Ensure integer
-            var newLabel = $(this).val();
-
-            if (legendConfiguration) {
-                var skillList = skillType === 'mandatory' ? legendConfiguration.MandatorySkills : legendConfiguration.OperationalSkills;
-                if (skillList) {
-                    var item = skillList.find(function (item) { return parseInt(item.SkillLevelId) === skillLevelId; });
-                    if (item) {
-                        item.Label = newLabel;
-                    }
-                }
-            }
-
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(function () {
-                saveLegendConfiguration();
-            }, 500);
-        });
-
-        // Native color picker functionality
-        function setColorPickerValue(prefix, hexColor) {
-            if (!hexColor || hexColor.length < 4) return;
-            // Ensure hex color is 7 characters (with #)
-            if (hexColor.length === 4) {
-                hexColor = '#' + hexColor[1] + hexColor[1] + hexColor[2] + hexColor[2] + hexColor[3] + hexColor[3];
-            }
-            $('#' + prefix + 'ColorPicker').val(hexColor);
-            $('#' + prefix + 'ColorHex').val(hexColor.toUpperCase());
+        // Color picker helpers
+        function setColorPicker(prefix, hex) {
+            if (!hex) return;
+            if (hex.length === 4) hex = '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
+            $('#' + prefix + 'ColorPicker').val(hex);
+            $('#' + prefix + 'ColorHex').val(hex.toUpperCase());
         }
 
-        function updateColorPreview() {
-            var iconColor = $('#iconColorHex').val();
-            var bgColor = $('#bgColorHex').val();
+        function updatePreview() {
             $('#colorPreviewCircle').css({
-                'background-color': bgColor,
-                'border-color': iconColor,
-                'color': iconColor
+                'background-color': $('#bgColorHex').val(),
+                'border-color': $('#iconColorHex').val(),
+                'color': $('#iconColorHex').val()
             });
         }
 
-        // Native color picker change event
         $('#iconColorPicker, #bgColorPicker').on('input change', function () {
             var prefix = $(this).attr('id').includes('icon') ? 'icon' : 'bg';
-            var hexColor = $(this).val().toUpperCase();
-            $('#' + prefix + 'ColorHex').val(hexColor);
-            updateColorPreview();
+            $('#' + prefix + 'ColorHex').val($(this).val().toUpperCase());
+            updatePreview();
         });
 
-        // Hex input change
         $('#iconColorHex, #bgColorHex').on('input', function () {
             var hex = $(this).val();
             if (hex.length === 7 && hex.charAt(0) === '#') {
                 var prefix = $(this).attr('id').includes('icon') ? 'icon' : 'bg';
                 $('#' + prefix + 'ColorPicker').val(hex);
-                updateColorPreview();
+                updatePreview();
             }
         });
     });
 </script>
 
 <style>
-    /* Circle button styles */
     .circlebtn {
         width: 48px;
         height: 48px;
@@ -570,11 +388,7 @@
         font-size: 22px !important;
         outline: 0 !important;
     }
-
-        .circlebtn i {
-            font-size: 18px;
-        }
-
+    .circlebtn i { font-size: 18px; }
     .legend-item-row {
         padding: 8px 12px;
         background-color: white;
@@ -582,42 +396,19 @@
         margin-bottom: 8px;
         transition: box-shadow 0.2s;
     }
-
-        .legend-item-row:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
+    .legend-item-row:hover { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
     .legend-label-input {
         border: 1px solid #e0e0e0;
         border-radius: 4px;
         padding: 8px 12px;
     }
-
-        .legend-label-input:focus {
-            border-color: #93C54B;
-            box-shadow: 0 0 0 2px rgba(147, 197, 75, 0.2);
-        }
-
-    .legend-preview-btn {
-        transition: transform 0.2s;
+    .legend-label-input:focus {
+        border-color: #93C54B;
+        box-shadow: 0 0 0 2px rgba(147, 197, 75, 0.2);
     }
-
-        .legend-preview-btn:hover {
-            transform: scale(1.1);
-        }
-
-    /* Native color picker styling */
-    .form-control-color {
-        border: 2px solid #dee2e6;
-        border-radius: 4px;
-    }
-
-        .form-control-color:hover {
-            border-color: #93C54B;
-        }
-
-        .form-control-color:focus {
-            border-color: #93C54B;
-            box-shadow: 0 0 0 2px rgba(147, 197, 75, 0.2);
-        }
+    .legend-preview-btn { transition: transform 0.2s; }
+    .legend-preview-btn:hover { transform: scale(1.1); }
+    .form-control-color { border: 2px solid #dee2e6; border-radius: 4px; }
+    .form-control-color:hover { border-color: #93C54B; }
+    .form-control-color:focus { border-color: #93C54B; box-shadow: 0 0 0 2px rgba(147, 197, 75, 0.2); }
 </style>

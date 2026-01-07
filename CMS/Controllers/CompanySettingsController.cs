@@ -4,7 +4,11 @@ using EZGO.CMS.LIB.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using WebApp.Logic.Interfaces;
@@ -65,6 +69,21 @@ namespace WebApp.Controllers
             output.Filter.Module = FilterViewModel.ApplicationModules.CompanySetting;
             output.Locale = _locale;
             output.ApplicationSettings = await this.GetApplicationSettings();
+
+            // Load legend configuration
+            var legendResult = await _connector.GetCall(string.Format(Logic.Constants.Skills.SkillMatrixLegendUrl, User.GetProfile().Company.Id));
+            if (legendResult.StatusCode == HttpStatusCode.OK && !string.IsNullOrEmpty(legendResult.Message) && legendResult.Message != "null")
+            {
+                try
+                {
+                    output.LegendConfiguration = JsonConvert.DeserializeObject<Models.Skills.SkillMatrixLegendConfiguration>(legendResult.Message);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            }
+
             return PartialView("_skillsMatrix", output);
         }
 
