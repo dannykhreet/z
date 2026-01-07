@@ -2242,11 +2242,11 @@ var matrix = {
                 2: 'fa-exclamation-triangle', // Almost expired
                 3: 'fa-exclamation-triangle'  // Expired
             };
-            // Background images for PDF export (Font Awesome doesn't work with dom-to-image)
-            var skillLevelImageMapping = {
-                1: '/images/icons/v2/thumbsup.png',
-                2: '/images/icons/v2/warning.png',
-                3: '/images/icons/v2/warning.png'
+            // Unicode symbols for PDF export (Font Awesome doesn't work with dom-to-image)
+            var skillLevelUnicodeMapping = {
+                1: '👍',  // Masters - thumbs up
+                2: '⚠',   // Almost expired - warning
+                3: '⚠'    // Expired - warning
             };
             // Apply to matrix cells and user skill values modal mandatory buttons
             $('[data-popup="thumbs"][data-value], #UserSkillValuesModalBodyMandatory .circlebtnNoHover[data-value]').each(function () {
@@ -2262,12 +2262,12 @@ var matrix = {
                             'border-color': item.IconColor,
                             'color': item.IconColor
                         });
-                        // Add icon: Font Awesome for screen, background-image for PDF
+                        // Add icon: Font Awesome for screen, unicode for PDF
                         if (skipFontAwesome) {
-                            // Use background image for PDF export (combined shorthand like ViewerMatrix.cshtml)
-                            var imgUrl = skillLevelImageMapping[skillLevelId];
-                            if (imgUrl) {
-                                $(this).css('background', 'url(' + imgUrl + ') center / 16px no-repeat, ' + item.BackgroundColor);
+                            // Use unicode symbol for PDF export (inherits CSS color)
+                            var unicode = skillLevelUnicodeMapping[skillLevelId];
+                            if (unicode) {
+                                $(this).html('<span style="font-size: 14px;">' + unicode + '</span>');
                             }
                         } else {
                             // Use Font Awesome for screen display
@@ -2352,17 +2352,16 @@ var matrix = {
                         'color': item.IconColor,
                         'display': 'flex',
                         'align-items': 'center',
-                        'justify-content': 'center'
+                        'justify-content': 'center',
+                        'background-image': 'none'
                     };
-                    // Only remove background-image if we're adding Font Awesome icons
-                    if (!skipFontAwesome) {
-                        cssProps['background-image'] = 'none';
-                    }
                     $(this).css(cssProps);
-                    // Add Font Awesome icon if not already present (skip for PDF export)
-                    var faClass = skillLevelIconMapping[3];
-                    if (faClass && !skipFontAwesome) {
-                        if (!$(this).find('i.fa').length) {
+                    // Add icon: Font Awesome for screen, unicode for PDF
+                    if (skipFontAwesome) {
+                        $(this).html('<span style="font-size: 10px;">⚠</span>');
+                    } else {
+                        var faClass = skillLevelIconMapping[3];
+                        if (faClass && !$(this).find('i.fa').length) {
                             $(this).html('<i class="fa ' + faClass + '" style="font-size: 10px;"></i>');
                         }
                     }
@@ -2381,17 +2380,16 @@ var matrix = {
                         'color': item.IconColor,
                         'display': 'flex',
                         'align-items': 'center',
-                        'justify-content': 'center'
+                        'justify-content': 'center',
+                        'background-image': 'none'
                     };
-                    // Only remove background-image if we're adding Font Awesome icons
-                    if (!skipFontAwesome) {
-                        cssProps['background-image'] = 'none';
-                    }
                     $(this).css(cssProps);
-                    // Add Font Awesome icon if not already present (skip for PDF export)
-                    var faClass = skillLevelIconMapping[2];
-                    if (faClass && !skipFontAwesome) {
-                        if (!$(this).find('i.fa').length) {
+                    // Add icon: Font Awesome for screen, unicode for PDF
+                    if (skipFontAwesome) {
+                        $(this).html('<span style="font-size: 10px;">⚠</span>');
+                    } else {
+                        var faClass = skillLevelIconMapping[2];
+                        if (faClass && !$(this).find('i.fa').length) {
                             $(this).html('<i class="fa ' + faClass + '" style="font-size: 10px;"></i>');
                         }
                     }
