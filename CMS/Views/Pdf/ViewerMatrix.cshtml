@@ -1094,8 +1094,7 @@
             type: 'GET',
             success: function (response) {
                 matrix.legendConfiguration = response;
-                // Skip Font Awesome icons for PDF export - dom-to-image has issues with web fonts
-                matrix.applyLegendToMatrixCells(response, { skipFontAwesome: true });
+                matrix.applyLegendToMatrixCells(response);
                 // Small delay to ensure DOM has re-rendered with colors
                 setTimeout(function () {
                     generateMatrixImage();
