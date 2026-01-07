@@ -2264,13 +2264,10 @@ var matrix = {
                         });
                         // Add icon: Font Awesome for screen, background-image for PDF
                         if (skipFontAwesome) {
-                            // Use background image for PDF export
+                            // Use background image for PDF export (combined shorthand like ViewerMatrix.cshtml)
                             var imgUrl = skillLevelImageMapping[skillLevelId];
                             if (imgUrl) {
-                                $(this).css('background-image', 'url(' + imgUrl + ')');
-                                $(this).css('background-size', '16px');
-                                $(this).css('background-repeat', 'no-repeat');
-                                $(this).css('background-position', 'center');
+                                $(this).css('background', 'url(' + imgUrl + ') center / 16px no-repeat, ' + item.BackgroundColor);
                             }
                         } else {
                             // Use Font Awesome for screen display
