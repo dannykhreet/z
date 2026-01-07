@@ -2242,6 +2242,12 @@ var matrix = {
                 2: 'fa-exclamation-triangle', // Almost expired
                 3: 'fa-exclamation-triangle'  // Expired
             };
+            // Background images for PDF export (Font Awesome doesn't work with dom-to-image)
+            var skillLevelImageMapping = {
+                1: '/images/icons/v2/thumbsup.png',
+                2: '/images/icons/v2/warning.png',
+                3: '/images/icons/v2/warning.png'
+            };
             // Apply to matrix cells and user skill values modal mandatory buttons
             $('[data-popup="thumbs"][data-value], #UserSkillValuesModalBodyMandatory .circlebtnNoHover[data-value]').each(function () {
                 var value = $(this).attr('data-value');
@@ -2256,13 +2262,25 @@ var matrix = {
                             'border-color': item.IconColor,
                             'color': item.IconColor
                         });
-                        // Add Font Awesome icon inside button (skip for PDF export)
-                        var faClass = skillLevelIconMapping[skillLevelId];
-                        if (faClass && !skipFontAwesome) {
-                            if (!$(this).find('i.fa').length) {
-                                $(this).html('<i class="fa ' + faClass + '"></i>');
-                            } else {
-                                $(this).find('i.fa').removeClass('fa-thumbs-up fa-thumbs-down fa-exclamation-triangle').addClass(faClass);
+                        // Add icon: Font Awesome for screen, background-image for PDF
+                        if (skipFontAwesome) {
+                            // Use background image for PDF export
+                            var imgUrl = skillLevelImageMapping[skillLevelId];
+                            if (imgUrl) {
+                                $(this).css('background-image', 'url(' + imgUrl + ')');
+                                $(this).css('background-size', '16px');
+                                $(this).css('background-repeat', 'no-repeat');
+                                $(this).css('background-position', 'center');
+                            }
+                        } else {
+                            // Use Font Awesome for screen display
+                            var faClass = skillLevelIconMapping[skillLevelId];
+                            if (faClass) {
+                                if (!$(this).find('i.fa').length) {
+                                    $(this).html('<i class="fa ' + faClass + '"></i>');
+                                } else {
+                                    $(this).find('i.fa').removeClass('fa-thumbs-up fa-thumbs-down fa-exclamation-triangle').addClass(faClass);
+                                }
                             }
                         }
                         if (item.Label) {
