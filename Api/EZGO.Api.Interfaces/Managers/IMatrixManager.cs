@@ -43,7 +43,6 @@ namespace EZGO.Api.Interfaces.Managers
         // Legend Configuration Methods
         Task<SkillMatrixLegendConfiguration?> GetLegendConfigurationAsync(int companyId);
         Task<bool> SaveLegendConfigurationAsync(int companyId, int userId, SkillMatrixLegendConfiguration configuration);
-        Task<bool> UpdateLegendItemAsync(int companyId, int userId, SkillMatrixLegendItem item);
 
         List<Exception> GetPossibleExceptions();
 

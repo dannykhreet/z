@@ -1085,38 +1085,14 @@ namespace EZGO.Api.Logic.Managers
         }
 
         /// <summary>
-        /// Saves the complete legend configuration for a company.
+        /// Saves the legend configuration for a company. Only stores label, iconColor, backgroundColor per skill level.
         /// </summary>
         public async Task<bool> SaveLegendConfigurationAsync(int companyId, int userId, SkillMatrixLegendConfiguration configuration)
         {
             try
             {
-                configuration.CompanyId = companyId;
-
-                // Update timestamps for all items
-                var now = DateTime.UtcNow;
-                if (configuration.MandatorySkills != null)
-                {
-                    foreach (var item in configuration.MandatorySkills)
-                    {
-                        item.CompanyId = companyId;
-                        item.UpdatedAt = now;
-                        item.UpdatedBy = userId;
-                    }
-                }
-                if (configuration.OperationalSkills != null)
-                {
-                    foreach (var item in configuration.OperationalSkills)
-                    {
-                        item.CompanyId = companyId;
-                        item.UpdatedAt = now;
-                        item.UpdatedBy = userId;
-                    }
-                }
-
                 var jsonValue = JsonSerializer.Serialize(configuration);
 
-                // Use IGeneralManager to save the setting with ResourceId 134
                 var settingItem = new Models.Settings.SettingResourceItem
                 {
                     CompanyId = companyId,
@@ -1129,54 +1105,6 @@ namespace EZGO.Api.Logic.Managers
             catch (Exception ex)
             {
                 _logger.LogError(exception: ex, message: string.Concat("MatrixManager.SaveLegendConfigurationAsync(): ", ex.Message));
-                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Updates a single legend item. Requires existing configuration - use SaveLegendConfigurationAsync for initial setup.
-        /// </summary>
-        public async Task<bool> UpdateLegendItemAsync(int companyId, int userId, SkillMatrixLegendItem item)
-        {
-            try
-            {
-                var config = await GetLegendConfigurationAsync(companyId);
-
-                // Return false if no configuration exists - frontend should use SaveLegendConfigurationAsync first
-                if (config == null)
-                {
-                    _logger.LogWarning("MatrixManager.UpdateLegendItemAsync(): No legend configuration exists for company {CompanyId}. Use SaveLegendConfigurationAsync first.", companyId);
-                    return false;
-                }
-
-                // Find and update the item
-                var targetList = item.SkillType == "mandatory" ? config.MandatorySkills : config.OperationalSkills;
-                var existingItem = targetList?.FirstOrDefault(i => i.SkillLevelId == item.SkillLevelId);
-
-                if (existingItem != null)
-                {
-                    existingItem.Label = item.Label;
-                    existingItem.Description = item.Description;
-                    existingItem.IconColor = item.IconColor;
-                    existingItem.BackgroundColor = item.BackgroundColor;
-                    existingItem.IconClass = item.IconClass;
-                    existingItem.UpdatedAt = DateTime.UtcNow;
-                    existingItem.UpdatedBy = userId;
-                }
-                else
-                {
-                    item.CompanyId = companyId;
-                    item.CreatedAt = DateTime.UtcNow;
-                    item.CreatedBy = userId;
-                    targetList?.Add(item);
-                }
-
-                return await SaveLegendConfigurationAsync(companyId, userId, config);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.UpdateLegendItemAsync(): ", ex.Message));
                 if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
                 return false;
             }

@@ -598,6 +598,20 @@ namespace WebApp.Controllers
 
             if (output.UserGroups == null) { output.UserGroups = new List<EZGO.Api.Models.Users.UserGroup>(); }
 
+            // Load legend configuration
+            var legendResult = await _connector.GetCall(string.Format(Logic.Constants.Skills.SkillMatrixLegendUrl, User.GetProfile().Company.Id));
+            if (legendResult.StatusCode == HttpStatusCode.OK && !string.IsNullOrEmpty(legendResult.Message) && legendResult.Message != "null")
+            {
+                try
+                {
+                    output.LegendConfiguration = JsonConvert.DeserializeObject<Models.Skills.SkillMatrixLegendConfiguration>(legendResult.Message);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            }
+
             return View("~/Views/Skills/Matrix/Details.cshtml", output);
         }
 

@@ -1082,45 +1082,6 @@ namespace EZGO.Api.Controllers.V1
                 return StatusCode((int)HttpStatusCode.InternalServerError, new { success = false, message = "Failed to save legend configuration" }.ToJsonFromObject());
             }
         }
-
-        /// <summary>
-        /// Updates a single legend item.
-        /// </summary>
-        [Authorize(Roles = AuthenticationSettings.AUTHORIZATION_MANAGER_ADMINISTRATOR_ROLES)]
-        [Route("skillsmatrix/legend/{companyId}/item")]
-        [HttpPost]
-        public async Task<IActionResult> UpdateLegendItem([FromRoute] int companyId, [FromBody] SkillMatrixLegendItem item)
-        {
-            if (!this.IsCmsRequest)
-            {
-                return StatusCode((int)HttpStatusCode.NotFound, "".ToJsonFromObject());
-            }
-
-            if (await this.CurrentApplicationUser.GetAndSetCompanyIdAsync() != companyId)
-            {
-                return StatusCode((int)HttpStatusCode.Forbidden, AuthenticationSettings.MESSAGE_FORBIDDEN_OBJECT.ToJsonFromObject());
-            }
-
-            Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
-
-            var output = await _matrixManager.UpdateLegendItemAsync(
-                companyId: companyId,
-                userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(),
-                item: item);
-
-            AppendCapturedExceptionToApm(_matrixManager.GetPossibleExceptions());
-
-            Agent.Tracer.CurrentSpan.End();
-
-            if (output)
-            {
-                return StatusCode((int)HttpStatusCode.OK, new { success = true }.ToJsonFromObject());
-            }
-            else
-            {
-                return StatusCode((int)HttpStatusCode.InternalServerError, new { success = false, message = "Failed to update legend item" }.ToJsonFromObject());
-            }
-        }
         #endregion
 
     }

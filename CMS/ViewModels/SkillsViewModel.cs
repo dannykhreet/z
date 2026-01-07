@@ -27,6 +27,7 @@ namespace WebApp.ViewModels
 
         public SkillsMatrix CurrentSkillsMatrix { get; set; }
         public List<SkillsMatrix> SkillsMatrices { get; set; }
+        public SkillMatrixLegendConfiguration LegendConfiguration { get; set; }
         public List<Area> Areas { get; set; }
         public List<SkillAssessmentTemplateWorkInstructionTemplate> WorkInstructionTemplates { get; set; } 
         public List<Models.User.UserProfile> Users { get; set; }

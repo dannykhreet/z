@@ -294,42 +294,34 @@
             });
         }
 
-        // Get default legend configuration from the UI (PascalCase to match API)
+        // Get legend configuration from the UI - only essential fields
         function getDefaultLegendConfiguration() {
             var config = {
                 MandatorySkills: [],
                 OperationalSkills: []
             };
 
-            // Read mandatory skills defaults from UI
+            // Read mandatory skills from UI
             $('.legend-item-row[data-skill-type="mandatory"]').each(function() {
                 var row = $(this);
                 var btn = row.find('.legend-preview-btn');
                 config.MandatorySkills.push({
-                    SkillLevelId: row.data('skill-level-id'),
-                    SkillType: 'mandatory',
+                    SkillLevelId: parseInt(row.data('skill-level-id')),
                     Label: row.find('.legend-label-input').val(),
                     IconColor: btn.data('icon-color') || '#52AC52',
-                    BackgroundColor: btn.data('bg-color') || '#E5F3E5',
-                    IconClass: btn.data('icon-class') || 'thumbsup',
-                    Order: row.data('skill-level-id'),
-                    IsDefault: true
+                    BackgroundColor: btn.data('bg-color') || '#E5F3E5'
                 });
             });
 
-            // Read operational skills defaults from UI
+            // Read operational skills from UI
             $('.legend-item-row[data-skill-type="operational"]').each(function() {
                 var row = $(this);
                 var btn = row.find('.legend-preview-btn');
                 config.OperationalSkills.push({
-                    SkillLevelId: row.data('skill-level-id'),
-                    SkillType: 'operational',
+                    SkillLevelId: parseInt(row.data('skill-level-id')),
                     Label: row.find('.legend-label-input').val(),
                     IconColor: btn.data('icon-color') || '#52AC52',
-                    BackgroundColor: btn.data('bg-color') || '#E5F3E5',
-                    ScoreValue: row.data('score-value'),
-                    Order: row.data('skill-level-id'),
-                    IsDefault: true
+                    BackgroundColor: btn.data('bg-color') || '#E5F3E5'
                 });
             });
 
