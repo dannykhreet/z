@@ -2242,8 +2242,6 @@ var matrix = {
                 2: 'fa-exclamation-triangle', // Almost expired
                 3: 'fa-exclamation-triangle'  // Expired
             };
-            // Simple text for PDF (inherits CSS color)
-            var pdfTextMapping = { 1: '✓', 2: '!', 3: '!' };
             // Apply to matrix cells and user skill values modal mandatory buttons
             $('[data-popup="thumbs"][data-value], #UserSkillValuesModalBodyMandatory .circlebtnNoHover[data-value]').each(function () {
                 var value = $(this).attr('data-value');
@@ -2258,21 +2256,13 @@ var matrix = {
                             'border-color': item.IconColor,
                             'color': item.IconColor
                         });
-                        // Add icon: Font Awesome for screen, text for PDF
-                        if (skipFontAwesome) {
-                            var txt = pdfTextMapping[skillLevelId];
-                            if (txt) {
-                                $(this).html('<span style="font-size:14px;font-weight:bold;">' + txt + '</span>');
-                            }
-                        } else {
-                            // Use Font Awesome for screen display
-                            var faClass = skillLevelIconMapping[skillLevelId];
-                            if (faClass) {
-                                if (!$(this).find('i.fa').length) {
-                                    $(this).html('<i class="fa ' + faClass + '"></i>');
-                                } else {
-                                    $(this).find('i.fa').removeClass('fa-thumbs-up fa-thumbs-down fa-exclamation-triangle').addClass(faClass);
-                                }
+                        // Always use Font Awesome icons
+                        var faClass = skillLevelIconMapping[skillLevelId];
+                        if (faClass) {
+                            if (!$(this).find('i.fa').length) {
+                                $(this).html('<i class="fa ' + faClass + '"></i>');
+                            } else {
+                                $(this).find('i.fa').removeClass('fa-thumbs-up fa-thumbs-down fa-exclamation-triangle').addClass(faClass);
                             }
                         }
                         if (item.Label) {
@@ -2351,14 +2341,9 @@ var matrix = {
                         'background-image': 'none'
                     };
                     $(this).css(cssProps);
-                    // Add icon: Font Awesome for screen, text for PDF
-                    if (skipFontAwesome) {
-                        $(this).html('<span style="font-size:10px;font-weight:bold;">!</span>');
-                    } else {
-                        var faClass = skillLevelIconMapping[3];
-                        if (faClass && !$(this).find('i.fa').length) {
-                            $(this).html('<i class="fa ' + faClass + '" style="font-size: 10px;"></i>');
-                        }
+                    // Always use Font Awesome icons
+                    if (!$(this).find('i.fa').length) {
+                        $(this).html('<i class="fa fa-exclamation-triangle" style="font-size: 10px;"></i>');
                     }
                     if (item.Label) {
                         $(this).attr('title', item.Label);
@@ -2379,14 +2364,9 @@ var matrix = {
                         'background-image': 'none'
                     };
                     $(this).css(cssProps);
-                    // Add icon: Font Awesome for screen, text for PDF
-                    if (skipFontAwesome) {
-                        $(this).html('<span style="font-size:10px;font-weight:bold;">!</span>');
-                    } else {
-                        var faClass = skillLevelIconMapping[2];
-                        if (faClass && !$(this).find('i.fa').length) {
-                            $(this).html('<i class="fa ' + faClass + '" style="font-size: 10px;"></i>');
-                        }
+                    // Always use Font Awesome icons
+                    if (!$(this).find('i.fa').length) {
+                        $(this).html('<i class="fa fa-exclamation-triangle" style="font-size: 10px;"></i>');
                     }
                     if (item.Label) {
                         $(this).attr('title', item.Label);
