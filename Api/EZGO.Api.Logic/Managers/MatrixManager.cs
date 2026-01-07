@@ -17,6 +17,7 @@ using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace EZGO.Api.Logic.Managers
@@ -29,16 +30,21 @@ namespace EZGO.Api.Logic.Managers
         private readonly IConfigurationHelper _configurationHelper;
         private readonly IUserStandingManager _userStandingManager;
         private readonly IAreaManager _areaManager;
+        private readonly IGeneralManager _generalManager;
+
+        // Resource ID for Skill Matrix Legend Options setting
+        private const int SKILL_MATRIX_LEGEND_OPTIONS_RESOURCE_ID = 134;
         #endregion
 
         #region - constructor(s) -
-        public MatrixManager(IDatabaseAccessHelper manager, ITaskManager taskManager, IAreaManager areaManager, IConfigurationHelper configurationHelper, IDataAuditing dataAuditing, IUserStandingManager userStandingManager, ILogger<MatrixManager> logger) : base(logger)
+        public MatrixManager(IDatabaseAccessHelper manager, ITaskManager taskManager, IAreaManager areaManager, IConfigurationHelper configurationHelper, IDataAuditing dataAuditing, IUserStandingManager userStandingManager, IGeneralManager generalManager, ILogger<MatrixManager> logger) : base(logger)
         {
             _manager = manager;
             _dataAuditing = dataAuditing;
             _configurationHelper = configurationHelper;
             _userStandingManager = userStandingManager;
             _areaManager = areaManager;
+            _generalManager = generalManager;
         }
         #endregion
 
@@ -1039,6 +1045,69 @@ namespace EZGO.Api.Logic.Managers
 
             return userValue;
 
+        }
+        #endregion
+
+        #region - legend configuration -
+        /// <summary>
+        /// Gets the legend configuration for a company. Returns null if none exists (frontend handles defaults).
+        /// </summary>
+        public async Task<SkillMatrixLegendConfiguration?> GetLegendConfigurationAsync(int companyId)
+        {
+            try
+            {
+                // Get company-specific legend configuration using IGeneralManager
+                var jsonValue = await _generalManager.GetSettingValueForCompanyByResourceId(companyId, SKILL_MATRIX_LEGEND_OPTIONS_RESOURCE_ID);
+
+                if (!string.IsNullOrEmpty(jsonValue))
+                {
+                    // Use case-insensitive deserialization to handle both old camelCase and new PascalCase data
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    };
+                    var parsed = JsonSerializer.Deserialize<SkillMatrixLegendConfiguration>(jsonValue, options);
+                    if (parsed != null)
+                    {
+                        parsed.CompanyId = companyId;
+                        return parsed;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.GetLegendConfigurationAsync(): ", ex.Message));
+                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
+            }
+
+            // Return null if no configuration exists - frontend handles default values
+            return null;
+        }
+
+        /// <summary>
+        /// Saves the legend configuration for a company. Only stores label, iconColor, backgroundColor per skill level.
+        /// </summary>
+        public async Task<bool> SaveLegendConfigurationAsync(int companyId, int userId, SkillMatrixLegendConfiguration configuration)
+        {
+            try
+            {
+                var jsonValue = JsonSerializer.Serialize(configuration);
+
+                var settingItem = new Models.Settings.SettingResourceItem
+                {
+                    CompanyId = companyId,
+                    ResourceId = SKILL_MATRIX_LEGEND_OPTIONS_RESOURCE_ID,
+                    Value = jsonValue
+                };
+
+                return await _generalManager.ChangeSettingResourceCompany(companyid: companyId, setting: settingItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(exception: ex, message: string.Concat("MatrixManager.SaveLegendConfigurationAsync(): ", ex.Message));
+                if (_configurationHelper.GetValueAsBool(Settings.ApiSettings.ENABLE_ELASTIC_SEARCH_IN_LOGIC_TRACE_CONFIG_KEY)) this.Exceptions.Add(ex);
+                return false;
+            }
         }
         #endregion
 

@@ -1747,59 +1747,65 @@
             </div>
 
             <div class="modal-body" id="matrixLegendModalBody">
-                <!-- Mandatory Skills Section - Dynamic -->
+                <!-- Mandatory Skills Section -->
                 @if (Model.ApplicationSettings.Features.SkillMatrixMandatorySkills != null && Model.ApplicationSettings.Features.SkillMatrixMandatorySkills.Value)
                 {
+                    var m1 = Model.LegendConfiguration?.GetMandatory(1);
+                    var m2 = Model.LegendConfiguration?.GetMandatory(2);
+                    var m3 = Model.LegendConfiguration?.GetMandatory(3);
                     <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixMandatorySkills, "Mandatory skills") ?? "Mandatory skills")</h5>
                     <div id="legendMandatorySkills" class="mb-4">
-                        <!-- Dynamic mandatory skills will be loaded here -->
                         <div class="row">
                             <div class="col-4 d-flex align-items-center mb-2">
-                                <button class="btn circlebtn m-2 legend-btn-mandatory" data-skill-level-id="1" type="button" style="cursor: default; background-color: #DDF7DD; border-color: #008000; color: #008000;"><i class="fa fa-thumbs-up"></i></button>
-                                <span class="legend-label-mandatory" data-skill-level-id="1">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueMastersTheSkill, "Masters the skill") ?? "Masters the skill")</span>
+                                <button class="btn circlebtn m-2" type="button" style="cursor: default; background-color: @(m1?.BackgroundColor ?? "#DDF7DD"); border-color: @(m1?.IconColor ?? "#008000"); color: @(m1?.IconColor ?? "#008000");"><i class="fa fa-thumbs-up"></i></button>
+                                <span>@(m1?.Label ?? Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueMastersTheSkill, "Masters the skill") ?? "Masters the skill")</span>
                             </div>
                             <div class="col-4 d-flex align-items-center mb-2">
-                                <button class="btn circlebtn m-2 legend-btn-mandatory" data-skill-level-id="2" type="button" style="cursor: default; background-color: #FFF0D4; border-color: #FFA500; color: #FFA500;"><i class="fa fa-exclamation-triangle"></i></button>
-                                <span class="legend-label-mandatory" data-skill-level-id="2">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueAlmostExpired, "Almost expired") ?? "Almost expired")</span>
+                                <button class="btn circlebtn m-2" type="button" style="cursor: default; background-color: @(m2?.BackgroundColor ?? "#FFF0D4"); border-color: @(m2?.IconColor ?? "#FFA500"); color: @(m2?.IconColor ?? "#FFA500");"><i class="fa fa-exclamation-triangle"></i></button>
+                                <span>@(m2?.Label ?? Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueAlmostExpired, "Almost expired") ?? "Almost expired")</span>
                             </div>
                             <div class="col-4 d-flex align-items-center mb-2">
-                                <button class="btn circlebtn m-2 legend-btn-mandatory" data-skill-level-id="3" type="button" style="cursor: default; background-color: #FFEAEA; border-color: #CB0000; color: #CB0000;"><i class="fa fa-exclamation-triangle"></i></button>
-                                <span class="legend-label-mandatory" data-skill-level-id="3">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueExpired, "Expired") ?? "Expired")</span>
+                                <button class="btn circlebtn m-2" type="button" style="cursor: default; background-color: @(m3?.BackgroundColor ?? "#FFEAEA"); border-color: @(m3?.IconColor ?? "#CB0000"); color: @(m3?.IconColor ?? "#CB0000");"><i class="fa fa-exclamation-triangle"></i></button>
+                                <span>@(m3?.Label ?? Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueExpired, "Expired") ?? "Expired")</span>
                             </div>
                         </div>
                     </div>
                 }
 
-                <!-- Operational Skills Section - Dynamic -->
+                <!-- Operational Skills Section -->
                 @if (Model.ApplicationSettings.Features.SkillMatrixOperationalSkills != null && Model.ApplicationSettings.Features.SkillMatrixOperationalSkills.Value)
                 {
+                    var o1 = Model.LegendConfiguration?.GetOperational(1);
+                    var o2 = Model.LegendConfiguration?.GetOperational(2);
+                    var o3 = Model.LegendConfiguration?.GetOperational(3);
+                    var o4 = Model.LegendConfiguration?.GetOperational(4);
+                    var o5 = Model.LegendConfiguration?.GetOperational(5);
                     <h5>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.MatrixOperationalSkillsTitle, "Operational skills") ?? "Operational skills")</h5>
                     <div id="legendOperationalSkills" class="mb-4">
-                        <!-- Dynamic operational skills will be loaded here -->
                         <div class="row">
                             <div class="col-6 d-flex align-items-center mb-2">
-                                <button class="btn circlebtn m-2 legend-btn-operational" data-skill-level-id="1" type="button" style="font-size:22px !important; cursor: default; background-color: #FFEAEA; border-color: #CB0000; color: #CB0000;">1</button>
-                                <span class="legend-label-operational" data-skill-level-id="1">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueNoKnowTheTheory, "Doesn't know the theory") ?? "Doesn't know the theory")</span>
+                                <button class="btn circlebtn m-2" type="button" style="font-size:22px !important; cursor: default; background-color: @(o1?.BackgroundColor ?? "#FFEAEA"); border-color: @(o1?.IconColor ?? "#CB0000"); color: @(o1?.IconColor ?? "#CB0000");">1</button>
+                                <span>@(o1?.Label ?? Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueNoKnowTheTheory, "Doesn't know the theory") ?? "Doesn't know the theory")</span>
                             </div>
                             <div class="col-6 d-flex align-items-center mb-2">
-                                <button class="btn circlebtn m-2 legend-btn-operational" data-skill-level-id="2" type="button" style="font-size:22px !important; cursor: default; background-color: #FFE4DA; border-color: #FF4500; color: #FF4500;">2</button>
-                                <span class="legend-label-operational" data-skill-level-id="2">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueKnowTheTheory, "Knows the theory") ?? "Knows the theory")</span>
+                                <button class="btn circlebtn m-2" type="button" style="font-size:22px !important; cursor: default; background-color: @(o2?.BackgroundColor ?? "#FFE4DA"); border-color: @(o2?.IconColor ?? "#FF4500"); color: @(o2?.IconColor ?? "#FF4500");">2</button>
+                                <span>@(o2?.Label ?? Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueKnowTheTheory, "Knows the theory") ?? "Knows the theory")</span>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-6 d-flex align-items-center mb-2">
-                                <button class="btn circlebtn m-2 legend-btn-operational" data-skill-level-id="3" type="button" style="font-size:22px !important; cursor: default; background-color: #FFF0D4; border-color: #FFA500; color: #FFA500;">3</button>
-                                <span class="legend-label-operational" data-skill-level-id="3">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueStandardSituations, "Is able to apply this in the standard situations") ?? "Is able to apply this in the standard situations")</span>
+                                <button class="btn circlebtn m-2" type="button" style="font-size:22px !important; cursor: default; background-color: @(o3?.BackgroundColor ?? "#FFF0D4"); border-color: @(o3?.IconColor ?? "#FFA500"); color: @(o3?.IconColor ?? "#FFA500");">3</button>
+                                <span>@(o3?.Label ?? Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueStandardSituations, "Is able to apply this in the standard situations") ?? "Is able to apply this in the standard situations")</span>
                             </div>
                             <div class="col-6 d-flex align-items-center mb-2">
-                                <button class="btn circlebtn m-2 legend-btn-operational" data-skill-level-id="4" type="button" style="font-size:22px !important; cursor: default; background-color: #F2F5DD; border-color: #8DA304; color: #8DA304;">4</button>
-                                <span class="legend-label-operational" data-skill-level-id="4">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueNonStandardConditions, "Is able to apply this in the non-standard conditions") ?? "Is able to apply this in the non-standard conditions")</span>
+                                <button class="btn circlebtn m-2" type="button" style="font-size:22px !important; cursor: default; background-color: @(o4?.BackgroundColor ?? "#F2F5DD"); border-color: @(o4?.IconColor ?? "#8DA304"); color: @(o4?.IconColor ?? "#8DA304");">4</button>
+                                <span>@(o4?.Label ?? Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueNonStandardConditions, "Is able to apply this in the non-standard conditions") ?? "Is able to apply this in the non-standard conditions")</span>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-6 d-flex align-items-center mb-2">
-                                <button class="btn circlebtn m-2 legend-btn-operational" data-skill-level-id="5" type="button" style="font-size:22px !important; cursor: default; background-color: #DDF7DD; border-color: #008000; color: #008000;">5</button>
-                                <span class="legend-label-operational" data-skill-level-id="5">@(Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueCanEducateOthers, "Can educate others") ?? "Can educate others")</span>
+                                <button class="btn circlebtn m-2" type="button" style="font-size:22px !important; cursor: default; background-color: @(o5?.BackgroundColor ?? "#DDF7DD"); border-color: @(o5?.IconColor ?? "#008000"); color: @(o5?.IconColor ?? "#008000");">5</button>
+                                <span>@(o5?.Label ?? Model?.CmsLanguage?.GetValue(LanguageKeys.Skills.ValueCanEducateOthers, "Can educate others") ?? "Can educate others")</span>
                             </div>
                         </div>
                     </div>
