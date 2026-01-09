@@ -196,7 +196,39 @@
                 </div>
 
                 <div id="contentBody" class="pr-3" style="height: calc(100vh - 252px);overflow:auto; padding-left: 0px">
-                    
+
+                    <div class="row no-gutters mx-1 mb-2" id="sortHeader" style="background: #f8f9fa; border-radius: 4px; padding: 8px 0;">
+                        <div class="col-2 d-none d-md-block"></div>
+                        <div class="col-md-2 col-sm-3 col-3 sortable-header" data-sort="duedate" style="cursor: pointer;">
+                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Action.DueDate, "Due Date") ?? "Due Date")</strong>
+                            <i class="fas fa-sort sort-icon" data-sort-icon="duedate"></i>
+                        </div>
+                        <div class="col-md-2 col-sm-3 col-3 sortable-header" data-sort="startdate" style="cursor: pointer;">
+                            <strong>@(Model?.CmsLanguage?.GetValue(LanguageKeys.Action.StartDate, "Start Date") ?? "Start Date")</strong>
+                            <i class="fas fa-sort sort-icon" data-sort-icon="startdate"></i>
+                        </div>
+                        <div class="col-md-2 col-3 d-none d-md-block sortable-header" data-sort="modifiedat" style="cursor: pointer;">
+                            <strong>Modified</strong>
+                            <i class="fas fa-sort sort-icon" data-sort-icon="modifiedat"></i>
+                        </div>
+                        <div class="col-md-1 col-3 d-none d-lg-block sortable-header" data-sort="areaname" style="cursor: pointer;">
+                            <strong>Area</strong>
+                            <i class="fas fa-sort sort-icon" data-sort-icon="areaname"></i>
+                        </div>
+                        <div class="col-md-1 col-3 d-none d-lg-block sortable-header" data-sort="username" style="cursor: pointer;">
+                            <strong>User</strong>
+                            <i class="fas fa-sort sort-icon" data-sort-icon="username"></i>
+                        </div>
+                        <div class="col-md-1 col-3 d-none d-xl-block sortable-header" data-sort="lastcommentdate" style="cursor: pointer;">
+                            <strong>Last Comment</strong>
+                            <i class="fas fa-sort sort-icon" data-sort-icon="lastcommentdate"></i>
+                        </div>
+                        <div class="col-md-1 col-3 sortable-header" data-sort="priority" style="cursor: pointer;">
+                            <strong>Priority</strong>
+                            <i class="fas fa-sort sort-icon" data-sort-icon="priority"></i>
+                        </div>
+                    </div>
+
                     <div class="row no-gutters" id="contentCol">
                         <partial name="_overview" model="@Model" />
                     </div>
@@ -291,7 +323,9 @@
                 actionType: "action",
                 hasUnviewedComments: null,
                 parentAreaId: null,
-                taskId: @(taskId == null ? "null" : taskId.ToString())
+                taskId: @(taskId == null ? "null" : taskId.ToString()),
+                sort: "duedate",
+                direction: "asc"
             },
             lastActionOverviewLocation: window.location.pathname + window.location.search,
             useTaskActions: @Model?.UseTaskIdFiltering.ToString().ToLower(),
@@ -816,6 +850,15 @@
                 });
             });
 
+            // Attach click handlers to sortable headers
+            $('.sortable-header').on('click', function() {
+                var sortColumn = $(this).data('sort');
+                handleSortClick(sortColumn);
+            });
+
+            // Initialize sort icons based on current state
+            updateSortIcons();
+
             loadActions();
             loadActionCounts();
 
@@ -1021,6 +1064,14 @@
                 urlParams.push("offset=" + ezgoActionOverview.actionFilters.offset);
             }
 
+            if (ezgoActionOverview.actionFilters.sort != "") {
+                urlParams.push("sort=" + ezgoActionOverview.actionFilters.sort);
+            }
+
+            if (ezgoActionOverview.actionFilters.direction != "") {
+                urlParams.push("direction=" + ezgoActionOverview.actionFilters.direction);
+            }
+
             if (urlParams.length > 0) {
                 loadActionsRequestURL = url + '?' + urlParams.join('&');
             }
@@ -1071,8 +1122,8 @@
                 offset: 0,
                 filterText: "", //also for comment
                 tagids: [], //also for comment
-                status: [],
-                involvement: "",
+                status: ["unresolved"],
+                involvement: "myactions",
                 assignedUserIds: [],
                 assignedAreaIds: [],
                 createdFrom: null, //also for comment
@@ -1083,7 +1134,9 @@
                 overdueTo: null,
                 actionType: "action",
                 hasUnviewedComments: null,
-                parentAreaId: null
+                parentAreaId: null,
+                sort: "duedate",
+                direction: "asc"
             }
 
             localStorage.setItem('actionfilters', JSON.stringify(ezgoActionOverview.actionFilters));
@@ -1175,8 +1228,46 @@
 
             // return to top
             $('#back-to-top').click();
-            
+
             ezgomediafetcher.preloadVisibleImagesAndVideos();
+            updateSortIcons();
+        }
+
+        function updateSortIcons() {
+            // Reset all sort icons
+            $('.sort-icon').removeClass('fa-sort-up fa-sort-down').addClass('fa-sort');
+
+            // Update the active sort column icon
+            var sortColumn = ezgoActionOverview.actionFilters.sort;
+            var direction = ezgoActionOverview.actionFilters.direction;
+
+            var iconClass = direction === 'asc' ? 'fa-sort-up' : 'fa-sort-down';
+            $('[data-sort-icon="' + sortColumn + '"]').removeClass('fa-sort').addClass(iconClass);
+        }
+
+        function handleSortClick(sortColumn) {
+            // Toggle direction if clicking the same column, otherwise set to ascending
+            if (ezgoActionOverview.actionFilters.sort === sortColumn) {
+                ezgoActionOverview.actionFilters.direction =
+                    ezgoActionOverview.actionFilters.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                ezgoActionOverview.actionFilters.sort = sortColumn;
+                ezgoActionOverview.actionFilters.direction = 'asc';
+            }
+
+            // Reset offset and reload actions
+            ezgoActionOverview.actionFilters.offset = 0;
+            ezgoActionOverview.actionsLoaded = false;
+            $('#contentCol').html('');
+            $('#totalCounter').html('Loading...');
+
+            // Save to localStorage
+            localStorage.setItem('actionfilters', JSON.stringify(ezgoActionOverview.actionFilters));
+
+            // Update icons and load actions
+            updateSortIcons();
+            loadActions();
+            loadActionCounts();
         }
 
         function showCorrectFiltersForType(actionTypeValue) {

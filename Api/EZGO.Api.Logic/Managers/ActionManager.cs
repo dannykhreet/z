@@ -408,7 +408,63 @@ namespace EZGO.Api.Logic.Managers
             if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.UserInformation.ToString().ToLower())) output = await GetUserWithActionsAsync(companyId: companyId, actions: output);
             if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Tags.ToString().ToLower())) output = await AppendTagsToActionsAsync(companyId: companyId, actions: output);
 
+            // Apply sorting
+            if (filters.HasValue)
+            {
+                var sortColumn = filters.Value.SortColumn ?? SortColumnTypeEnum.DueDate;
+                var sortDirection = filters.Value.SortDirection ?? SortColumnDirectionTypeEnum.Ascending;
+
+                output = sortDirection == SortColumnDirectionTypeEnum.Ascending
+                    ? ApplySortAscending(output, sortColumn).ToList()
+                    : ApplySortDescending(output, sortColumn).ToList();
+            }
+            else
+            {
+                // Default sort: DueDate ascending
+                output = output.OrderBy(a => a.DueDate).ToList();
+            }
+
             return output;
+        }
+
+        /// <summary>
+        /// Apply sorting in ascending order based on the sort column
+        /// </summary>
+        private IEnumerable<ActionsAction> ApplySortAscending(List<ActionsAction> actions, SortColumnTypeEnum sortColumn)
+        {
+            return sortColumn switch
+            {
+                SortColumnTypeEnum.Id => actions.OrderBy(a => a.Id),
+                SortColumnTypeEnum.Name => actions.OrderBy(a => a.Description),
+                SortColumnTypeEnum.DueDate => actions.OrderBy(a => a.DueDate),
+                SortColumnTypeEnum.StartDate => actions.OrderBy(a => a.CreatedAt),
+                SortColumnTypeEnum.ModifiedAt => actions.OrderBy(a => a.ModifiedAt),
+                SortColumnTypeEnum.AreaName => actions.OrderBy(a => a.AssignedAreas?.FirstOrDefault()?.Name),
+                SortColumnTypeEnum.UserName => actions.OrderBy(a => a.AssignedUsers?.FirstOrDefault()?.Name),
+                SortColumnTypeEnum.LastCommentDate => actions.OrderBy(a => a.LastCommentDate),
+                SortColumnTypeEnum.Priority => actions.OrderBy(a => a.Priority ?? ActionPriorityEnum.Low),
+                _ => actions.OrderBy(a => a.DueDate)
+            };
+        }
+
+        /// <summary>
+        /// Apply sorting in descending order based on the sort column
+        /// </summary>
+        private IEnumerable<ActionsAction> ApplySortDescending(List<ActionsAction> actions, SortColumnTypeEnum sortColumn)
+        {
+            return sortColumn switch
+            {
+                SortColumnTypeEnum.Id => actions.OrderByDescending(a => a.Id),
+                SortColumnTypeEnum.Name => actions.OrderByDescending(a => a.Description),
+                SortColumnTypeEnum.DueDate => actions.OrderByDescending(a => a.DueDate),
+                SortColumnTypeEnum.StartDate => actions.OrderByDescending(a => a.CreatedAt),
+                SortColumnTypeEnum.ModifiedAt => actions.OrderByDescending(a => a.ModifiedAt),
+                SortColumnTypeEnum.AreaName => actions.OrderByDescending(a => a.AssignedAreas?.FirstOrDefault()?.Name),
+                SortColumnTypeEnum.UserName => actions.OrderByDescending(a => a.AssignedUsers?.FirstOrDefault()?.Name),
+                SortColumnTypeEnum.LastCommentDate => actions.OrderByDescending(a => a.LastCommentDate),
+                SortColumnTypeEnum.Priority => actions.OrderByDescending(a => a.Priority ?? ActionPriorityEnum.Low),
+                _ => actions.OrderByDescending(a => a.DueDate)
+            };
         }
 
         /// <summary>
@@ -1595,6 +1651,18 @@ namespace EZGO.Api.Logic.Managers
                 var mutated = await _manager.GetDataRowAsJson(Models.Enumerations.TableNames.actions_actioncomment.ToString(), possibleId);
                 await _dataAuditing.WriteDataAudit(original: string.Empty, mutated: mutated, Models.Enumerations.TableNames.actions_actioncomment.ToString(), objectId: possibleId, userId: userId, companyId: companyId, description: "Added actioncomment.");
 
+                // Update parent action's LastCommentDate
+                if (actionComment.ActionId.HasValue && actionComment.ActionId.Value > 0)
+                {
+                    var updateParams = new List<NpgsqlParameter>();
+                    updateParams.Add(new NpgsqlParameter("@_actionid", actionComment.ActionId.Value));
+                    updateParams.Add(new NpgsqlParameter("@_lastcommentdate", DateTime.UtcNow));
+
+                    await _manager.ExecuteNonQueryAsync(
+                        "UPDATE actions_action SET last_comment_date = @_lastcommentdate WHERE id = @_actionid",
+                        parameters: updateParams,
+                        commandType: System.Data.CommandType.Text);
+                }
             }
 
             return possibleId;

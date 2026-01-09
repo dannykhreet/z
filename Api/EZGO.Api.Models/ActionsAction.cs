@@ -1,4 +1,5 @@
 ﻿using EZGO.Api.Models.Basic;
+using EZGO.Api.Models.Enumerations;
 using EZGO.Api.Models.SapPm;
 using EZGO.Api.Models.Tags;
 using System;
@@ -106,7 +107,11 @@ namespace EZGO.Api.Models
         /// </summary>
         public DateTime? ModifiedAt { get; set; }
         /// <summary>
-        /// Parent; Parent contains a action parent basic object. This is based on the TaskId and/or TaskTemplateId. 
+        /// Priority; Priority level of the action. DB: [actions_action.priority]
+        /// </summary>
+        public ActionPriorityEnum? Priority { get; set; }
+        /// <summary>
+        /// Parent; Parent contains a action parent basic object. This is based on the TaskId and/or TaskTemplateId.
         /// </summary>
         public ActionParentBasic Parent { get; set; }
         /// <summary>

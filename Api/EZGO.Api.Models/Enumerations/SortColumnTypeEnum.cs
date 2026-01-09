@@ -7,7 +7,14 @@ namespace EZGO.Api.Models.Enumerations
     public enum SortColumnTypeEnum
     {
         Id,
-        Name
+        Name,
+        DueDate,
+        StartDate,
+        ModifiedAt,
+        AreaName,
+        UserName,
+        LastCommentDate,
+        Priority
     }
 
     public enum SortColumnDirectionTypeEnum
