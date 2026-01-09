@@ -104,7 +104,7 @@ namespace EZGO.Api.Logic.Managers
             try
             {
                 //var storedProcedure = GetActionsSourceStoredProcedureBasedOnFilter(actionFilters: filters);
-                var storedProcedure = "get_actions_v3";
+                var storedProcedure = "get_actions_v3_sorting";
 
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
 
@@ -291,6 +291,19 @@ namespace EZGO.Api.Logic.Managers
                     {
                         parameters.Add(new NpgsqlParameter("@_offset", filters.Value.Offset.Value));
                     }
+
+                    //sort parameters
+                    if (filters.Value.SortColumn.HasValue)
+                    {
+                        var sortBy = filters.Value.SortColumn.Value.ToString().ToLower();
+                        parameters.Add(new NpgsqlParameter("@_sortby", sortBy));
+                    }
+
+                    if (filters.Value.SortDirection.HasValue)
+                    {
+                        var sortDir = filters.Value.SortDirection.Value == SortColumnDirectionTypeEnum.Ascending ? "asc" : "desc";
+                        parameters.Add(new NpgsqlParameter("@_sortdirection", sortDir));
+                    }
                 }
 
                 using (dr = await _manager.GetDataReader(storedProcedure, commandType: System.Data.CommandType.StoredProcedure, parameters: parameters))
@@ -408,63 +421,7 @@ namespace EZGO.Api.Logic.Managers
             if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.UserInformation.ToString().ToLower())) output = await GetUserWithActionsAsync(companyId: companyId, actions: output);
             if (!string.IsNullOrEmpty(include) && include.Split(",").Contains(IncludesEnum.Tags.ToString().ToLower())) output = await AppendTagsToActionsAsync(companyId: companyId, actions: output);
 
-            // Apply sorting
-            if (filters.HasValue)
-            {
-                var sortColumn = filters.Value.SortColumn ?? SortColumnTypeEnum.DueDate;
-                var sortDirection = filters.Value.SortDirection ?? SortColumnDirectionTypeEnum.Ascending;
-
-                output = sortDirection == SortColumnDirectionTypeEnum.Ascending
-                    ? ApplySortAscending(output, sortColumn).ToList()
-                    : ApplySortDescending(output, sortColumn).ToList();
-            }
-            else
-            {
-                // Default sort: DueDate ascending
-                output = output.OrderBy(a => a.DueDate).ToList();
-            }
-
             return output;
-        }
-
-        /// <summary>
-        /// Apply sorting in ascending order based on the sort column
-        /// </summary>
-        private IEnumerable<ActionsAction> ApplySortAscending(List<ActionsAction> actions, SortColumnTypeEnum sortColumn)
-        {
-            return sortColumn switch
-            {
-                SortColumnTypeEnum.Id => actions.OrderBy(a => a.Id),
-                SortColumnTypeEnum.Name => actions.OrderBy(a => a.Description),
-                SortColumnTypeEnum.DueDate => actions.OrderBy(a => a.DueDate),
-                SortColumnTypeEnum.StartDate => actions.OrderBy(a => a.CreatedAt),
-                SortColumnTypeEnum.ModifiedAt => actions.OrderBy(a => a.ModifiedAt),
-                SortColumnTypeEnum.AreaName => actions.OrderBy(a => a.AssignedAreas?.FirstOrDefault()?.Name),
-                SortColumnTypeEnum.UserName => actions.OrderBy(a => a.AssignedUsers?.FirstOrDefault()?.Name),
-                SortColumnTypeEnum.LastCommentDate => actions.OrderBy(a => a.LastCommentDate),
-                SortColumnTypeEnum.Priority => actions.OrderBy(a => a.Priority ?? ActionPriorityEnum.Low),
-                _ => actions.OrderBy(a => a.DueDate)
-            };
-        }
-
-        /// <summary>
-        /// Apply sorting in descending order based on the sort column
-        /// </summary>
-        private IEnumerable<ActionsAction> ApplySortDescending(List<ActionsAction> actions, SortColumnTypeEnum sortColumn)
-        {
-            return sortColumn switch
-            {
-                SortColumnTypeEnum.Id => actions.OrderByDescending(a => a.Id),
-                SortColumnTypeEnum.Name => actions.OrderByDescending(a => a.Description),
-                SortColumnTypeEnum.DueDate => actions.OrderByDescending(a => a.DueDate),
-                SortColumnTypeEnum.StartDate => actions.OrderByDescending(a => a.CreatedAt),
-                SortColumnTypeEnum.ModifiedAt => actions.OrderByDescending(a => a.ModifiedAt),
-                SortColumnTypeEnum.AreaName => actions.OrderByDescending(a => a.AssignedAreas?.FirstOrDefault()?.Name),
-                SortColumnTypeEnum.UserName => actions.OrderByDescending(a => a.AssignedUsers?.FirstOrDefault()?.Name),
-                SortColumnTypeEnum.LastCommentDate => actions.OrderByDescending(a => a.LastCommentDate),
-                SortColumnTypeEnum.Priority => actions.OrderByDescending(a => a.Priority ?? ActionPriorityEnum.Low),
-                _ => actions.OrderByDescending(a => a.DueDate)
-            };
         }
 
         /// <summary>
@@ -2875,6 +2832,12 @@ namespace EZGO.Api.Logic.Managers
                 if(dr["lastcommentdate"] != DBNull.Value)
                 {
                     action.LastCommentDate = Convert.ToDateTime(dr["lastcommentdate"]);
+                }
+            }
+            if (dr.HasColumn("priority")) {
+                if(dr["priority"] != DBNull.Value)
+                {
+                    action.Priority = (ActionPriorityEnum)Convert.ToInt32(dr["priority"]);
                 }
             }
             if (dr.HasColumn("unviewedcommentnr"))
