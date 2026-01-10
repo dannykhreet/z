@@ -1607,19 +1607,6 @@ namespace EZGO.Api.Logic.Managers
             {
                 var mutated = await _manager.GetDataRowAsJson(Models.Enumerations.TableNames.actions_actioncomment.ToString(), possibleId);
                 await _dataAuditing.WriteDataAudit(original: string.Empty, mutated: mutated, Models.Enumerations.TableNames.actions_actioncomment.ToString(), objectId: possibleId, userId: userId, companyId: companyId, description: "Added actioncomment.");
-
-                // Update parent action's LastCommentDate
-                if (actionComment.ActionId.HasValue && actionComment.ActionId.Value > 0)
-                {
-                    var updateParams = new List<NpgsqlParameter>();
-                    updateParams.Add(new NpgsqlParameter("@_actionid", actionComment.ActionId.Value));
-                    updateParams.Add(new NpgsqlParameter("@_lastcommentdate", DateTime.UtcNow));
-
-                    await _manager.ExecuteNonQueryAsync(
-                        "UPDATE actions_action SET last_comment_date = @_lastcommentdate WHERE id = @_actionid",
-                        parameters: updateParams,
-                        commandType: System.Data.CommandType.Text);
-                }
             }
 
             return possibleId;

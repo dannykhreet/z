@@ -4,7 +4,8 @@
 -- Description:
 --   1. Adds priority column to actions_action table
 --   2. Creates new get_actions_v3_sorting stored procedure with comprehensive sorting
---   3. Keeps existing get_actions_v3 function unchanged for backward compatibility
+--   3. Creates update_action_lastcommentdate stored procedure for updating last comment date
+--   4. Keeps existing get_actions_v3 function unchanged for backward compatibility
 -- ============================================
 
 -- ============================================
@@ -358,7 +359,7 @@ COMMENT ON FUNCTION public.get_actions_v3_sorting IS 'Enhanced version of get_ac
 DO $$
 DECLARE
     priority_exists boolean;
-    procedure_exists boolean;
+    sorting_procedure_exists boolean;
 BEGIN
     -- Check if priority column exists
     SELECT EXISTS (
@@ -368,12 +369,12 @@ BEGIN
           AND column_name = 'priority'
     ) INTO priority_exists;
 
-    -- Check if stored procedure exists
+    -- Check if get_actions_v3_sorting stored procedure exists
     SELECT EXISTS (
         SELECT 1 FROM information_schema.routines
         WHERE routine_schema = 'public'
           AND routine_name = 'get_actions_v3_sorting'
-    ) INTO procedure_exists;
+    ) INTO sorting_procedure_exists;
 
     -- Report results
     IF priority_exists THEN
@@ -382,7 +383,7 @@ BEGIN
         RAISE WARNING '✗ Priority column NOT found in actions_action table';
     END IF;
 
-    IF procedure_exists THEN
+    IF sorting_procedure_exists THEN
         RAISE NOTICE '✓ Stored procedure get_actions_v3_sorting created successfully';
     ELSE
         RAISE WARNING '✗ Stored procedure get_actions_v3_sorting NOT found';

@@ -51,10 +51,11 @@ Copy the entire contents of the migration file and execute in your database clie
    FROM information_schema.columns
    WHERE table_name = 'actions_action' AND column_name = 'priority';
 
-   -- Check stored procedure
+   -- Check stored procedures
    SELECT routine_name, routine_type
    FROM information_schema.routines
-   WHERE routine_name = 'get_actions_v3_sorting' AND routine_schema = 'public';
+   WHERE routine_name = 'get_actions_v3_sorting'
+     AND routine_schema = 'public';
    ```
 
 3. **Test the sorting**:
@@ -95,7 +96,7 @@ Copy the entire contents of the migration file and execute in your database clie
 ### Rollback (if needed)
 
 ```sql
--- Remove stored procedure
+-- Remove stored procedures
 DROP FUNCTION IF EXISTS public.get_actions_v3_sorting;
 
 -- Remove priority column (WARNING: data loss)
