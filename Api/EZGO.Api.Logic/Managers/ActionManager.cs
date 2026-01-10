@@ -293,16 +293,14 @@ namespace EZGO.Api.Logic.Managers
                     }
 
                     //sort parameters
-                    if (filters.Value.SortColumn.HasValue)
+                    if (!string.IsNullOrWhiteSpace(filters.Value.SortColumn))
                     {
-                        var sortBy = filters.Value.SortColumn.Value.ToString().ToLower();
-                        parameters.Add(new NpgsqlParameter("@_sortby", sortBy));
+                        parameters.Add(new NpgsqlParameter("@_sortby", filters.Value.SortColumn.ToLower()));
                     }
 
-                    if (filters.Value.SortDirection.HasValue)
+                    if (!string.IsNullOrWhiteSpace(filters.Value.SortDirection))
                     {
-                        var sortDir = filters.Value.SortDirection.Value == SortColumnDirectionTypeEnum.Ascending ? "asc" : "desc";
-                        parameters.Add(new NpgsqlParameter("@_sortdirection", sortDir));
+                        parameters.Add(new NpgsqlParameter("@_sortdirection", filters.Value.SortDirection.ToLower()));
                     }
                 }
 
