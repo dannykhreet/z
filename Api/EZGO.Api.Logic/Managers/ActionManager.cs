@@ -291,6 +291,17 @@ namespace EZGO.Api.Logic.Managers
                     {
                         parameters.Add(new NpgsqlParameter("@_offset", filters.Value.Offset.Value));
                     }
+
+                    //sort parameters
+                    if (!string.IsNullOrWhiteSpace(filters.Value.SortColumn))
+                    {
+                        parameters.Add(new NpgsqlParameter("@_sortby", filters.Value.SortColumn.ToLower()));
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(filters.Value.SortDirection))
+                    {
+                        parameters.Add(new NpgsqlParameter("@_sortdirection", filters.Value.SortDirection.ToLower()));
+                    }
                 }
 
                 using (dr = await _manager.GetDataReader(storedProcedure, commandType: System.Data.CommandType.StoredProcedure, parameters: parameters))
@@ -1594,7 +1605,6 @@ namespace EZGO.Api.Logic.Managers
             {
                 var mutated = await _manager.GetDataRowAsJson(Models.Enumerations.TableNames.actions_actioncomment.ToString(), possibleId);
                 await _dataAuditing.WriteDataAudit(original: string.Empty, mutated: mutated, Models.Enumerations.TableNames.actions_actioncomment.ToString(), objectId: possibleId, userId: userId, companyId: companyId, description: "Added actioncomment.");
-
             }
 
             return possibleId;
@@ -2807,6 +2817,12 @@ namespace EZGO.Api.Logic.Managers
                 if(dr["lastcommentdate"] != DBNull.Value)
                 {
                     action.LastCommentDate = Convert.ToDateTime(dr["lastcommentdate"]);
+                }
+            }
+            if (dr.HasColumn("priority")) {
+                if(dr["priority"] != DBNull.Value)
+                {
+                    action.Priority = (ActionPriorityEnum)Convert.ToInt32(dr["priority"]);
                 }
             }
             if (dr.HasColumn("unviewedcommentnr"))

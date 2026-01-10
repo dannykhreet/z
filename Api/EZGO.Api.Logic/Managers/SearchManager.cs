@@ -129,14 +129,14 @@ namespace EZGO.Api.Logic.Managers
                         parameters.Add(new NpgsqlParameter("@_types", String.Join(",", filters.Value.Types)));
                     }
 
-                    if (filters.Value.SortColumn.HasValue)
+                    if (!string.IsNullOrWhiteSpace(filters.Value.SortColumn))
                     {
-                        parameters.Add(new NpgsqlParameter("@_sortcolumn", filters.Value.SortColumn.ToString().ToLower()));
+                        parameters.Add(new NpgsqlParameter("@_sortcolumn", filters.Value.SortColumn.ToLower()));
                     }
 
-                    if (filters.Value.SortDirection.HasValue)
+                    if (!string.IsNullOrWhiteSpace(filters.Value.SortDirection))
                     {
-                        parameters.Add(new NpgsqlParameter("@_sortdirection", filters.Value.SortDirection.ToString().ToLower()));
+                        parameters.Add(new NpgsqlParameter("@_sortdirection", filters.Value.SortDirection.ToLower()));
                     }
 
                 }
