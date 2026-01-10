@@ -104,7 +104,7 @@ namespace EZGO.Api.Logic.Managers
             try
             {
                 //var storedProcedure = GetActionsSourceStoredProcedureBasedOnFilter(actionFilters: filters);
-                var storedProcedure = "get_actions_v3_sorting";
+                var storedProcedure = "get_actions_v3";
 
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>();
 

@@ -10,15 +10,32 @@
    - Values: 1=Critical, 2=High, 3=Normal, 4=Low
    - Creates index `idx_actions_action_priority` for performance
 
-2. **Creates new stored procedure** `get_actions_v3_sorting`
-   - Same functionality as `get_actions_v3` plus sorting capabilities
-   - Adds `priority` to return table
-   - Adds `_sortby` parameter (text, default: 'duedate')
-   - Adds `_sortdirection` parameter (text, default: 'asc')
-   - Supports sorting by: id, name, duedate, startdate, modifiedat, areaname, username, lastcommentdate, priority
-   - Backwards compatible with old parameter names
+2. **Updates existing stored procedure** `get_actions_v3` with the following changes:
+   - **Added parameters:**
+     - `_sortby` (text, default: 'duedate') - determines which column to sort by
+     - `_sortdirection` (text, default: 'asc') - determines sort direction (asc/desc)
+   - **Added to return table:**
+     - `priority` (integer) - action priority level
+   - **Updated ORDER BY clause:** Replaced fixed ordering with dynamic sorting that supports:
+     - `id`: Sort by action ID
+     - `name` or `description`: Sort by action description
+     - `duedate`: Sort by due date (default)
+     - `startdate`: Sort by created_at date
+     - `modifiedat` or `modificationdate`: Sort by modified_at timestamp
+     - `areaname` or `area`: Sort by assigned area name
+     - `username` or `user`: Sort by assigned user name
+     - `lastcommentdate` or `recentchat`: Sort by most recent comment date
+     - `priority`: Sort by priority level (1=Critical, 2=High, 3=Normal, 4=Low)
+   - **Backwards compatible** with old parameter names
+   - **NULL handling:** All NULL values sorted to end (NULLS LAST)
+   - **Secondary sorting:** Maintains consistent ordering by is_resolved, due_date, modified_at
 
-3. **Keeps existing** `get_actions_v3` function unchanged for compatibility
+### What This Migration Does NOT Change
+
+- All existing filtering logic remains unchanged
+- All existing WHERE clauses remain unchanged
+- All existing parameters remain with same defaults
+- Backwards compatible - existing calls will work without any changes
 
 ### How to Run
 
@@ -41,7 +58,7 @@ Copy the entire contents of the migration file and execute in your database clie
 
 1. **Grant permissions** to your application user:
    ```sql
-   GRANT EXECUTE ON FUNCTION public.get_actions_v3_sorting TO your_app_user;
+   GRANT EXECUTE ON FUNCTION public.get_actions_v3 TO your_app_user;
    ```
 
 2. **Verify the migration**:
@@ -54,7 +71,7 @@ Copy the entire contents of the migration file and execute in your database clie
    -- Check stored procedures
    SELECT routine_name, routine_type
    FROM information_schema.routines
-   WHERE routine_name = 'get_actions_v3_sorting'
+   WHERE routine_name = 'get_actions_v3'
      AND routine_schema = 'public';
    ```
 
@@ -62,7 +79,7 @@ Copy the entire contents of the migration file and execute in your database clie
    ```sql
    -- Test ascending priority sort
    SELECT id, description, priority, due_date
-   FROM get_actions_v3_sorting(
+   FROM get_actions_v3(
        _companyid := 1,
        _sortby := 'priority',
        _sortdirection := 'asc',
@@ -71,34 +88,45 @@ Copy the entire contents of the migration file and execute in your database clie
 
    -- Test descending due date sort
    SELECT id, description, priority, due_date
-   FROM get_actions_v3_sorting(
+   FROM get_actions_v3(
        _companyid := 1,
        _sortby := 'duedate',
        _sortdirection := 'desc',
        _limit := 10
    );
+
+   -- Test last comment date sort
+   SELECT id, description, lastcommentdate
+   FROM get_actions_v3(
+       _companyid := 1,
+       _sortby := 'lastcommentdate',
+       _sortdirection := 'desc',
+       _limit := 10
+   );
    ```
 
-### Supported Sort Parameters
+### Supported Sort Columns
 
-| Frontend Value | Database Value | Description |
-|----------------|----------------|-------------|
-| duedate | duedate | Due date (default) |
-| startdate | startdate | Created date |
-| modifiedat | modifiedat, modificationdate | Last modified date |
-| priority | priority | Action priority (1-4) |
-| areaname | areaname, area | Assigned area name |
-| username | username, user | Assigned user name |
-| lastcommentdate | lastcommentdate, recentchat | Last comment timestamp |
+| Sort By Value | Column | Description |
+|---------------|--------|-------------|
 | id | id | Action ID |
-| name | name | Action description |
+| name | description | Action description/name |
+| description | description | Action description/name |
+| duedate | due_date | Due date (default) |
+| startdate | created_at | Action creation date |
+| modifiedat | modified_at | Last modification timestamp |
+| modificationdate | modified_at | Last modification timestamp (alias) |
+| areaname | area.name | Assigned area name |
+| area | area.name | Assigned area name (alias) |
+| username | user.name | Assigned user name |
+| user | user.name | Assigned user name (alias) |
+| lastcommentdate | comment.modified_at | Most recent comment date |
+| recentchat | comment.modified_at | Most recent comment date (alias) |
+| priority | priority | Priority level (1=Critical, 2=High, 3=Normal, 4=Low) |
 
 ### Rollback (if needed)
 
 ```sql
--- Remove stored procedures
-DROP FUNCTION IF EXISTS public.get_actions_v3_sorting;
-
 -- Remove priority column (WARNING: data loss)
 ALTER TABLE public.actions_action DROP COLUMN IF EXISTS priority;
 
@@ -106,13 +134,16 @@ ALTER TABLE public.actions_action DROP COLUMN IF EXISTS priority;
 DROP INDEX IF EXISTS public.idx_actions_action_priority;
 ```
 
+**Note:** After rollback, you'll need to restore the original `get_actions_v3` function from your backup or previous version.
+
 ### Notes
 
 - Migration is **idempotent** - safe to run multiple times
-- Existing `get_actions_v3` function remains unchanged
 - Default priority for existing actions is `3` (Normal)
 - The script includes verification checks and will output success/failure messages
 - NULLS are handled with `NULLS LAST` to ensure consistent sorting
+- All existing filtering parameters and logic remain unchanged
+- Default sort behavior: duedate ascending (same as before if no sort parameters provided)
 
 ### Support
 

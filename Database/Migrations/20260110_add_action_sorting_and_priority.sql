@@ -3,9 +3,7 @@
 -- Date: 2026-01-10
 -- Description:
 --   1. Adds priority column to actions_action table
---   2. Creates new get_actions_v3_sorting stored procedure with comprehensive sorting
---   3. Creates update_action_lastcommentdate stored procedure for updating last comment date
---   4. Keeps existing get_actions_v3 function unchanged for backward compatibility
+--   2. Updates existing get_actions_v3 stored procedure to add sorting capabilities
 -- ============================================
 
 -- ============================================
@@ -37,11 +35,29 @@ BEGIN
 END $$;
 
 -- ============================================
--- STEP 2: Create get_actions_v3_sorting stored procedure
+-- STEP 2: Update get_actions_v3 stored procedure
 -- ============================================
--- DROP FUNCTION IF EXISTS public.get_actions_v3_sorting;
+-- CHANGES MADE TO get_actions_v3:
+--   1. Added _sortby parameter (text, default: 'duedate') - determines which column to sort by
+--   2. Added _sortdirection parameter (text, default: 'asc') - determines sort direction (asc/desc)
+--   3. Added 'priority' column to RETURNS TABLE definition
+--   4. Added AA.priority to SELECT statement
+--   5. Replaced fixed ORDER BY clause with dynamic sorting logic supporting:
+--      - id: Sort by action ID
+--      - name/description: Sort by action description
+--      - duedate: Sort by due date (default)
+--      - startdate: Sort by created_at date
+--      - modifiedat/modificationdate: Sort by modified_at timestamp
+--      - areaname/area: Sort by assigned area name
+--      - username/user: Sort by assigned user name
+--      - lastcommentdate/recentchat: Sort by most recent comment date
+--      - priority: Sort by priority level (1=Critical, 2=High, 3=Normal, 4=Low)
+--   6. Backwards compatible with old parameter names (recentchat→lastcommentdate, user→username, etc.)
+--   7. All NULL values sorted to end (NULLS LAST) for consistent behavior
+--   8. Maintains secondary sort by is_resolved, due_date, modified_at for consistent ordering
+-- ============================================
 
-CREATE OR REPLACE FUNCTION public.get_actions_v3_sorting(
+CREATE OR REPLACE FUNCTION public.get_actions_v3(
     _companyid integer,
     _filtertext character varying DEFAULT NULL::character varying,
     _isresolved boolean DEFAULT NULL::boolean,
@@ -152,11 +168,10 @@ BEGIN
         AA.video_thumbnail_5,
         (SELECT Count(AAC.id)::int4 FROM actions_actioncomment AAC WHERE AAC.action_id = AA.id AND AAC.is_active = true) AS commentnr,
         (SELECT (T.comment_count - T.comment_viewed_count)::int4 FROM
-            (SELECT COUNT(AAC.id) AS comment_count, COUNT(AACV.comment_id) AS comment_viewed_count FROM actions_actioncomment AAC
+            (SELECT COUNT(AAC.id) AS comment_count,COUNT(AACV.comment_id) AS comment_viewed_count FROM actions_actioncomment AAC
                 LEFT JOIN actions_action_assigned_users AAU ON AAU.action_id = AA."id" AND AAU.user_id = _userid
                 LEFT JOIN actions_actioncommentviewed AACV ON AACV.comment_id = AAC."id" AND AACV.user_id = _userid
-                WHERE AAC.action_id = AA."id" AND AAC.user_id <> _userid AND AA.is_active = true AND AAC.is_active = true) AS T
-        ) AS unviewedcommentnr,
+                WHERE AAC.action_id = AA."id" AND AAC.user_id <> _userid AND AA.is_active = true AND AAC.is_active = true) AS T) AS unviewedcommentnr,
         CONCAT(PU.first_name, ' ', PU.last_name) AS createdby,
         (SELECT AAC.modified_at::timestamptz FROM actions_actioncomment AAC WHERE AAC.action_id = AA.id ORDER BY modified_at DESC LIMIT 1) AS lastcommentdate,
         AA.priority
@@ -172,23 +187,24 @@ BEGIN
         -- filter text
         AND (_filtertext IS NULL OR POSITION(LOWER(_filtertext) IN LOWER(CONCAT(AA."id", ' ', AA.comment, ' ', AA.description))) > 0)
 
-        -- filter isresolved, isoverdue, isunresolved
+        -- filter isresolved
+        -- filter isoverdue
+        -- filter isunresolved
         AND ((_isresolved IS NULL AND _isoverdue IS NULL AND _isunresolved IS NULL)
-            OR (_isresolved IS NOT NULL AND AA.is_resolved = _isresolved)
-            OR (_isoverdue IS NOT NULL AND now()::date > AA.due_date AND AA.is_resolved = false)
-            OR (_isunresolved IS NOT NULL AND now()::date <= AA.due_date AND AA.is_resolved = false))
+        OR (_isresolved IS NOT NULL AND AA.is_resolved = _isresolved)
+        OR (_isoverdue IS NOT NULL AND now()::date > AA.due_date AND AA.is_resolved = false)
+        OR (_isunresolved IS NOT NULL AND now()::date <= AA.due_date AND AA.is_resolved = false))
 
         -- filter assignedareaid
         AND (_assignedareaid IS NULL OR AAA.area_id = _assignedareaid)
-
         -- filter assignedareaids
         AND (_assignedareaids IS NULL
             OR (AA."id" IN (
                 SELECT DISTINCT AAAF.action_id
                 FROM actions_action_assigned_areas AAAF
                 WHERE AAAF.area_id = ANY(_assignedareaids)
-            )))
-
+            )
+        ))
         -- filter 'assigned to me'
         AND (_assignedtomeuserid IS NULL
             OR AA."id" IN (SELECT AAA.action_id FROM actions_action_assigned_users AAA WHERE AAA.user_id = _assignedtomeuserid)
@@ -196,18 +212,19 @@ BEGIN
                 SELECT DISTINCT AAAF.action_id
                 FROM actions_action_assigned_areas AAAF
                 WHERE AAAF.area_id IN (SELECT area_id FROM get_allowedareaids_by_user(_companyid, _assignedtomeuserid))
-            )))
-
+                )
+            )
+        )
         -- filter assigneduserid
         AND (_assigneduserid IS NULL OR AAU.user_id = _assigneduserid)
-
         -- filter assigneduserids
         AND (_assigneduserids IS NULL
             OR (AA."id" IN (
                 SELECT DISTINCT AAUF.action_id
                 FROM actions_action_assigned_users AAUF
                 WHERE AAUF.user_id = ANY(_assigneduserids)
-            )))
+            )
+        ))
 
         -- filter timestamp
         AND (_timestamp IS NULL OR AA.created_at < _timestamp)
@@ -229,15 +246,18 @@ BEGIN
 
         -- filter createdbyorassignedto
         AND (_createdbyorassignedto IS NULL OR
-            AA.created_by_id = _createdbyorassignedto
-            OR AAUCA.user_id = _createdbyorassignedto
-            OR (AA."id" IN (
-                SELECT DISTINCT AAAF.action_id
-                FROM actions_action_assigned_areas AAAF
-                WHERE AAAF.area_id IN (SELECT area_id FROM get_allowedareaids_by_user(_companyid, _createdbyorassignedto))
-            )))
+                AA.created_by_id = _createdbyorassignedto
+                OR AAUCA.user_id = _createdbyorassignedto
+                OR (AA."id" IN (
+                    SELECT DISTINCT AAAF.action_id
+                    FROM actions_action_assigned_areas AAAF
+                    WHERE AAAF.area_id IN (SELECT area_id FROM get_allowedareaids_by_user(_companyid, _createdbyorassignedto))
+                    )
+                )
+            )
 
-        -- filter taskid and tasktemplateid
+        -- filter taskid
+        -- filter tasktemplateid
         AND CASE WHEN (_taskid IS NOT NULL AND _tasktemplateid IS NOT NULL) THEN
             AA.task_id = _taskid OR AA.task_template_id = _tasktemplateid
         ELSE
@@ -252,9 +272,9 @@ BEGIN
                 FROM checklists_checklist CC
                 INNER JOIN checklists_checklist_tasks CCT ON CCT.checklist_id = _checklistid
                 INNER JOIN tasks_task TT ON TT.id = CCT.task_id
-            ))
+            ))--filter on checklistid end
 
-        -- filter checklisttemplateid
+        --filter checklisttemplateid
         AND (_checklisttemplateid IS NULL
             OR AA."task_template_id" IN (
                 SELECT DISTINCT TTT."id"
@@ -270,9 +290,9 @@ BEGIN
                 FROM audits_audit AA
                 INNER JOIN audits_audit_tasks AAT ON AAT.audit_id = _auditid
                 INNER JOIN tasks_task TT ON TT.id = AAT.task_id
-            ))
+            ))--filter on auditid end
 
-        -- filter audittemplateid
+        --filter audittemplateid
         AND (_audittemplateid IS NULL
             OR AA."task_template_id" IN (
                 SELECT DISTINCT TTT."id"
@@ -281,68 +301,86 @@ BEGIN
                 INNER JOIN tasks_tasktemplate TTT ON TTT.id = AATT.tasktemplate_id
             ))
 
-        -- filter parentareaid
+        --filter parentareaid
         AND (_parentareaid IS NULL
-            OR ((SELECT DISTINCT AAA1.area_id FROM actions_action_area AAA1 WHERE AAA1.action_id = AA."id" LIMIT 1)
-                IN (SELECT DISTINCT areas.id FROM get_area_nodes_from_root_to_leaf(_companyid, _parentareaid) areas)))
+            OR ((SELECT DISTINCT AAA1.area_id FROM actions_action_area AAA1 WHERE AAA1.action_id = AA."id" LIMIT 1) IN (SELECT DISTINCT areas.id FROM get_area_nodes_from_root_to_leaf(_companyid, _parentareaid) areas))
+            )
 
-        -- filter unviewed comments user id
+        --filter unviewed comments user id
         AND (_hasunviewedcomments IS NULL OR
             (SELECT (T.comment_count - T.comment_viewed_count)::int4 FROM
                 (SELECT COUNT(AAC.id) AS comment_count, COUNT(AACV.comment_id) AS comment_viewed_count FROM actions_actioncomment AAC
-                    LEFT JOIN actions_action_assigned_users AAU ON AAU.action_id = AA."id" AND AAU.user_id = _userid
-                    LEFT JOIN actions_actioncommentviewed AACV ON AACV.comment_id = AAC."id" AND AACV.user_id = _userid
-                    WHERE AAC.action_id = AA."id" AND AAC.user_id <> _userid AND AA.is_active = true AND AAC.is_active = true) AS T
-            ) > 0)
+                LEFT JOIN actions_action_assigned_users AAU ON AAU.action_id = AA."id" AND AAU.user_id = _userid
+                LEFT JOIN actions_actioncommentviewed AACV ON AACV.comment_id = AAC."id" AND AACV.user_id = _userid
+                WHERE AAC.action_id = AA."id" AND AAC.user_id <> _userid AND AA.is_active = true AND AAC.is_active = true) AS T
+            ) > 0
+        )
 
         -- filter tagids
-        AND (_tagids IS NULL
+        AND (_tagids IS NULL --filter on tags start
             OR (AA."id" IN (
                 SELECT DISTINCT TTR.action_id
                 FROM tags_tag_relation TTR
                 WHERE TTR.action_id IS NOT NULL AND TTR.tag_id = ANY(_tagids)
-            )))
-
+            )
+        )) --filter on tags end
     ORDER BY
-        -- Priority (supports 'priority')
-        CASE WHEN _sortby = 'priority' AND _sortdirection = 'desc' THEN AA.priority END DESC NULLS LAST,
-        CASE WHEN _sortby = 'priority' AND _sortdirection = 'asc' THEN AA.priority END ASC NULLS LAST,
+        -- Priority: 1=Critical, 2=High, 3=Normal, 4=Low (lower number = higher priority)
+        CASE WHEN LOWER(_sortby) = 'priority' AND LOWER(_sortdirection) = 'desc' THEN AA.priority END DESC NULLS LAST,
+        CASE WHEN LOWER(_sortby) = 'priority' AND LOWER(_sortdirection) = 'asc' THEN AA.priority END ASC NULLS LAST,
 
-        -- Last Comment Date (supports both 'recentchat' and 'lastcommentdate')
-        CASE WHEN (_sortby = 'recentchat' OR _sortby = 'lastcommentdate') AND _sortdirection = 'desc'
-            THEN (SELECT AAC.modified_at::timestamptz FROM actions_actioncomment AAC WHERE AAC.action_id = AA.id ORDER BY modified_at DESC LIMIT 1) END DESC NULLS LAST,
-        CASE WHEN (_sortby = 'recentchat' OR _sortby = 'lastcommentdate') AND _sortdirection = 'asc'
-            THEN (SELECT AAC.modified_at::timestamptz FROM actions_actioncomment AAC WHERE AAC.action_id = AA.id ORDER BY modified_at DESC LIMIT 1) END ASC NULLS LAST,
+        -- ID sorting
+        CASE WHEN LOWER(_sortby) = 'id' AND LOWER(_sortdirection) = 'desc' THEN AA.id END DESC NULLS LAST,
+        CASE WHEN LOWER(_sortby) = 'id' AND LOWER(_sortdirection) = 'asc' THEN AA.id END ASC NULLS LAST,
 
-        -- User Name (supports both 'user' and 'username')
-        CASE WHEN (_sortby = 'user' OR _sortby = 'username') AND _sortdirection = 'desc' THEN CONCAT(PU.first_name, ' ', PU.last_name) END DESC,
-        CASE WHEN (_sortby = 'user' OR _sortby = 'username') AND _sortdirection = 'asc' THEN CONCAT(PU.first_name, ' ', PU.last_name) END ASC,
+        -- Name/Description sorting
+        CASE WHEN LOWER(_sortby) IN ('name', 'description') AND LOWER(_sortdirection) = 'desc' THEN AA.description END DESC NULLS LAST,
+        CASE WHEN LOWER(_sortby) IN ('name', 'description') AND LOWER(_sortdirection) = 'asc' THEN AA.description END ASC NULLS LAST,
 
-        -- Modified At (supports both 'modificationdate' and 'modifiedat')
-        CASE WHEN (_sortby = 'modificationdate' OR _sortby = 'modifiedat') AND _sortdirection = 'desc' THEN AA.modified_at END DESC,
-        CASE WHEN (_sortby = 'modificationdate' OR _sortby = 'modifiedat') AND _sortdirection = 'asc' THEN AA.modified_at END ASC,
+        -- Start Date (created_at) sorting
+        CASE WHEN LOWER(_sortby) = 'startdate' AND LOWER(_sortdirection) = 'desc' THEN AA.created_at END DESC NULLS LAST,
+        CASE WHEN LOWER(_sortby) = 'startdate' AND LOWER(_sortdirection) = 'asc' THEN AA.created_at END ASC NULLS LAST,
 
-        -- Start Date (supports 'startdate')
-        CASE WHEN _sortby = 'startdate' AND _sortdirection = 'desc' THEN AA.created_at END DESC,
-        CASE WHEN _sortby = 'startdate' AND _sortdirection = 'asc' THEN AA.created_at END ASC,
+        -- Modified At sorting (support both 'modifiedat' and 'modificationdate')
+        CASE WHEN LOWER(_sortby) IN ('modifiedat', 'modificationdate') AND LOWER(_sortdirection) = 'desc' THEN AA.modified_at END DESC NULLS LAST,
+        CASE WHEN LOWER(_sortby) IN ('modifiedat', 'modificationdate') AND LOWER(_sortdirection) = 'asc' THEN AA.modified_at END ASC NULLS LAST,
 
-        -- ID (supports 'id')
-        CASE WHEN _sortby = 'id' AND _sortdirection = 'desc' THEN AA.id END DESC,
-        CASE WHEN _sortby = 'id' AND _sortdirection = 'asc' THEN AA.id END ASC,
+        -- Area Name sorting (support both 'areaname' and 'area')
+        CASE WHEN LOWER(_sortby) IN ('areaname', 'area') AND LOWER(_sortdirection) = 'desc' THEN
+            (SELECT AR.name FROM actions_action_assigned_areas AAAA
+             INNER JOIN areas_area AR ON AR.id = AAAA.area_id
+             WHERE AAAA.action_id = AA.id LIMIT 1) END DESC NULLS LAST,
+        CASE WHEN LOWER(_sortby) IN ('areaname', 'area') AND LOWER(_sortdirection) = 'asc' THEN
+            (SELECT AR.name FROM actions_action_assigned_areas AAAA
+             INNER JOIN areas_area AR ON AR.id = AAAA.area_id
+             WHERE AAAA.action_id = AA.id LIMIT 1) END ASC NULLS LAST,
 
-        -- Name/Description (supports 'name')
-        CASE WHEN _sortby = 'name' AND _sortdirection = 'desc' THEN AA.description END DESC,
-        CASE WHEN _sortby = 'name' AND _sortdirection = 'asc' THEN AA.description END ASC,
+        -- User Name sorting (support both 'username' and 'user')
+        CASE WHEN LOWER(_sortby) IN ('username', 'user') AND LOWER(_sortdirection) = 'desc' THEN
+            (SELECT CONCAT(PUF.first_name, ' ', PUF.last_name) FROM actions_action_assigned_users AAAU
+             INNER JOIN profiles_user PUF ON PUF.id = AAAU.user_id
+             WHERE AAAU.action_id = AA.id LIMIT 1) END DESC NULLS LAST,
+        CASE WHEN LOWER(_sortby) IN ('username', 'user') AND LOWER(_sortdirection) = 'asc' THEN
+            (SELECT CONCAT(PUF.first_name, ' ', PUF.last_name) FROM actions_action_assigned_users AAAU
+             INNER JOIN profiles_user PUF ON PUF.id = AAAU.user_id
+             WHERE AAAU.action_id = AA.id LIMIT 1) END ASC NULLS LAST,
 
-        -- Area (supports both 'area' and 'areaname')
-        CASE WHEN (_sortby = 'area' OR _sortby = 'areaname') AND _sortdirection = 'desc'
-            THEN (SELECT AAAF.area_id FROM actions_action_assigned_areas AAAF WHERE AAAF.action_id = AA.id ORDER BY AAAF.area_id LIMIT 1) END DESC NULLS LAST,
-        CASE WHEN (_sortby = 'area' OR _sortby = 'areaname') AND _sortdirection = 'asc'
-            THEN (SELECT AAAF.area_id FROM actions_action_assigned_areas AAAF WHERE AAAF.action_id = AA.id ORDER BY AAAF.area_id LIMIT 1) END ASC NULLS LAST,
+        -- Last Comment Date sorting (support both 'lastcommentdate' and 'recentchat')
+        CASE WHEN LOWER(_sortby) IN ('lastcommentdate', 'recentchat') AND LOWER(_sortdirection) = 'desc' THEN
+            (SELECT AAC.modified_at FROM actions_actioncomment AAC
+             WHERE AAC.action_id = AA.id ORDER BY modified_at DESC LIMIT 1) END DESC NULLS LAST,
+        CASE WHEN LOWER(_sortby) IN ('lastcommentdate', 'recentchat') AND LOWER(_sortdirection) = 'asc' THEN
+            (SELECT AAC.modified_at FROM actions_actioncomment AAC
+             WHERE AAC.action_id = AA.id ORDER BY modified_at DESC LIMIT 1) END ASC NULLS LAST,
 
-        -- Default: Due Date (when _sortby IS NULL or 'duedate')
-        CASE WHEN (_sortby IS NULL OR _sortby = 'duedate') AND _sortdirection = 'desc' THEN AA.due_date END DESC NULLS LAST,
-        CASE WHEN (_sortby IS NULL OR _sortby = 'duedate') AND _sortdirection = 'asc' THEN AA.due_date END ASC NULLS LAST
+        -- Due Date sorting (default when _sortby is NULL or 'duedate')
+        CASE WHEN (LOWER(_sortby) = 'duedate' OR _sortby IS NULL) AND LOWER(_sortdirection) = 'desc' THEN AA.due_date END DESC NULLS LAST,
+        CASE WHEN (LOWER(_sortby) = 'duedate' OR _sortby IS NULL) AND LOWER(_sortdirection) = 'asc' THEN AA.due_date END ASC NULLS LAST,
+
+        -- Secondary sort for consistent ordering
+        AA.is_resolved ASC,
+        AA.due_date ASC NULLS LAST,
+        AA.modified_at DESC
 
     LIMIT CASE WHEN (_limit > 0) THEN _limit END
     OFFSET CASE WHEN (_offset > 0) THEN _offset END;
@@ -351,7 +389,7 @@ END$function$;
 -- ============================================
 -- STEP 3: Add comments and documentation
 -- ============================================
-COMMENT ON FUNCTION public.get_actions_v3_sorting IS 'Enhanced version of get_actions_v3 with comprehensive sorting capabilities. Supports sorting by: id, name, duedate, startdate, modifiedat, areaname, username, lastcommentdate, priority. Backwards compatible with old sort parameter names (recentchat, user, modificationdate, area).';
+COMMENT ON FUNCTION public.get_actions_v3 IS 'Retrieves actions with comprehensive filtering and sorting capabilities. Supports sorting by: id, name, duedate, startdate, modifiedat, areaname, username, lastcommentdate, priority. Backwards compatible with old sort parameter names (recentchat, user, modificationdate, area). Added priority column and dynamic sorting in v3.1.';
 
 -- ============================================
 -- STEP 4: Verification queries
@@ -359,7 +397,7 @@ COMMENT ON FUNCTION public.get_actions_v3_sorting IS 'Enhanced version of get_ac
 DO $$
 DECLARE
     priority_exists boolean;
-    sorting_procedure_exists boolean;
+    procedure_exists boolean;
 BEGIN
     -- Check if priority column exists
     SELECT EXISTS (
@@ -369,12 +407,12 @@ BEGIN
           AND column_name = 'priority'
     ) INTO priority_exists;
 
-    -- Check if get_actions_v3_sorting stored procedure exists
+    -- Check if get_actions_v3 stored procedure exists
     SELECT EXISTS (
         SELECT 1 FROM information_schema.routines
         WHERE routine_schema = 'public'
-          AND routine_name = 'get_actions_v3_sorting'
-    ) INTO sorting_procedure_exists;
+          AND routine_name = 'get_actions_v3'
+    ) INTO procedure_exists;
 
     -- Report results
     IF priority_exists THEN
@@ -383,10 +421,10 @@ BEGIN
         RAISE WARNING '✗ Priority column NOT found in actions_action table';
     END IF;
 
-    IF sorting_procedure_exists THEN
-        RAISE NOTICE '✓ Stored procedure get_actions_v3_sorting created successfully';
+    IF procedure_exists THEN
+        RAISE NOTICE '✓ Stored procedure get_actions_v3 updated successfully';
     ELSE
-        RAISE WARNING '✗ Stored procedure get_actions_v3_sorting NOT found';
+        RAISE WARNING '✗ Stored procedure get_actions_v3 NOT found';
     END IF;
 
     RAISE NOTICE '============================================';
@@ -397,7 +435,7 @@ END $$;
 -- ============================================
 -- STEP 5: Grant permissions (update with your user)
 -- ============================================
--- GRANT EXECUTE ON FUNCTION public.get_actions_v3_sorting TO your_app_user;
+-- GRANT EXECUTE ON FUNCTION public.get_actions_v3 TO your_app_user;
 
 -- ============================================
 -- END OF MIGRATION
