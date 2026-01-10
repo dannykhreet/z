@@ -37,24 +37,8 @@ END $$;
 -- ============================================
 -- STEP 2: Update get_actions_v3 stored procedure
 -- ============================================
--- CHANGES MADE TO get_actions_v3:
---   1. Added _sortby parameter (text, default: 'duedate') - determines which column to sort by
---   2. Added _sortdirection parameter (text, default: 'asc') - determines sort direction (asc/desc)
---   3. Added 'priority' column to RETURNS TABLE definition
---   4. Added AA.priority to SELECT statement
---   5. Replaced fixed ORDER BY clause with dynamic sorting logic supporting:
---      - id: Sort by action ID
---      - name/description: Sort by action description
---      - duedate: Sort by due date (default)
---      - startdate: Sort by created_at date
---      - modifiedat/modificationdate: Sort by modified_at timestamp
---      - areaname/area: Sort by assigned area name
---      - username/user: Sort by assigned user name
---      - lastcommentdate/recentchat: Sort by most recent comment date
---      - priority: Sort by priority level (1=Critical, 2=High, 3=Normal, 4=Low)
---   6. Backwards compatible with old parameter names (recentchat→lastcommentdate, user→username, etc.)
---   7. All NULL values sorted to end (NULLS LAST) for consistent behavior
---   8. Maintains secondary sort by is_resolved, due_date, modified_at for consistent ordering
+-- Added: _sortby and _sortdirection parameters, priority column in return table and SELECT
+-- Updated: ORDER BY clause now supports dynamic sorting by specified column and direction
 -- ============================================
 
 CREATE OR REPLACE FUNCTION public.get_actions_v3(
@@ -325,27 +309,16 @@ BEGIN
             )
         )) --filter on tags end
     ORDER BY
-        -- Priority: 1=Critical, 2=High, 3=Normal, 4=Low (lower number = higher priority)
         CASE WHEN LOWER(_sortby) = 'priority' AND LOWER(_sortdirection) = 'desc' THEN AA.priority END DESC NULLS LAST,
         CASE WHEN LOWER(_sortby) = 'priority' AND LOWER(_sortdirection) = 'asc' THEN AA.priority END ASC NULLS LAST,
-
-        -- ID sorting
         CASE WHEN LOWER(_sortby) = 'id' AND LOWER(_sortdirection) = 'desc' THEN AA.id END DESC NULLS LAST,
         CASE WHEN LOWER(_sortby) = 'id' AND LOWER(_sortdirection) = 'asc' THEN AA.id END ASC NULLS LAST,
-
-        -- Name/Description sorting
         CASE WHEN LOWER(_sortby) IN ('name', 'description') AND LOWER(_sortdirection) = 'desc' THEN AA.description END DESC NULLS LAST,
         CASE WHEN LOWER(_sortby) IN ('name', 'description') AND LOWER(_sortdirection) = 'asc' THEN AA.description END ASC NULLS LAST,
-
-        -- Start Date (created_at) sorting
         CASE WHEN LOWER(_sortby) = 'startdate' AND LOWER(_sortdirection) = 'desc' THEN AA.created_at END DESC NULLS LAST,
         CASE WHEN LOWER(_sortby) = 'startdate' AND LOWER(_sortdirection) = 'asc' THEN AA.created_at END ASC NULLS LAST,
-
-        -- Modified At sorting (support both 'modifiedat' and 'modificationdate')
         CASE WHEN LOWER(_sortby) IN ('modifiedat', 'modificationdate') AND LOWER(_sortdirection) = 'desc' THEN AA.modified_at END DESC NULLS LAST,
         CASE WHEN LOWER(_sortby) IN ('modifiedat', 'modificationdate') AND LOWER(_sortdirection) = 'asc' THEN AA.modified_at END ASC NULLS LAST,
-
-        -- Area Name sorting (support both 'areaname' and 'area')
         CASE WHEN LOWER(_sortby) IN ('areaname', 'area') AND LOWER(_sortdirection) = 'desc' THEN
             (SELECT AR.name FROM actions_action_assigned_areas AAAA
              INNER JOIN areas_area AR ON AR.id = AAAA.area_id
@@ -354,8 +327,6 @@ BEGIN
             (SELECT AR.name FROM actions_action_assigned_areas AAAA
              INNER JOIN areas_area AR ON AR.id = AAAA.area_id
              WHERE AAAA.action_id = AA.id LIMIT 1) END ASC NULLS LAST,
-
-        -- User Name sorting (support both 'username' and 'user')
         CASE WHEN LOWER(_sortby) IN ('username', 'user') AND LOWER(_sortdirection) = 'desc' THEN
             (SELECT CONCAT(PUF.first_name, ' ', PUF.last_name) FROM actions_action_assigned_users AAAU
              INNER JOIN profiles_user PUF ON PUF.id = AAAU.user_id
@@ -364,32 +335,23 @@ BEGIN
             (SELECT CONCAT(PUF.first_name, ' ', PUF.last_name) FROM actions_action_assigned_users AAAU
              INNER JOIN profiles_user PUF ON PUF.id = AAAU.user_id
              WHERE AAAU.action_id = AA.id LIMIT 1) END ASC NULLS LAST,
-
-        -- Last Comment Date sorting (support both 'lastcommentdate' and 'recentchat')
         CASE WHEN LOWER(_sortby) IN ('lastcommentdate', 'recentchat') AND LOWER(_sortdirection) = 'desc' THEN
             (SELECT AAC.modified_at FROM actions_actioncomment AAC
              WHERE AAC.action_id = AA.id ORDER BY modified_at DESC LIMIT 1) END DESC NULLS LAST,
         CASE WHEN LOWER(_sortby) IN ('lastcommentdate', 'recentchat') AND LOWER(_sortdirection) = 'asc' THEN
             (SELECT AAC.modified_at FROM actions_actioncomment AAC
              WHERE AAC.action_id = AA.id ORDER BY modified_at DESC LIMIT 1) END ASC NULLS LAST,
-
-        -- Due Date sorting (default when _sortby is NULL or 'duedate')
         CASE WHEN (LOWER(_sortby) = 'duedate' OR _sortby IS NULL) AND LOWER(_sortdirection) = 'desc' THEN AA.due_date END DESC NULLS LAST,
-        CASE WHEN (LOWER(_sortby) = 'duedate' OR _sortby IS NULL) AND LOWER(_sortdirection) = 'asc' THEN AA.due_date END ASC NULLS LAST,
-
-        -- Secondary sort for consistent ordering
-        AA.is_resolved ASC,
-        AA.due_date ASC NULLS LAST,
-        AA.modified_at DESC
+        CASE WHEN (LOWER(_sortby) = 'duedate' OR _sortby IS NULL) AND LOWER(_sortdirection) = 'asc' THEN AA.due_date END ASC NULLS LAST
 
     LIMIT CASE WHEN (_limit > 0) THEN _limit END
     OFFSET CASE WHEN (_offset > 0) THEN _offset END;
 END$function$;
 
 -- ============================================
--- STEP 3: Add comments and documentation
+-- STEP 3: Add function comment
 -- ============================================
-COMMENT ON FUNCTION public.get_actions_v3 IS 'Retrieves actions with comprehensive filtering and sorting capabilities. Supports sorting by: id, name, duedate, startdate, modifiedat, areaname, username, lastcommentdate, priority. Backwards compatible with old sort parameter names (recentchat, user, modificationdate, area). Added priority column and dynamic sorting in v3.1.';
+COMMENT ON FUNCTION public.get_actions_v3 IS 'Retrieves actions with filtering and sorting. Supports sorting by: id, name, duedate, startdate, modifiedat, areaname, username, lastcommentdate, priority.';
 
 -- ============================================
 -- STEP 4: Verification queries
