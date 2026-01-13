@@ -38,15 +38,5 @@ namespace EZGO.Api.Helper
                 _ => null
             };
         }
-
-        public static string ToSortString(this SortColumnTypeEnum sortColumn)
-        {
-            return sortColumn.ToString().ToLower();
-        }
-
-        public static string ToSortString(this SortColumnDirectionTypeEnum sortDirection)
-        {
-            return sortDirection == SortColumnDirectionTypeEnum.Ascending ? "asc" : "desc";
-        }
     }
 }
