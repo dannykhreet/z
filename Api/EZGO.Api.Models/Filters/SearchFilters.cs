@@ -22,8 +22,8 @@ namespace EZGO.Api.Models.Filters
         public string SearchValue { get; set; }
         public int? Limit { get; set; }
         public int? OffSet { get; set; }
-        public string SortColumn { get; set; }
-        public string SortDirection { get; set; }
+        public SortColumnTypeEnum? SortColumn { get; set; }
+        public SortColumnDirectionTypeEnum? SortDirection { get; set; }
 
     }
 }

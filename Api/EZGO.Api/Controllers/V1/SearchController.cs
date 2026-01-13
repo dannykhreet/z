@@ -193,13 +193,48 @@ namespace EZGO.Api.Controllers.V1
             var output = new SearchFilters()
             {
                 SearchValue = searchValue,
-                SortColumn = sort,
-                SortDirection = direction,
+                SortColumn = ParseSortColumn(sort),
+                SortDirection = ParseSortDirection(direction),
                 Limit = limit,
                 OffSet = offset
             };
 
             return output;
+        }
+
+        private SortColumnTypeEnum? ParseSortColumn(string sort)
+        {
+            if (string.IsNullOrWhiteSpace(sort))
+                return null;
+
+            return sort.ToLower() switch
+            {
+                "id" => SortColumnTypeEnum.Id,
+                "name" => SortColumnTypeEnum.Name,
+                "duedate" => SortColumnTypeEnum.DueDate,
+                "startdate" => SortColumnTypeEnum.StartDate,
+                "modifiedat" => SortColumnTypeEnum.ModifiedAt,
+                "areaname" => SortColumnTypeEnum.AreaName,
+                "username" => SortColumnTypeEnum.UserName,
+                "lastcommentdate" => SortColumnTypeEnum.LastCommentDate,
+                "priority" => SortColumnTypeEnum.Priority,
+                _ => null
+            };
+        }
+
+        private SortColumnDirectionTypeEnum? ParseSortDirection(string direction)
+        {
+            if (string.IsNullOrWhiteSpace(direction))
+                return null;
+
+            return direction.ToLower() switch
+            {
+                "asc" => SortColumnDirectionTypeEnum.Ascending,
+                "ascending" => SortColumnDirectionTypeEnum.Ascending,
+                "desc" => SortColumnDirectionTypeEnum.Descending,
+                "descending" => SortColumnDirectionTypeEnum.Descending,
+                _ => null
+            };
         }
     }
 }

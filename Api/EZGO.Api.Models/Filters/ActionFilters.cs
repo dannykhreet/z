@@ -30,8 +30,8 @@ namespace EZGO.Api.Models.Filters
         public int? Offset;
         public bool? AllowedOnly;
         public DateTime? Timestamp;
-        public string SortColumn { get; set; }
-        public string SortDirection { get; set; }
+        public SortColumnTypeEnum? SortColumn { get; set; }
+        public SortColumnDirectionTypeEnum? SortDirection { get; set; }
         public int[] TagIds;
 
         public bool? HasUnviewedComments { get; set; }
