@@ -1500,49 +1500,14 @@ namespace EZGO.Api.Controllers.V1
 
                 ParentAreaId = parentareaid,
 
-                SortColumn = ParseSortColumn(sort),
-                SortDirection = ParseSortDirection(direction),
+                SortColumn = SortParameterHelper.ParseSortColumn(sort),
+                SortDirection = SortParameterHelper.ParseSortDirection(direction),
 
                 Limit = limit ?? ApiSettings.DEFAULT_MAX_NUMBER_OF_ACTION_RETURN_ITEMS,
                 Offset = offset
             };
 
             return filters;
-        }
-
-        private SortColumnTypeEnum? ParseSortColumn(string sort)
-        {
-            if (string.IsNullOrWhiteSpace(sort))
-                return null;
-
-            return sort.ToLower() switch
-            {
-                "id" => SortColumnTypeEnum.Id,
-                "name" => SortColumnTypeEnum.Name,
-                "duedate" => SortColumnTypeEnum.DueDate,
-                "startdate" => SortColumnTypeEnum.StartDate,
-                "modifiedat" => SortColumnTypeEnum.ModifiedAt,
-                "areaname" => SortColumnTypeEnum.AreaName,
-                "username" => SortColumnTypeEnum.UserName,
-                "lastcommentdate" => SortColumnTypeEnum.LastCommentDate,
-                "priority" => SortColumnTypeEnum.Priority,
-                _ => null
-            };
-        }
-
-        private SortColumnDirectionTypeEnum? ParseSortDirection(string direction)
-        {
-            if (string.IsNullOrWhiteSpace(direction))
-                return null;
-
-            return direction.ToLower() switch
-            {
-                "asc" => SortColumnDirectionTypeEnum.Ascending,
-                "ascending" => SortColumnDirectionTypeEnum.Ascending,
-                "desc" => SortColumnDirectionTypeEnum.Descending,
-                "descending" => SortColumnDirectionTypeEnum.Descending,
-                _ => null
-            };
         }
         #endregion
     }
