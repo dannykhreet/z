@@ -106,12 +106,12 @@ namespace EZGO.Api.Controllers.V1
         /// <response code="401">No rights to retrieve the list of actions.</response>
         [Route("actions")]
         [HttpGet]
-        public async Task<IActionResult> GetActions([FromQuery] string filtertext, [FromQuery] bool? isresolved, [FromQuery] bool? isoverdue, [FromQuery] bool? isunresolved, 
-            [FromQuery] bool? hasunviewedcomments, [FromQuery] bool? assignedtome, [FromQuery] bool? createdByOrAssignedToMe, [FromQuery] int? createdbyid, [FromQuery] int? taskid, [FromQuery] int? tasktemplateid, 
-            [FromQuery] string tagids, [FromQuery] int? assigneduserid, [FromQuery] string assigneduserids, [FromQuery] FilterAreaTypeEnum? filterassignedareatype, [FromQuery] int? assignedareaid, 
-            [FromQuery] string assignedareaids, [FromQuery] string timestamp, [FromQuery] string createdfrom, [FromQuery] string createdto, [FromQuery] string resolvedfrom, [FromQuery] string resolvedto, 
+        public async Task<IActionResult> GetActions([FromQuery] string filtertext, [FromQuery] bool? isresolved, [FromQuery] bool? isoverdue, [FromQuery] bool? isunresolved,
+            [FromQuery] bool? hasunviewedcomments, [FromQuery] bool? assignedtome, [FromQuery] bool? createdByOrAssignedToMe, [FromQuery] int? createdbyid, [FromQuery] int? taskid, [FromQuery] int? tasktemplateid,
+            [FromQuery] string tagids, [FromQuery] int? assigneduserid, [FromQuery] string assigneduserids, [FromQuery] FilterAreaTypeEnum? filterassignedareatype, [FromQuery] int? assignedareaid,
+            [FromQuery] string assignedareaids, [FromQuery] string timestamp, [FromQuery] string createdfrom, [FromQuery] string createdto, [FromQuery] string resolvedfrom, [FromQuery] string resolvedto,
             [FromQuery] string overduefrom, [FromQuery] string overdueto, [FromQuery] string resolvedcutoffdate, [FromQuery] int? checklistid, [FromQuery] int? checklisttemplateid, [FromQuery] int? auditid, [FromQuery] int? audittemplateid, [FromQuery] int? parentareaid,
-            [FromQuery] string rangeperiod,
+            [FromQuery] string rangeperiod, [FromQuery] string sort, [FromQuery] string direction,
             [FromQuery] string include, [FromQuery] int? limit, [FromQuery] int? offset)
         {
             _manager.Culture = TranslationLanguage;
@@ -119,7 +119,7 @@ namespace EZGO.Api.Controllers.V1
 
              var filters = await GetActionFilters(filtertext, isresolved, isoverdue, isunresolved, hasunviewedcomments, assignedtome, createdByOrAssignedToMe,
                     createdbyid, taskid, tasktemplateid, tagids, assigneduserid, assigneduserids, filterassignedareatype, assignedareaid,
-                    assignedareaids, timestamp, createdfrom, createdto, resolvedfrom, resolvedto, overduefrom, overdueto, resolvedcutoffdate, checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid, limit, offset);
+                    assignedareaids, timestamp, createdfrom, createdto, resolvedfrom, resolvedto, overduefrom, overdueto, resolvedcutoffdate, checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid, sort, direction, limit, offset);
                                   
             var _companyId = await CurrentApplicationUser.GetAndSetCompanyIdAsync();
 
@@ -230,18 +230,18 @@ namespace EZGO.Api.Controllers.V1
         [Route("actions_counts")]
         [Route("actions/counts")]
         [HttpGet]
-        public async Task<IActionResult> GetActionCounts([FromQuery] string filtertext, [FromQuery] bool? isresolved, [FromQuery] bool? isoverdue, [FromQuery] bool? isunresolved, 
-            [FromQuery] bool? hasunviewedcomments, [FromQuery] bool? assignedtome, [FromQuery] bool? createdByOrAssignedToMe, [FromQuery] int? createdbyid, [FromQuery] int? taskid, [FromQuery] int? tasktemplateid, 
-            [FromQuery] string tagids, [FromQuery] int? assigneduserid, [FromQuery] string assigneduserids, [FromQuery] FilterAreaTypeEnum? filterassignedareatype, [FromQuery] int? assignedareaid, 
-            [FromQuery] string assignedareaids, [FromQuery] string timestamp, [FromQuery] string createdfrom, [FromQuery] string createdto, [FromQuery] string resolvedfrom, 
-            [FromQuery] string resolvedto, [FromQuery] string overduefrom, [FromQuery] string overdueto, [FromQuery] string resolvedcutoffdate, [FromQuery] int? checklistid, [FromQuery] int? checklisttemplateid, [FromQuery] int? auditid, [FromQuery] int? audittemplateid, [FromQuery] int? parentareaid, 
-            [FromQuery] string include, [FromQuery] int? limit, [FromQuery] int? offset)
+        public async Task<IActionResult> GetActionCounts([FromQuery] string filtertext, [FromQuery] bool? isresolved, [FromQuery] bool? isoverdue, [FromQuery] bool? isunresolved,
+            [FromQuery] bool? hasunviewedcomments, [FromQuery] bool? assignedtome, [FromQuery] bool? createdByOrAssignedToMe, [FromQuery] int? createdbyid, [FromQuery] int? taskid, [FromQuery] int? tasktemplateid,
+            [FromQuery] string tagids, [FromQuery] int? assigneduserid, [FromQuery] string assigneduserids, [FromQuery] FilterAreaTypeEnum? filterassignedareatype, [FromQuery] int? assignedareaid,
+            [FromQuery] string assignedareaids, [FromQuery] string timestamp, [FromQuery] string createdfrom, [FromQuery] string createdto, [FromQuery] string resolvedfrom,
+            [FromQuery] string resolvedto, [FromQuery] string overduefrom, [FromQuery] string overdueto, [FromQuery] string resolvedcutoffdate, [FromQuery] int? checklistid, [FromQuery] int? checklisttemplateid, [FromQuery] int? auditid, [FromQuery] int? audittemplateid, [FromQuery] int? parentareaid,
+            [FromQuery] string sort, [FromQuery] string direction, [FromQuery] string include, [FromQuery] int? limit, [FromQuery] int? offset)
         {
             _manager.Culture = TranslationLanguage;
 
             var filters = await GetActionFilters(filtertext, isresolved, isoverdue, isunresolved, hasunviewedcomments, assignedtome, createdByOrAssignedToMe,
                 createdbyid, taskid, tasktemplateid, tagids, assigneduserid, assigneduserids, filterassignedareatype, assignedareaid,
-                assignedareaids, timestamp, createdfrom, createdto, resolvedfrom, resolvedto, overduefrom, overdueto, resolvedcutoffdate, checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid, limit, offset);
+                assignedareaids, timestamp, createdfrom, createdto, resolvedfrom, resolvedto, overduefrom, overdueto, resolvedcutoffdate, checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid, sort, direction, limit, offset);
 
             if (!ActionFiltersValidators.ValidateAndClean(filters, out var messages))
             {
@@ -303,17 +303,17 @@ namespace EZGO.Api.Controllers.V1
         [Route("actions_relations")]
         [Route("actions/relations")]
         [HttpGet]
-        public async Task<IActionResult> GetActionRelations([FromQuery] string filtertext, [FromQuery] bool? isresolved, [FromQuery] bool? isoverdue, [FromQuery] bool? isunresolved, 
-            [FromQuery] bool? hasunviewedcomments, [FromQuery] bool? assignedtome, [FromQuery] bool? createdByOrAssignedToMe, [FromQuery] int? createdbyid, [FromQuery] int? taskid, [FromQuery] int? tasktemplateid, 
-            [FromQuery] string tagids, [FromQuery] int? assigneduserid, [FromQuery] string assigneduserids, [FromQuery] FilterAreaTypeEnum? filterassignedareatype, [FromQuery] int? assignedareaid, 
-            [FromQuery] string assignedareaids, [FromQuery] string timestamp, [FromQuery] string createdfrom, [FromQuery] string createdto, [FromQuery] string resolvedfrom, [FromQuery] string resolvedto, 
-            [FromQuery] string overduefrom, [FromQuery] string overdueto, [FromQuery] string resolvedcutoffdate, [FromQuery] string include, [FromQuery] int? limit, [FromQuery] int? offset)
+        public async Task<IActionResult> GetActionRelations([FromQuery] string filtertext, [FromQuery] bool? isresolved, [FromQuery] bool? isoverdue, [FromQuery] bool? isunresolved,
+            [FromQuery] bool? hasunviewedcomments, [FromQuery] bool? assignedtome, [FromQuery] bool? createdByOrAssignedToMe, [FromQuery] int? createdbyid, [FromQuery] int? taskid, [FromQuery] int? tasktemplateid,
+            [FromQuery] string tagids, [FromQuery] int? assigneduserid, [FromQuery] string assigneduserids, [FromQuery] FilterAreaTypeEnum? filterassignedareatype, [FromQuery] int? assignedareaid,
+            [FromQuery] string assignedareaids, [FromQuery] string timestamp, [FromQuery] string createdfrom, [FromQuery] string createdto, [FromQuery] string resolvedfrom, [FromQuery] string resolvedto,
+            [FromQuery] string overduefrom, [FromQuery] string overdueto, [FromQuery] string resolvedcutoffdate, [FromQuery] string sort, [FromQuery] string direction, [FromQuery] string include, [FromQuery] int? limit, [FromQuery] int? offset)
         {
             _manager.Culture = TranslationLanguage;
 
             var filters = await GetActionFilters(filtertext, isresolved, isoverdue, isunresolved, hasunviewedcomments, assignedtome, createdByOrAssignedToMe,
                 createdbyid, taskid, tasktemplateid, tagids, assigneduserid, assigneduserids, filterassignedareatype, assignedareaid,
-                assignedareaids, timestamp, createdfrom, createdto, resolvedfrom, resolvedto, overduefrom, overdueto, resolvedcutoffdate, null, null, null, null, null, limit, offset);//todo support checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid
+                assignedareaids, timestamp, createdfrom, createdto, resolvedfrom, resolvedto, overduefrom, overdueto, resolvedcutoffdate, null, null, null, null, null, sort, direction, limit, offset);//todo support checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid
 
             if (!ActionFiltersValidators.ValidateAndClean(filters, out var messages))
             {
@@ -387,7 +387,7 @@ namespace EZGO.Api.Controllers.V1
 
             var filters = await GetActionFilters(filtertext, isresolved, isoverdue, isunresolved, hasunviewedcomments, assignedtome, createdByOrAssignedToMe: true,
                 createdbyid, taskid, tasktemplateid, tagids, assigneduserid, assigneduserids, filterassignedareatype, assignedareaid,
-                assignedareaids, timestamp, createdfrom, createdto, resolvedfrom, resolvedto, overduefrom, overdueto, resolvedcutoffdate, checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid, limit, offset);//todo support checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid
+                assignedareaids, timestamp, createdfrom, createdto, resolvedfrom, resolvedto, overduefrom, overdueto, resolvedcutoffdate, checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid, null, null, limit, offset);//todo support checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid
 
             if (!ActionFiltersValidators.ValidateAndClean(filters, out var messages))
             {
@@ -457,7 +457,7 @@ namespace EZGO.Api.Controllers.V1
 
             var filters = await GetActionFilters(filtertext, isresolved, isoverdue, isunresolved, hasunviewedcomments, assignedtome, createdByOrAssignedToMe: true,
                 createdbyid, taskid, tasktemplateid, tagids, assigneduserid, assigneduserids, filterassignedareatype, assignedareaid,
-                assignedareaids, timestamp, createdfrom, createdto, resolvedfrom, resolvedto, overduefrom, overdueto, resolvedcutoffdate, checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid, limit, offset);//todo support checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid
+                assignedareaids, timestamp, createdfrom, createdto, resolvedfrom, resolvedto, overduefrom, overdueto, resolvedcutoffdate, checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid, null, null, limit, offset);//todo support checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid
 
             if (!ActionFiltersValidators.ValidateAndClean(filters, out var messages))
             {
@@ -528,7 +528,7 @@ namespace EZGO.Api.Controllers.V1
             _manager.Culture = TranslationLanguage;
 
             var filters = await GetActionFilters(filtertext, isresolved, isoverdue, isunresolved, hasunviewedcomments, assignedtome, createdByOrAssignedToMe, createdbyid: await this.CurrentApplicationUser.GetAndSetUserIdAsync(), taskid, tasktemplateid, tagids,
-            assigneduserid, assigneduserids, filterassignedareatype, assignedareaid, assignedareaids, timestamp, createdfrom, createdto, resolvedfrom, resolvedto, overduefrom, overdueto, resolvedcutoffdate, checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid, limit, offset);//todo support checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid
+            assigneduserid, assigneduserids, filterassignedareatype, assignedareaid, assignedareaids, timestamp, createdfrom, createdto, resolvedfrom, resolvedto, overduefrom, overdueto, resolvedcutoffdate, checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid, null, null, limit, offset);//todo support checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid
 
             if (!ActionFiltersValidators.ValidateAndClean(filters, out var messages))
             {
@@ -597,7 +597,7 @@ namespace EZGO.Api.Controllers.V1
             _manager.Culture = TranslationLanguage;
 
             var filters = await GetActionFilters(filtertext, isresolved, isoverdue, isunresolved, hasunviewedcomments, assignedtome, createdByOrAssignedToMe, createdbyid: await this.CurrentApplicationUser.GetAndSetUserIdAsync(), taskid, tasktemplateid, tagids,
-            assigneduserid, assigneduserids, filterassignedareatype, assignedareaid, assignedareaids, timestamp, createdfrom, createdto, resolvedfrom, resolvedto, overduefrom, overdueto, resolvedcutoffdate, checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid, limit, offset);//todo support checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid
+            assigneduserid, assigneduserids, filterassignedareatype, assignedareaid, assignedareaids, timestamp, createdfrom, createdto, resolvedfrom, resolvedto, overduefrom, overdueto, resolvedcutoffdate, checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid, null, null, limit, offset);//todo support checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid
 
             if (!ActionFiltersValidators.ValidateAndClean(filters, out var messages))
             {
@@ -668,7 +668,7 @@ namespace EZGO.Api.Controllers.V1
 
             var filters = await GetActionFilters(filtertext, isresolved, isoverdue, isunresolved, hasunviewedcomments, assignedToMe: true, createdByOrAssignedToMe,
                 createdbyid, taskid, tasktemplateid, tagids, assigneduserid, assigneduserids,
-                filterassignedareatype, assignedareaid, assignedareaids, timestamp, createdfrom, createdto, resolvedfrom, resolvedto, overduefrom, overdueto, resolvedcutoffdate, checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid, limit, offset);//todo support checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid
+                filterassignedareatype, assignedareaid, assignedareaids, timestamp, createdfrom, createdto, resolvedfrom, resolvedto, overduefrom, overdueto, resolvedcutoffdate, checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid, null, null, limit, offset);//todo support checklistid, checklisttemplateid, auditid, audittemplateid, parentareaid
 
             if (!ActionFiltersValidators.ValidateAndClean(filters, out var messages))
             {
@@ -1436,9 +1436,9 @@ namespace EZGO.Api.Controllers.V1
         /// <returns>ActionFilters object</returns>
         [NonAction]
         private async Task<ActionFilters> GetActionFilters(string filtertext, bool? isresolved, bool? isoverdue, bool? isunresolved, bool? hasunviewedcomments, bool? assignedToMe, bool? createdByOrAssignedToMe,
-            int? createdbyid, int? taskid, int? tasktemplateid, string tagids, int? assigneduserid, string assigneduserids, FilterAreaTypeEnum? filterassignedareatype, int? assignedareaid, 
+            int? createdbyid, int? taskid, int? tasktemplateid, string tagids, int? assigneduserid, string assigneduserids, FilterAreaTypeEnum? filterassignedareatype, int? assignedareaid,
             string assignedareaids, string timestamp, string createdfrom, string createdto, string resolvedfrom, string resolvedto, string overduefrom, string overdueto, string resolvedcutoffdate, int? checklistid,
-            int? checklisttemplateid, int? auditid, int? audittemplateid, int? parentareaid, int? limit, int? offset)
+            int? checklisttemplateid, int? auditid, int? audittemplateid, int? parentareaid, string sort, string direction, int? limit, int? offset)
         {
             DateTime.TryParseExact(timestamp, "dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedTimeStamp);
             DateTime.TryParseExact(createdfrom, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime createdFromTimeStamp);
@@ -1499,6 +1499,9 @@ namespace EZGO.Api.Controllers.V1
                 AuditTemplateId = audittemplateid,
 
                 ParentAreaId = parentareaid,
+
+                SortColumn = SortParameterHelper.ParseSortColumn(sort),
+                SortDirection = SortParameterHelper.ParseSortDirection(direction),
 
                 Limit = limit ?? ApiSettings.DEFAULT_MAX_NUMBER_OF_ACTION_RETURN_ITEMS,
                 Offset = offset

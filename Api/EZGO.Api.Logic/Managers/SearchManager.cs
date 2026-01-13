@@ -1,4 +1,5 @@
 ﻿using EEZGO.Api.Utils.Data;
+using EZGO.Api.Helper;
 using EZGO.Api.Interfaces.Data;
 using EZGO.Api.Interfaces.Managers;
 using EZGO.Api.Interfaces.Settings;
@@ -131,12 +132,13 @@ namespace EZGO.Api.Logic.Managers
 
                     if (filters.Value.SortColumn.HasValue)
                     {
-                        parameters.Add(new NpgsqlParameter("@_sortcolumn", filters.Value.SortColumn.ToString().ToLower()));
+                        parameters.Add(new NpgsqlParameter("@_sortcolumn", filters.Value.SortColumn.Value.ToString().ToLower()));
                     }
 
                     if (filters.Value.SortDirection.HasValue)
                     {
-                        parameters.Add(new NpgsqlParameter("@_sortdirection", filters.Value.SortDirection.ToString().ToLower()));
+                        var sortDir = filters.Value.SortDirection.Value == SortColumnDirectionTypeEnum.Ascending ? "asc" : "desc";
+                        parameters.Add(new NpgsqlParameter("@_sortdirection", sortDir));
                     }
 
                 }

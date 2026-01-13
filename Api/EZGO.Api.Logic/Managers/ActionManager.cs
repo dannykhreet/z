@@ -1,5 +1,6 @@
 ﻿using EEZGO.Api.Utils.Data;
 using EZGO.Api.Data.Enumerations;
+using EZGO.Api.Helper;
 using EZGO.Api.Interfaces.Data;
 using EZGO.Api.Interfaces.Managers;
 using EZGO.Api.Interfaces.Settings;
@@ -290,6 +291,18 @@ namespace EZGO.Api.Logic.Managers
                     if (filters.Value.Offset.HasValue && filters.Value.Offset.Value > 0)
                     {
                         parameters.Add(new NpgsqlParameter("@_offset", filters.Value.Offset.Value));
+                    }
+
+                    //sort parameters
+                    if (filters.Value.SortColumn.HasValue)
+                    {
+                        parameters.Add(new NpgsqlParameter("@_sortby", filters.Value.SortColumn.Value.ToString().ToLower()));
+                    }
+
+                    if (filters.Value.SortDirection.HasValue)
+                    {
+                        var sortDir = filters.Value.SortDirection.Value == SortColumnDirectionTypeEnum.Ascending ? "asc" : "desc";
+                        parameters.Add(new NpgsqlParameter("@_sortdirection", sortDir));
                     }
                 }
 
@@ -1594,7 +1607,6 @@ namespace EZGO.Api.Logic.Managers
             {
                 var mutated = await _manager.GetDataRowAsJson(Models.Enumerations.TableNames.actions_actioncomment.ToString(), possibleId);
                 await _dataAuditing.WriteDataAudit(original: string.Empty, mutated: mutated, Models.Enumerations.TableNames.actions_actioncomment.ToString(), objectId: possibleId, userId: userId, companyId: companyId, description: "Added actioncomment.");
-
             }
 
             return possibleId;
@@ -2807,6 +2819,12 @@ namespace EZGO.Api.Logic.Managers
                 if(dr["lastcommentdate"] != DBNull.Value)
                 {
                     action.LastCommentDate = Convert.ToDateTime(dr["lastcommentdate"]);
+                }
+            }
+            if (dr.HasColumn("priority")) {
+                if(dr["priority"] != DBNull.Value)
+                {
+                    action.Priority = (ActionPriorityEnum)Convert.ToInt32(dr["priority"]);
                 }
             }
             if (dr.HasColumn("unviewedcommentnr"))

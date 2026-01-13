@@ -1,8 +1,10 @@
 ﻿using Elastic.Apm;
 using Elastic.Apm.Api;
 using EZGO.Api.Controllers.Base;
+using EZGO.Api.Helper;
 using EZGO.Api.Interfaces.Managers;
 using EZGO.Api.Interfaces.Settings;
+using EZGO.Api.Models.Enumerations;
 using EZGO.Api.Models.Filters;
 using EZGO.Api.Security.Interfaces;
 using EZGO.Api.Utils.Json;
@@ -135,10 +137,10 @@ namespace EZGO.Api.Controllers.V1
         //search/actions
         [Route("search/actions")]
         [HttpGet]
-        public async Task<IActionResult> SearchActions([FromQuery] string searchvalue, [FromQuery] string include, [FromQuery] int? limit, [FromQuery] int? offset)
+        public async Task<IActionResult> SearchActions([FromQuery] string searchvalue, [FromQuery] string sort, [FromQuery] string direction, [FromQuery] string include, [FromQuery] int? limit, [FromQuery] int? offset)
         {
             Agent.Tracer.CurrentTransaction.StartSpan("logic.execution", ApiConstants.ActionExec);
-            var filters = GetSearchFilters();
+            var filters = GetSearchFilters(searchvalue, sort, direction, limit, offset);
 
             var result = await _manager.GetSearchResultAsync(companyId: await this.CurrentApplicationUser.GetAndSetCompanyIdAsync(), searchType: Models.Enumerations.SearchTypeEnum.Actions, userId: await this.CurrentApplicationUser.GetAndSetUserIdAsync(), include: include, filters: filters);
 
@@ -187,10 +189,17 @@ namespace EZGO.Api.Controllers.V1
         //search/audits
         //search/assessments
 
-        private SearchFilters GetSearchFilters()
+        private SearchFilters GetSearchFilters(string searchValue = null, string sort = null, string direction = null, int? limit = null, int? offset = null)
         {
-            var output = new SearchFilters();           
-            
+            var output = new SearchFilters()
+            {
+                SearchValue = searchValue,
+                SortColumn = SortParameterHelper.ParseSortColumn(sort),
+                SortDirection = SortParameterHelper.ParseSortDirection(direction),
+                Limit = limit,
+                OffSet = offset
+            };
+
             return output;
         }
     }
