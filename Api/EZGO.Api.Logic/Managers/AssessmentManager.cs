@@ -404,6 +404,16 @@ namespace EZGO.Api.Logic.Managers
                         parameters.Add(new NpgsqlParameter(@"_sortbymodifiedat", filters.Value.SortByModifiedAt.Value));
                     }
 
+                    // When IsCompleted=true, apply default sorting by completed_at DESC
+                    // This ensures the most recently completed assessments appear first
+                    // Only apply if SortByModifiedAt is not explicitly requested
+                    if ((filters.Value.SortByCompletedAt != null && filters.Value.SortByCompletedAt.Value) ||
+                        (filters.Value.IsCompleted.HasValue && filters.Value.IsCompleted.Value &&
+                         (filters.Value.SortByModifiedAt == null || !filters.Value.SortByModifiedAt.Value)))
+                    {
+                        parameters.Add(new NpgsqlParameter(@"_sortbycompletedat", true));
+                    }
+
                     if (!string.IsNullOrEmpty(filters.Value.FilterText))
                     {
                         parameters.Add(new NpgsqlParameter("@_filtertext", filters.Value.FilterText));
