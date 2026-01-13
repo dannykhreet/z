@@ -26,6 +26,7 @@ namespace EZGO.Api.Models.Filters
         public string FilterText;
 
         public bool? SortByModifiedAt;
+        public bool? SortByCompletedAt;
 
 
         public bool HasFilters()
