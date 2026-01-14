@@ -281,8 +281,8 @@ END$function$
 
 -- =============================================================================
 -- 5. NEW: export_data_assessmentinstructions_tags_overview
--- New tab for assessment instruction tags
--- Fields: InstructionTemplateId, AssessmentName, AssessmentId, InstructionName, InstructionId
+-- New tab for assessment instruction tags (based on assessment tags structure)
+-- Fields: InstructionTemplateId, AssessmentName, AssessmentId, InstructionName, InstructionId + tag fields
 -- =============================================================================
 
 CREATE OR REPLACE FUNCTION public.export_data_assessmentinstructions_tags_overview(_companyid integer, _starttimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone, _endtimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone)
@@ -312,22 +312,21 @@ BEGIN
 		date_trunc('second', timezone(_timezone, AMSI.start_at::timestamptz)::timestamp) AS StartedDateTime,
 		date_trunc('second', timezone(_timezone, AMSI.completed_at::timestamptz)::timestamp) AS DoneDateTime
 	FROM
-		assessment_skillinstructions AMSI
-		INNER JOIN assessments A ON A.id = AMSI.assessment_id AND A.company_id = _companyid
-		INNER JOIN assessment_templates AT ON AT."id" = A.assessment_template_id AND AT.company_id = _companyid
-		INNER JOIN assessment_template_skillinstructions ATSI ON ATSI.id = AMSI.assessment_template_skillinstruction_id
-		INNER JOIN workinstruction_templates WIT ON WIT.id = ATSI.workinstruction_template_id
-		INNER JOIN companies_area CA ON CA."id" = AT.area_id AND CA.company_id = _companyid
-		-- Tags are linked to the work instruction template
-		INNER JOIN tags_tag_relation TR ON TR.object_id = WIT.id AND TR.object_type = 2 AND TR.company_id = _companyid
-		INNER JOIN tags_tag T ON T."id" = TR.tag_id
+		tags_tag T
+		INNER JOIN tags_tag_relation TR ON TR.tag_id = T."id" AND TR.company_id = _companyid AND TR.assessment_id IS NOT NULL
 		INNER JOIN tags_taggroup_tags TGT ON TGT.tag_id = T."id"
 		INNER JOIN tags_taggroup TG ON TG."id" = TGT.taggroup_id
+		INNER JOIN assessments A ON A.id = TR.assessment_id AND A.company_id = _companyid
+		INNER JOIN assessment_templates AT ON AT."id" = A.assessment_template_id AND AT.company_id = _companyid
+		INNER JOIN companies_area CA ON CA."id" = AT.area_id AND CA.company_id = _companyid
+		-- Join to get instruction details for each assessment
+		INNER JOIN assessment_skillinstructions AMSI ON AMSI.assessment_id = A.id AND AMSI.company_id = _companyid AND AMSI.is_active = true
+		INNER JOIN assessment_template_skillinstructions ATSI ON ATSI.id = AMSI.assessment_template_skillinstruction_id
+		INNER JOIN workinstruction_templates WIT ON WIT.id = ATSI.workinstruction_template_id
 	WHERE
 		T.is_active = TRUE
 		AND A.is_active
 		AND A.is_completed = TRUE
-		AND AMSI.is_active
 		AND (A.completed_at >= timezone(_timezone, _starttimestamp::timestamp) OR _starttimestamp IS NULL)
 		AND (A.completed_at <= timezone(_timezone, _endtimestamp::timestamp) OR _endtimestamp IS NULL)
 	ORDER BY AT.name, WIT.name, T."name" ASC;
