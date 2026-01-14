@@ -34,31 +34,15 @@ BEGIN
 		CA.name AS AreaName, --AreaName
 
 		CONCAT(PUA.first_name, ' ',PUA.last_name)::varchar AS Assessor, --Assessor
-		-- Assessors: Get all distinct assessors from assessment_skillinstruction_items
+		-- Assessors: Get all distinct assessor names from assessment_skillinstruction_items
 		COALESCE((
-			SELECT json_agg(
-				json_build_object(
-					'Id', uu.id,
-					'Name', TRIM(BOTH FROM COALESCE(
-						NULLIF(CONCAT(uu.first_name,' ',uu.last_name),' '),
-						NULLIF(uu.username,''),
-						'User '||uu.id::text
-					)),
-					'Picture', NULLIF(uu.picture,'')
-				)
-				ORDER BY uu.id
-			)
-			FROM (
-				SELECT DISTINCT u.id, u.first_name, u.last_name, u.username, u.picture
-				FROM assessment_skillinstruction_items asii
-				JOIN profiles_user u
-					ON u.id = asii.assessor_id
-					AND u.company_id = _companyid
-				WHERE asii.company_id = _companyid
-					AND asii.assessment_id = AM.id
-					AND asii.assessor_id IS NOT NULL
-			) uu
-		)::text, '[]') AS Assessors,
+			SELECT string_agg(DISTINCT TRIM(CONCAT(u.first_name, ' ', u.last_name)), ', ' ORDER BY TRIM(CONCAT(u.first_name, ' ', u.last_name)))
+			FROM assessment_skillinstruction_items asii
+			JOIN profiles_user u ON u.id = asii.assessor_id AND u.company_id = _companyid
+			WHERE asii.company_id = _companyid
+				AND asii.assessment_id = AM.id
+				AND asii.assessor_id IS NOT NULL
+		), '') AS Assessors,
 		CONCAT(PUC.first_name, ' ',PUC.last_name)::varchar AS Assessee,--Assessee
 
 		AM.total_score AS TotalScore, --TotalScore
@@ -126,31 +110,15 @@ BEGIN
 		CA.name AS AreaName, --AreaName
 
 		CONCAT(PUA.first_name, ' ',PUA.last_name)::varchar AS Assessor, --Assessor
-		-- Assessors: Get all distinct assessors from assessment_skillinstruction_items for this instruction
+		-- Assessors: Get all distinct assessor names from assessment_skillinstruction_items for this instruction
 		COALESCE((
-			SELECT json_agg(
-				json_build_object(
-					'Id', uu.id,
-					'Name', TRIM(BOTH FROM COALESCE(
-						NULLIF(CONCAT(uu.first_name,' ',uu.last_name),' '),
-						NULLIF(uu.username,''),
-						'User '||uu.id::text
-					)),
-					'Picture', NULLIF(uu.picture,'')
-				)
-				ORDER BY uu.id
-			)
-			FROM (
-				SELECT DISTINCT u.id, u.first_name, u.last_name, u.username, u.picture
-				FROM assessment_skillinstruction_items asii
-				JOIN profiles_user u
-					ON u.id = asii.assessor_id
-					AND u.company_id = _companyid
-				WHERE asii.company_id = _companyid
-					AND asii.assessment_skillinstruction_id = AMSI.id
-					AND asii.assessor_id IS NOT NULL
-			) uu
-		)::text, '[]') AS Assessors,
+			SELECT string_agg(DISTINCT TRIM(CONCAT(u.first_name, ' ', u.last_name)), ', ' ORDER BY TRIM(CONCAT(u.first_name, ' ', u.last_name)))
+			FROM assessment_skillinstruction_items asii
+			JOIN profiles_user u ON u.id = asii.assessor_id AND u.company_id = _companyid
+			WHERE asii.company_id = _companyid
+				AND asii.assessment_skillinstruction_id = AMSI.id
+				AND asii.assessor_id IS NOT NULL
+		), '') AS Assessors,
 		CONCAT(PUC.first_name, ' ',PUC.last_name)::varchar AS Assessee,--Assessee
 
 		-- CHANGED: from created_at to start_at
