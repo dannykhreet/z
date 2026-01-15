@@ -116,9 +116,10 @@
                     <span class="badge badge-warning navbar-badge">@Model.NewComments</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                    <a href="/action?filter=unviewed" class="dropdown-item">
-                        <i class="fas fa-comments mr-2"></i>@(Model?.CmsLanguage.GetValue(LanguageKeys.Shared.NewComments, "new comments for") ?? "new comments for")
-                        <span class="float-right text-muted text-sm">@(Model.NewComments) @(Model?.CmsLanguage.GetValue(LanguageKeys.Shared.Actions, "Actions") ?? "Actions")</span>
+                    <a href="/action?filter=unviewed" class="dropdown-item" style="display: flex; align-items: center; gap: 0.5rem; white-space: normal;">
+                        <i class="fas fa-comments" style="flex-shrink: 0;"></i>
+                        <span style="flex: 1; min-width: 0;">@(Model?.CmsLanguage.GetValue(LanguageKeys.Shared.NewComments, "new comments for") ?? "new comments for")</span>
+                        <span class="text-muted text-sm" style="flex-shrink: 0; white-space: nowrap;">@(Model.NewComments) @(Model?.CmsLanguage.GetValue(LanguageKeys.Shared.Actions, "Actions") ?? "Actions")</span>
                     </a>
                 </div>
             </li>
