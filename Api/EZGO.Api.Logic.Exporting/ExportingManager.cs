@@ -1028,13 +1028,15 @@ namespace EZGO.Api.Logic.Exporting
             var parametersAssessmentItemsOverview = _dbmanager.GetBaseParameters(companyId: companyid);
             var parametersAssessmentInstructionItemsOverview = _dbmanager.GetBaseParameters(companyId: companyid);
             var parametersAssessmentTagsOverview = _dbmanager.GetBaseParameters(companyId: companyid);
-            
+            var parametersAssessmentInstructionTagsOverview = _dbmanager.GetBaseParameters(companyId: companyid);
+
             if (from.HasValue && from.Value != DateTime.MinValue)
             {
                 parametersAssessmentsOverview.Add(new NpgsqlParameter("@_starttimestamp", from.Value));
                 parametersAssessmentItemsOverview.Add(new NpgsqlParameter("@_starttimestamp", from.Value));
                 parametersAssessmentInstructionItemsOverview.Add(new NpgsqlParameter("@_starttimestamp", from.Value));
                 parametersAssessmentTagsOverview.Add(new NpgsqlParameter("@_starttimestamp", from.Value));
+                parametersAssessmentInstructionTagsOverview.Add(new NpgsqlParameter("@_starttimestamp", from.Value));
             }
 
             if (to.HasValue && to.Value != DateTime.MinValue)
@@ -1043,6 +1045,7 @@ namespace EZGO.Api.Logic.Exporting
                 parametersAssessmentItemsOverview.Add(new NpgsqlParameter("@_endtimestamp", to.Value));
                 parametersAssessmentInstructionItemsOverview.Add(new NpgsqlParameter("@_endtimestamp", to.Value));
                 parametersAssessmentTagsOverview.Add(new NpgsqlParameter("@_endtimestamp", to.Value));
+                parametersAssessmentInstructionTagsOverview.Add(new NpgsqlParameter("@_endtimestamp", to.Value));
             }
 
             output.Tables.Add(await _dbmanager.GetDataTable(procedureNameOrQuery: "export_data_assessments_overview",
@@ -1062,6 +1065,10 @@ namespace EZGO.Api.Logic.Exporting
                 output.Tables.Add(await _dbmanager.GetDataTable(procedureNameOrQuery: "export_data_assessments_tags_overview",
                                                            parameters: parametersAssessmentTagsOverview,
                                                            dataTableName: "ASSESSMENT TAGS"));
+
+                output.Tables.Add(await _dbmanager.GetDataTable(procedureNameOrQuery: "export_data_assessmentinstructions_tags_overview",
+                                                           parameters: parametersAssessmentInstructionTagsOverview,
+                                                           dataTableName: "ASSESSMENT INSTRUCTION TAGS"));
             }
 
             return output;
