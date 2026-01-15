@@ -198,6 +198,24 @@ namespace EZGO.Api.Logic.Managers
                         tagGroupLimit = 8; //default to 8 if nothing is set
                     }
                     result.TagGroupLimit = tagGroupLimit;
+
+                    //property limit
+                    var CompanyPropertyLimit = settings?.Where(x => x.SettingsKey == SettingResourceTypeEnum.COMPANY_PROPERTY_LIMIT.ToString().ToUpper())?.FirstOrDefault()?.Value;
+                    if (string.IsNullOrEmpty(CompanyPropertyLimit)) CompanyPropertyLimit = settings?.Where(x => x.SettingsKey == SettingResourceTypeEnum.GENERAL_PROPERTY_LIMIT.ToString().ToUpper())?.FirstOrDefault()?.Value;
+                    if (!int.TryParse(CompanyPropertyLimit, out int propertyLimit))
+                    {
+                        propertyLimit = 5; //default to 5 if nothing is set
+                    }
+                    result.PropertyLimit = propertyLimit;
+
+                    //open fields limit
+                    var CompanyOpenFieldsLimit = settings?.Where(x => x.SettingsKey == SettingResourceTypeEnum.COMPANY_OPEN_FIELDS_LIMIT.ToString().ToUpper())?.FirstOrDefault()?.Value;
+                    if (string.IsNullOrEmpty(CompanyOpenFieldsLimit)) CompanyOpenFieldsLimit = settings?.Where(x => x.SettingsKey == SettingResourceTypeEnum.GENERAL_OPEN_FIELDS_LIMIT.ToString().ToUpper())?.FirstOrDefault()?.Value;
+                    if (!int.TryParse(CompanyOpenFieldsLimit, out int openFieldsLimit))
+                    {
+                        openFieldsLimit = 10; //default to 10 if nothing is set
+                    }
+                    result.OpenFieldsLimit = openFieldsLimit;
                 }
             }
             catch (Exception ex)

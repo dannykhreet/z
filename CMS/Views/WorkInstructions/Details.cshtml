@@ -911,7 +911,9 @@
         ezgolist.init(
         @Model.CurrentWorkInstructionTemplate.Id,
         @Model.CurrentWorkInstructionTemplate.CompanyId,
-            'workinstruction'
+            'workinstruction',
+            null,
+            null
         );
         $('body').on('ezgolistChanged', function (e) {
             if (ezgolist._hasChanged) {

@@ -26,6 +26,12 @@
                 ezgoprops.disablePropertyAdd();
             }
         }
+        // Set property limit from settings (default to 5 if not provided)
+        if (params !== undefined && params != null && params.propertyLimit !== undefined && params.propertyLimit != null) {
+            ezgoprops.propertyLimit = params.propertyLimit;
+        } else {
+            ezgoprops.propertyLimit = 5;
+        }
         ezgoprops.load();
     },
 
@@ -138,7 +144,7 @@
             index++;
         });
 
-        if ($('#valueProps li').length < 5) {
+        if ($('#valueProps li').length < ezgoprops.propertyLimit) {
             $('#valueProps').append(ezgoprops._renderAddButton());
         }
     },

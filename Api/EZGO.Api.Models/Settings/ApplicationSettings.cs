@@ -67,7 +67,15 @@ namespace EZGO.Api.Models.Settings
         /// </summary>
         public int TagGroupLimit { get; set; }
         /// <summary>
-        /// Media locations used by application. 
+        /// Limit to the amount of properties per checklist item, audit item, and task (can be set globally and per company in management portal)
+        /// </summary>
+        public int PropertyLimit { get; set; }
+        /// <summary>
+        /// Limit to the amount of open fields per checklist and audit (can be set globally and per company in management portal)
+        /// </summary>
+        public int OpenFieldsLimit { get; set; }
+        /// <summary>
+        /// Media locations used by application.
         /// </summary>
         public MediaLocations MediaLocations { get; set; }
         /// <summary>

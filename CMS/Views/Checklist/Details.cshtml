@@ -1213,7 +1213,9 @@
         ezgolist.init(
         @Model.CurrentChecklistTemplate.Id,
         @Model.CurrentChecklistTemplate.CompanyId,
-            'checklist'
+            'checklist',
+            null,
+            @Model.ApplicationSettings.OpenFieldsLimit
         );
 
         ezgoprops.language = {
@@ -1224,6 +1226,7 @@
             proptype: 'checklist',
             templateid: @Model.CurrentChecklistTemplate.Id,
             propertiesEnabled: @(Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null && Model.ApplicationSettings.Features.AuditsPropertyValueRegistrationEnabled.HasValue ? Model.ApplicationSettings.Features.AuditsPropertyValueRegistrationEnabled.Value.ToString().ToLower() : false.ToString().ToLower()),
+            propertyLimit: @Model.ApplicationSettings.PropertyLimit
         });
 
         $('body').on('ezgolistChanged', function (e) {

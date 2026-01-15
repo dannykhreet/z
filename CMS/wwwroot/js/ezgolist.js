@@ -89,7 +89,7 @@
     //adds event handlers for some html elements
     //calls render() for a new list or 
     //load() for an existing list, based on the list id
-    init: function (id, companyid, listtype, propertyVersion) {
+    init: function (id, companyid, listtype, propertyVersion, openFieldsLimit) {
         if (typeof analytics !== 'undefined') {
             if (analytics != null) {
                 analytics.logEvent('load_templates', { name: listtype, companyid: companyid });
@@ -105,6 +105,9 @@
         ezgolist.listType = listtype;
         ezgolist.lastId = $('#itemlist').find('li[data-type="item"]').length;
         $(ezgolist.itemListSelector).empty();
+
+        // Set open fields limit from settings (default to 10 if not provided)
+        ezgolist.openFieldsLimit = (openFieldsLimit !== undefined && openFieldsLimit != null) ? openFieldsLimit : 10;
 
         //determine if background for stages should be displayed
         ezgolist.liClass = (ezgolist.listType == 'checklist') ? 'template-item' : 'list-inline-item pb-3';
@@ -3339,7 +3342,7 @@
 
                 $(ezgolist.openFieldsSelector).prepend(allfields);
 
-                if (ezgolist.tmpl.OpenFieldsProperties.length == 10) {
+                if (ezgolist.tmpl.OpenFieldsProperties.length >= ezgolist.openFieldsLimit) {
                     $('[data-containertype="add_open_field_container"]').hide();
                 }
                 else {
@@ -3450,7 +3453,7 @@
         }
         else {
             ezgolist.clearAndContinueOpenFieldModal();
-            if (ezgolist.tmpl.OpenFieldsProperties.length == 10) {
+            if (ezgolist.tmpl.OpenFieldsProperties.length >= ezgolist.openFieldsLimit) {
                 $('#btnSaveCloseOpenField').hide();
                 $('#btnSaveOpenField').hide();
                 $('#editOpenFieldModal').modal('hide');

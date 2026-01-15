@@ -1201,7 +1201,9 @@
         ezgolist.init(
             @Model.CurrentAudit.Id,
             @Model.CurrentAudit.CompanyId,
-            'audit'
+            'audit',
+            null,
+            @Model.ApplicationSettings.OpenFieldsLimit
         );
 
         ezgoprops.language = {
@@ -1212,6 +1214,7 @@
             proptype: 'audit',
             templateid: @Model.CurrentAudit.Id,
             propertiesEnabled: @(Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null && Model.ApplicationSettings.Features.AuditsPropertyValueRegistrationEnabled.HasValue ? Model.ApplicationSettings.Features.AuditsPropertyValueRegistrationEnabled.Value.ToString().ToLower() : false.ToString().ToLower()),
+            propertyLimit: @Model.ApplicationSettings.PropertyLimit
         });
 
         $('body').on('ezgolistChanged', function (e) {
