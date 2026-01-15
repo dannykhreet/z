@@ -1112,7 +1112,8 @@
             proptype: 'task',
             templateid: @Model.CurrentTaskTemplate?.Id,
             propertiesEnabled: @(Model.ApplicationSettings != null && Model.ApplicationSettings.Features != null && Model.ApplicationSettings.Features.AuditsPropertyValueRegistrationEnabled.HasValue ? Model.ApplicationSettings.Features.AuditsPropertyValueRegistrationEnabled.Value.ToString().ToLower() : false.ToString().ToLower()),
-            propertyStructureVersion: @Model.PropertyStructureVersion
+            propertyStructureVersion: @Model.PropertyStructureVersion,
+            propertyLimit: @Model.ApplicationSettings.PropertyLimit
         });
 
         $('body').on('ezgolistChanged', function (e) {

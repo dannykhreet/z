@@ -27,5 +27,13 @@ namespace EZGO.Api.Models.Enumerations
         COMPANY_TAGGROUP_LIMIT = 76,
 
         GENERAL_TAGGROUP_LIMIT = 77,
+
+        COMPANY_PROPERTY_LIMIT = 78,
+
+        GENERAL_PROPERTY_LIMIT = 79,
+
+        COMPANY_OPEN_FIELDS_LIMIT = 80,
+
+        GENERAL_OPEN_FIELDS_LIMIT = 81,
     }
 }
