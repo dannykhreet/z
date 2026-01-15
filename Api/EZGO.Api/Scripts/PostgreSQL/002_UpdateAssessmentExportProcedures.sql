@@ -1,22 +1,22 @@
 -- Assessment Export Stored Procedures Update
 -- This script updates existing export procedures and creates a new one for assessment instruction tags
 --
--- Changes:
--- 1. export_data_assessments_overview: Add Assessor(s) column, change Started fields from created_at to start_at
--- 2. export_data_assessmentitems_overview: Add Assessors column, change Started fields from created_at to start_at
--- 3. export_data_assessmentinstructionitems_overview: Replace Started/Done with MarkedOn (completed_at)
--- 4. export_data_assessments_tags_overview: Add AssessmentId, filter only completed assessments
+-- Changes (BACKWARDS COMPATIBLE - new columns added at end):
+-- 1. export_data_assessments_overview: Add Assessor(s) column at end, change Started fields from created_at to start_at
+-- 2. export_data_assessmentitems_overview: Add Assessors column at end, change Started fields from created_at to start_at
+-- 3. export_data_assessmentinstructionitems_overview: Add MarkedOn fields at end (keep Started/Done for compatibility)
+-- 4. export_data_assessments_tags_overview: Add AssessmentId at end, filter only completed assessments
 -- 5. NEW: export_data_assessmentinstructions_tags_overview: Tags for assessment instructions
 
 -- =============================================================================
 -- 1. UPDATE export_data_assessments_overview
--- Add "Assessor(s)" column between Assessor and Assessee
+-- Add "Assessor(s)" column at END (backwards compatible)
 -- Change "Started..." fields from created_at to start_at
 -- =============================================================================
 DROP FUNCTION public.export_data_assessments_overview(int4, timestamp, timestamp);
 
 CREATE OR REPLACE FUNCTION public.export_data_assessments_overview(_companyid integer, _starttimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone, _endtimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone)
- RETURNS TABLE("AssessmentID" integer, "AssessmentTemplateID" integer, "Assessment Name" character varying, "NrOfAssessmentInstructions" integer, "AreaID" integer, "AreaName" character varying, "Assessor" character varying,"Assessor(s)" text, "Assessee" character varying, "TotalScore" integer, "AverageScore" double precision, "StartedDateTime" timestamp without time zone, "StartedDate" date, "StartedTime" character varying, "StartedWeekDay" integer, "StartedWeekNr" integer, "StartedMonth" integer, "StartedYear" integer, "DoneDateTime" timestamp without time zone, "DoneDate" date, "DoneTime" character varying, "DoneWeekDay" integer, "DoneWeekNr" integer, "DoneMonth" integer, "DoneYear" integer)
+ RETURNS TABLE("AssessmentID" integer, "AssessmentTemplateID" integer, "Assessment Name" character varying, "NrOfAssessmentInstructions" integer, "AreaID" integer, "AreaName" character varying, "Assessor" character varying, "Assessee" character varying, "TotalScore" integer, "AverageScore" double precision, "StartedDateTime" timestamp without time zone, "StartedDate" date, "StartedTime" character varying, "StartedWeekDay" integer, "StartedWeekNr" integer, "StartedMonth" integer, "StartedYear" integer, "DoneDateTime" timestamp without time zone, "DoneDate" date, "DoneTime" character varying, "DoneWeekDay" integer, "DoneWeekNr" integer, "DoneMonth" integer, "DoneYear" integer, "Assessor(s)" text)
  LANGUAGE plpgsql
  STABLE
 AS $function$
@@ -34,19 +34,12 @@ BEGIN
 		CA.name AS AreaName, --AreaName
 
 		CONCAT(PUA.first_name, ' ',PUA.last_name)::varchar AS Assessor, --Assessor
-	 	COALESCE((
-			SELECT string_agg(DISTINCT TRIM(CONCAT(u.first_name, ' ', u.last_name)), ', ' ORDER BY TRIM(CONCAT(u.first_name, ' ', u.last_name)))
-			FROM assessment_skillinstruction_items asii
-			JOIN profiles_user u ON u.id = asii.assessor_id AND u.company_id = _companyid
-			WHERE asii.company_id = _companyid
-				AND asii.assessment_id = AM.id
-				AND asii.assessor_id IS NOT NULL
-		), '') AS "Assessor(s)",
 		CONCAT(PUC.first_name, ' ',PUC.last_name)::varchar AS Assessee,--Assessee
 
 		AM.total_score AS TotalScore, --TotalScore
 		(AM.calculated_score)::float AS AverageScore,--AverageScore
 
+		-- CHANGED: from created_at to MIN(start_at) from assessment_skillinstructions using LATERAL join
 		date_trunc('second', timezone(_timezone, ASI_START.start_at::timestamptz)::timestamp) AS StartedDateTime, --StartedDateTime
 		timezone(_timezone, ASI_START.start_at::timestamptz)::date AS StartedDate, --StartedDate
 		TO_CHAR(timezone(_timezone, ASI_START.start_at::timestamptz), 'HH24:MI')::varchar AS StartedTime, --StartedTime
@@ -61,7 +54,17 @@ BEGIN
 		TO_CHAR(timezone(_timezone, AM.completed_at::timestamptz), 'D')::int AS DoneWeekDay, --DoneWeekDay
 		TO_CHAR(timezone(_timezone, AM.completed_at::timestamptz), 'IW')::int As DoneWeekNr, --DoneWeekNr
 		TO_CHAR(timezone(_timezone, AM.completed_at::timestamptz), 'MM')::int As DoneMonth, --DoneMonth
-		TO_CHAR(timezone(_timezone, AM.completed_at::timestamptz), 'YYYY')::int As DoneYear --DoneYear
+		TO_CHAR(timezone(_timezone, AM.completed_at::timestamptz), 'YYYY')::int As DoneYear, --DoneYear
+
+		-- NEW: Assessor(s) column added at end for backwards compatibility
+		COALESCE((
+			SELECT string_agg(DISTINCT TRIM(CONCAT(u.first_name, ' ', u.last_name)), ', ' ORDER BY TRIM(CONCAT(u.first_name, ' ', u.last_name)))
+			FROM assessment_skillinstruction_items asii
+			JOIN profiles_user u ON u.id = asii.assessor_id AND u.company_id = _companyid
+			WHERE asii.company_id = _companyid
+				AND asii.assessment_id = AM.id
+				AND asii.assessor_id IS NOT NULL
+		), '') AS "Assessor(s)"
 		FROM assessments AM
 		INNER JOIN assessment_templates AMT ON AMT.id = AM.assessment_template_id
 		INNER JOIN companies_area CA ON CA.id = AMT.area_id
@@ -84,13 +87,13 @@ END$function$
 
 -- =============================================================================
 -- 2. UPDATE export_data_assessmentitems_overview (ASSESSMENT INSTRUCTIONS)
--- Add "Assessors" column
+-- Add "Assessors" column at END (backwards compatible)
 -- Change "Started..." fields from created_at to start_at
 -- =============================================================================
- DROP FUNCTION public.export_data_assessmentitems_overview(int4, timestamp, timestamp);
+DROP FUNCTION public.export_data_assessmentitems_overview(int4, timestamp, timestamp);
 
 CREATE OR REPLACE FUNCTION public.export_data_assessmentitems_overview(_companyid integer, _starttimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone, _endtimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone)
- RETURNS TABLE("AssessmentID" integer, "AssessmentTemplateID" integer, "Assessment Name" character varying, "NrOfInstructionItems" integer, "AreaID" integer, "AreaName" character varying, "Assessor" character varying, "Assessors" text, "Assessee" character varying, "StartedDateTime" timestamp without time zone, "StartedDate" date, "StartedTime" character varying, "StartedWeekDay" integer, "StartedWeekNr" integer, "StartedMonth" integer, "StartedYear" integer, "DoneDateTime" timestamp without time zone, "DoneDate" date, "DoneTime" character varying, "DoneWeekDay" integer, "DoneWeekNr" integer, "DoneMonth" integer, "DoneYear" integer, "InstructionID" integer, "InstructionTemplateID" integer, "AssessmentInstructionName" character varying, "TotalScore" integer, "AverageScore" double precision)
+ RETURNS TABLE("AssessmentID" integer, "AssessmentTemplateID" integer, "Assessment Name" character varying, "NrOfInstructionItems" integer, "AreaID" integer, "AreaName" character varying, "Assessor" character varying, "Assessee" character varying, "StartedDateTime" timestamp without time zone, "StartedDate" date, "StartedTime" character varying, "StartedWeekDay" integer, "StartedWeekNr" integer, "StartedMonth" integer, "StartedYear" integer, "DoneDateTime" timestamp without time zone, "DoneDate" date, "DoneTime" character varying, "DoneWeekDay" integer, "DoneWeekNr" integer, "DoneMonth" integer, "DoneYear" integer, "InstructionID" integer, "InstructionTemplateID" integer, "AssessmentInstructionName" character varying, "TotalScore" integer, "AverageScore" double precision, "Assessors" text)
  LANGUAGE plpgsql
  STABLE
 AS $function$
@@ -108,17 +111,9 @@ BEGIN
 		CA.name AS AreaName, --AreaName
 
 		CONCAT(PUA.first_name, ' ',PUA.last_name)::varchar AS Assessor, --Assessor
-
-		COALESCE((
-			SELECT string_agg(DISTINCT TRIM(CONCAT(u.first_name, ' ', u.last_name)), ', ' ORDER BY TRIM(CONCAT(u.first_name, ' ', u.last_name)))
-			FROM assessment_skillinstruction_items asii
-			JOIN profiles_user u ON u.id = asii.assessor_id AND u.company_id = _companyid
-			WHERE asii.company_id = _companyid
-				AND asii.assessment_skillinstruction_id = AMSI.id
-				AND asii.assessor_id IS NOT NULL
-		), '') AS Assessors,
 		CONCAT(PUC.first_name, ' ',PUC.last_name)::varchar AS Assessee,--Assessee
 
+		-- CHANGED: from created_at to start_at
 		date_trunc('second', timezone(_timezone, AMSI.start_at::timestamptz)::timestamp) AS StartedDateTime, --StartedDateTime
 		timezone(_timezone, AMSI.start_at::timestamptz)::date AS StartedDate, --StartedDate
 		TO_CHAR(timezone(_timezone, AMSI.start_at::timestamptz), 'HH24:MI')::varchar AS StartedTime, --StartedTime
@@ -134,12 +129,23 @@ BEGIN
 		TO_CHAR(timezone(_timezone, AMSI.completed_at::timestamptz), 'IW')::int As DoneWeekNr, --DoneWeekNr
 		TO_CHAR(timezone(_timezone, AMSI.completed_at::timestamptz), 'MM')::int As DoneMonth, --DoneMonth
 		TO_CHAR(timezone(_timezone, AMSI.completed_at::timestamptz), 'YYYY')::int As DoneYear, --DoneYear
+
 		AMSI.id AS InstructionID, --InstructionID
 		ATSI.workinstruction_template_id AS InstructionTemplateID, --InstructionTemplateID
 		WIT.name AS AssessmentInstructionName, --AssessmentInstructionName
 		AMSI.total_score AS TotalScore, --TotalScore
 		(ROUND((AMSI.total_score / CASE WHEN ((SELECT COUNT(AMSII.id) FROM assessment_skillinstruction_items AMSII WHERE AMSII.assessment_skillinstruction_id = AMSI.id)) != 0 THEN ((SELECT COUNT(AMSII.id) FROM assessment_skillinstruction_items AMSII WHERE AMSII.assessment_skillinstruction_id = AMSI.id)::float) ELSE 1 END
-		)::numeric, 2))::float AS AverageScore--AverageScore
+		)::numeric, 2))::float AS AverageScore, --AverageScore
+
+		-- NEW: Assessors column added at end for backwards compatibility
+		COALESCE((
+			SELECT string_agg(DISTINCT TRIM(CONCAT(u.first_name, ' ', u.last_name)), ', ' ORDER BY TRIM(CONCAT(u.first_name, ' ', u.last_name)))
+			FROM assessment_skillinstruction_items asii
+			JOIN profiles_user u ON u.id = asii.assessor_id AND u.company_id = _companyid
+			WHERE asii.company_id = _companyid
+				AND asii.assessment_skillinstruction_id = AMSI.id
+				AND asii.assessor_id IS NOT NULL
+		), '') AS Assessors
 	FROM assessment_skillinstructions AMSI
 		INNER JOIN assessments AM ON AM.id = AMSI.assessment_id
 		INNER JOIN assessment_templates AMT ON AMT.id = AMSI.assessment_template_id
@@ -159,12 +165,12 @@ END$function$
 
 -- =============================================================================
 -- 3. UPDATE export_data_assessmentinstructionitems_overview
--- Replace "Started..." and "Done..." fields with single "MarkedOn" field (completed_at)
+-- Keep original Started/Done columns, ADD MarkedOn columns at END (backwards compatible)
 -- =============================================================================
 DROP FUNCTION public.export_data_assessmentinstructionitems_overview(int4, timestamp, timestamp);
 
 CREATE OR REPLACE FUNCTION public.export_data_assessmentinstructionitems_overview(_companyid integer, _starttimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone, _endtimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone)
- RETURNS TABLE("AssessmentID" integer, "AssessmentTemplateID" integer, "Assessment Name" character varying, "InstructionID" integer, "InstructionTemplateID" integer, "AssessmentInstructionName" character varying, "AreaID" integer, "AreaName" character varying, "Assessor" character varying, "Assessee" character varying, "MarkedOnDateTime" timestamp without time zone, "MarkedOnDate" date, "MarkedOnTime" character varying, "MarkedOnWeekDay" integer, "MarkedOnWeekNr" integer, "MarkedOnMonth" integer, "MarkedOnYear" integer, "ItemID" integer, "ItemTemplateID" integer, "ItemName" character varying, "Score" integer)
+ RETURNS TABLE("AssessmentID" integer, "AssessmentTemplateID" integer, "Assessment Name" character varying, "InstructionID" integer, "InstructionTemplateID" integer, "AssessmentInstructionName" character varying, "AreaID" integer, "AreaName" character varying, "Assessor" character varying, "Assessee" character varying, "StartedDateTime" timestamp without time zone, "StartedDate" date, "StartedTime" character varying, "StartedWeekDay" integer, "StartedWeekNr" integer, "StartedMonth" integer, "StartedYear" integer, "DoneDateTime" timestamp without time zone, "DoneDate" date, "DoneTime" character varying, "DoneWeekDay" integer, "DoneWeekNr" integer, "DoneMonth" integer, "DoneYear" integer, "ItemID" integer, "ItemTemplateID" integer, "ItemName" character varying, "Score" integer, "MarkedOnDateTime" timestamp without time zone, "MarkedOnDate" date, "MarkedOnTime" character varying, "MarkedOnWeekDay" integer, "MarkedOnWeekNr" integer, "MarkedOnMonth" integer, "MarkedOnYear" integer)
  LANGUAGE plpgsql
  STABLE
 AS $function$
@@ -186,19 +192,37 @@ BEGIN
 		CONCAT(PUA.first_name, ' ',PUA.last_name)::varchar AS Assessor, --Assessor
 		CONCAT(PUC.first_name, ' ',PUC.last_name)::varchar AS Assessee,--Assessee
 
+		-- Keep original Started fields (from AMSI.created_at) for backwards compatibility
+		date_trunc('second', timezone(_timezone, AMSI.created_at::timestamptz)::timestamp) AS StartedDateTime, --StartedDateTime
+		timezone(_timezone, AMSI.created_at::timestamptz)::date AS StartedDate, --StartedDate
+		TO_CHAR(timezone(_timezone, AMSI.created_at::timestamptz), 'HH24:MI')::varchar AS StartedTime, --StartedTime
+		TO_CHAR(timezone(_timezone, AMSI.created_at::timestamptz), 'D')::int AS StartedWeekDay, --StartedWeekDay
+		TO_CHAR(timezone(_timezone, AMSI.created_at::timestamptz), 'IW')::int As StartedWeekNr, --StartedWeekNr
+		TO_CHAR(timezone(_timezone, AMSI.created_at::timestamptz), 'MM')::int As StartedMonth, --StartedMonth
+		TO_CHAR(timezone(_timezone, AMSI.created_at::timestamptz), 'YYYY')::int As StartedYear, --StartedYear
 
+		-- Keep original Done fields (from AMSI.completed_at) for backwards compatibility
+		date_trunc('second', timezone(_timezone, AMSI.completed_at::timestamptz)::timestamp) AS DoneDateTime, --DoneDateTime
+		timezone(_timezone, AMSI.completed_at::timestamptz)::date AS DoneDate, --DoneDate
+		TO_CHAR(timezone(_timezone, AMSI.completed_at::timestamptz), 'HH24:MI')::varchar AS DoneTime, --DoneTime
+		TO_CHAR(timezone(_timezone, AMSI.completed_at::timestamptz), 'D')::int AS DoneWeekDay, --DoneWeekDay
+		TO_CHAR(timezone(_timezone, AMSI.completed_at::timestamptz), 'IW')::int As DoneWeekNr, --DoneWeekNr
+		TO_CHAR(timezone(_timezone, AMSI.completed_at::timestamptz), 'MM')::int As DoneMonth, --DoneMonth
+		TO_CHAR(timezone(_timezone, AMSI.completed_at::timestamptz), 'YYYY')::int As DoneYear, --DoneYear
+
+		AMSII.id AS ItemID, --ItemID
+		AMSII.workinstruction_template_item_id AS ItemTemplateID, --ItemTemplateID
+		WITI.name AS ItemName, --ItemName
+		AMSII.score AS Score,
+
+		-- NEW: MarkedOn fields added at end for backwards compatibility (using AMSII.completed_at)
 		date_trunc('second', timezone(_timezone, AMSII.completed_at::timestamptz)::timestamp) AS MarkedOnDateTime, --MarkedOnDateTime
 		timezone(_timezone, AMSII.completed_at::timestamptz)::date AS MarkedOnDate, --MarkedOnDate
 		TO_CHAR(timezone(_timezone, AMSII.completed_at::timestamptz), 'HH24:MI')::varchar AS MarkedOnTime, --MarkedOnTime
 		TO_CHAR(timezone(_timezone, AMSII.completed_at::timestamptz), 'D')::int AS MarkedOnWeekDay, --MarkedOnWeekDay
 		TO_CHAR(timezone(_timezone, AMSII.completed_at::timestamptz), 'IW')::int As MarkedOnWeekNr, --MarkedOnWeekNr
 		TO_CHAR(timezone(_timezone, AMSII.completed_at::timestamptz), 'MM')::int As MarkedOnMonth, --MarkedOnMonth
-		TO_CHAR(timezone(_timezone, AMSII.completed_at::timestamptz), 'YYYY')::int As MarkedOnYear, --MarkedOnYear
-
-		AMSII.id AS ItemID, --ItemID
-		AMSII.workinstruction_template_item_id AS ItemTemplateID, --ItemTemplateID
-		WITI.name AS ItemName, --ItemName
-		AMSII.score AS Score
+		TO_CHAR(timezone(_timezone, AMSII.completed_at::timestamptz), 'YYYY')::int As MarkedOnYear --MarkedOnYear
 	FROM assessment_skillinstruction_items AMSII
 		INNER JOIN assessment_skillinstructions AMSI ON AMSI.id = AMSII.assessment_skillinstruction_id
 		INNER JOIN assessments AM ON AM.id = AMSI.assessment_id
@@ -220,13 +244,13 @@ END$function$
 
 -- =============================================================================
 -- 4. UPDATE export_data_assessments_tags_overview
--- Add AssessmentId column
+-- Add AssessmentId column at END (backwards compatible)
 -- Filter to only return tags for COMPLETED assessments
 -- =============================================================================
 DROP FUNCTION public.export_data_assessments_tags_overview(int4, timestamp, timestamp);
 
 CREATE OR REPLACE FUNCTION public.export_data_assessments_tags_overview(_companyid integer, _starttimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone, _endtimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone)
- RETURNS TABLE("AssessmentId" integer, "TagId" integer, "TagName" character varying, "IsSystemTag" boolean, "IsHoldingTag" boolean, "TagGroupId" integer, "TagGroupName" character varying, "AssessmentTemplateId" integer, "AssessmentTemplateName" character varying, "AreaId" integer, "AreaName" character varying, "StartedDateTime" timestamp without time zone, "DoneDateTime" timestamp without time zone)
+ RETURNS TABLE("TagId" integer, "TagName" character varying, "IsSystemTag" boolean, "IsHoldingTag" boolean, "TagGroupId" integer, "TagGroupName" character varying, "AssessmentTemplateId" integer, "AssessmentTemplateName" character varying, "AreaId" integer, "AreaName" character varying, "StartedDateTime" timestamp without time zone, "DoneDateTime" timestamp without time zone, "AssessmentId" integer)
  LANGUAGE plpgsql
  STABLE
 AS $function$
@@ -236,7 +260,6 @@ BEGIN
 	SELECT get_timezone_with_company(_companyid) INTO _timezone;
 	RETURN QUERY
 	SELECT
-		A."id" AS "AssessmentId",
 		T."id" AS "TagId",
 		T."name" AS "TagName",
 		T.is_system_tag AS "IsSystemTag",
@@ -248,7 +271,9 @@ BEGIN
 		AT.area_id AS "AreaId",
 		CA."name" AS "AreaName",
 		date_trunc('second', timezone(_timezone, A.created_at::timestamptz)::timestamp) AS StartedDateTime,
-		date_trunc('second', timezone(_timezone, A.completed_at::timestamptz)::timestamp) AS DoneDateTime
+		date_trunc('second', timezone(_timezone, A.completed_at::timestamptz)::timestamp) AS DoneDateTime,
+		-- NEW: AssessmentId column added at end for backwards compatibility
+		A."id" AS "AssessmentId"
 	FROM
 		tags_tag T
 		INNER JOIN tags_tag_relation TR ON TR.tag_id = T."id" AND TR.company_id = _companyid AND TR.assessment_id IS NOT NULL
@@ -298,11 +323,11 @@ BEGIN
 		TG."id" AS "TagGroupId",
 		TG."name" AS "TagGroupName",
 		AT."id" AS "AssessmentTemplateId",
-        AT."name" AS "AssessmentTemplateName",
+		AT."name" AS "AssessmentTemplateName",
 		AT.area_id AS "AreaId",
 		CA."name" AS "AreaName",
-        date_trunc('second', timezone(_timezone, A.created_at::timestamptz)::timestamp) AS StartedDateTime,
-        date_trunc('second', timezone(_timezone, A.completed_at::timestamptz)::timestamp) AS DoneDateTime
+		date_trunc('second', timezone(_timezone, A.created_at::timestamptz)::timestamp) AS StartedDateTime,
+		date_trunc('second', timezone(_timezone, A.completed_at::timestamptz)::timestamp) AS DoneDateTime
 	FROM
 		tags_tag T
 		INNER JOIN tags_tag_relation TR ON TR.tag_id = T."id" AND TR.company_id = _companyid AND TR.assessment_id IS NOT NULL
